@@ -1,0 +1,3122 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visiekaart v4 — Fase 5: Roadmap</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display:ital@0;1&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --orange:#FAA833;--oh:#D8901E;--ol:rgba(250,168,51,0.12);--ob:rgba(250,168,51,.28);
+  --green:#BDD24D;--gl:rgba(189,210,77,0.20);--gd:#7B8E1E;
+  --coral:#F05736;--red:#E8423F;--cll:rgba(240,87,54,0.10);--cd:#B53A20;
+  --purple:#9666AA;--pl:rgba(150,102,170,0.14);
+  --teal:#2A9791;--tl:rgba(42,151,145,0.14);
+  --blue:#70A2D7;--bl:rgba(112,162,215,0.15);
+  --amber:#FAA833;--al:rgba(250,168,51,0.12);
+  --bg:#F9F8F5;--surface:#FFF;
+  --b0:rgba(0,0,0,.07);--b1:rgba(0,0,0,.11);--b2:rgba(0,0,0,.18);
+  --text:#262A36;--t2:#5A5956;--t3:#9A9894;
+  --r:10px;--rsm:6px;--rlg:16px;--rxl:22px;
+  --sh:0 1px 3px rgba(0,0,0,.07),0 4px 14px rgba(0,0,0,.05);
+  --sh-md:0 2px 8px rgba(0,0,0,.1),0 8px 24px rgba(0,0,0,.07);
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.55}
+.serif{font-family:'DM Serif Display',serif}
+
+/* ── HEADER ── */
+.hdr{background:var(--surface);border-bottom:1px solid var(--b0);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;gap:12px}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;cursor:pointer;flex-shrink:0}
+.hdr-c{display:flex;align-items:center;gap:12px;flex:1;justify-content:center;min-width:0}
+.q-steps{display:flex;gap:5px;width:180px;flex-shrink:0}
+.q-step{flex:1;height:6px;border-radius:3px;background:var(--b0);transition:background .3s}
+.q-step.done{background:var(--orange)}
+.q-step.active{background:var(--orange)}
+.phase-pill{background:var(--ol);color:var(--oh);font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;border:1px solid var(--ob);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.hdr-r{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.lang-toggle{display:flex;border:1px solid var(--b2);border-radius:var(--rsm);overflow:hidden}
+.lang-btn{padding:5px 10px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;border:none;background:transparent;cursor:pointer;color:var(--t3);letter-spacing:.04em;transition:all .13s}
+.lang-btn.on{background:var(--orange);color:#fff}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:var(--rsm);border:1px solid var(--b2);background:var(--surface);color:var(--t2);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .13s;white-space:nowrap}
+.btn:hover{background:var(--bg);color:var(--text)}
+.btn-orange{background:var(--orange);border-color:var(--oh);color:#fff;box-shadow:0 2px 8px rgba(250,168,51,.25)}
+.btn-orange:hover:not(:disabled){background:var(--oh);transform:translateY(-1px);box-shadow:0 4px 14px rgba(250,168,51,.35)}
+.btn-green{background:var(--green);border-color:var(--gd);color:#fff}
+.btn-green:hover:not(:disabled){background:var(--gd);transform:translateY(-1px)}
+.btn-ghost{border-color:var(--b1);color:var(--t3);font-size:12px}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.btn-lg{padding:11px 24px;font-size:15px;font-weight:600;border-radius:var(--r)}
+
+/* ── LAYOUT ── */
+.wrap{max-width:1060px;margin:0 auto;padding:24px 20px 100px}
+.card{background:var(--surface);border:1px solid var(--b0);border-radius:var(--rxl);padding:22px 26px;margin-bottom:14px;box-shadow:var(--sh)}
+.card-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--b0)}
+.phase-icon{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--orange),var(--oh));color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ── VISION DISPLAY ── */
+.vision-hero{background:linear-gradient(135deg,#FAA833 0%,#E8930A 100%);border-radius:var(--rxl);padding:28px 32px;margin-bottom:20px;position:relative;overflow:hidden}
+.vh-deco{position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.08)}
+.vh-deco2{position:absolute;right:40px;bottom:-30px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.05)}
+.vh-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.75);margin-bottom:8px}
+.vh-sentence{font-family:'DM Serif Display',serif;font-size:19px;line-height:1.5;color:#fff;position:relative;z-index:1}
+.vh-components{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.vh-comp{padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.18);font-size:11px;font-weight:600;color:#fff;letter-spacing:.04em;cursor:default}
+.vh-comp.active{background:rgba(255,255,255,.35)}
+
+/* ── TAB NAV ── */
+.tab-nav{display:flex;background:var(--bg);border:1px solid var(--b1);border-radius:var(--r);padding:3px;gap:2px;margin-bottom:18px;overflow-x:auto}
+.tab-btn{padding:8px 16px;border-radius:var(--rsm);font-size:13px;font-weight:500;border:none;background:transparent;cursor:pointer;color:var(--t2);transition:all .13s;white-space:nowrap;display:flex;align-items:center;gap:6px;font-family:'DM Sans',sans-serif}
+.tab-btn:hover{background:rgba(255,255,255,.6);color:var(--text)}
+.tab-btn.on{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.tab-icon{font-size:14px}
+
+/* ── GANTT ── */
+.gantt-wrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--b1)}
+.gantt-header{display:flex;background:var(--bg);border-bottom:1px solid var(--b1)}
+.gantt-label-col{width:160px;min-width:160px;padding:9px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);border-right:1px solid var(--b1)}
+.gantt-periods{flex:1;display:flex;min-width:0}
+.gantt-period{flex:1;padding:9px 4px;text-align:center;font-size:11px;font-weight:600;color:var(--t2);border-right:1px solid var(--b0)}
+.gantt-period:last-child{border-right:none}
+.gantt-row{display:flex;border-bottom:1px solid var(--b0);min-height:52px}
+.gantt-row:last-child{border-bottom:none}
+.gantt-theme-label{width:160px;min-width:160px;padding:8px 12px;display:flex;align-items:center;gap:8px;border-right:1px solid var(--b1);background:var(--surface)}
+.gtl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.gtl-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.3}
+.gantt-timeline{flex:1;position:relative;background:var(--surface);min-height:52px}
+.gantt-grid-line{position:absolute;top:0;bottom:0;width:1px;background:var(--b0)}
+.action-bar{position:absolute;top:8px;height:34px;border-radius:var(--rsm);display:flex;align-items:center;padding:0 8px;font-size:11px;font-weight:600;color:#fff;overflow:hidden;white-space:nowrap;cursor:pointer;transition:filter .13s,box-shadow .13s;user-select:none;z-index:2}
+.action-bar:hover{filter:brightness(1.1);box-shadow:0 3px 10px rgba(0,0,0,.2);z-index:3}
+.action-bar .ab-text{overflow:hidden;text-overflow:ellipsis;flex:1}
+.action-bar .ab-owner{font-size:10px;background:rgba(255,255,255,.25);border-radius:10px;padding:1px 5px;margin-left:4px;flex-shrink:0}
+.action-bar .ab-priority{font-size:9px;font-weight:700;opacity:.8;margin-left:3px;flex-shrink:0}
+.action-bar.selected-bar{outline:2.5px solid var(--text);outline-offset:2px;z-index:4}
+.edit-popover{position:absolute;background:var(--surface);border:1px solid var(--b2);border-radius:var(--r);padding:12px 14px;box-shadow:var(--sh-md);z-index:100;min-width:220px;font-size:12px}
+.ep-title{font-weight:700;margin-bottom:8px;font-size:13px}
+.ep-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+
+/* ── MATRIX ── */
+.matrix-outer{position:relative}
+.matrix-svg{width:100%;max-width:640px;display:block;margin:0 auto}
+.matrix-tooltip{position:absolute;background:var(--surface);border:1px solid var(--b2);border-radius:var(--r);padding:10px 12px;box-shadow:var(--sh-md);font-size:12px;pointer-events:none;z-index:50;max-width:220px;display:none}
+
+/* ── THEME VIEW ── */
+.theme-section{margin-bottom:18px;border:1px solid var(--b1);border-radius:var(--rlg);overflow:hidden}
+.ts-head{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--b0)}
+.ts-bubble{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+.ts-title{font-size:15px;font-weight:700}
+.ts-score{font-size:12px;color:var(--t3);margin-top:1px}
+.action-row{display:flex;align-items:flex-start;gap:12px;padding:12px 18px;border-bottom:1px solid var(--b0);transition:background .13s}
+.action-row:last-child{border-bottom:none}
+.action-row:hover{background:var(--bg)}
+.ar-rank{width:26px;height:26px;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.ar-body{flex:1;min-width:0}
+.ar-text{font-size:13px;font-weight:600;margin-bottom:5px;line-height:1.4}
+.ar-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.ar-badge{padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.ar-bar-wrap{display:flex;align-items:center;gap:8px;margin-top:6px}
+.ar-bar-bg{flex:1;height:5px;background:var(--b0);border-radius:3px;overflow:hidden}
+.ar-bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.ar-score-txt{font-size:11px;font-weight:700;white-space:nowrap}
+.ar-justif{font-size:11px;color:var(--t3);margin-top:4px;font-style:italic;line-height:1.5}
+.ar-period-badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;border:1px solid transparent;white-space:nowrap}
+
+/* ── RISK VIEW ── */
+.risk-table{width:100%;border-collapse:collapse;font-size:12px}
+.risk-table th{text-align:left;padding:8px 12px;background:var(--bg);border-bottom:2px solid var(--b1);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);white-space:nowrap}
+.risk-table td{padding:9px 12px;border-bottom:1px solid var(--b0);vertical-align:top}
+.risk-table tr:hover td{background:var(--bg)}
+.risk-bar{height:6px;border-radius:3px;background:var(--b0);overflow:hidden;width:80px}
+.risk-fill{height:100%;border-radius:3px}
+.risk-high .risk-fill{background:var(--coral)}
+.risk-med .risk-fill{background:var(--amber)}
+.risk-low .risk-fill{background:var(--green)}
+.tag-v{background:var(--gl);color:var(--gd);padding:1px 6px;border-radius:10px;font-size:10px;font-weight:600;display:inline-block;margin:1px}
+.tag-r{background:var(--cll);color:var(--cd);padding:1px 6px;border-radius:10px;font-size:10px;font-weight:600;display:inline-block;margin:1px}
+
+/* ── OWNER ASSIGNMENT ── */
+.owner-section{margin-bottom:16px;border:1px solid var(--b1);border-radius:var(--rlg);overflow:hidden}
+.owner-theme-head{padding:12px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--b0)}
+.owner-row{display:flex;align-items:center;gap:12px;padding:10px 18px;border-bottom:1px solid var(--b0)}
+.owner-row:last-child{border-bottom:none}
+.owner-num{width:22px;height:22px;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.owner-text{flex:1;font-size:13px;font-weight:500;min-width:0}
+.owner-input{padding:6px 10px;border:1.5px solid var(--b2);border-radius:var(--rsm);font-size:12px;font-family:'DM Sans',sans-serif;width:150px;transition:border-color .13s}
+.owner-input:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(250,168,51,.1)}
+.period-badge-small{font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap}
+
+/* ── FINAL CANVAS ── */
+.view-toggle{display:flex;background:var(--bg);border:1px solid var(--b2);border-radius:var(--r);padding:3px;gap:2px}
+.vt-btn{padding:7px 14px;border-radius:var(--rsm);font-size:13px;font-weight:500;border:none;background:transparent;cursor:pointer;color:var(--t2);transition:all .13s;white-space:nowrap}
+.vt-btn.on{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.canvas-wrap{background:var(--surface);border-radius:var(--rxl);border:1px solid var(--b0);box-shadow:var(--sh);overflow:hidden}
+.canvas-note{padding:11px 20px;background:var(--bg);border-top:1px solid var(--b0);font-size:12px;color:var(--t3);text-align:center}
+
+/* ── AI LOADING ── */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.ai-load{text-align:center;padding:48px 24px}
+.ai-dots{display:flex;gap:8px;justify-content:center;margin-bottom:18px}
+.ai-dot{width:10px;height:10px;border-radius:50%;background:var(--orange)}
+.ai-dot:nth-child(1){animation:pulse .9s ease-in-out infinite}
+.ai-dot:nth-child(2){animation:pulse .9s .2s ease-in-out infinite}
+.ai-dot:nth-child(3){animation:pulse .9s .4s ease-in-out infinite}
+.ai-step{font-size:13px;color:var(--t3);margin-top:8px}
+
+/* ── BOT BAR ── */
+.bot-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.93);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--b0);padding:12px 24px;display:flex;justify-content:space-between;align-items:center;z-index:100;gap:12px}
+.bot-info{font-size:13px;color:var(--t2);flex:1}
+
+/* ── SCREENS ── */
+.screen{display:none}.screen.open{display:block}
+/* ═══ VK SHARED SCROLL WRAPPER (v4b) ═══ */
+/* Lost de schermafkapping op: de inhoud van het actieve scherm scrollt nu
+   onafhankelijk binnen het zichtbare gebied, bóven de vaste bot-bar. Hierdoor
+   valt geen tekst meer weg — robuust in zowel test/preview-iframe als live. */
+.screen.open{max-height:calc(100vh - 168px);overflow-y:auto;overflow-x:hidden;padding-right:6px;scrollbar-width:thin;scrollbar-color:var(--b1) transparent}
+.screen.open::-webkit-scrollbar{width:8px}
+.screen.open::-webkit-scrollbar-track{background:transparent}
+.screen.open::-webkit-scrollbar-thumb{background:var(--b1);border-radius:4px}
+.screen.open::-webkit-scrollbar-thumb:hover{background:var(--t3)}
+body.sess-open .screen.open{max-height:calc(100vh - 250px)}
+@media(max-width:640px){.screen.open{max-height:calc(100vh - 190px)}}
+/* ═══ END VK SHARED SCROLL WRAPPER (v4b) ═══ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.anim{animation:fadeUp .3s ease forwards}
+/* v4b-fix: schermen faden zónder transform — een transform-animatie maakt het
+   scherm tot containing-block, waardoor de vaste .bot-bar in het scrollgebied
+   gevangen raakt en inhoud bedekt. Alleen schermen krijgen deze fade; de
+   slide-animatie (fadeUp) blijft voor alle overige .anim-elementen behouden. */
+@keyframes vkScreenFade{from{opacity:0}to{opacity:1}}
+.screen.anim{animation:vkScreenFade .3s ease forwards}
+
+/* ── PARTICIPANT ── */
+.pview{display:none;min-height:100vh;background:var(--bg);padding:24px 16px}
+.pview.open{display:block}
+.pcard{background:var(--surface);border-radius:var(--rxl);border:1px solid var(--b0);box-shadow:var(--sh);padding:22px;max-width:600px;margin:0 auto}
+.p-back{text-align:right;max-width:600px;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:24px;height:24px;border:2.5px solid var(--b1);border-top-color:var(--orange);border-radius:50%;animation:spin .9s linear infinite;margin:0 auto 14px}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--b0);margin:16px 0}
+
+/* ── SESSIE-INFO PANEEL ── */
+.sess-bar{background:var(--surface);border-bottom:1px solid var(--b0);padding:0 24px}
+.sess-toggle{display:flex;align-items:center;gap:8px;background:transparent;border:none;cursor:pointer;width:100%;padding:8px 0;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--t2);text-align:left}
+.sess-toggle .chev{width:11px;height:11px;transition:transform .2s;flex-shrink:0;color:var(--t3)}
+.sess-toggle[aria-expanded="true"] .chev{transform:rotate(90deg)}
+.sess-toggle .sess-mini{color:var(--t3);font-weight:500;margin-left:4px;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sess-panel{display:none;padding:6px 0 12px}
+.sess-bar.open .sess-panel{display:block}
+.sess-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:7px}
+.sess-item{display:flex;flex-direction:column;gap:1px;padding:7px 10px;background:var(--bg);border:1px solid var(--b0);border-radius:var(--rsm);min-width:0}
+.sess-k{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--t3)}
+.sess-v{font-size:12px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── INFO-ICOON + POPOVER ── */
+.info-wrap{position:relative;display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+.info-icon{width:18px;height:18px;border-radius:50%;background:var(--ol);color:var(--oh);font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid var(--ob);font-family:'DM Sans',sans-serif;line-height:1;transition:all .13s;flex-shrink:0}
+.info-icon:hover,.info-icon:focus{background:var(--orange);color:#fff;outline:none}
+.info-popover{display:none;background:var(--surface);border:1px solid var(--b1);border-radius:var(--r);padding:11px 14px;font-size:12px;line-height:1.55;color:var(--t2);box-shadow:var(--sh);margin-top:8px}
+.info-popover.open{display:block;animation:fadeUp .25s ease forwards}
+
+/* ── MODAL ── */
+.modal{display:none;position:fixed;inset:0;background:rgba(38,42,54,.55);align-items:center;justify-content:center;z-index:9000;padding:24px}
+.modal.open{display:flex;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-card{background:var(--surface);border-radius:var(--rlg);padding:26px 28px;max-width:560px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.25);max-height:84vh;overflow-y:auto}
+.modal-card h3{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);margin-bottom:12px}
+.modal-card p{font-size:13.5px;line-height:1.65;color:var(--t2);margin-bottom:10px}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+
+/* ═══ VK SHARED TIP POPUP (verenigde stijl, accent: orange voor F5) ═══ */
+.vk-tip-backdrop{display:none;position:fixed;inset:0;background:rgba(38,42,54,.55);z-index:999}
+.vk-tip-backdrop.open{display:block}
+.vk-tip-popup{display:none;position:fixed;background:var(--surface);border-radius:var(--rxl);box-shadow:0 12px 40px rgba(0,0,0,.22);z-index:1000;font-family:'DM Sans',sans-serif;animation:vkTipIn .18s ease}
+@keyframes vkTipIn{from{opacity:0;transform:translateY(6px) scale(.985)}to{opacity:1;transform:none}}
+.vk-tip-popup.open{display:flex;flex-direction:column}
+.vk-tip-popup[data-size="lg"]{top:5vh;left:50%;transform:translateX(-50%);max-width:640px;width:calc(100% - 40px);max-height:90vh;padding:32px 36px 28px}
+.vk-tip-popup[data-size="lg"].open{transform:translateX(-50%)}
+.vk-tip-popup[data-size="sm"]{max-width:340px;padding:14px 16px 12px}
+.vk-tip-popup .vk-tip-close{position:absolute;top:10px;right:12px;width:30px;height:30px;background:var(--surface);border:1px solid var(--b1);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--t2);padding:0;line-height:1;transition:all .13s}
+.vk-tip-popup .vk-tip-close:hover{background:var(--bg);color:var(--text)}
+.vk-tip-popup[data-size="sm"] .vk-tip-close{width:22px;height:22px;font-size:14px;top:6px;right:6px;border-color:var(--b0)}
+.vk-tip-popup .vk-tip-title{font-family:'DM Serif Display',serif;color:var(--text);margin:0 36px 4px 0;letter-spacing:-0.01em}
+.vk-tip-popup[data-size="lg"] .vk-tip-title{font-size:22px}
+.vk-tip-popup[data-size="sm"] .vk-tip-title{font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;margin-right:28px}
+.vk-tip-popup .vk-tip-sub{font-size:13px;color:var(--t2);margin-bottom:22px}
+.vk-tip-popup[data-size="sm"] .vk-tip-sub{display:none}
+.vk-tip-popup .vk-tip-body{color:var(--t2);line-height:1.7;overflow-y:auto}
+.vk-tip-popup[data-size="lg"] .vk-tip-body{font-size:13.5px;max-height:calc(90vh - 140px)}
+.vk-tip-popup[data-size="sm"] .vk-tip-body{font-size:12.5px;line-height:1.55}
+.vk-tip-popup .vk-tip-body p{margin:0 0 10px}
+.vk-tip-popup .vk-tip-body p:last-child{margin-bottom:0}
+.vk-tip-popup .vk-tip-h{font-size:14px;font-weight:700;color:var(--orange);margin:16px 0 5px;display:flex;align-items:center;gap:7px}
+.vk-tip-popup .vk-tip-h:first-child{margin-top:0}
+.vk-tip-popup .vk-tip-h::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--orange);flex-shrink:0}
+.vk-tip-popup .vk-tip-actions{display:flex;justify-content:flex-end;margin-top:18px}
+.vk-tip-popup[data-size="sm"] .vk-tip-actions{display:none}
+@media(max-width:520px){
+  .vk-tip-popup[data-size="sm"]{left:20px !important;right:20px !important;max-width:none;width:auto}
+  .vk-tip-popup[data-size="lg"]{padding:24px 22px 20px}
+}
+/* ═══ END VK SHARED TIP POPUP ═══ */
+
+/* ═══ VK SHARED CUMULATIVE RESULTS STYLES (F5: alle fasen samen) ═══ */
+.vk-cum-wrap{margin-top:18px;padding-top:18px;border-top:1px solid var(--b0)}
+.vk-cum-section{margin-bottom:18px}
+.vk-cum-section:last-child{margin-bottom:0}
+.vk-cum-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:8px}
+.vk-cum-stip{font-size:14.5px;line-height:1.55;color:var(--text);padding:10px 14px;background:rgba(252,196,41,.12);border-left:3px solid #FCC429;border-radius:6px}
+.vk-cum-themes{display:flex;flex-wrap:wrap;gap:6px}
+.vk-cum-theme-pill{padding:4px 10px;border-radius:14px;font-size:12px;font-weight:600;color:#fff}
+.vk-cum-vr-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.vk-cum-vr-grid{grid-template-columns:1fr}}
+.vk-cum-vr-block{padding:10px 12px;border-radius:6px;background:var(--bg);border-left:3px solid var(--b2)}
+.vk-cum-vr-block.v{border-left-color:#BDD24D}
+.vk-cum-vr-block.r{border-left-color:#E8423F}
+.vk-cum-vr-label{font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
+.vk-cum-vr-list{font-size:12.5px;color:var(--t2);line-height:1.5;padding-left:18px;margin:0}
+.vk-cum-vr-list li{list-style:disc;margin-bottom:2px}
+.vk-cum-actions-block{margin-bottom:12px;padding:10px 12px;border-radius:6px;background:var(--bg);border-left:3px solid var(--b2)}
+.vk-cum-actions-block:last-child{margin-bottom:0}
+.vk-cum-actions-theme{font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:4px}
+.vk-cum-actions-list{font-size:12.5px;color:var(--t2);line-height:1.6;padding-left:18px;margin:0}
+.vk-cum-actions-list li{list-style:disc}
+/* ═══ END VK SHARED CUMULATIVE RESULTS STYLES ═══ */
+
+/* ═══ VK SHARED FINAL ACTIONS STYLES ═══ */
+.vk-final-actions{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.vk-back-edit-btn{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;color:var(--t2)}
+.vk-back-edit-btn:hover{color:var(--text);background:var(--bg)}
+.vk-back-edit-btn svg{color:var(--t3)}
+.vk-back-edit-btn:hover svg{color:var(--text)}
+/* ═══ END VK SHARED FINAL ACTIONS STYLES ═══ */
+
+
+/* ── INTRO-CARD WAT/HOE PATTERN ── */
+.wh-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.wh-block{background:var(--bg);border:1px solid var(--b0);border-radius:var(--rlg);padding:14px 16px}
+.wh-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--oh);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.wh-title .wh-dot{width:7px;height:7px;border-radius:50%;background:var(--orange)}
+.wh-body{font-size:13px;line-height:1.6;color:var(--text)}
+
+/* ── PARTICIPANT VIEW UITBREIDING ── */
+.p-summary{background:var(--ol);border:1px solid var(--ob);border-radius:var(--r);padding:11px 14px;margin-bottom:14px;font-size:12.5px;line-height:1.55;color:var(--text)}
+.p-summary strong{color:var(--oh)}
+.p-fac{background:var(--bg);border:1px solid var(--b0);border-radius:var(--rsm);padding:9px 12px;margin-bottom:14px;font-size:12px;color:var(--t2);display:flex;align-items:center;gap:7px}
+.p-fac strong{color:var(--text);font-weight:600}
+.p-status{text-align:center;font-size:12.5px;color:var(--t3);margin-top:18px;font-style:italic}
+.p-roadmap-list{display:flex;flex-direction:column;gap:9px;margin-top:6px}
+.p-rm-item{display:flex;gap:11px;padding:11px 13px;background:var(--bg);border:1px solid var(--b0);border-radius:var(--r);align-items:flex-start}
+.p-rm-num{width:24px;height:24px;border-radius:50%;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.p-rm-body{flex:1;min-width:0}
+.p-rm-text{font-size:13px;font-weight:600;line-height:1.4;margin-bottom:4px;word-break:break-word}
+.p-rm-meta{display:flex;flex-wrap:wrap;gap:5px;font-size:10.5px}
+.p-rm-pill{padding:2px 7px;border-radius:10px;font-weight:600}
+
+@media(max-width:700px){
+  .hdr{padding:0 12px}.wrap{padding:16px 12px 90px}
+  .card{padding:16px 14px}.bot-bar{padding:10px 14px}
+  .gantt-label-col,.gantt-theme-label{width:110px;min-width:110px}
+  .vision-hero{padding:20px 20px}
+  .vh-sentence{font-size:15px}
+  .tab-btn{padding:7px 10px;font-size:12px}
+  .q-steps{width:120px}
+  .sess-bar{padding:0 12px}
+  .wh-grid{grid-template-columns:1fr}
+  .hdr-c .phase-pill{display:none}
+  .modal-card{padding:20px 18px}
+}
+
+/* ── CINAB LOGO ── */
+.logo-img{height:32px;width:auto;display:block}
+/* ═══ VK SHARED LOGO STYLES ═══ */
+.logo-img .fil-logo-main   { fill:#2A9791; }
+.logo-img .fil-logo-shadow { fill:#2A9791; filter:brightness(0.5); }
+.logo-img .fil-logo-line   { fill:none; stroke:#F7A710; stroke-width:300; stroke-miterlimit:22.9256; }
+.logo-img .fil-logo-bar    { fill:#F7A710; }
+/* ═══ END VK SHARED LOGO STYLES ═══ */
+.logo{padding-left:6px}
+
+
+/* ═══ VK FASE-EXPRESSIE VARS (fase-specifiek) ═══ */
+:root{ --fase-accent:#2C539D; --fase-accent-text:#FFFFFF; --fase-nummer:"5"; }
+
+/* ═══ VK SHARED EXPRESSIE (v1) — byte-identiek in alle fasebestanden, in één keer wijzigen ═══
+   Expressielaag conform CINAB-EXPRESSIE-STIJL: uitsluitend tokens, geen gradients,
+   geen alpha-kleurtinten, betekenis nooit alleen via kleur, reduced-motion gerespecteerd.
+   Methodiek-DNA Visiekaart: de oranje stip op de horizon + vijf vaste themakleuren. */
+:root{
+  --vk-ex-stip:#FAA833;   /* signatuurkleur: de stip op de horizon (zon) */
+  --vk-ex-line:#E5E3DB;   /* tone-on-tone watermerk- en rasterkleur */
+  --vk-ex-card:#FFFFFF;
+  --vk-ex-t1:#70A2D7;     /* thema 1 · Klantgerichtheid */
+  --vk-ex-t2:#BDD24D;     /* thema 2 · Kwaliteit & processen */
+  --vk-ex-t3:#F05736;     /* thema 3 · Medewerkers & ontwikkeling */
+  --vk-ex-t4:#9666AA;     /* thema 4 · Digitalisering */
+  --vk-ex-t5:#2A9791;     /* thema 5 · Samenwerking */
+  --vk-ex-inset:inset 0 0 0 1px rgba(0,0,0,.12); /* goedgekeurde speelstuk-schaduw */
+}
+
+/* ── E1 · fase-accent ── */
+.hdr,.header,.phdr,.print-bar{border-bottom:3px solid var(--fase-accent)}
+.phase-pill{background:var(--fase-accent);color:var(--fase-accent-text);border:1px solid var(--fase-accent)}
+.phase-num,.step-num,.phase-icon,.q-num{background:var(--fase-accent);color:var(--fase-accent-text);box-shadow:var(--vk-ex-inset)}
+
+/* ── E2 · methodiek-DNA in micro-vormen ── */
+.card,.pcard{border-left:6px solid var(--fase-accent)}
+.card-title::before{content:'';display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--vk-ex-stip);box-shadow:var(--vk-ex-inset);margin-right:7px;vertical-align:1px}
+.card-head,.q-meta{position:relative;border-bottom:2px dotted var(--vk-ex-line);padding-bottom:16px;margin-bottom:22px}
+
+/* ── F2 · themaladder als ornament op de bordlijn ── */
+.card-head::before,.q-meta::before{content:'';position:absolute;left:0;bottom:-5px;width:8px;height:8px;border-radius:50%;background:var(--vk-ex-t1);box-shadow:14px 0 0 var(--vk-ex-t2),28px 0 0 var(--vk-ex-t3),42px 0 0 var(--vk-ex-t4),56px 0 0 var(--vk-ex-t5)}
+
+/* ── E3 + F1 · watermerk en accentstreep (DM Serif Display, afsprakenblad leidend) ── */
+.phase-header{position:relative}
+/* Groot fasecijfer (Optie 1): uitsluitend op de startpagina van elke fase.
+   Fase 1-5 = introscherm (#sIntro); fase 0 = .phase-header (eigen startpagina).
+   Geen wisselende tekens (?, 123, vinkje) meer en niet meer op werkschermen,
+   dus geen overlap met fase-gegevens. */
+#sIntro .card:first-of-type{position:relative}
+#sIntro .card:first-of-type::after,.phase-header::after{content:var(--fase-nummer);position:absolute;font-family:'DM Serif Display',serif;font-weight:600;font-size:84px;line-height:1;letter-spacing:-.025em;color:var(--vk-ex-line);pointer-events:none;user-select:none;z-index:0}
+.phase-header::after{right:0;top:-10px}
+#sIntro .card:first-of-type::after{right:22px;top:16px}
+.card:first-of-type .card-head .card-title::after,.card:first-of-type .q-text::after,.phase-title::after{content:'';display:block;width:56px;height:5px;border-radius:3px;background:var(--fase-accent);margin-top:8px}
+@media(max-width:900px){#sIntro .card:first-of-type::after,.phase-header::after{display:none!important}}
+
+/* ── E4 + F3 · beweging en voortgang ── */
+.card,.pcard{transition:transform .15s ease,box-shadow .15s ease}
+.card:hover,.pcard:hover{transform:translateY(-2px);box-shadow:0 2px 5px rgba(0,0,0,.08),0 8px 22px rgba(0,0,0,.09)}
+.btn:hover:not(:disabled){transform:translateY(-1px)}
+.q-steps{align-items:center}
+.q-step{flex:0 0 11px;height:11px;border-radius:50%;background:var(--vk-ex-line);box-shadow:var(--vk-ex-inset)}
+.q-step.done{background:var(--vk-ex-stip)}
+.q-step.active{background:var(--fase-accent);box-shadow:var(--vk-ex-inset),0 0 0 2px var(--vk-ex-card),0 0 0 3px var(--fase-accent)}
+
+/* ── F4 · wachtschermen: trio speelstukken (zon + twee themacirkels) ── */
+@keyframes vkExPulse{0%,100%{opacity:1}50%{opacity:.45}}
+.wait-screen .spinner{width:16px;height:16px;border:none;border-radius:50%;background:var(--vk-ex-stip);box-shadow:var(--vk-ex-inset),12px 0 0 var(--vk-ex-t1),24px 0 0 var(--vk-ex-t2);position:relative;left:-12px;margin:0 auto 16px;animation:vkExPulse 1.6s ease-in-out infinite}
+
+/* ── F5 · rasterwatermerk + R-watermerk (alleen rapport; klassen bestaan alleen daar) ── */
+.section-head{position:relative;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Cpath d='M14 0H0v14' fill='none' stroke='%23E5E3DB' stroke-width='1'/%3E%3C/svg%3E")}
+.section-head::after{content:var(--fase-nummer);position:absolute;right:16px;top:50%;transform:translateY(-50%);font-family:'DM Serif Display',serif;font-weight:600;font-size:44px;line-height:1;color:var(--vk-ex-line);pointer-events:none;user-select:none;z-index:0}
+@media(max-width:900px){.section-head::after{display:none!important}}
+
+/* ── A11y · reduced motion ── */
+@media (prefers-reduced-motion:reduce){
+  .card,.pcard,.btn,.q-step{transition:none!important}
+  .card:hover,.pcard:hover,.btn:hover:not(:disabled){transform:none!important}
+  .wait-screen .spinner{animation:none!important}
+}
+/* ═══ END VK SHARED EXPRESSIE (v1) ═══ */
+</style>
+</head>
+<body>
+
+<!-- ═══════════ FACILITATOR ═══════════ -->
+<div id="facView">
+  <header class="hdr">
+    <div class="logo" onclick="navPhase(4)" role="button" tabindex="0" aria-label="Terug naar fase 4">
+      <svg class="logo-img" xmlns="http://www.w3.org/2000/svg" viewBox="6392 11502 7040 7040" aria-hidden="true" focusable="false">
+        <rect class="fil-logo-shadow" x="6542.13" y="11652.68" width="6840.47" height="6840.47" rx="625.64" ry="625.64"/>
+        <rect class="fil-logo-main"   x="6492.13" y="11602.68" width="6840.47" height="6840.47" rx="625.64" ry="625.64"/>
+        <path class="fil-logo-line" d="M8459.51 11340.66l6.77 2886.05c0.53,225.18 44.93,223.19 131.76,299.11 64.53,56.42 712.98,613.44 1067.73,922.39m279.67 498.36c-3.85,335.14 -17.51,1600.45 -22.09,2025.82m-1460.38 -5160.51l785.98 4.94m3662.81 274.39l-6.72 591.26 -710.88 10.16 0 978.81m-1557.05 3300.95c-5.59,-19.68 -10.23,-41.55 -13.66,-65.97 -40.62,-289.42 -55.5,-1603.06 -55.5,-1603.06m0 0l-12.4 -1458.25c0,0 -44.42,-161.55 137.32,-169.63 181.74,-8.08 658.3,-4.04 658.3,-4.04l-3.77 -1608.68m459.06 3230.04l-615.21 -562.61m1311.37 -167.26l-1179.41 -4.13m-1388.18 1333.84l1210.17 -1126.72c0,0 173.66,-113.07 201.93,-286.74 28.27,-173.67 4.04,-807.74 4.04,-807.74l1579.11 0c0,0 10.18,8.09 137.31,-44.42 53.21,-21.98 127.68,-100.56 196.29,-184.51m-4091.56 3529.88c18.68,-34.96 33.6,-74 38.36,-114.44 16.15,-137.31 24.23,-1514.5 24.23,-1514.5 0,0 -4.03,-137.32 -72.69,-185.78 -68.66,-48.46 -665.89,-556.18 -665.89,-556.18m-467.07 653.4l469.73 -451.59c0,0 69.04,-77 -2.66,-201.81m-1213.8 -2.13l1213.8 2.13 -29.21 -897.55 -563.22 -1.72m-1022.85 -1671.85l3.28 541.68c0,0 -10.23,140.69 117.67,140.69 127.9,0 600.9,26.88 600.9,26.88l-1 659.21m-302.89 299.12l-178.2 -1.97c0,0 -220.41,18.58 -300.07,-21.25 -41.28,-20.64 -175.23,-151.79 -294.75,-273.38m1035.23 -2176.98l5.68 516.43 895.89 -2.1m2.16 920.01l2255.42 21.86m-1471.05 -1258.2l-0.37 394.45 -2.13 2268.51m2268.36 -3395.11c-121.47,117.05 -302.96,241.2 -548.07,278.79m-1062.71 -1009.16l-14.83 1611m313.94 307.52l452.12 4 9.35 -663.77m8.52 -604.84l5.09 -361.34m1408.26 1081.76l-2065.77 2035.4c-50.75,50 -106.04,79.05 -108.71,151.99 -1.64,44.93 10.93,491.27 20.85,827.53m-1774.69 2623.29l879.79 0 134 0 720.63 0 30.4 0 713.76 0 217.25 0 802.66 0 0 323.39 -3498.49 0 0 -323.39z"/>
+        <rect class="fil-logo-bar" x="8158.53" y="17972.39" width="3395.02" height="332.88"/>
+      </svg>
+    </div>
+    <div class="hdr-c">
+      <div class="q-steps" id="qStepsBar" aria-label="Voortgang fasen"></div>
+      <span class="phase-pill" id="t-phasePill">Fase 5 · Roadmap</span>
+    </div>
+    <div class="hdr-r">
+      <button class="btn btn-ghost" data-env="dev-only" onclick="showPView()" id="t-pvBtn" aria-label="Open deelnemer-view">Deelnemer-view →</button>
+      <button class="btn btn-ghost" data-env="dev-only" onclick="resetDemoData()" id="t-resetBtn" aria-label="Reset demo-data" style="padding:6px 10px"><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M2 7a5 5 0 0 1 8.5-3.5L12 5M12 2v3h-3M12 7a5 5 0 0 1-8.5 3.5L2 9M2 12V9h3"/></svg></button>
+      <div class="lang-toggle" role="group" aria-label="Taalkeuze">
+        <button class="lang-btn on" id="lNL" onclick="setLang('nl')" aria-label="Nederlands">NL</button>
+        <button class="lang-btn" id="lEN" onclick="setLang('en')" aria-label="English">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══ SESSIE-INFO PANEEL ═══ -->
+  <div class="sess-bar" id="sessBar" style="display:none">
+    <button class="sess-toggle" id="sessToggle" onclick="toggleSessPanel()" aria-expanded="false" aria-controls="sessPanel">
+      <svg class="chev" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3.5 1.5L7.5 5.5L3.5 9.5"/></svg>
+      <span id="t-sessTitle">Sessie-info</span>
+      <span class="sess-mini" id="sessMini"></span>
+    </button>
+    <div class="sess-panel" id="sessPanel" role="region" aria-label="Sessiecontext">
+      <div class="sess-grid" id="sessGrid"></div>
+    </div>
+  </div>
+
+  <main class="wrap">
+
+    <!-- INTRO -->
+    <div id="sIntro" class="screen open anim">
+      <div class="card">
+        <div class="card-head">
+          <div class="phase-icon">5</div>
+          <div style="flex:1">
+            <div class="info-wrap">
+              <div style="font-family:'DM Serif Display',serif;font-size:22px;letter-spacing:-.01em" id="t-introTitle">Fase 5 — Strategische roadmap</div>
+              <span class="info-icon" onclick="event.stopPropagation();vkInfoOpen('infoIntro',this)" role="button" tabindex="0" aria-label="Uitleg over deze stap">i</span>
+            </div>
+            <div style="font-size:13px;color:var(--t2);margin-top:2px" id="t-introSub">Alle fasen samengevoegd, AI-gewogen prioritering, tijdlijn en eigenaren</div>
+          </div>
+        </div>
+        <div class="vision-hero">
+          <div class="vh-deco"></div><div class="vh-deco2"></div>
+          <div class="vh-label" id="t-visionLabel">Stip op de horizon</div>
+          <div class="vh-sentence" id="visionHero">—</div>
+          <div class="vh-components" id="visionComponents"></div>
+        </div>
+        <div class="wh-grid">
+          <div class="wh-block">
+            <div class="wh-title"><span class="wh-dot"></span><span id="t-introWhatTitle">Wat is een roadmap</span></div>
+            <div class="wh-body" id="t-introWhatBody">De roadmap vertaalt alle eerdere keuzes (visie, thema's, acties, versnellers en remmers) in een tijdgebonden uitvoeringsplan. Het is een zichtbare route die richting geeft aan dagelijkse keuzes.</div>
+          </div>
+          <div class="wh-block">
+            <div class="wh-title"><span class="wh-dot"></span><span id="t-introHowTitle">Hoe komt deze tot stand</span></div>
+            <div class="wh-body" id="t-introBody">Per actie wordt een composiet-prioriteitscore berekend op basis van thema-gewicht, visie-bijdrage, haalbaarheid en impact. Versnellers en remmers bepalen het risico en de volgorde op de tijdlijn.</div>
+          </div>
+        </div>
+        <div id="introSummary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:6px"></div>
+      </div>
+      <div class="bot-bar">
+        <div class="bot-info" id="t-introBotInfo">Alle fasen zijn voltooid, klaar om de roadmap te genereren</div>
+        <button class="btn btn-orange btn-lg" onclick="generateRoadmap()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.5" stroke="white" stroke-width="1.5"/><path d="M5.5 8l2 2 3-3" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="t-introStart">Roadmap genereren</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- AI GENERATE -->
+    <div id="sGenerate" class="screen anim">
+      <div class="card">
+        <div class="ai-load">
+          <div class="ai-dots"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>
+          <p class="serif" style="font-size:22px;margin-bottom:8px" id="t-genTitle">Roadmap wordt opgebouwd...</p>
+          <div id="aiSteps"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROADMAP MAIN -->
+    <div id="sRoadmap" class="screen anim">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div style="flex:1;min-width:200px">
+          <div class="info-wrap">
+            <div style="font-family:'DM Serif Display',serif;font-size:24px;letter-spacing:-.01em" id="t-roadmapTitle">Strategische Roadmap</div>
+            <span class="info-icon" onclick="event.stopPropagation();vkInfoOpen('infoRoadmap',this)" role="button" tabindex="0" aria-label="Uitleg over de roadmap">i</span>
+          </div>
+          <div style="font-size:13px;color:var(--t2);margin-top:2px" id="roadmapSubtitle">—</div>
+        </div>
+        <div id="contextBadges" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+      </div>
+
+      <div class="vision-hero" style="padding:18px 24px;margin-bottom:16px">
+        <div class="vh-deco"></div>
+        <div class="vh-label" id="t-visionLabel2">Stip op de horizon</div>
+        <div class="vh-sentence" id="visionInRoadmap" style="font-size:16px">—</div>
+      </div>
+
+      <div class="tab-nav" id="tabNav"></div>
+
+      <div id="tabTimeline" class="tab-pane"></div>
+      <div id="tabMatrix" class="tab-pane" style="display:none"></div>
+      <div id="tabThemes" class="tab-pane" style="display:none"></div>
+      <div id="tabRisk" class="tab-pane" style="display:none"></div>
+
+      <div class="bot-bar">
+        <div class="bot-info" id="t-roadmapBot">Bekijk de roadmap en pas aan waar nodig voordat u eigenaren koppelt</div>
+        <button class="btn btn-orange btn-lg" onclick="goScreen('sOwners')">
+          <span id="t-toOwners">Eigenaren koppelen →</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- OWNERS -->
+    <div id="sOwners" class="screen anim">
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-head">
+          <div class="phase-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><circle cx="8" cy="6" r="3"/><path d="M3 14c0-2.8 2.2-5 5-5s5 2.2 5 5"/></svg>
+          </div>
+          <div>
+            <div style="font-size:16px;font-weight:600" id="t-ownersTitle">Eigenaren koppelen aan acties</div>
+            <div style="font-size:13px;color:var(--t2);margin-top:2px" id="t-ownersSub">Eigenaren zijn verantwoordelijk voor planning, voortgang en resultaat — niet per se voor uitvoering</div>
+          </div>
+        </div>
+        <div id="ownersContent"></div>
+      </div>
+      <div class="bot-bar">
+        <div class="bot-info" id="t-ownersBot">Koppel eigenaren aan de acties — kan ook achteraf worden aangevuld</div>
+        <button class="btn btn-green btn-lg" onclick="confirmRoadmap()">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M2.5 8l4 4L12.5 3.5"/></svg>
+          <span id="t-confirmRoadmap">Roadmap definitief maken</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="sFinal" class="screen anim">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+        <div>
+          <div class="phase-pill" style="margin-bottom:6px;display:inline-flex" id="t-finalBadge">Roadmap definitief</div>
+          <h2 class="serif" style="font-size:26px;letter-spacing:-.01em" id="t-finalTitle">Roadmap vastgesteld</h2>
+        </div>
+        <div class="view-toggle">
+          <button class="vt-btn on" id="vt-roadmap" onclick="switchFinal('roadmap')"><span id="t-vtRoadmap">Roadmap</span></button>
+          <button class="vt-btn" id="vt-canvas" onclick="switchFinal('canvas')"><span id="t-vtCanvas">Visiekaart</span></button>
+        </div>
+      </div>
+      <div id="fvRoadmap"></div>
+      <!-- VK CUMULATIVE RESULTS (alle fasen) — gevuld door vkRenderCumulativeF5() -->
+      <div class="vk-cum-wrap" id="vkCumWrap"></div>
+      <div style="padding-top:14px;border-top:1px solid var(--b0);margin-top:14px">
+        <div class="vk-final-actions">
+          <button class="btn btn-ghost vk-back-edit-btn" onclick="vkBackToEdit()" type="button" id="vkBackEditBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            <span id="t-vkBackEdit">Aanpassen</span>
+          </button>
+          <button class="btn btn-orange btn-lg" onclick="goToRapport()" id="t-toRapport">
+            <span id="t-toRapportLbl">Naar rapport →</span>
+          </button>
+        </div>
+      </div>
+      <div id="fvCanvas" style="display:none">
+        <div class="canvas-wrap">
+          <div style="padding:14px 20px;border-bottom:1px solid var(--b0);display:flex;justify-content:space-between;align-items:center">
+            <span class="serif" style="font-size:15px" id="t-canvasTitle">Visiekaart — complete strategische kaart</span>
+            <span style="font-size:12px;color:var(--t3)" id="t-canvasSub">Alle thema's, acties en roadmap in één beeld</span>
+          </div>
+          <svg id="vkCanvas" viewBox="0 0 800 460" width="100%" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div class="canvas-note" id="t-canvasNote">Gefeliciteerd — de visiekaart is volledig ingevuld</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══════════ PARTICIPANT ═══════════ -->
+<div id="pView" class="pview">
+  <div class="p-back" data-env="dev-only"><button class="btn btn-ghost" onclick="hidePView()" id="t-pBack">← Facilitator-view</button></div>
+  <div class="pcard">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+      <div style="width:28px;height:28px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff">5</div>
+      <span style="font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.05em" id="t-p5phase">Fase 5 · Roadmap</span>
+    </div>
+
+    <!-- PRE-WAIT: voor de facilitator de roadmap genereert -->
+    <div id="p5PreWait" class="p-stage">
+      <div class="p-summary" id="pSummaryBlock" style="display:none">
+        <span id="pSummaryText"></span>
+      </div>
+      <div class="p-fac" id="pFacilitatorBlock" style="display:none">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="6.5" cy="4.5" r="2.5"/><path d="M2 11.5c0-2.5 2-4 4.5-4s4.5 1.5 4.5 4"/></svg>
+        <span id="t-pFacLabel">Facilitator:</span>&nbsp;<strong id="pFacName">—</strong>
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--b0);border-radius:var(--rlg);padding:13px 15px;margin-bottom:12px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--oh);margin-bottom:5px" id="t-pIntroWhatTitle">Wat is een roadmap</div>
+        <div style="font-size:12.5px;line-height:1.55;color:var(--text)" id="t-pIntroWhatBody">De roadmap vertaalt alle eerdere keuzes (visie, thema's, acties, versnellers en remmers) in een tijdgebonden uitvoeringsplan.</div>
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--b0);border-radius:var(--rlg);padding:13px 15px;margin-bottom:12px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--oh);margin-bottom:5px" id="t-pIntroHowTitle">Hoe ziet jouw rol eruit</div>
+        <div style="font-size:12.5px;line-height:1.55;color:var(--text)" id="t-pIntroHowBody">De facilitator stelt de definitieve roadmap samen op basis van eerdere fasen. Je ziet de uitkomst zodra die klaar is.</div>
+      </div>
+      <div style="display:flex;justify-content:center;margin-bottom:6px">
+        <button class="btn" onclick="openOnderbouwing()" id="pOnderbouwingBtn1" aria-label="Open onderbouwing">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="6.5" cy="6.5" r="5"/><path d="M6.5 6V9M6.5 4V4.1" stroke-linecap="round"/></svg>
+          <span id="t-pOnderbouwingBtnLabel">Onderbouwing</span>
+        </button>
+      </div>
+      <div class="p-status" id="t-pPreWaitStatus">Wachten op de facilitator…</div>
+    </div>
+
+    <!-- WAIT: tijdens generate / roadmap-opbouw -->
+    <div id="p5Wait" class="p-stage" style="display:none">
+      <div class="spinner" aria-hidden="true"></div>
+      <div style="text-align:center;font-size:13px;color:var(--t2);font-weight:600" id="t-pWaitTitle">De roadmap wordt samengesteld…</div>
+      <div style="text-align:center;font-size:12px;color:var(--t3);margin-top:4px" id="t-pWaitSub">Even geduld, dit duurt slechts een moment.</div>
+    </div>
+
+    <!-- FINAL: roadmap definitief -->
+    <div id="p5Final" class="p-stage" style="display:none">
+      <div style="background:linear-gradient(135deg,#FAA833,#D8901E);border-radius:var(--rlg);padding:14px 16px;margin-bottom:14px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.78);margin-bottom:5px" id="t-pVisionLabel">Stip op de horizon</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:14px;color:#fff;line-height:1.5" id="pVisionText">—</div>
+      </div>
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:7px" id="t-pTop5Label">Top 5 strategische acties</div>
+      <div class="p-roadmap-list" id="pRoadmapList"></div>
+      <div style="font-size:11.5px;color:var(--t3);margin-top:12px;text-align:center" id="t-pFinalNote">De volledige roadmap volgt in de rapportage.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ ONDERBOUWING MODAL ═══════════ -->
+<!-- ═══════════════ VK SHARED TIP POPUP (DOM) ═══════════════ -->
+<div id="vkTipBackdrop" class="vk-tip-backdrop" onclick="vkCloseTip()"></div>
+<div id="vkTipPopup" class="vk-tip-popup" role="dialog" aria-modal="true" aria-labelledby="vkTipTitle">
+  <button class="vk-tip-close" onclick="vkCloseTip()" aria-label="Sluiten" type="button">×</button>
+  <h3 class="vk-tip-title" id="vkTipTitle"></h3>
+  <p class="vk-tip-sub" id="vkTipSub"></p>
+  <div class="vk-tip-body" id="vkTipBody"></div>
+  <div class="vk-tip-actions" id="vkTipActions">
+    <button class="btn btn-orange" onclick="vkCloseTip()" id="vkTipCloseBtn" type="button">Sluiten</button>
+  </div>
+</div>
+
+<script>
+/* ═══ VK SHARED CANVAS BUILDER (injected) ═══ */
+/* ══════════════════════════════════════════════════════════════════════
+   VISIEKAART CANVAS — shared blueprint (used in fase 1 t/m 5 + rapport)
+   ──────────────────────────────────────────────────────────────────────
+   Geometry is faithful to bijlage_-_visiekaart_v2.svg.
+   ViewBox: 0 0 67733 38100 (CorelDRAW mm × 100).
+   Colors are mapped to standaard kleurcodes (Option B).
+   Font: DM Sans throughout.
+   ══════════════════════════════════════════════════════════════════════ */
+
+const VK_THEME_COLORS = ['#70A2D7','#BDD24D','#E8423F','#9666AA','#2A9791'];
+const VK_SUN = '#FCC429';
+const VK_BAND = '#BDD24D';
+const VK_DOTS = '#C5D93D';
+const VK_DARK = '#262A36';
+const VK_WHITE = '#FFFFFF';
+
+const VK_GEOM = {
+  sun: { cx: 33748, cy: 17537, r: 10421 },
+  band: { x: 2464, y: 17751, w: 62569, h: 19058, r: 886 },
+  themes: [
+    { cx: 20071, cy: 14057 },
+    { cx: 24285, cy:  7294 },
+    { cx: 33748, cy:  3625 },
+    { cx: 43161, cy:  7294 },
+    { cx: 47403, cy: 14057 }
+  ],
+  themeR: 3312,
+  triangle: 'M11768 35254 L33477 17752 L55186 35254 Z',
+  triApex: { x: 33477, y: 17751 },
+  triLeft: { x: 11768, y: 35254 },
+  triRight: { x: 55186, y: 35254 },
+  numbers: [
+    { x: 15205, y: 33897 },
+    { x: 18205, y: 31295 },
+    { x: 21439, y: 28632 },
+    { x: 24286, y: 25980 },
+    { x: 27496, y: 23474 }
+  ],
+  dots: [
+    { cx: 16229, cy: 14135 },
+    { cx: 64191, cy: 14135 },
+    { cx: 21013, cy:  9466 }
+  ]
+};
+
+function vkEscape(s){
+  return String(s||'').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function vkWrap(text, maxChars){
+  const words = String(text||'').split(/\s+/).filter(Boolean);
+  const out = [];
+  let line = '';
+  for (const w of words) {
+    const cand = line ? line + ' ' + w : w;
+    if (cand.length > maxChars && line) { out.push(line); line = w; }
+    else line = cand;
+  }
+  if (line) out.push(line);
+  return out;
+}
+
+function vkTruncate(text, maxChars){
+  text = String(text||'');
+  if (text.length <= maxChars) return text;
+  return text.substring(0, maxChars - 1).trimEnd() + '…';
+}
+
+/* Right edge of triangle at a given y */
+function vkTriRightX(y){
+  const apex = VK_GEOM.triApex, br = VK_GEOM.triRight;
+  if (y <= apex.y) return apex.x;
+  if (y >= br.y) return br.x;
+  return apex.x + (y - apex.y) / (br.y - apex.y) * (br.x - apex.x);
+}
+
+/*
+  data = {
+    visionSentence:  string | '',
+    themeNames:      array[5] of string | [],
+    themeActions:    array[5] of array[5] of string | [],
+    versnellers:     array of string,
+    remmers:         array of string,
+    roadmapTop5:     array of {text, themeIdx} | [],
+    lang:            'nl' | 'en',
+    stickyMode:      'numbers'  // show numbered chips in phase 3+
+  }
+*/
+function vkBuildCanvas(data){
+  const d = Object.assign({
+    visionSentence: '', themeNames: [], themeActions: [],
+    versnellers: [], remmers: [], roadmapTop5: [],
+    lang: 'nl', stickyMode: 'numbers'
+  }, data || {});
+  const isEN = d.lang === 'en';
+
+  const stoereLine1 = isEN ? 'bold steps' : 'stoere stappen';
+  const stoereLine2 = isEN ? 'to our dot' : 'naar onze stip';
+  const versnLabel = isEN ? 'accelerators' : 'versnellers';
+  const remmLabel  = isEN ? 'obstacles'    : 'remmers';
+  const placeholderPrefix = isEN ? 'theme' : 'thema';
+  const visionPlaceholder = isEN ? ['our dot on','the horizon'] : ['onze stip op','de horizon'];
+
+  let svg = '';
+
+  svg += `<rect x="0" y="0" width="67733" height="38100" fill="${VK_WHITE}"/>`;
+
+  const sun = VK_GEOM.sun;
+  svg += `<circle cx="${sun.cx}" cy="${sun.cy}" r="${sun.r}" fill="${VK_SUN}"/>`;
+
+  {
+    const visTop = sun.cy - sun.r;
+    const bandTop = VK_GEOM.band.y;
+    const visCenterY = (visTop + bandTop) / 2;
+    const sentence = d.visionSentence ? d.visionSentence : visionPlaceholder.join(' ');
+    let lines = vkWrap(sentence, 24).slice(0, 5);
+    if (!lines.length) lines = visionPlaceholder;
+    const fontSize = lines.length > 3 ? 900 : 1050;
+    const lineH = fontSize * 1.2;
+    const totalH = lines.length * lineH;
+    const startY = visCenterY - totalH/2 + lineH/2;
+    svg += lines.map((ln, i) =>
+      `<text x="${sun.cx}" y="${startY + i*lineH}" text-anchor="middle" dominant-baseline="central" font-size="${fontSize}" fill="${VK_WHITE}" font-weight="500">${vkEscape(ln)}</text>`
+    ).join('');
+  }
+
+  const b = VK_GEOM.band;
+  svg += `<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="${b.r}" ry="${b.r}" fill="${VK_BAND}"/>`;
+
+  VK_GEOM.dots.forEach(p => {
+    svg += `<circle cx="${p.cx}" cy="${p.cy}" r="80" fill="${VK_DOTS}"/>`;
+  });
+
+  VK_GEOM.themes.forEach((p, i) => {
+    const color = VK_THEME_COLORS[i];
+    const name = d.themeNames[i];
+    const isPlaceholder = !name;
+    const opacity = isPlaceholder ? 0.35 : 1;
+    svg += `<circle cx="${p.cx}" cy="${p.cy}" r="${VK_GEOM.themeR}" fill="${color}" opacity="${opacity}"/>`;
+    const numberLabel = String(i+1);
+    const display = name || `${placeholderPrefix} ${i+1}`;
+    const wrapped = vkWrap(display, 10).slice(0, 3).map(ln => vkTruncate(ln, 12));
+    const lineH = wrapped.length > 2 ? 560 : 680;
+    const blockH = wrapped.length * lineH;
+    const numberH = 1100;
+    const totalH = numberH + 200 + blockH;
+    const startY = p.cy - totalH/2 + numberH/2;
+    svg += `<text x="${p.cx}" y="${startY}" text-anchor="middle" dominant-baseline="central" font-size="${numberH}" fill="${VK_WHITE}" font-weight="700">${numberLabel}</text>`;
+    const nameTop = startY + numberH/2 + 200 + lineH/2;
+    svg += wrapped.map((ln, li) =>
+      `<text x="${p.cx}" y="${nameTop + li*lineH}" text-anchor="middle" dominant-baseline="central" font-size="${lineH}" fill="${VK_WHITE}" font-weight="600">${vkEscape(ln)}</text>`
+    ).join('');
+  });
+
+  VK_GEOM.themes.forEach((p, i) => {
+    const actions = d.themeActions[i];
+    if (!actions || !actions.length) return;
+    const n = Math.min(actions.length, 5);
+    const color = VK_THEME_COLORS[i];
+    // v4b: stickies vergroot en naar de buitenzijde van elke themabol gespreid
+    // (conform referentie 'visiekaart actiebeeld' B). Links-thema's → rij links,
+    // rechts-thema's → rij rechts, top-thema (2) → links/rechts geflankeerd.
+    const w = 1300, h = 1100, gap = 200, rx = 150, numFont = 620, strokeW = 80;
+    const R = VK_GEOM.themeR;
+    const drawSticky = (x, y, label) => {
+      svg += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" ry="${rx}" fill="${color}" stroke="${VK_WHITE}" stroke-width="${strokeW}"/>`
+           + `<text x="${x + w/2}" y="${y + h/2}" text-anchor="middle" dominant-baseline="central" font-size="${numFont}" fill="${VK_WHITE}" font-weight="700">${label}</text>`;
+    };
+    const rowLeftOf = (rightEdge, cy, count, start) => {
+      let x = rightEdge - (count * w + (count - 1) * gap);
+      const y = cy - h / 2;
+      for (let s = 0; s < count; s++){ drawSticky(x, y, start + s); x += w + gap; }
+    };
+    const rowRightOf = (leftEdge, cy, count, start) => {
+      let x = leftEdge;
+      const y = cy - h / 2;
+      for (let s = 0; s < count; s++){ drawSticky(x, y, start + s); x += w + gap; }
+    };
+    if (i === 0 || i === 1){
+      rowLeftOf(p.cx - R - 250, p.cy, n, 1);
+    } else if (i === 3 || i === 4){
+      rowRightOf(p.cx + R + 250, p.cy, n, 1);
+    } else {
+      const leftN = Math.ceil(n / 2), rightN = n - leftN;
+      const fy = p.cy - 260;
+      if (leftN)  rowLeftOf(p.cx - R - 250, fy, leftN, 1);
+      if (rightN) rowRightOf(p.cx + R + 250, fy, rightN, leftN + 1);
+    }
+  });
+
+  svg += `<path d="${VK_GEOM.triangle}" fill="${VK_WHITE}"/>`;
+
+  {
+    const apex = VK_GEOM.triApex;
+    const headY = apex.y + 1850;
+    svg += `<text x="${apex.x}" y="${headY}" text-anchor="middle" font-size="900" fill="${VK_DARK}" font-weight="600">${stoereLine1}</text>
+      <text x="${apex.x}" y="${headY + 1100}" text-anchor="middle" font-size="900" fill="${VK_DARK}" font-weight="400">${stoereLine2}</text>`;
+  }
+
+  VK_GEOM.numbers.forEach((p, i) => {
+    svg += `<text x="${p.x}" y="${p.y}" font-size="900" fill="${VK_DARK}" font-weight="600">${i+1}</text>`;
+    const action = d.roadmapTop5[i];
+    if (!action) return;
+    const themeIdx = (typeof action.themeIdx === 'number' ? action.themeIdx : 0);
+    const themeColor = VK_THEME_COLORS[themeIdx] || VK_DARK;
+    const bx = p.x + 1200;
+    const by = p.y - 280;
+    const br = 380;
+    svg += `<circle cx="${bx}" cy="${by}" r="${br}" fill="${themeColor}"/>
+      <text x="${bx}" y="${by}" text-anchor="middle" dominant-baseline="central" font-size="500" fill="${VK_WHITE}" font-weight="700">${themeIdx+1}</text>`;
+    const tx = bx + br + 200;
+    const xRight = vkTriRightX(p.y);
+    const maxW = xRight - tx - 500;
+    const charBudget = Math.max(8, Math.floor(maxW / 340));
+    const text = vkTruncate(action.text || '', charBudget);
+    svg += `<text x="${tx}" y="${p.y}" font-size="600" fill="${VK_DARK}" font-weight="400">${vkEscape(text)}</text>`;
+  });
+
+  {
+    const headX = 3360;
+    const headY = 18950;
+    svg += `<text x="${headX}" y="${headY}" font-size="1100" fill="${VK_DARK}" font-weight="700">${versnLabel}</text>`;
+    d.versnellers.slice(0, 5).forEach((v, i) => {
+      const t = typeof v === 'string' ? v : (v && (v.title || v.name) || '');
+      svg += `<text x="${headX}" y="${headY + 1700 + i*1500}" font-size="700" fill="${VK_DARK}" font-weight="400">${i+1}. ${vkEscape(vkTruncate(t, 28))}</text>`;
+    });
+  }
+
+  {
+    const headX = 64374;
+    const headY = 18950;
+    svg += `<text x="${headX}" y="${headY}" text-anchor="end" font-size="1100" fill="${VK_DARK}" font-weight="700">${remmLabel}</text>`;
+    d.remmers.slice(0, 5).forEach((r, i) => {
+      const t = typeof r === 'string' ? r : (r && (r.title || r.name) || '');
+      svg += `<text x="${headX}" y="${headY + 1700 + i*1500}" text-anchor="end" font-size="700" fill="${VK_DARK}" font-weight="400">${i+1}. ${vkEscape(vkTruncate(t, 28))}</text>`;
+    });
+  }
+
+  return svg;
+}
+
+/* Apply to an <svg> element: sets viewBox + innerHTML */
+function vkRenderInto(svgEl, data){
+  if (!svgEl) return;
+  svgEl.setAttribute('viewBox', '0 0 67733 38100');
+  svgEl.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+  svgEl.style.fontFamily = "'DM Sans', sans-serif";
+  svgEl.innerHTML = vkBuildCanvas(data);
+}
+
+/* ═══ END VK SHARED CANVAS BUILDER ═══ */
+
+/* ══════════════════════════════════════
+   STATE & CONSTANTS
+══════════════════════════════════════ */
+let lang = 'nl';
+let currentTab = 'timeline';
+let selectedActionBar = null; // for inline editing
+
+const THEME_COLORS = ['#70A2D7','#BDD24D','#E8423F','#9666AA','#2A9791'];
+const THEME_LIGHT  = ['rgba(112,162,215,.15)','rgba(189,210,77,.15)','rgba(240,87,54,.12)','rgba(150,102,170,.12)','rgba(42,151,145,.13)'];
+const VISION_COMPS = ['bestaansreden','doelgroep','behoefte','ambitie','focus'];
+const VISION_COMPS_EN = ['reason','audience','need','ambition','focus'];
+
+// All data loaded from previous phases (with demo fallbacks)
+let session = {};
+let visionSentence = '';
+let visionKeywords = {};
+let themes = [];
+let confirmedActions = {}; // {0:[...],1:[...],...}
+let versnellers = [];
+let remmers = [];
+
+// Generated roadmap actions (enriched objects)
+let roadmapActions = [];
+
+// Timeline config
+let timelineConfig = {};
+
+/* ══════════════════════════════════════
+   TRANSLATIONS
+══════════════════════════════════════ */
+const T = {
+  nl:{
+    phasePill:'Fase 5 · Roadmap',pvBtn:'Deelnemer-view →',
+    sessTitle:'Sessie-info',
+    introTitle:'Fase 5 — Strategische roadmap',
+    introSub:'Alle fasen samengevoegd, AI-gewogen prioritering, tijdlijn en eigenaren',
+    introWhatTitle:'Wat is een roadmap',
+    introWhatBody:'De roadmap vertaalt alle eerdere keuzes (visie, thema\'s, acties, versnellers en remmers) in een tijdgebonden uitvoeringsplan. Het is een zichtbare route die richting geeft aan dagelijkse keuzes.',
+    introHowTitle:'Hoe komt deze tot stand',
+    introBody:'Per actie wordt een composiet-prioriteitscore berekend op basis van thema-gewicht, visie-bijdrage, haalbaarheid en impact. Versnellers en remmers bepalen het risico en de volgorde op de tijdlijn.',
+    infoIntro:'De roadmap is het actiegerichte hart van het plan: het brengt de stip op de horizon binnen handbereik door alle acties uit fase 3 in de tijd uit te zetten, te wegen op haalbaarheid en impact, en te koppelen aan eigenaren. Versnellers en remmers uit fase 4 worden meegewogen in de prioritering. Het resultaat is een concreet uitvoeringsplan waar het team morgen mee aan de slag kan.',
+    infoRoadmap:'De tijdlijn-tab toont een Gantt-overzicht; de matrix-tab plaatst acties op haalbaarheid en impact; het thema-overzicht groepeert per thema; de risico-analyse rangschikt op uitvoeringsrisico. Per actie geeft de AI een toelichting met de gebruikte versnellers en remmers.',
+    visionLabel:'Stip op de horizon',visionLabel2:'Stip op de horizon',
+    introBotInfo:'Alle fasen zijn voltooid, klaar om de roadmap te genereren',
+    introStart:'Roadmap genereren',
+    genTitle:'Roadmap wordt opgebouwd…',
+    aiSteps:['Thema-gewichten en actie-scores berekenen…','Versnellers en remmers koppelen aan acties…','Haalbaarheid en impact per actie bepalen…','Tijdlijn samenstellen op basis van prioriteit…','Roadmap visualisatie opbouwen…'],
+    roadmapTitle:'Strategische Roadmap',
+    roadmapBot:'Bekijk de roadmap en pas aan waar nodig voordat u eigenaren koppelt',
+    toOwners:'Eigenaren koppelen →',
+    tabs:{timeline:'Tijdlijn',matrix:'Prioriteitsmatrix',themes:'Thema-overzicht',risk:'Risico-analyse'},
+    ownersTitle:'Eigenaren koppelen aan acties',
+    ownersSub:'Eigenaren zijn verantwoordelijk voor planning, voortgang en resultaat, niet per se voor uitvoering',
+    ownerPlaceholder:'Naam eigenaar…',
+    ownersBot:'Koppel eigenaren aan de acties, kan ook achteraf worden aangevuld',
+    confirmRoadmap:'Roadmap definitief maken',
+    finalBadge:'Roadmap definitief',finalTitle:'Roadmap vastgesteld',
+    vtRoadmap:'Roadmap',vtCanvas:'Visiekaart',toRapportLbl:'Naar rapport →',
+    canvasTitle:'Visiekaart, complete strategische kaart',
+    canvasSub:'Alle thema\'s, acties en roadmap in één beeld',
+    canvasNote:'Gefeliciteerd, de visiekaart is volledig ingevuld',
+    pBack:'← Facilitator-view',
+    p5phase:'Fase 5 · Roadmap',
+    pIntroWhatTitle:'Wat is een roadmap',
+    pIntroWhatBody:'De roadmap vertaalt alle eerdere keuzes (visie, thema\'s, acties, versnellers en remmers) in een tijdgebonden uitvoeringsplan.',
+    pIntroHowTitle:'Hoe ziet jouw rol eruit',
+    pIntroHowBody:'De facilitator stelt de definitieve roadmap samen op basis van eerdere fasen. Je ziet de uitkomst zodra die klaar is.',
+    pPreWaitStatus:'Wachten op de facilitator…',
+    pWaitTitle:'De roadmap wordt samengesteld…',
+    pWaitSub:'Even geduld, dit duurt slechts een moment.',
+    pVisionLabel:'Stip op de horizon',
+    pTop5Label:'Top 5 strategische acties',
+    pFinalNote:'De volledige roadmap volgt in de rapportage.',
+    pFacLabel:'Facilitator:',
+    onderbouwingBtn:'Onderbouwing',
+    onderbouwingTitle:'Theoretische onderbouwing — fase 5',
+    onderbouwingBody:'In deze laatste fase combineert de app alle eerdere uitkomsten tot één samenhangende roadmap. Thema-scores wegen mee in de volgorde, versnellers uit fase 4 verhogen de kans van slagen van een actie, remmers verhogen het risico en de kernwoorden uit de stip op de horizon bepalen welke actie aan welk visie-component bijdraagt. Een goede roadmap is ambitieus maar geloofwaardig, duidelijk geprioriteerd, gekoppeld aan eigenaren en realistisch in de tijd geplaatst. Hij vormt het brug tussen ambitie en uitvoering: van strategische intentie naar concrete uitvoering met heldere verantwoordelijkheden.',
+    onderbouwingClose:'Sluiten',
+    visionComps:['Bestaansreden','Doelgroep','Behoefte','Ambitie','Focus'],
+    priorityLabel:'Prioriteit',feasLabel:'Haalbaarheid',impactLabel:'Impact',riskLabel:'Risico',
+    periodLabel:['Jan','Feb','Mrt','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec'],
+    periodLabelQ:['Q1','Q2','Q3','Q4'],
+    quickWin:'Quick win',strategic:'Strategisch',fillIn:'Aanvuller',reconsider:'Heroverweeg',
+    matrixX:'Haalbaarheid →',matrixY:'↑ Impact',
+    matrixHint:'Quick win: hoge impact en hoge haalbaarheid, deze als eerste uitvoeren.',
+    themeScore:'Themabeoordeling',
+    visContrib:'Bijdrage aan',
+    periodeLabel:'Periode',
+    remRelated:'Gerelateerde remmers',
+    verRelated:'Gerelateerde versnellers',
+    justifLabel:'AI-toelichting:',
+    noOwner:'Eigenaar toevoegen',
+    editBar:'Actie verplaatsen',
+    moveEarlier:'← Eerder',moveLater:'Later →',
+    closeEdit:'Sluiten',
+    legendTopFive:'★★★ = top 5 prioriteit · ★★ = prioriteit 6-15 · ★ = overige',
+    confirmDone:'✅ Roadmap is definitief vastgesteld',
+    printBtn:'Afdrukken',
+    backConfirm:'Terug naar fase {n}?',
+    resetConfirm:'Alle sessiedata wissen (visiezin, thema\'s, acties, scores, roadmap)?\n\nDe demo-defaults worden hersteld bij de volgende pagina.',
+    resetDone:'Demo-data gewist. Pagina wordt herladen.',
+    sectorLabels:{overheid:'Uitvoeringsagenda',zorg:'Zorgontwikkelagenda',zakelijk:'Business Roadmap',industrie:'Productie-roadmap',handel:'Commerciële roadmap',landbouw:'Sectoragenda',default:'Strategische Roadmap'},
+    sessTypeLbl:{strategisch:'strategisch plan',jaarplan:'jaarplan',project:'project',anders:'sessie'},
+    sessTypeLblFull:{strategisch:'Strategisch plan',jaarplan:'Jaarplan',project:'Project',anders:'Anders'},
+    scaleLbl:{team:'teamniveau',afdeling:'afdelingsniveau',organisatie:'organisatieniveau',netwerk:'netwerkniveau'},
+    scaleLblFull:{team:'Team',afdeling:'Afdeling',organisatie:'Organisatie',netwerk:'Netwerk'},
+    urgLbl:{laag:'lage',medium:'gemiddelde',hoog:'hoge'},
+    urgLblFull:{laag:'Laag',medium:'Medium',hoog:'Hoog'},
+    budLbl:{beperkt:'beperkt',voldoende:'voldoende',ruim:'ruim',onbekend:'onbekend'},
+    budLblFull:{beperkt:'Beperkt',voldoende:'Voldoende',ruim:'Ruim',onbekend:'Onbekend'},
+    horLbl:{'<1jr':'minder dan een jaar','1-3jr':'1 tot 3 jaar','3-5jr':'3 tot 5 jaar','5+jr':'meer dan 5 jaar'},
+    horLblFull:{'<1jr':'< 1 jaar','1-3jr':'1-3 jaar','3-5jr':'3-5 jaar','5+jr':'5+ jaar'},
+    urgencyContext:{laag:'Ruime tijdlijn',medium:'Gebalanceerde planning',hoog:'Urgente uitvoering'},
+    budgetContext:{beperkt:'Beperkt budget',voldoende:'Voldoende budget',ruim:'Ruim budget',onbekend:'Budget onbekend'},
+    horizonContext:{'<1jr':'< 1 jaar','1-3jr':'1-3 jaar','3-5jr':'3-5 jaar','5+jr':'5+ jaar'},
+    summaryTpl:'Vandaag stellen we een {type} op, op {scale}, onder de naam \'{name}\'. Het is een plan met {urg} urgentie, waarvoor we {bud} budget hebben en met een tijdshorizon van {hor}.',
+    summaryTplNoName:'Vandaag stellen we een {type} op, op {scale}. Het is een plan met {urg} urgentie, waarvoor we {bud} budget hebben en met een tijdshorizon van {hor}.',
+    summaryFallback:'De sessie is nog niet gestart door de facilitator.',
+    sessKOrg:'Organisatie',sessKName:'Sessienaam',sessKType:'Type',sessKScale:'Schaal',sessKUrg:'Urgentie',sessKBud:'Budget',sessKHor:'Horizon',
+    docTitle:'Visiekaart v4 — Fase 5: Roadmap',
+    // Cross-fase shared keys (v4)
+    tipClose:'Sluiten',
+    vkBackEdit:'Aanpassen',
+    pOnderbouwingBtnLabel:'Onderbouwing',
+    cumStipLabel:'Stip op de horizon',
+    cumThemesLabel:'Thema\'s',
+    cumVersnellersLabel:'Top 5 versnellers',
+    cumRemmersLabel:'Top 5 remmers',
+    cumActionsLabel:'Acties per thema',
+    cumRoadmapLabel:'Roadmap-acties',
+  },
+  en:{
+    phasePill:'Phase 5 · Roadmap',pvBtn:'Participant view →',
+    sessTitle:'Session info',
+    introTitle:'Phase 5 — Strategic roadmap',
+    introSub:'All phases combined, AI-weighted prioritisation, timeline and owners',
+    introWhatTitle:'What is a roadmap',
+    introWhatBody:'The roadmap translates all earlier choices (vision, themes, actions, accelerators and obstacles) into a time-bound execution plan. It is a visible route that gives direction to daily decisions.',
+    introHowTitle:'How is it built',
+    introBody:'A composite priority score is calculated per action based on theme weight, vision contribution, feasibility and impact. Accelerators and obstacles determine risk and sequence on the timeline.',
+    infoIntro:'The roadmap is the action-oriented heart of the plan: it brings the dot on the horizon within reach by placing all actions from phase 3 in time, weighing them on feasibility and impact, and linking them to owners. Accelerators and obstacles from phase 4 feed into the prioritisation. The result is a concrete execution plan the team can start working on tomorrow.',
+    infoRoadmap:'The timeline tab shows a Gantt overview; the matrix tab places actions on feasibility versus impact; the theme overview groups by theme; the risk analysis ranks by execution risk. For each action the AI gives a note with the relevant accelerators and obstacles.',
+    visionLabel:'Dot on the horizon',visionLabel2:'Dot on the horizon',
+    introBotInfo:'All phases are complete, ready to generate the roadmap',
+    introStart:'Generate roadmap',
+    genTitle:'Building roadmap…',
+    aiSteps:['Calculating theme weights and action scores…','Matching accelerators and obstacles to actions…','Determining feasibility and impact per action…','Composing timeline based on priority…','Building roadmap visualisation…'],
+    roadmapTitle:'Strategic Roadmap',
+    roadmapBot:'Review the roadmap and adjust where needed before assigning owners',
+    toOwners:'Assign owners →',
+    tabs:{timeline:'Timeline',matrix:'Priority matrix',themes:'Theme overview',risk:'Risk analysis'},
+    ownersTitle:'Assign owners to actions',
+    ownersSub:'Owners are responsible for planning, progress and results, not necessarily for execution',
+    ownerPlaceholder:'Owner name…',
+    ownersBot:'Assign owners, can also be added later',
+    confirmRoadmap:'Finalise roadmap',
+    finalBadge:'Roadmap final',finalTitle:'Roadmap confirmed',
+    vtRoadmap:'Roadmap',vtCanvas:'Visiekaart',toRapportLbl:'To report →',
+    canvasTitle:'Visiekaart, complete strategic map',
+    canvasSub:'All themes, actions and roadmap in one view',
+    canvasNote:'Congratulations, the visiekaart is complete',
+    pBack:'← Facilitator view',
+    p5phase:'Phase 5 · Roadmap',
+    pIntroWhatTitle:'What is a roadmap',
+    pIntroWhatBody:'The roadmap translates all earlier choices (vision, themes, actions, accelerators and obstacles) into a time-bound execution plan.',
+    pIntroHowTitle:'What is your role',
+    pIntroHowBody:'The facilitator builds the final roadmap based on the earlier phases. You will see the outcome once it is ready.',
+    pPreWaitStatus:'Waiting for the facilitator…',
+    pWaitTitle:'The roadmap is being built…',
+    pWaitSub:'One moment, this will only take a few seconds.',
+    pVisionLabel:'Dot on the horizon',
+    pTop5Label:'Top 5 strategic actions',
+    pFinalNote:'The complete roadmap follows in the report.',
+    pFacLabel:'Facilitator:',
+    onderbouwingBtn:'Background',
+    onderbouwingTitle:'Theoretical background — phase 5',
+    onderbouwingBody:'In this final phase the app combines all earlier outcomes into one coherent roadmap. Theme scores weigh into the ordering, accelerators from phase 4 raise the chance of success of an action, obstacles increase risk, and keywords from the dot on the horizon determine which action contributes to which vision component. A good roadmap is ambitious yet credible, clearly prioritised, linked to owners and realistically placed in time. It forms the bridge between ambition and execution: from strategic intent to concrete execution with clear responsibilities.',
+    onderbouwingClose:'Close',
+    visionComps:['Reason','Audience','Need','Ambition','Focus'],
+    priorityLabel:'Priority',feasLabel:'Feasibility',impactLabel:'Impact',riskLabel:'Risk',
+    periodLabel:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    periodLabelQ:['Q1','Q2','Q3','Q4'],
+    quickWin:'Quick win',strategic:'Strategic',fillIn:'Filler',reconsider:'Reconsider',
+    matrixX:'Feasibility →',matrixY:'↑ Impact',
+    matrixHint:'Quick win: high impact and high feasibility, execute these first.',
+    themeScore:'Theme score',
+    visContrib:'Contributes to',
+    periodeLabel:'Period',
+    remRelated:'Related obstacles',
+    verRelated:'Related accelerators',
+    justifLabel:'AI note:',
+    noOwner:'Add owner',
+    editBar:'Move action',
+    moveEarlier:'← Earlier',moveLater:'Later →',
+    closeEdit:'Close',
+    legendTopFive:'★★★ = top 5 priority · ★★ = priority 6-15 · ★ = others',
+    confirmDone:'✅ Roadmap has been finalised',
+    printBtn:'Print',
+    backConfirm:'Back to phase {n}?',
+    resetConfirm:'Clear all session data (vision sentence, themes, actions, scores, roadmap)?\n\nDefaults will reload on the next page.',
+    resetDone:'Demo data cleared. Page will reload.',
+    sectorLabels:{overheid:'Implementation agenda',zorg:'Care development agenda',zakelijk:'Business Roadmap',industrie:'Production roadmap',handel:'Commercial roadmap',landbouw:'Sector agenda',default:'Strategic Roadmap'},
+    sessTypeLbl:{strategisch:'strategic plan',jaarplan:'annual plan',project:'project',anders:'session'},
+    sessTypeLblFull:{strategisch:'Strategic plan',jaarplan:'Annual plan',project:'Project',anders:'Other'},
+    scaleLbl:{team:'team level',afdeling:'department level',organisatie:'organisation level',netwerk:'network level'},
+    scaleLblFull:{team:'Team',afdeling:'Department',organisatie:'Organisation',netwerk:'Network'},
+    urgLbl:{laag:'low',medium:'medium',hoog:'high'},
+    urgLblFull:{laag:'Low',medium:'Medium',hoog:'High'},
+    budLbl:{beperkt:'limited',voldoende:'sufficient',ruim:'ample',onbekend:'unknown'},
+    budLblFull:{beperkt:'Limited',voldoende:'Sufficient',ruim:'Ample',onbekend:'Unknown'},
+    horLbl:{'<1jr':'less than a year','1-3jr':'1 to 3 years','3-5jr':'3 to 5 years','5+jr':'more than 5 years'},
+    horLblFull:{'<1jr':'< 1 year','1-3jr':'1-3 years','3-5jr':'3-5 years','5+jr':'5+ years'},
+    urgencyContext:{laag:'Relaxed timeline',medium:'Balanced planning',hoog:'Urgent execution'},
+    budgetContext:{beperkt:'Limited budget',voldoende:'Sufficient budget',ruim:'Ample budget',onbekend:'Budget unknown'},
+    horizonContext:{'<1jr':'< 1 year','1-3jr':'1-3 years','3-5jr':'3-5 years','5+jr':'5+ years'},
+    summaryTpl:'Today we are building a {type} at {scale}, named \'{name}\'. It is a plan with {urg} urgency, for which we have {bud} budget and a time horizon of {hor}.',
+    summaryTplNoName:'Today we are building a {type} at {scale}. It is a plan with {urg} urgency, for which we have {bud} budget and a time horizon of {hor}.',
+    summaryFallback:'The session has not yet been started by the facilitator.',
+    sessKOrg:'Organisation',sessKName:'Session name',sessKType:'Type',sessKScale:'Scale',sessKUrg:'Urgency',sessKBud:'Budget',sessKHor:'Horizon',
+    docTitle:'Visiekaart v4 — Phase 5: Roadmap',
+    // Cross-fase shared keys (v4)
+    tipClose:'Close',
+    vkBackEdit:'Edit',
+    pOnderbouwingBtnLabel:'Theory',
+    cumStipLabel:'Dot on the horizon',
+    cumThemesLabel:'Themes',
+    cumVersnellersLabel:'Top 5 accelerators',
+    cumRemmersLabel:'Top 5 obstacles',
+    cumActionsLabel:'Actions per theme',
+    cumRoadmapLabel:'Roadmap actions',
+  }
+};
+
+/* ══════════════════════════════════════
+   VK SHARED ENVIRONMENT DETECTION (v4)
+══════════════════════════════════════ */
+function isProductionMode(){
+  const host = (window.location.hostname || '').toLowerCase();
+  const protocol = window.location.protocol;
+  if (protocol === 'file:') return false;
+  if (host === '' || host === 'localhost' || host === '127.0.0.1' || host === '::1') return false;
+  if (/^192\.168\./.test(host)) return false;
+  if (/^10\./.test(host)) return false;
+  if (/^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(host)) return false;
+  if (/\.local$/.test(host)) return false;
+  return true;
+}
+function vkApplyEnvironmentRules(){
+  if (!isProductionMode()) return;
+  document.querySelectorAll('[data-env="dev-only"]').forEach(el => { el.style.display = 'none'; });
+  window.__VK_PROD = true;
+}
+
+/* ══════════ VK LIVE-MODE SWITCH (Cluster A / B1) ══════════
+   VK_LIVE = echte data + AI; false = demo-simulatie. Eén bron-van-waarheid voor alle fasen. */
+const VK_LIVE = isProductionMode();
+if (typeof window.__VK_TOKEN === 'undefined') window.__VK_TOKEN = '';
+
+/* ── Rol- en sessiedetectie (Blok 2) — identiek aan fase 1/2/3/4 ── */
+const VK_JOIN_CODE = (function(){
+  try {
+    // Fasebestanden worden uitsluitend bereikt met ?join={code} in de query
+    // (via join.html en fase-naar-fase-navigatie), nooit onder een /join/-pad.
+    // Code alleen uit de query lezen voorkomt dat de /join/{seg}-regex per
+    // ongeluk de bestandsnaam (bv. 'visiekaart_fase1') als sessiecode oppikt.
+    const q = new URLSearchParams(location.search);
+    return q.get('join') || q.get('code') || null;
+  } catch(e){ return null; }
+})();
+const VK_IS_PARTICIPANT = !!VK_JOIN_CODE;
+function vkLiveCode(){
+  if (VK_JOIN_CODE) return VK_JOIN_CODE;
+  try { return (JSON.parse(localStorage.getItem('vk_session')||'{}')).sessionCode || ''; } catch(e){ return ''; }
+}
+function vkParseStage(raw){
+  if (raw == null) return null;
+  if (typeof raw === 'object') return raw;
+  try { return JSON.parse(raw); } catch(e){ return { stage: String(raw) }; }
+}
+/* De definitieve roadmap reist mee in de 'final'-stage zodat het deelnemer-
+   apparaat (zonder vk_roadmap_actions in localStorage) de top-5 kan tonen. */
+function vkSerializeRoadmap(){
+  try { return (roadmapActions||[]).map(a=>({
+    text:a.text, themeIdx:a.themeIdx, themeName:a.themeName, priorityScore:a.priorityScore,
+    startPeriod:a.startPeriod, visComp:a.visComp, owner:a.owner })); } catch(e){ return []; }
+}
+
+/* ══════════ VK AI-HELPER (Cluster A) — ingebouwde vk-ai.js ══════════
+   Roept de server-side proxy (/vk-ai-proxy.php) aan met timeout en NETTE TERUGVAL:
+   bij elke fout (offline, geen token, parse-fout) reject → de aanroeper gebruikt de
+   bestaande lokale berekening, zodat een sessie nooit vastloopt. De Anthropic-sleutel
+   zit NOOIT hier (werkboek §2/§7.3); de prompt wordt server-side opgebouwd. */
+(function (global) {
+  'use strict';
+  var VK_AI_ENDPOINT = '/vk-ai-proxy.php';
+  var VK_AI_TIMEOUT_MS = 30000;
+  function vkSessionToken() {
+    try { return global.__VK_TOKEN || ''; } catch (e) { return ''; }
+  }
+  function vkCallAI(task, data, opts) {
+    opts = opts || {};
+    var lang = opts.lang || (global.lang) || 'nl';
+    var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var timer = setTimeout(function () { if (controller) controller.abort(); }, opts.timeout || VK_AI_TIMEOUT_MS);
+    return fetch(VK_AI_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CINAB-Token': vkSessionToken() },
+      body: JSON.stringify({ task: task, lang: lang, token: vkSessionToken(), data: data }),
+      signal: controller ? controller.signal : undefined
+    }).then(function (res) {
+      clearTimeout(timer);
+      if (!res.ok) { return res.json().catch(function(){return{};}).then(function(j){ throw mkErr(res.status, j); }); }
+      return res.json();
+    }).then(function (out) {
+      var text = (out && out.text) ? out.text : '';
+      try { return JSON.parse(stripFences(text)); }
+      catch (e) { throw mkErr(0, { error: 'ai_unparsable' }); }
+    }).catch(function (err) {
+      clearTimeout(timer);
+      throw (err && err.__vk) ? err : mkErr(0, { error: 'ai_unreachable' });
+    });
+  }
+  function stripFences(s) { return String(s).replace(/```json/gi, '').replace(/```/g, '').trim(); }
+  function mkErr(status, j) { var e = new Error((j && j.error) || 'ai_error'); e.__vk = true; e.status = status; e.body = j; return e; }
+  global.vkCallAI = vkCallAI;
+})(window);
+
+/* ══════════════════════════════════════
+   VK SHARED HELPERS (v4)
+══════════════════════════════════════ */
+function vkEscape(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+function vkFillSentenceTemplate(template, vars){
+  let s = template;
+  for (const k in vars){
+    const v = (vars[k] == null) ? '' : String(vars[k]);
+    s = s.split('{' + k + '}').join(v);
+  }
+  s = s.replace(/\b(op|at)\s+(?=[,\.])/g, '');
+  s = s.replace(/,\s*,/g, ',');
+  s = s.replace(/\s+([,\.])/g, '$1');
+  s = s.replace(/[ \t]+/g, ' ');
+  s = s.replace(/\s*\u2018\s*\u2019\s*/g, ' ');
+  s = s.replace(/\s*''\s*/g, ' ');
+  return s.trim();
+}
+
+/* ══════════════════════════════════════
+   VK SHARED TIP POPUP (v4)
+══════════════════════════════════════ */
+function vkOpenTip(opts){
+  const popup    = document.getElementById('vkTipPopup');
+  const backdrop = document.getElementById('vkTipBackdrop');
+  const titleEl  = document.getElementById('vkTipTitle');
+  const subEl    = document.getElementById('vkTipSub');
+  const bodyEl   = document.getElementById('vkTipBody');
+  const closeBtn = document.getElementById('vkTipCloseBtn');
+  if (!popup) return;
+  const size = opts.size === 'sm' ? 'sm' : 'lg';
+  popup.setAttribute('data-size', size);
+  if (opts.title){ titleEl.textContent = opts.title; titleEl.style.display = ''; }
+  else           { titleEl.textContent = ''; titleEl.style.display = 'none'; }
+  if (opts.sub && size === 'lg'){ subEl.textContent = opts.sub; subEl.style.display = ''; }
+  else                          { subEl.textContent = ''; subEl.style.display = 'none'; }
+  const bodyArr = Array.isArray(opts.body) ? opts.body : [opts.body];
+  bodyEl.innerHTML = bodyArr.map(item => {
+    if (item == null) return '';
+    if (typeof item === 'string') return '<p>' + vkEscape(item) + '</p>';
+    if (typeof item === 'object'){
+      let html = '';
+      if (item.h) html += '<div class="vk-tip-h">' + vkEscape(item.h) + '</div>';
+      if (item.p) html += '<p>' + vkEscape(item.p) + '</p>';
+      return html;
+    }
+    return '';
+  }).join('');
+  if (closeBtn) closeBtn.textContent = opts.closeLabel || (T[lang] && T[lang].tipClose) || 'Sluiten';
+  if (size === 'lg'){
+    backdrop.classList.add('open');
+    popup.style.top = ''; popup.style.left = ''; popup.style.transform = '';
+  } else {
+    backdrop.classList.remove('open');
+    if (opts.anchor){
+      const r = opts.anchor.getBoundingClientRect();
+      const popW = 340;
+      let left = r.left;
+      if (left + popW > window.innerWidth - 16) left = window.innerWidth - popW - 16;
+      if (left < 16) left = 16;
+      popup.style.left = left + 'px';
+      popup.style.top  = (r.bottom + 12) + 'px';
+      popup.style.transform = '';
+    } else {
+      popup.style.left = '50%'; popup.style.top = '40%';
+      popup.style.transform = 'translate(-50%, -50%)';
+    }
+  }
+  popup.classList.add('open');
+  setTimeout(() => popup.querySelector('.vk-tip-close')?.focus(), 50);
+}
+function vkCloseTip(){
+  const popup    = document.getElementById('vkTipPopup');
+  const backdrop = document.getElementById('vkTipBackdrop');
+  if (popup)    popup.classList.remove('open');
+  if (backdrop) backdrop.classList.remove('open');
+}
+
+// ── INFO ICON WRAPPER (v4 BUG FIX) ────────────────────────────────────────
+// Inline onclick="..." kan T/lang (const/let) niet zien.
+// Daarom: 'i'-iconen roepen vkInfoOpen('infoXxx', this) aan.
+function vkInfoOpen(key, anchor){
+  if (typeof T === 'undefined' || !T[lang]) return;
+  const body = T[lang][key];
+  if (body == null) return;
+  vkOpenTip({ size: 'sm', body: body, anchor: anchor });
+}
+
+// Esc + klik buiten sm-popup
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') vkCloseTip();
+});
+document.addEventListener('click', e => {
+  const popup = document.getElementById('vkTipPopup');
+  if (!popup || !popup.classList.contains('open')) return;
+  if (popup.getAttribute('data-size') !== 'sm') return;
+  if (popup.contains(e.target)) return;
+  if (e.target.classList && e.target.classList.contains('info-icon')) return;
+  vkCloseTip();
+});
+
+/* ══════════════════════════════════════
+   LANGUAGE
+══════════════════════════════════════ */
+function setLang(l, opts){
+  lang=l;
+  vkCloseTip();
+  document.documentElement.lang=l;
+  document.title = (T[lang] && T[lang].docTitle) || document.title;
+  document.getElementById('lNL').classList.toggle('on',l==='nl');
+  document.getElementById('lEN').classList.toggle('on',l==='en');
+  applyT();
+  if (!opts || !opts.fromStorage) {
+    try { localStorage.setItem('vk_lang', l); } catch(e){}
+  }
+}
+function initLang(){
+  let init = null;
+  try {
+    const stored = localStorage.getItem('vk_lang');
+    if (stored === 'nl' || stored === 'en') init = stored;
+    if (!init) {
+      const ss = localStorage.getItem('vk_session_started');
+      if (ss) { const o = JSON.parse(ss); if (o && (o.lang === 'nl' || o.lang === 'en')) init = o.lang; }
+    }
+  } catch(e){}
+  if (init && init !== lang) setLang(init, {fromStorage:true});
+}
+function applyT(){
+  const t=T[lang];
+  if (!t) return;
+  Object.keys(t).forEach(k=>{
+    if (typeof t[k] !== 'string') return;
+    const el = document.getElementById('t-'+k);
+    if (!el) return;
+    if (el.children.length > 0) {
+      let textNode = null;
+      for (const n of el.childNodes) {
+        if (n.nodeType === 3 && n.textContent.trim()) { textNode = n; break; }
+      }
+      if (textNode) textNode.textContent = t[k] + ' ';
+      else el.insertBefore(document.createTextNode(t[k] + ' '), el.firstChild);
+    } else {
+      el.textContent = t[k];
+    }
+  });
+  // Placeholders
+  document.querySelectorAll('[data-t-placeholder]').forEach(el=>{
+    const key = el.dataset.tPlaceholder;
+    if (t[key]) el.placeholder = t[key];
+  });
+  // Heronderdelen die context nodig hebben
+  buildQSteps();
+  initIntro();
+  renderSessPanel();
+  updatePSummary();
+  // Als de roadmap al gegenereerd is, herrenderen we de dynamische delen
+  // zodat de sector-specifieke titel, context-badges en tabs in de nieuwe taal staan.
+  if (typeof roadmapActions !== 'undefined' && roadmapActions.length) {
+    try {
+      buildRoadmapUI();
+      // Reset built-state op de tabs zodat ze opnieuw renderen met de nieuwe taal
+      ['tabTimeline','tabMatrix','tabThemes','tabRisk'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { delete el.dataset.built; el.innerHTML = ''; el.style.display = 'none'; }
+      });
+      const firstTab = document.getElementById('tabTimeline');
+      if (firstTab) firstTab.style.display = 'block';
+      switchTab('timeline');
+      // Final-screen ook hertekenen als die zichtbaar is
+      const finalScreen = document.getElementById('sFinal');
+      if (finalScreen && finalScreen.classList.contains('open')) {
+        buildFinalScreen();
+        buildCanvas();
+      }
+    } catch(e){}
+  }
+}
+
+/* ══════════════════════════════════════
+   HELPERS
+══════════════════════════════════════ */
+function escapeHtml(s){
+  return String(s||'').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ── Q-steps voortgangsbalk: alle 5 segmenten "done" voor fase 5 ── */
+function buildQSteps(){
+  const el = document.getElementById('qStepsBar');
+  if (!el) return;
+  // 5 segmenten, alle als done (fase 5 is de laatste fase)
+  el.innerHTML = Array.from({length:5}, (_,i)=>
+    `<div class="q-step done" aria-label="Fase ${i+1}"></div>`
+  ).join('');
+}
+
+/* ── Sessie-info paneel ── */
+function readSession(){
+  try {
+    const s = localStorage.getItem('vk_session');
+    if (s) return JSON.parse(s);
+  } catch(e){}
+  return null;
+}
+function toggleSessPanel(){
+  const bar = document.getElementById('sessBar');
+  const tgl = document.getElementById('sessToggle');
+  const open = !bar.classList.contains('open');
+  bar.classList.toggle('open', open);
+  tgl.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+function renderSessPanel(){
+  const bar = document.getElementById('sessBar');
+  const grid = document.getElementById('sessGrid');
+  const mini = document.getElementById('sessMini');
+  if (!bar || !grid) return;
+  const s = readSession();
+  if (!s || !s.org) { bar.style.display = 'none'; return; }
+  bar.style.display = 'block';
+  const t = T[lang];
+  const items = [
+    {k:t.sessKOrg, v:s.org||'—'},
+    {k:t.sessKName, v:s.sessionName||'—'},
+    {k:t.sessKType, v:(t.sessTypeLblFull && t.sessTypeLblFull[s.sessionType]) || s.sessionType || '—'},
+    {k:t.sessKScale, v:(t.scaleLblFull && t.scaleLblFull[s.scale]) || s.scale || '—'},
+    {k:t.sessKUrg, v:(t.urgLblFull && t.urgLblFull[s.urgency]) || s.urgency || '—'},
+    {k:t.sessKBud, v:(t.budLblFull && t.budLblFull[s.budget]) || s.budget || '—'},
+    {k:t.sessKHor, v:(t.horLblFull && t.horLblFull[s.horizon]) || s.horizon || '—'},
+  ];
+  grid.innerHTML = items.map(i =>
+    `<div class="sess-item"><span class="sess-k">${escapeHtml(i.k)}</span><span class="sess-v" title="${escapeHtml(i.v)}">${escapeHtml(i.v)}</span></div>`
+  ).join('');
+  if (mini) mini.textContent = [s.org, s.sessionName].filter(Boolean).join(' · ');
+}
+
+/* ══════════════════════════════════════
+   ONDERBOUWING (v4: via vkOpenTip) + BACK-EDIT + CUMULATIVE RESULTS
+══════════════════════════════════════ */
+function openOnderbouwing(){
+  const t = T[lang];
+  vkOpenTip({
+    size: 'lg',
+    title: t.onderbouwingTitle,
+    body: t.onderbouwingBody,
+    closeLabel: t.tipClose || t.onderbouwingClose
+  });
+}
+
+function vkBackToEdit(){
+  try{ localStorage.setItem('vk_phase5_state', 'editing'); }catch(e){}
+  // Terug naar roadmap-tabs voor verdere aanpassingen
+  goScreen('sRoadmap');
+}
+
+function vkRenderCumulativeF5(){
+  const wrap = document.getElementById('vkCumWrap');
+  if (!wrap) return;
+  const t = T[lang];
+  let stip = '';
+  let themesArr = [];
+  let actionsByTheme = {};
+  let versnellers = [];
+  let remmers = [];
+  let roadmap = [];
+  try {
+    stip = localStorage.getItem('vk_vision_sentence') || '';
+    const rawThemes = localStorage.getItem('vk_selected_themes');
+    if (rawThemes) themesArr = JSON.parse(rawThemes) || [];
+    const rawActs = localStorage.getItem('vk_confirmed_actions');
+    if (rawActs) actionsByTheme = JSON.parse(rawActs) || {};
+    const rawV = localStorage.getItem('vk_versnellers');
+    if (rawV) versnellers = JSON.parse(rawV) || [];
+    const rawR = localStorage.getItem('vk_remmers');
+    if (rawR) remmers = JSON.parse(rawR) || [];
+    const rawRm = localStorage.getItem('vk_roadmap_actions');
+    if (rawRm) roadmap = JSON.parse(rawRm) || [];
+  } catch(e){}
+
+  if (!stip && (!themesArr || !themesArr.length)) {
+    wrap.style.display = 'none';
+    return;
+  }
+  wrap.style.display = '';
+
+  const themeColors = ['#70A2D7','#BDD24D','#E8423F','#9666AA','#2A9791'];
+  let html = '';
+
+  // 1. Stip
+  if (stip) {
+    html += `<div class="vk-cum-section">
+      <div class="vk-cum-label">${vkEscape(t.cumStipLabel || 'Stip op de horizon')}</div>
+      <div class="vk-cum-stip">${vkEscape(stip)}</div>
+    </div>`;
+  }
+
+  // 2. Thema's
+  if (themesArr && themesArr.length) {
+    html += `<div class="vk-cum-section">
+      <div class="vk-cum-label">${vkEscape(t.cumThemesLabel || "Thema's")}</div>
+      <div class="vk-cum-themes">
+        ${themesArr.map((th, i) => {
+          const name = (th && typeof th === 'object') ? (th.name || '') : String(th || '');
+          const c = themeColors[i % themeColors.length];
+          return `<span class="vk-cum-theme-pill" style="background:${c}">${vkEscape(name)}</span>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
+
+  // 3. Versnellers + remmers
+  const vTop = (versnellers || []).slice(0, 5);
+  const rTop = (remmers || []).slice(0, 5);
+  if (vTop.length || rTop.length) {
+    const extractText = it => (it && typeof it === 'object') ? (it.text || it.label || '') : String(it || '');
+    html += `<div class="vk-cum-section">
+      <div class="vk-cum-vr-grid">
+        <div class="vk-cum-vr-block v">
+          <div class="vk-cum-vr-label">${vkEscape(t.cumVersnellersLabel || 'Top 5 versnellers')}</div>
+          <ul class="vk-cum-vr-list">
+            ${vTop.map(v => `<li>${vkEscape(extractText(v))}</li>`).join('') || '<li style="list-style:none;color:var(--t3);font-style:italic">—</li>'}
+          </ul>
+        </div>
+        <div class="vk-cum-vr-block r">
+          <div class="vk-cum-vr-label">${vkEscape(t.cumRemmersLabel || 'Top 5 remmers')}</div>
+          <ul class="vk-cum-vr-list">
+            ${rTop.map(r => `<li>${vkEscape(extractText(r))}</li>`).join('') || '<li style="list-style:none;color:var(--t3);font-style:italic">—</li>'}
+          </ul>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // 4. Acties per thema (uit fase 3)
+  const actionKeys = Object.keys(actionsByTheme || {});
+  if (actionKeys.length) {
+    let actionsHtml = '';
+    themesArr.forEach((th, i) => {
+      const name = (th && typeof th === 'object') ? (th.name || '') : String(th || '');
+      const c = themeColors[i % themeColors.length];
+      const acts = actionsByTheme[i] || actionsByTheme[String(i)] || actionsByTheme[name];
+      if (!acts || !acts.length) return;
+      actionsHtml += `<div class="vk-cum-actions-block" style="border-left-color:${c}">
+        <div class="vk-cum-actions-theme">${vkEscape(name)}</div>
+        <ul class="vk-cum-actions-list">
+          ${acts.map(a => `<li>${vkEscape(typeof a === 'string' ? a : (a && a.text) || '')}</li>`).join('')}
+        </ul>
+      </div>`;
+    });
+    if (actionsHtml) {
+      html += `<div class="vk-cum-section">
+        <div class="vk-cum-label">${vkEscape(t.cumActionsLabel || 'Acties per thema')}</div>
+        ${actionsHtml}
+      </div>`;
+    }
+  }
+
+  // 5. Roadmap-acties (uit fase 5 zelf): per thema, gesorteerd op rank, met periode-label + eigenaar
+  if (roadmap && roadmap.length) {
+    const tl = (typeof timelineConfig !== 'undefined') ? timelineConfig : null;
+    let rmHtml = '';
+    themesArr.forEach((th, i) => {
+      const name = (th && typeof th === 'object') ? (th.name || '') : String(th || '');
+      const c = themeColors[i % themeColors.length];
+      const acts = roadmap
+        .filter(a => a && a.themeIdx === i)
+        .sort((a, b) => (a.rank || 0) - (b.rank || 0));
+      if (!acts.length) return;
+      const items = acts.map((a, ai) => {
+        const txt = a.text || '';
+        const owner = (a.owner || '').trim();
+        const period = (tl && tl.periodLabels && tl.periodLabels[a.startPeriod] && tl.periodLabels[a.startPeriod].label)
+                       || (a.startPeriod != null ? `P${a.startPeriod + 1}` : '');
+        const meta = [period, owner].filter(Boolean).join(' · ');
+        return `<li>${vkEscape(txt)}${meta ? ` <span style="color:var(--t3);font-size:11.5px">— ${vkEscape(meta)}</span>` : ''}</li>`;
+      }).join('');
+      rmHtml += `<div class="vk-cum-actions-block" style="border-left-color:${c}">
+        <div class="vk-cum-actions-theme">${vkEscape(name)}</div>
+        <ul class="vk-cum-actions-list">${items}</ul>
+      </div>`;
+    });
+    if (rmHtml) {
+      html += `<div class="vk-cum-section">
+        <div class="vk-cum-label">${vkEscape(t.cumRoadmapLabel || 'Roadmap-acties')}</div>
+        ${rmHtml}
+      </div>`;
+    }
+  }
+
+  wrap.innerHTML = html;
+}
+
+/* ══════════════════════════════════════
+   CROSS-TAB STAGE SYNC (fase 5)
+══════════════════════════════════════ */
+let pStage = 'preWait';
+function publishStage(stage, payload){
+  try {
+    const obj = {stage, at: Date.now()};
+    if (payload) Object.assign(obj, payload);
+    localStorage.setItem('vk_phase5_stage', JSON.stringify(obj));
+  } catch(e){}
+  // Alleen de facilitator zendt; een deelnemer mag de live stage nooit overschrijven.
+  if (VK_LIVE && window.vkFb && !VK_IS_PARTICIPANT){
+    try {
+      const g = Object.assign({ phase: 5, stage: stage, at: Date.now() }, payload || {});
+      vkFb.stageSet(vkLiveCode(), JSON.stringify(g));
+    } catch(e){}
+  }
+}
+function readStage(){
+  try {
+    const s = localStorage.getItem('vk_phase5_stage');
+    if (s) return JSON.parse(s);
+  } catch(e){}
+  return null;
+}
+function applyStageToPView(stObj){
+  const st = stObj || readStage();
+  const stage = (st && st.stage) || 'preWait';
+  pStage = stage;
+  // Eindscherm: gebruik de roadmap die de facilitator meestuurt (deelnemer-apparaat
+  // heeft geen vk_roadmap_actions in localStorage).
+  if (stage === 'final' && st && Array.isArray(st.acts) && st.acts.length){
+    roadmapActions = st.acts;
+    try { localStorage.setItem('vk_roadmap_actions', JSON.stringify(st.acts)); } catch(e){}
+  }
+  const pre = document.getElementById('p5PreWait');
+  const wait = document.getElementById('p5Wait');
+  const fin = document.getElementById('p5Final');
+  if (!pre || !wait || !fin) return;
+  pre.style.display = stage === 'preWait' ? 'block' : 'none';
+  wait.style.display = ['generating','roadmap','owners'].includes(stage) ? 'block' : 'none';
+  fin.style.display = stage === 'final' ? 'block' : 'none';
+  if (stage === 'final') renderPFinal();
+  if (stage === 'preWait') updatePSummary();
+}
+window.addEventListener('storage', e => {
+  if (e.key === 'vk_phase5_stage' || e.key === 'vk_session' || e.key === 'vk_session_started' || e.key === 'vk_roadmap_actions' || e.key === 'vk_vision_sentence') {
+    applyStageToPView();
+    if (e.key === 'vk_session' || e.key === 'vk_session_started') {
+      renderSessPanel();
+      updatePSummary();
+    }
+  }
+  if (e.key === 'vk_lang' && e.newValue && e.newValue !== lang) {
+    setLang(e.newValue, {fromStorage:true});
+  }
+});
+
+/* ══════════════════════════════════════
+   PARTICIPANT-VIEW SAMENVATTING
+══════════════════════════════════════ */
+function updatePSummary(){
+  const block = document.getElementById('pSummaryBlock');
+  const text = document.getElementById('pSummaryText');
+  const facBlock = document.getElementById('pFacilitatorBlock');
+  const facName = document.getElementById('pFacName');
+  if (!block || !text) return;
+  const sess = readSession();
+  const t = T[lang];
+  if (!sess || !sess.org) {
+    block.style.display = 'block';
+    text.textContent = t.summaryFallback;
+    if (facBlock) facBlock.style.display = 'none';
+    return;
+  }
+  const typeLbl = (t.sessTypeLbl && t.sessTypeLbl[sess.sessionType]) || sess.sessionType || '';
+  const scaleLbl = (t.scaleLbl && t.scaleLbl[sess.scale]) || sess.scale || '';
+  const urgLbl = (t.urgLbl && t.urgLbl[sess.urgency]) || sess.urgency || '';
+  const budLbl = (t.budLbl && t.budLbl[sess.budget]) || sess.budget || '';
+  const horLbl = (t.horLbl && t.horLbl[sess.horizon]) || sess.horizon || '';
+  const name = (sess.sessionName || '').trim();
+  const tpl = name ? t.summaryTpl : t.summaryTplNoName;
+  text.textContent = tpl
+    .replace('{type}', typeLbl).replace('{scale}', scaleLbl).replace('{name}', name)
+    .replace('{urg}', urgLbl).replace('{bud}', budLbl).replace('{hor}', horLbl);
+  block.style.display = 'block';
+  if (facBlock && facName) {
+    if (sess.facilitator && String(sess.facilitator).trim()) {
+      facName.textContent = sess.facilitator;
+      facBlock.style.display = 'flex';
+    } else {
+      facBlock.style.display = 'none';
+    }
+  }
+}
+
+function renderPFinal(){
+  const list = document.getElementById('pRoadmapList');
+  const visEl = document.getElementById('pVisionText');
+  if (visEl) visEl.textContent = visionSentence || '—';
+  if (!list) return;
+  let acts = roadmapActions;
+  if (!acts || !acts.length) {
+    try {
+      const stored = localStorage.getItem('vk_roadmap_actions');
+      if (stored) acts = JSON.parse(stored);
+    } catch(e){}
+  }
+  if (!acts || !acts.length) { list.innerHTML = ''; return; }
+  const top5 = acts.slice().sort((a,b)=>(b.priorityScore||0)-(a.priorityScore||0)).slice(0,5);
+  const t = T[lang];
+  const tl = timelineConfig || {};
+  list.innerHTML = top5.map((a,i)=>{
+    const themeIdx = a.themeIdx || 0;
+    const color = THEME_COLORS[themeIdx] || '#262A36';
+    const periodLabel = (tl.periodLabels && tl.periodLabels[a.startPeriod] && tl.periodLabels[a.startPeriod].label) || `P${(a.startPeriod||0)+1}`;
+    const visComp = (t.visionComps && t.visionComps[a.visComp]) || '';
+    return `<div class="p-rm-item">
+      <div class="p-rm-num" style="background:${color}">${i+1}</div>
+      <div class="p-rm-body">
+        <div class="p-rm-text">${escapeHtml(a.text||'')}</div>
+        <div class="p-rm-meta">
+          ${visComp?`<span class="p-rm-pill" style="background:${color}18;color:${color}">${escapeHtml(visComp)}</span>`:''}
+          <span class="p-rm-pill" style="background:var(--ol);color:var(--oh)">📅 ${escapeHtml(periodLabel)}</span>
+          ${a.owner?`<span class="p-rm-pill" style="background:var(--gl);color:var(--gd)">👤 ${escapeHtml(a.owner)}</span>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════
+   SCREENS
+══════════════════════════════════════ */
+function goScreen(id){
+  ['sIntro','sGenerate','sRoadmap','sOwners','sFinal'].forEach(s=>{
+    const el=document.getElementById(s);if(el)el.classList.remove('open');
+  });
+  const el=document.getElementById(id);if(el){el.classList.add('open');window.scrollTo({top:0,behavior:'smooth'});}
+}
+
+/* ══════════════════════════════════════
+   LOAD SESSION DATA
+══════════════════════════════════════ */
+function loadData(){
+  try{
+    const vs=localStorage.getItem('vk_vision_sentence');
+    if(vs) visionSentence=vs;
+    const vk=localStorage.getItem('vk_vision_keywords');
+    if(vk) visionKeywords=JSON.parse(vk);
+    const st=localStorage.getItem('vk_selected_themes');
+    if(st) themes=JSON.parse(st).map((t,i)=>({...t,color:THEME_COLORS[i]}));
+    const ca=localStorage.getItem('vk_confirmed_actions');
+    if(ca) confirmedActions=JSON.parse(ca);
+
+    // ── Fase 4-data: prefereer vk_phase4_scores.versnellersRanked / remmersRanked ──
+    // Dat bevat de volledige rangorde met count per item. Fallback: vk_versnellers / vk_remmers
+    // (datacontract: arrays van strings). We normaliseren altijd naar [{title, count, source?}].
+    const ph4 = localStorage.getItem('vk_phase4_scores');
+    let usedRanked = false;
+    if (ph4) {
+      try {
+        const sc = JSON.parse(ph4);
+        if (Array.isArray(sc.versnellersRanked) && sc.versnellersRanked.length) {
+          versnellers = sc.versnellersRanked.slice(0,5).map(v => ({
+            title: v.title || v.titleNl || v.titleEn || '',
+            count: typeof v.count === 'number' ? v.count : 0,
+            source: v.source || ''
+          }));
+          usedRanked = true;
+        }
+        if (Array.isArray(sc.remmersRanked) && sc.remmersRanked.length) {
+          remmers = sc.remmersRanked.slice(0,5).map(r => ({
+            title: r.title || r.titleNl || r.titleEn || '',
+            count: typeof r.count === 'number' ? r.count : 0,
+            source: r.source || ''
+          }));
+        }
+      } catch(e){}
+    }
+    if (!usedRanked) {
+      const vrs=localStorage.getItem('vk_versnellers');
+      if(vrs) {
+        const parsed = JSON.parse(vrs);
+        if (Array.isArray(parsed)) {
+          versnellers = parsed.map((v,i) => typeof v === 'string'
+            ? {title: v, count: 5-i, source:''}
+            : {title: v.title || v.name || '', count: typeof v.count === 'number' ? v.count : (5-i), source: v.source||''});
+        }
+      }
+      const rm=localStorage.getItem('vk_remmers');
+      if(rm) {
+        const parsed = JSON.parse(rm);
+        if (Array.isArray(parsed)) {
+          remmers = parsed.map((r,i) => typeof r === 'string'
+            ? {title: r, count: 5-i, source:''}
+            : {title: r.title || r.name || '', count: typeof r.count === 'number' ? r.count : (5-i), source: r.source||''});
+        }
+      }
+    }
+    const sess=localStorage.getItem('vk_session');
+    if(sess) session=JSON.parse(sess);
+  } catch(e){}
+
+  // Apply defaults if missing
+  if(!visionSentence) visionSentence = lang==='nl'
+    ? 'Omdat er te weinig toegankelijke zorg is, richten wij ons op ouderen die zelfstandig willen wonen, die behoefte hebben aan een vertrouwd gezicht. Wij willen bereiken dat mensen hun eigen leven kunnen leiden. Daarom ligt onze focus de komende periode op het moderniseren van onze werkprocessen.'
+    : 'Because accessible care is insufficient, we focus on elderly people who need a familiar face. We want to achieve that people can lead their own lives. Therefore our focus is on modernising our processes.';
+
+  if(!themes.length) themes = (lang==='nl'
+    ?['Klantgerichtheid','Kwaliteit en processen','Medewerkers en ontwikkeling','Digitalisering','Samenwerking']
+    :['Customer focus','Quality and processes','Staff and development','Digitalisation','Collaboration']
+  ).map((name,i)=>({name,color:THEME_COLORS[i],score:3.5+Math.random()*1.5}));
+
+  if(!Object.keys(confirmedActions).length){
+    const demoActionsNl=[
+      ['Interview tien klanten over hun knelpunten','Maak drie klantpersona\'s','Breng klantreis in kaart','Ontwikkel tevredenheidsmeting','Organiseer kwartaalse klantpanels'],
+      ['Breng kernprocessen in kaart','Implementeer PDCA-cyclus','Stel kwaliteitsnormen vast','Voer maandelijkse audit uit','Train team op procesdenken'],
+      ['Voer ontwikkelgesprekken','Maak persoonlijk ontwikkelplan','Organiseer kennisdelingsoverleg','Creëer opleidingskalender','Introduceer mentorprogramma'],
+      ['Inventariseer digitale tools','Maak digitale roadmap','Implementeer cliëntvolgsysteem','Train medewerkers op systemen','Automatiseer administratieve taken'],
+      ['Breng samenwerkingspartners in kaart','Sluit drie nieuwe overeenkomsten','Organiseer kwartaaloverleg','Maak communicatieplan','Evalueer samenwerkingen jaarlijks'],
+    ];
+    const demoActionsEn=[
+      ['Interview ten clients about pain points','Create three client personas','Map the client journey','Develop satisfaction measurement','Organise quarterly client panels'],
+      ['Map core processes','Implement PDCA cycle','Set quality standards','Conduct monthly audit','Train team on process thinking'],
+      ['Conduct development conversations','Create personal development plans','Organise knowledge sharing','Create training calendar','Introduce mentoring programme'],
+      ['Inventory digital tools','Create digital roadmap','Implement client tracking system','Train staff on systems','Automate administrative tasks'],
+      ['Map collaboration partners','Sign three new agreements','Organise quarterly meetings','Create communication plan','Evaluate collaborations annually'],
+    ];
+    const da = lang==='nl' ? demoActionsNl : demoActionsEn;
+    da.forEach((actions,i) => { confirmedActions[i] = actions; });
+  }
+
+  if(!versnellers.length) versnellers = (lang==='nl'
+    ?['Eigenaarschap en accountability','Klant- en stakeholdergerichtheid','Prioritering en focus','Kwalitatieve personele bezetting','Financiële middelen en budgetten']
+    :['Ownership and accountability','Client and stakeholder focus','Prioritisation and focus','Qualitative staffing','Financial resources and budgets']
+  ).map((title,i)=>({title,count:5-i,source:''}));
+
+  if(!remmers.length) remmers = (lang==='nl'
+    ?['ICT en digitale ondersteuning','Verandervermogen','Data en managementinformatie','Leren en verbeteren','Kwantitatieve personele capaciteit']
+    :['ICT and digital support','Capacity for change','Data and management information','Learning and improvement','Quantitative staffing capacity']
+  ).map((title,i)=>({title,count:5-i,source:''}));
+
+  if(!session.horizon) session={horizon:'3-5jr',scale:'organisatie',urgency:'hoog',budget:'voldoende',sector:'zorg',sessionType:'strategisch',org:'Organisatie',facilitator:'Facilitator'};
+
+  // Ensure themes have scores
+  themes.forEach(t=>{ if(!t.score) t.score=3+Math.random()*2; });
+}
+
+/* ══════════════════════════════════════
+   INTRO
+══════════════════════════════════════ */
+function initIntro(){
+  const t=T[lang];
+  const visEl = document.getElementById('visionHero');
+  if (visEl) visEl.textContent = visionSentence||'—';
+  // Vision components as pills (de stip op de horizon bestaat uit 5 onderdelen)
+  const vc=document.getElementById('visionComponents');
+  if (vc) vc.innerHTML=t.visionComps.map((c)=>`<div class="vh-comp" title="${escapeHtml(c)}">${escapeHtml(c)}</div>`).join('');
+
+  // Summary cards: telling per fase 1/2/3/4 + horizon/urgentie/budget context
+  const summary=document.getElementById('introSummary');
+  if (!summary) return;
+  const s=session;
+  const totalActions = Object.values(confirmedActions).reduce((a,v)=>a+(Array.isArray(v)?v.length:0),0);
+  const items = [
+    {icon:'🗂',label:lang==='nl'?'Thema\'s':'Themes',val:`${themes.length}`},
+    {icon:'⚡',label:lang==='nl'?'Acties':'Actions',val:`${totalActions}`},
+    {icon:'↑',label:lang==='nl'?'Versnellers':'Accelerators',val:`${versnellers.length} top`},
+    {icon:'↓',label:lang==='nl'?'Remmers':'Obstacles',val:`${remmers.length} top`},
+    {icon:'📅',label:lang==='nl'?'Tijdshorizon':'Time horizon',val:t.horizonContext[s.horizon]||s.horizon||'—'},
+    {icon:'🔥',label:lang==='nl'?'Urgentie':'Urgency',val:t.urgencyContext[s.urgency]||s.urgency||'—'},
+  ];
+  summary.innerHTML = items.map(item=>`<div style="background:var(--surface);border:1px solid var(--b0);border-radius:var(--r);padding:12px 14px;box-shadow:var(--sh)">
+    <div style="font-size:18px;margin-bottom:4px">${item.icon}</div>
+    <div style="font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:2px">${escapeHtml(item.label)}</div>
+    <div style="font-size:14px;font-weight:700;color:var(--text)">${escapeHtml(String(item.val))}</div>
+  </div>`).join('');
+}
+
+/* ══════════════════════════════════════
+   TIMELINE CONFIG
+══════════════════════════════════════ */
+function buildTimelineConfig(){
+  const h=session.horizon||'3-5jr';
+  const u=session.urgency||'medium';
+  const b=session.budget||'voldoende';
+  const t=T[lang];
+  let periods, periodLabels, totalPeriods;
+
+  const now = new Date();
+  const yr = now.getFullYear();
+
+  if(h==='<1jr'){
+    totalPeriods=12;
+    periodLabels=t.periodLabel.map((m,i)=>({label:m,year:yr+(Math.floor(i/12))}));
+    periods='monthly';
+  } else if(h==='1-3jr'){
+    totalPeriods=12;
+    const qs=[];
+    for(let y=0;y<3;y++) for(let q=0;q<4;q++) qs.push({label:`${t.periodLabelQ[q]} '${String(yr+y).slice(2)}`,year:yr+y,q:q+1});
+    periodLabels=qs;periods='quarterly';
+  } else if(h==='3-5jr'){
+    totalPeriods=10;
+    const hs=[];
+    for(let y=0;y<5;y++) for(let h2=0;h2<2;h2++) hs.push({label:`H${h2+1} '${String(yr+y).slice(2)}`,year:yr+y});
+    periodLabels=hs;periods='half-yearly';
+  } else {
+    totalPeriods=7;
+    const ys=[];
+    for(let y=0;y<7;y++) ys.push({label:String(yr+y),year:yr+y});
+    periodLabels=ys;periods='yearly';
+  }
+
+  const maxParallel = b==='beperkt'?2:b==='ruim'?5:3;
+  const urgencyFactor = u==='hoog'?0.55:u==='laag'?1.0:0.75;
+
+  timelineConfig={periods,periodLabels,totalPeriods,maxParallel,urgencyFactor,horizon:h};
+}
+
+/* ══════════════════════════════════════
+   KEYWORD MATCHING
+══════════════════════════════════════ */
+function kwMatch(a, b){
+  const wa=String(a||'').toLowerCase().split(/\s+/).filter(w=>w.length>3);
+  const wb=String(b||'').toLowerCase().split(/\s+/).filter(w=>w.length>3);
+  if (!wa.length || !wb.length) return 0;
+  return wa.filter(w=>wb.some(w2=>w2.includes(w)||w.includes(w2))).length;
+}
+
+function matchToVision(text){
+  // Stap 1: probeer eerst de werkelijke kernwoorden uit fase 1 (per vraag-index).
+  // visionKeywords is een object {0:[kw,...],1:[...],...} of een array.
+  const tl = String(text||'').toLowerCase();
+  const userKw = visionKeywords || {};
+  let bestUser = -1, bestUserScore = 0;
+  const tryEntries = (obj) => {
+    Object.entries(obj).forEach(([idx, kws])=>{
+      const arr = Array.isArray(kws) ? kws : [];
+      let sc = 0;
+      arr.forEach(kw => {
+        const k = String(kw||'').toLowerCase().trim();
+        if (!k || k.length < 3) return;
+        if (tl.includes(k)) sc++;
+      });
+      if (sc > bestUserScore) { bestUserScore = sc; bestUser = parseInt(idx); }
+    });
+  };
+  if (Array.isArray(userKw)) tryEntries(Object.fromEntries(userKw.map((v,i)=>[i,v])));
+  else tryEntries(userKw);
+  if (bestUser >= 0 && bestUserScore > 0) return bestUser;
+
+  // Stap 2: fallback op generieke map (NL+EN)
+  const visionKeywordMap = {
+    0: ['probleem','kans','nodig','bestaansreden','reason','problem','exist','mission','purpose'],
+    1: ['klant','doelgroep','cliënt','client','gebruiker','target','user','audience','patient'],
+    2: ['behoefte','service','kwaliteit','frustratie','uitdaging','need','quality'],
+    3: ['bereiken','verbeteren','ambitie','doel','achieve','improve','result','ambition'],
+    4: ['prioriteit','proces','systeem','digitaal','focus','priority','process','system','digital'],
+  };
+  let best=3, bestScore=0;
+  Object.entries(visionKeywordMap).forEach(([idx,kws])=>{
+    const score=kws.filter(kw=>tl.includes(kw)).length;
+    if(score>bestScore){bestScore=score;best=parseInt(idx);}
+  });
+  return best;
+}
+
+/* ══════════════════════════════════════
+   GENERATE ROADMAP ACTIONS
+══════════════════════════════════════ */
+function computeActions(){
+  roadmapActions=[];
+  let globalRank=0;
+  const allActions=[];
+
+  // Flatten all actions with theme info
+  themes.forEach((theme,ti)=>{
+    const acts=confirmedActions[ti]||[];
+    acts.forEach((text,ai)=>{
+      if(!text||!text.trim()) return;
+      const themeScore=(theme.score||3)/5; // 0-1
+
+      // Vision component
+      const visComp=matchToVision(text);
+
+      // Versnellers/remmers relevance
+      const relV=versnellers.filter(v=>kwMatch(text,v.title)>0).map(v=>v.title).slice(0,2);
+      const relR=remmers.filter(r=>kwMatch(text,r.title)>0).map(r=>r.title).slice(0,2);
+
+      // Feasibility: start at 7, reduce for each relevant remmer
+      let feasibility=7+(relV.length*0.5)-(relR.length*1.5);
+      feasibility=Math.max(2,Math.min(9.5,feasibility));
+
+      // Impact: base from themeScore + versnellers boost
+      let impact=5+themeScore*3+(relV.length*0.8)-(relR.length*0.3);
+      impact=Math.max(2,Math.min(9.8,impact));
+
+      // Risk: inverse of feasibility, amplified by remmers
+      const riskScore=(10-feasibility)/10*100; // 0-100
+
+      // Composite priority (0-100)
+      const priorityScore=
+        themeScore*30 +
+        (visComp===4?20:visComp===3?18:16) + // vision contribution
+        feasibility/10*25 +
+        impact/10*25;
+
+      // Justification
+      const justif=buildJustif(text,relV,relR,priorityScore,lang);
+
+      // Estimated duration (in timeline periods)
+      const complexKws=['implementeer','ontwikkel','systeem','strateg','implementat','system','develop','digitalis','program'];
+      const isComplex=complexKws.some(kw=>text.toLowerCase().includes(kw));
+      const duration=isComplex?3:2;
+
+      allActions.push({
+        id:`T${ti}_A${ai}`, text, themeIdx:ti, themeName:theme.name, themeColor:theme.color, themeScore:theme.score||3,
+        visComp, feasibility, impact, riskScore, priorityScore, relV, relR, duration, owner:'', justif,
+        startPeriod:0, rank:0
+      });
+    });
+  });
+
+  // Sort all by composite priority (desc)
+  allActions.sort((a,b)=>b.priorityScore-a.priorityScore);
+
+  // Timeline placement with parallel limit
+  const periodLoad=Array(timelineConfig.totalPeriods).fill(0);
+  const max=timelineConfig.maxParallel;
+  const uf=timelineConfig.urgencyFactor;
+  const tp=timelineConfig.totalPeriods;
+
+  allActions.forEach((a,i)=>{
+    a.rank=i+1;
+    // Find earliest period with space, respecting urgency compression
+    const latestStart=Math.floor(((i/allActions.length)*uf+(1-uf)*0)*tp);
+    let sp=0;
+    for(let p=0;p<tp;p++){
+      if(periodLoad[p]<max){sp=p;break;}
+    }
+    sp=Math.max(sp,0);
+    a.startPeriod=sp;
+    for(let p=sp;p<Math.min(sp+a.duration,tp);p++) periodLoad[p]++;
+  });
+
+  roadmapActions=allActions;
+}
+
+function buildJustif(text,relV,relR,score,l){
+  const tl=T[l];
+  let s='';
+  if(score>70) s=l==='nl'?'Hoge composiet-score, directe bijdrage aan visie en strategie.':'High composite score, direct contribution to vision and strategy.';
+  else if(score>50) s=l==='nl'?'Gemiddelde prioriteit, relevant voor meerdere thema\'s.':'Medium priority, relevant to multiple themes.';
+  else s=l==='nl'?'Aanvullende actie, versterkt overige prioriteiten.':'Supporting action, reinforces other priorities.';
+  if(relV.length) s+=(l==='nl'?` Versneller '${relV[0]}' vergroot kans van slagen.`:` Accelerator '${relV[0]}' increases chance of success.`);
+  if(relR.length) s+=(l==='nl'?` Let op: remmer '${relR[0]}' verhoogt uitvoeringsrisico.`:` Note: obstacle '${relR[0]}' increases execution risk.`);
+  return s;
+}
+
+/* ══════════════════════════════════════
+   GENERATE ROADMAP
+══════════════════════════════════════ */
+function generateRoadmap(){
+  publishStage('generating');
+  goScreen('sGenerate');
+  buildTimelineConfig();
+  const t=T[lang];
+  const stepsEl=document.getElementById('aiSteps');
+  stepsEl.innerHTML='';
+  t.aiSteps.forEach((step,i)=>{
+    setTimeout(()=>{
+      const div=document.createElement('div');
+      div.className='ai-step';div.textContent=step;
+      stepsEl.appendChild(div);
+    },i*380);
+  });
+  setTimeout(async ()=>{
+    computeActions();                       // structuur + tijdlijn + terugval (blijft leidend)
+    try {
+      const ai = await vkCallAI('roadmap', {
+        stip: visionSentence,
+        themes: themes.map(th=>({name:th.name, score:th.score})),
+        acties: roadmapActions.map(a=>({text:a.text, themeName:a.themeName})),
+        versnellers: versnellers.map(v=>v.title),
+        remmers: remmers.map(r=>r.title),
+        sessie: { urgentie: timelineConfig.urgencyFactor, periodes: timelineConfig.totalPeriods }
+      }, { lang });
+      if (ai && Array.isArray(ai.actions)) {
+        // AI-overlay: alleen priorityScore/justif/owner verfijnen op de deterministische structuur
+        const byText = new Map(ai.actions.map(a=>[String(a.text||'').trim().toLowerCase(), a]));
+        roadmapActions.forEach(a=>{
+          const m = byText.get(String(a.text||'').trim().toLowerCase());
+          if (m){
+            if (m.priorityScore!=null && !isNaN(+m.priorityScore)) a.priorityScore=+m.priorityScore;
+            if (m.justif) a.justif=String(m.justif);
+            if (m.owner)  a.owner=String(m.owner);
+          }
+        });
+        roadmapActions.sort((x,y)=>y.priorityScore-x.priorityScore);
+        roadmapActions.forEach((a,i)=>a.rank=i+1);
+      }
+    } catch(e){ /* AI onbereikbaar/geen token → lokale berekening staat al klaar */ }
+    buildRoadmapUI();
+    goScreen('sRoadmap');
+    publishStage('roadmap');
+  },t.aiSteps.length*380+400);
+}
+
+/* ══════════════════════════════════════
+   BUILD ROADMAP UI
+══════════════════════════════════════ */
+function buildRoadmapUI(){
+  const t=T[lang];
+  // Subtitle
+  const sectorLabel=t.sectorLabels[session.sector]||t.sectorLabels.default;
+  document.getElementById('t-roadmapTitle').textContent=sectorLabel;
+  const orgName=session.org||'Organisatie';
+  document.getElementById('roadmapSubtitle').textContent=`${orgName} · ${session.sessionName||''} · ${t.horizonContext[session.horizon]||''}`;
+  document.getElementById('visionInRoadmap').textContent=visionSentence;
+
+  // Context badges
+  const cb=document.getElementById('contextBadges');
+  cb.innerHTML=[
+    {label:t.urgencyContext[session.urgency]||session.urgency,bg:'var(--cll)',col:'var(--cd)'},
+    {label:t.budgetContext[session.budget]||session.budget,bg:'var(--al)',col:'var(--oh)'},
+    {label:t.horizonContext[session.horizon]||session.horizon,bg:'var(--pl)',col:'var(--purple)'},
+  ].map(b=>`<span style="background:${b.bg};color:${b.col};padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700">${escapeHtml(b.label||'')}</span>`).join('');
+
+  // Tabs
+  buildTabs();
+  // Render first tab
+  switchTab('timeline');
+}
+
+function buildTabs(){
+  const t=T[lang];
+  const tabs=[
+    {id:'timeline',icon:'🗓',label:t.tabs.timeline},
+    {id:'matrix',icon:'📊',label:t.tabs.matrix},
+    {id:'themes',icon:'🎯',label:t.tabs.themes},
+    {id:'risk',icon:'⚠️',label:t.tabs.risk},
+  ];
+  document.getElementById('tabNav').innerHTML=tabs.map(tab=>
+    `<button class="tab-btn${tab.id==='timeline'?' on':''}" onclick="switchTab('${tab.id}')">
+      <span class="tab-icon">${tab.icon}</span>${escapeHtml(tab.label)}
+     </button>`
+  ).join('');
+}
+
+function switchTab(id){
+  currentTab=id;
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{
+    b.classList.toggle('on',['timeline','matrix','themes','risk'][i]===id);
+  });
+  document.querySelectorAll('.tab-pane').forEach(p=>p.style.display='none');
+  const pane=document.getElementById('tab'+id.charAt(0).toUpperCase()+id.slice(1));
+  if(pane){
+    pane.style.display='block';
+    if(!pane.dataset.built){
+      pane.dataset.built='1';
+      if(id==='timeline') buildTimeline(pane);
+      else if(id==='matrix') buildMatrix(pane);
+      else if(id==='themes') buildThemeView(pane);
+      else if(id==='risk') buildRiskView(pane);
+    }
+  }
+}
+
+/* ══════════════════════════════════════
+   TAB 1: TIMELINE (GANTT)
+══════════════════════════════════════ */
+function buildTimeline(container){
+  const t=T[lang];
+  const tl=timelineConfig;
+  const periods=tl.periodLabels.slice(0,tl.totalPeriods);
+  const periodW=100/tl.totalPeriods;
+
+  let html=`<div class="gantt-wrap" style="position:relative">`;
+  // Header
+  html+=`<div class="gantt-header">
+    <div class="gantt-label-col">${lang==='nl'?'Thema / Actie':'Theme / Action'}</div>
+    <div class="gantt-periods">${periods.map(p=>`<div class="gantt-period">${escapeHtml(p.label)}</div>`).join('')}</div>
+  </div>`;
+
+  // Rows per theme
+  themes.forEach((theme,ti)=>{
+    const acts=roadmapActions.filter(a=>a.themeIdx===ti).sort((a,b)=>a.rank-b.rank);
+    if(!acts.length) return;
+    html+=`<div class="gantt-row">
+      <div class="gantt-theme-label">
+        <div class="gtl-dot" style="background:${theme.color}"></div>
+        <div class="gtl-name">${escapeHtml(theme.name)}</div>
+      </div>
+      <div class="gantt-timeline" id="gtl-${ti}" style="position:relative;min-height:${Math.max(52,acts.length*44)}px">`;
+
+    // Grid lines
+    periods.forEach((_,pi)=>{
+      html+=`<div class="gantt-grid-line" style="left:${pi*periodW}%"></div>`;
+    });
+
+    // Action bars
+    acts.forEach((a,ai)=>{
+      const left=(a.startPeriod/tl.totalPeriods)*100;
+      const width=Math.max(periodW*0.9,(a.duration/tl.totalPeriods)*100-0.5);
+      const top=8+ai*44;
+      const priorityStars=a.rank<=5?'★★★':a.rank<=15?'★★':'★';
+      const ownerInit=a.owner?a.owner.split(' ').map(w=>w[0]).join('').slice(0,2):'';
+      html+=`<div class="action-bar" id="ab-${a.id}"
+        style="left:${left}%;width:${width}%;top:${top}px;background:${theme.color}"
+        title="${escapeHtml((a.text||'')+' — '+t.justifLabel+' '+(a.justif||''))}"
+        onclick="selectBar('${a.id}',${left},${top+44})">
+        <span class="ab-priority">${priorityStars}</span>
+        <span class="ab-text">${escapeHtml(a.text||'')}</span>
+        ${ownerInit?`<span class="ab-owner">${escapeHtml(ownerInit)}</span>`:''}
+      </div>`;
+    });
+
+    html+=`</div></div>`;
+  });
+  html+=`</div>`;
+
+  // Legend
+  html+=`<div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:12px;color:var(--t2)">
+    <span>${escapeHtml(T[lang].legendTopFive)}</span>
+    ${themes.map(th=>`<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${th.color};margin-right:4px;vertical-align:middle"></span>${escapeHtml(th.name)}</span>`).join('')}
+  </div>`;
+
+  container.innerHTML=html;
+  // Popover div
+  const pop=document.createElement('div');
+  pop.className='edit-popover';pop.id='editPopover';pop.style.display='none';
+  container.appendChild(pop);
+}
+
+function selectBar(actionId,leftPct,topOffset){
+  const a=roadmapActions.find(x=>x.id===actionId);
+  if(!a) return;
+  const t=T[lang];
+  const pop=document.getElementById('editPopover');
+  if(!pop) return;
+  // Toggle
+  if(selectedActionBar===actionId){
+    pop.style.display='none';selectedActionBar=null;
+    document.querySelectorAll('.action-bar').forEach(b=>b.classList.remove('selected-bar'));
+    return;
+  }
+  selectedActionBar=actionId;
+  document.querySelectorAll('.action-bar').forEach(b=>b.classList.remove('selected-bar'));
+  const targetBar = document.getElementById('ab-'+actionId);
+  if (targetBar) targetBar.classList.add('selected-bar');
+
+  const txt = a.text || '';
+  const shortTxt = txt.length>50 ? txt.slice(0,50)+'…' : txt;
+  const periodLabel = (timelineConfig.periodLabels[a.startPeriod] && timelineConfig.periodLabels[a.startPeriod].label) || (a.startPeriod+1);
+  pop.innerHTML=`
+    <div class="ep-title">${escapeHtml(shortTxt)}</div>
+    <div style="font-size:11px;color:var(--t3);margin-bottom:6px">${escapeHtml(t.justifLabel)} ${escapeHtml(a.justif||'')}</div>
+    <div class="ep-row">
+      <span style="font-size:12px;color:var(--t2)">${escapeHtml(t.periodeLabel)}: <strong>${escapeHtml(String(periodLabel))}</strong></span>
+    </div>
+    <div class="ep-row">
+      <button class="btn btn-ghost" onclick="moveBar('${actionId}',-1)" style="font-size:12px">${escapeHtml(t.moveEarlier)}</button>
+      <button class="btn btn-ghost" onclick="moveBar('${actionId}',1)" style="font-size:12px">${escapeHtml(t.moveLater)}</button>
+      <button class="btn btn-ghost" onclick="selectBar('${actionId}',0,0)" style="margin-left:auto">${escapeHtml(t.closeEdit)}</button>
+    </div>`;
+  pop.style.display='block';
+  pop.style.left=Math.min(leftPct,70)+'%';
+  pop.style.top=(topOffset+50)+'px';
+}
+
+function moveBar(actionId,dir){
+  const a=roadmapActions.find(x=>x.id===actionId);
+  if(!a) return;
+  const newSp=Math.max(0,Math.min(timelineConfig.totalPeriods-a.duration,a.startPeriod+dir));
+  a.startPeriod=newSp;
+  const pane=document.getElementById('tabTimeline');
+  delete pane.dataset.built;pane.style.display='none';
+  switchTab('timeline');
+  selectedActionBar=null;
+}
+
+/* ══════════════════════════════════════
+   TAB 2: MATRIX
+══════════════════════════════════════ */
+function buildMatrix(container){
+  const t=T[lang];
+  const maxI=window.innerWidth<700?300:480;
+  const W=maxI,H=Math.round(W*0.75);
+  const ML=52,MR=20,MT=20,MB=48;
+  const PW=W-ML-MR,PH=H-MT-MB;
+
+  let svg=`<svg class="matrix-svg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="max-width:${W}px">`;
+
+  // Quadrant backgrounds
+  svg+=`<rect x="${ML}" y="${MT}" width="${PW/2}" height="${PH/2}" fill="rgba(112,162,215,.06)"/>
+    <rect x="${ML+PW/2}" y="${MT}" width="${PW/2}" height="${PH/2}" fill="rgba(107,95,212,.07)"/>
+    <rect x="${ML}" y="${MT+PH/2}" width="${PW/2}" height="${PH/2}" fill="rgba(250,168,51,.06)"/>
+    <rect x="${ML+PW/2}" y="${MT+PH/2}" width="${PW/2}" height="${PH/2}" fill="rgba(189,210,77,.07)"/>`;
+
+  // Quadrant labels
+  const qlabel=(x,y,txt,col)=>`<text x="${x}" y="${y}" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="${col}" font-weight="700" opacity="0.6">${txt}</text>`;
+  svg+=qlabel(ML+PW/4,MT+PH/4-5,t.strategic,'#9666AA');
+  svg+=qlabel(ML+3*PW/4,MT+PH/4-5,t.quickWin,'#2A9791');
+  svg+=qlabel(ML+PW/4,MT+3*PH/4+8,t.reconsider,'#9A9894');
+  svg+=qlabel(ML+3*PW/4,MT+3*PH/4+8,t.fillIn,'#FAA833');
+
+  // Axes
+  svg+=`<line x1="${ML}" y1="${MT}" x2="${ML}" y2="${MT+PH}" stroke="rgba(0,0,0,.15)" stroke-width="1"/>
+    <line x1="${ML}" y1="${MT+PH}" x2="${ML+PW}" y2="${MT+PH}" stroke="rgba(0,0,0,.15)" stroke-width="1"/>
+    <line x1="${ML+PW/2}" y1="${MT}" x2="${ML+PW/2}" y2="${MT+PH}" stroke="rgba(0,0,0,.08)" stroke-width="1" stroke-dasharray="3 3"/>
+    <line x1="${ML}" y1="${MT+PH/2}" x2="${ML+PW}" y2="${MT+PH/2}" stroke="rgba(0,0,0,.08)" stroke-width="1" stroke-dasharray="3 3"/>`;
+
+  // Axis labels
+  svg+=`<text x="${ML+PW/2}" y="${H-8}" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(0,0,0,.5)">${t.matrixX}</text>
+    <text x="12" y="${MT+PH/2}" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(0,0,0,.5)" transform="rotate(-90 12 ${MT+PH/2})">${t.matrixY}</text>`;
+
+  // Action dots
+  roadmapActions.forEach(a=>{
+    const cx=ML+(a.feasibility/10)*PW;
+    const cy=MT+PH-(a.impact/10)*PH;
+    const r=Math.max(6,Math.min(14,(a.themeScore/5)*10));
+    svg+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${a.themeColor}" opacity="0.75" stroke="white" stroke-width="1.5">
+      <title>${escapeHtml(a.text||'')}\n${escapeHtml(t.feasLabel)}: ${a.feasibility.toFixed(1)} | ${escapeHtml(t.impactLabel)}: ${a.impact.toFixed(1)}</title>
+    </circle>`;
+    if(a.rank<=5){
+      svg+=`<text x="${cx}" y="${cy+3}" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8" fill="white" font-weight="700">${a.rank}</text>`;
+    }
+  });
+
+  svg+='</svg>';
+
+  container.innerHTML=`<div class="card">
+    ${svg}
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--t2)">
+      ${themes.map(th=>`<span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${th.color};margin-right:4px;vertical-align:middle"></span>${escapeHtml(th.name)}</span>`).join('')}
+    </div>
+    <p style="font-size:12px;color:var(--t3);margin-top:8px">${escapeHtml(t.matrixHint||'')}</p>
+  </div>`;
+}
+
+/* ══════════════════════════════════════
+   TAB 3: THEME OVERVIEW
+══════════════════════════════════════ */
+function buildThemeView(container){
+  const t=T[lang];
+  const maxScore=Math.max(...roadmapActions.map(a=>a.priorityScore));
+  const tl=timelineConfig;
+
+  let html='';
+  themes.forEach((theme,ti)=>{
+    const acts=roadmapActions.filter(a=>a.themeIdx===ti).sort((a,b)=>a.rank-b.rank);
+    if(!acts.length) return;
+    html+=`<div class="theme-section">
+      <div class="ts-head">
+        <div class="ts-bubble" style="background:${theme.color}">${ti+1}</div>
+        <div>
+          <div class="ts-title">${escapeHtml(theme.name)}</div>
+          <div class="ts-score">${escapeHtml(t.themeScore)}: ${(theme.score||3).toFixed(1)}/5 · ${acts.length} ${lang==='nl'?'acties':'actions'}</div>
+        </div>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+          <div style="width:80px;height:6px;background:var(--b0);border-radius:3px;overflow:hidden">
+            <div style="height:100%;background:${theme.color};width:${((theme.score||3)/5)*100}%;border-radius:3px"></div>
+          </div>
+          <span style="font-size:12px;font-weight:700;color:${theme.color}">${((theme.score||3)/5*100).toFixed(0)}%</span>
+        </div>
+      </div>`;
+
+    acts.forEach((a,ai)=>{
+      const pct=(a.priorityScore/maxScore)*100;
+      const periodLabel=(tl.periodLabels[a.startPeriod] && tl.periodLabels[a.startPeriod].label) || `P${a.startPeriod+1}`;
+      const vComp=t.visionComps[a.visComp]||'';
+      const riskClass=a.riskScore>60?'high':a.riskScore>35?'med':'low';
+      const riskColor=riskClass==='high'?'var(--coral)':riskClass==='med'?'var(--amber)':'var(--green)';
+
+      html+=`<div class="action-row">
+        <div class="ar-rank" style="background:${theme.color}18;color:${theme.color}">${ai+1}</div>
+        <div class="ar-body">
+          <div class="ar-text">${escapeHtml(a.text||'')}</div>
+          <div class="ar-bar-wrap">
+            <div class="ar-bar-bg"><div class="ar-bar-fill" style="width:${pct}%;background:${theme.color}"></div></div>
+            <span class="ar-score-txt" style="color:${theme.color}">${a.priorityScore.toFixed(0)}/100</span>
+          </div>
+          <div class="ar-meta">
+            <span class="ar-badge" style="background:${theme.color}15;color:${theme.color}">${escapeHtml(t.visContrib)}: ${escapeHtml(vComp)}</span>
+            <span class="ar-period-badge" style="background:var(--ol);color:var(--oh);border-color:var(--ob)">📅 ${escapeHtml(periodLabel)}</span>
+            ${a.relV.map(v=>`<span class="ar-badge" style="background:var(--gl);color:var(--gd)">↑ ${escapeHtml(String(v).split(' ')[0])}</span>`).join('')}
+            ${a.relR.map(r=>`<span class="ar-badge" style="background:var(--cll);color:var(--cd)">⚠ ${escapeHtml(String(r).split(' ')[0])}</span>`).join('')}
+          </div>
+          <div class="ar-justif">${escapeHtml(t.justifLabel)} ${escapeHtml(a.justif||'')}</div>
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+  });
+  container.innerHTML=html;
+}
+
+/* ══════════════════════════════════════
+   TAB 4: RISK VIEW
+══════════════════════════════════════ */
+function buildRiskView(container){
+  const t=T[lang];
+  const tl=timelineConfig;
+  const sorted=[...roadmapActions].sort((a,b)=>b.riskScore-a.riskScore);
+
+  let html=`<div class="card" style="overflow-x:auto"><table class="risk-table">
+    <thead><tr>
+      <th>${lang==='nl'?'Actie':'Action'}</th>
+      <th>${lang==='nl'?'Thema':'Theme'}</th>
+      <th>${t.riskLabel}</th>
+      <th>${t.verRelated}</th>
+      <th>${t.remRelated}</th>
+      <th>${t.periodeLabel}</th>
+    </tr></thead><tbody>`;
+
+  sorted.forEach(a=>{
+    const riskClass=a.riskScore>60?'risk-high':a.riskScore>35?'risk-med':'risk-low';
+    const periodLabel=(tl.periodLabels[a.startPeriod] && tl.periodLabels[a.startPeriod].label) || `P${a.startPeriod+1}`;
+    html+=`<tr class="${riskClass}">
+      <td style="max-width:200px;font-size:12px;font-weight:600">${escapeHtml(a.text||'')}</td>
+      <td><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px"><span style="width:8px;height:8px;border-radius:50%;background:${a.themeColor};display:inline-block"></span>${escapeHtml(a.themeName||'')}</span></td>
+      <td>
+        <div class="risk-bar"><div class="risk-fill" style="width:${a.riskScore}%"></div></div>
+        <div style="font-size:10px;font-weight:700;margin-top:2px;color:${a.riskScore>60?'var(--cd)':a.riskScore>35?'var(--amber)':'var(--gd)'}">${a.riskScore.toFixed(0)}%</div>
+      </td>
+      <td>${a.relV.map(v=>`<span class="tag-v">${escapeHtml(String(v).split(/[&,]/)[0].trim())}</span>`).join(' ')||'—'}</td>
+      <td>${a.relR.map(r=>`<span class="tag-r">${escapeHtml(String(r).split(/[&,]/)[0].trim())}</span>`).join(' ')||'—'}</td>
+      <td><span class="period-badge-small" style="background:var(--ol);color:var(--oh)">${escapeHtml(periodLabel)}</span></td>
+    </tr>`;
+  });
+
+  html+='</tbody></table></div>';
+  container.innerHTML=html;
+}
+
+/* ══════════════════════════════════════
+   OWNERS SCREEN
+══════════════════════════════════════ */
+function goScreen_owners(){goScreen('sOwners');buildOwnersScreen();}
+function buildOwnersScreen(){
+  const t=T[lang];
+  // v4: F0 schrijft participants als [{name,email}, ...]; normaliseer naar string-array
+  const rawParticipants = (session && session.participants) ? session.participants : ['Lisa','Pieter','Sara','Tom','Aisha'];
+  const participants = rawParticipants
+    .map(p => {
+      if (p == null) return '';
+      if (typeof p === 'string') return p.trim();
+      if (typeof p === 'object' && p.name) return String(p.name).trim();
+      return '';
+    })
+    .filter(Boolean);
+  const tl=timelineConfig;
+  let html='';
+
+  themes.forEach((theme,ti)=>{
+    const acts=roadmapActions.filter(a=>a.themeIdx===ti).sort((a,b)=>a.rank-b.rank);
+    if(!acts.length) return;
+    html+=`<div class="owner-section">
+      <div class="owner-theme-head">
+        <div style="width:28px;height:28px;border-radius:50%;background:${theme.color};color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center">${ti+1}</div>
+        <span style="font-size:14px;font-weight:700;color:${theme.color}">${escapeHtml(theme.name)}</span>
+      </div>`;
+
+    acts.forEach((a,ai)=>{
+      const periodLabel=(tl.periodLabels[a.startPeriod] && tl.periodLabels[a.startPeriod].label) || `P${a.startPeriod+1}`;
+      const txt = a.text || '';
+      const shortTxt = txt.length>55 ? txt.slice(0,53)+'…' : txt;
+      html+=`<div class="owner-row">
+        <div class="owner-num" style="background:${theme.color}15;color:${theme.color}">${ai+1}</div>
+        <div class="owner-text" title="${escapeHtml(txt)}">${escapeHtml(shortTxt)}</div>
+        <input class="owner-input" id="owner-${a.id}" list="participantsList" placeholder="${escapeHtml(t.ownerPlaceholder)}" value="${escapeHtml(a.owner||'')}" oninput="setOwner('${a.id}',this.value)">
+        <span class="period-badge-small" style="background:${theme.color}15;color:${theme.color}">${escapeHtml(periodLabel)}</span>
+      </div>`;
+    });
+    html+='</div>';
+  });
+
+  html+=`<datalist id="participantsList">${participants.map(p=>`<option value="${escapeHtml(p)}">`).join('')}</datalist>`;
+  document.getElementById('ownersContent').innerHTML=html;
+}
+
+function setOwner(actionId,value){
+  const a=roadmapActions.find(x=>x.id===actionId);
+  if(a) a.owner=value;
+}
+
+
+/* ══════════ RESET DEMO DATA ══════════ */
+function resetDemoData(){
+  if (window.__VK_PROD) return;
+  const msg = (T[lang] && T[lang].resetConfirm) || 'Alle sessiedata wissen?';
+  if(!confirm(msg)) return;
+  const keys = [
+    // fase 0 sessie
+    'vk_session','vk_session_started',
+    // fase 1
+    'vk_vision_sentence','vk_vision_keywords','vk_phase1_answers','vk_phase1_stage','vk_phase1_live_answers',
+    // fase 2
+    'vk_selected_themes','vk_phase2_submissions','vk_phase2_stage','vk_phase2_live_subs',
+    // fase 3
+    'vk_confirmed_actions','vk_phase3_submissions','vk_phase3_stage','vk_phase3_live_subs',
+    // fase 4
+    'vk_versnellers','vk_remmers','vk_phase4_scores','vk_phase4_submissions','vk_phase4_stage','vk_phase4_live_subs',
+    // fase 5
+    'vk_roadmap_actions','vk_phase5_stage','vk_phase5_state',
+    // alle fase-states (v4 back-edit flow)
+    'vk_phase1_state','vk_phase2_state','vk_phase3_state','vk_phase4_state',
+  ];
+  // vk_lang blijft expliciet behouden (UI-voorkeur)
+  keys.forEach(k=>localStorage.removeItem(k));
+  alert((T[lang] && T[lang].resetDone) || 'Demo-data gewist.');
+  location.reload();
+}
+
+/* ══════════════════════════════════════
+   CONFIRM & FINAL
+══════════════════════════════════════ */
+function confirmRoadmap(){
+  // ── Persist phase 5 (roadmap) output ─────────────────────
+  try{
+    localStorage.setItem('vk_roadmap_actions', JSON.stringify(roadmapActions));
+    // v4: markeer fase 5 als bevestigd voor back-edit flow + rapport
+    localStorage.setItem('vk_phase5_state', 'confirmed');
+  }catch(e){}
+  publishStage('final', {acts: vkSerializeRoadmap()});
+  buildFinalScreen();
+  goScreen('sFinal');
+  buildCanvas();
+  // v4: cumulative results onder roadmap
+  vkRenderCumulativeF5();
+}
+
+function buildFinalScreen(){
+  const t=T[lang];
+  const tl=timelineConfig;
+  let html=`<div class="card">
+    <div style="background:linear-gradient(135deg,#FAA833,#D8901E);border-radius:var(--r);padding:18px 22px;margin-bottom:18px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.75);margin-bottom:6px">${escapeHtml(t.visionLabel)}</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:16px;color:#fff;line-height:1.5">${escapeHtml(visionSentence)}</div>
+    </div>`;
+
+  themes.forEach((theme,ti)=>{
+    const acts=roadmapActions.filter(a=>a.themeIdx===ti).sort((a,b)=>a.rank-b.rank);
+    if(!acts.length) return;
+    html+=`<div style="margin-bottom:16px;border:1px solid ${theme.color}30;border-radius:var(--r);overflow:hidden">
+      <div style="background:${theme.color}12;padding:10px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid ${theme.color}20">
+        <div style="width:28px;height:28px;border-radius:50%;background:${theme.color};color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">${ti+1}</div>
+        <span style="font-size:14px;font-weight:700;color:${theme.color}">${escapeHtml(theme.name)}</span>
+      </div>`;
+
+    acts.forEach((a,ai)=>{
+      const owner=a.owner||'—';
+      const periodLabel=(tl.periodLabels[a.startPeriod] && tl.periodLabels[a.startPeriod].label) || `P${a.startPeriod+1}`;
+      const riskColor=a.riskScore>60?'var(--cd)':a.riskScore>35?'var(--amber)':'var(--gd)';
+      html+=`<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 16px;border-bottom:1px solid ${theme.color}15">
+        <div style="width:22px;height:22px;border-radius:50%;background:${theme.color}18;color:${theme.color};font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${ai+1}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;margin-bottom:3px">${escapeHtml(a.text)}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;font-size:11px">
+            <span style="background:var(--ol);color:var(--oh);padding:2px 7px;border-radius:10px">📅 ${escapeHtml(periodLabel)}</span>
+            <span style="background:var(--pl);color:var(--purple);padding:2px 7px;border-radius:10px">🎯 ${escapeHtml(t.visionComps[a.visComp]||'')}</span>
+            <span style="background:${riskColor}15;color:${riskColor};padding:2px 7px;border-radius:10px">⚠ ${a.riskScore.toFixed(0)}%</span>
+            ${owner!=='—'?`<span style="background:var(--gl);color:var(--gd);padding:2px 7px;border-radius:10px">👤 ${escapeHtml(owner)}</span>`:''}
+          </div>
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+  });
+  html+=`<div style="display:flex;justify-content:flex-end;margin-top:14px">
+    <button class="btn btn-ghost" onclick="window.print()" style="font-size:12px">🖨 ${escapeHtml(t.printBtn||'Afdrukken')}</button>
+  </div></div>`;
+
+  document.getElementById('fvRoadmap').innerHTML=html;
+}
+
+/* ══════════════════════════════════════
+   CANVAS
+══════════════════════════════════════ */
+function buildCanvas(){
+  const names = (typeof themes!=='undefined' ? themes : []).map(t => (t && t.name) || '');
+  const actions = (typeof themes!=='undefined' ? themes : []).map((_, i) => (confirmedActions && confirmedActions[i]) ? confirmedActions[i] : []);
+  const v = (typeof versnellers!=='undefined' ? versnellers : []).map(x => typeof x === 'string' ? x : (x && (x.title || x.name)) || '');
+  const r = (typeof remmers!=='undefined' ? remmers : []).map(x => typeof x === 'string' ? x : (x && (x.title || x.name)) || '');
+  // Selecteer top-5 op priorityScore, sorteer vervolgens chronologisch op startPeriod
+  // (Sibbet stap 6: orden de bold steps logisch in de tijd)
+  const ra = (typeof roadmapActions!=='undefined' ? roadmapActions : []);
+  const top5selected = ra.slice().sort((a,b)=>(b.priorityScore||0)-(a.priorityScore||0)).slice(0,5);
+  const top5chrono = top5selected.slice().sort((a,b)=>{
+    const da = (a.startPeriod||0) - (b.startPeriod||0);
+    if (da !== 0) return da;
+    return (b.priorityScore||0) - (a.priorityScore||0);
+  });
+  const top5 = top5chrono.map(a => ({text: a.text || '', themeIdx: a.themeIdx || 0}));
+  vkRenderInto(document.getElementById('vkCanvas'), {
+    visionSentence: (typeof visionSentence!=='undefined' ? visionSentence : '') || '',
+    themeNames: names,
+    themeActions: actions,
+    versnellers: v,
+    remmers: r,
+    roadmapTop5: top5,
+    lang: lang
+  });
+}
+
+/* ══════════════════════════════════════
+   VIEW TOGGLE
+══════════════════════════════════════ */
+function switchFinal(v){
+  const isR=v==='roadmap';
+  document.getElementById('fvRoadmap').style.display=isR?'block':'none';
+  document.getElementById('fvCanvas').style.display=isR?'none':'block';
+  document.getElementById('vt-roadmap').classList.toggle('on',isR);
+  document.getElementById('vt-canvas').classList.toggle('on',!isR);
+}
+
+/* ══════════════════════════════════════
+   PARTICIPANT VIEW
+══════════════════════════════════════ */
+function showPView(){
+  document.getElementById('facView').style.display='none';
+  document.getElementById('pView').classList.add('open');
+}
+function hidePView(){
+  document.getElementById('pView').classList.remove('open');
+  document.getElementById('facView').style.display='';
+}
+
+/* ══════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════ */
+function goToRapport(){
+  // Save any pending owner edits first
+  try{ localStorage.setItem('vk_roadmap_actions', JSON.stringify(roadmapActions)); }catch(e){}
+  if (VK_LIVE && window.VK_CINAB){ vkCinabSaveAndGo(); return; }
+  window.location.href = 'visiekaart_rapport.html';
+}
+
+/* ══ Cluster B (Blok 1): betaalpoort + rapport-opslaan ══ */
+// Rapport opslaan op het platform, daarna naar de lokale rapportweergave.
+async function vkCinabSaveAndGo(){
+  const client = await VK_CINAB.restore();
+  if (!client){ window.location.href = 'visiekaart_rapport.html'; return; }
+  try{
+    const wrapper = VK_CINAB.buildWrapper({ includeExport: true });
+    const out = await VK_CINAB.saveReport(client, wrapper);   // → {rapport_id, rapport_url} + notifyCompleted
+    if (out && out.rapport_url){ try{ sessionStorage.setItem('vk_rapport_url', out.rapport_url); }catch(e){} }
+  }catch(e){
+    if (e && e.isPaymentRequired){ vkCinabPaywallOverlay(); return; }   // betaalde fase niet afgerekend
+    console.warn('rapport-opslaan mislukt:', e);                        // andere fout → toch lokale weergave (geen dataverlies)
+  }
+  window.location.href = 'visiekaart_rapport.html';
+}
+
+// _cinab_betaal_vanaf_fase: betaalmuurfase. Bevestigd door CINAB: betalen vanaf fase 5
+// (APP-START §2). Eén bron van waarheid; wijzig hier als CINAB de poortfase verlegt.
+const VK_BETAAL_VANAF_FASE = 5;
+
+// Betaalpoort op de start van fase 5 (keuze b: blokkerende melding bij annuleren).
+async function vkCinabGateFase5(){
+  try{ delete VK_CINAB.__paying; }catch(e){}
+  const client = await VK_CINAB.restore();
+  if (!client) return;                         // geen platform-context → niets af te rekenen
+  const ok = await VK_CINAB.gate(client, VK_BETAAL_VANAF_FASE, {
+    returnUrl: location.href,
+    beforePay: async ()=>{                     // state persistent zetten vóór de Mollie-redirect (pay-resume)
+      try{
+        const code = (JSON.parse(localStorage.getItem('vk_session')||'{}')).sessionCode;
+        if (code && window.vkFb) await vkFb.stateSave(code, VK_CINAB.collectExport());
+      }catch(e){}
+    }
+  });
+  if (ok){ vkCinabRemoveOverlay(); return; }   // betaald (of resume) → fase 5 vrijgegeven
+  if (VK_CINAB.__paying) return;               // wordt doorgestuurd naar de shop → niets tonen
+  vkCinabPaywallOverlay();                     // geannuleerd → blokkerende melding (keuze b)
+}
+
+function vkCinabPaywallOverlay(){
+  vkCinabRemoveOverlay();
+  const titel = (lang==='en') ? 'This phase requires payment' : 'Deze fase vereist afrekenen';
+  const tekst = (lang==='en') ? 'The roadmap phase is paid. Settle to continue.' : 'De roadmap-fase wordt afgerekend. Reken af om verder te gaan.';
+  const opnw  = (lang==='en') ? 'Try again' : 'Opnieuw proberen';
+  const o = document.createElement('div');
+  o.id = 'vkCinabPaywall';
+  o.style.cssText = 'position:fixed;inset:0;z-index:99999;background:var(--bg,#ffffff);display:flex;align-items:center;justify-content:center;padding:24px;text-align:center';
+  o.innerHTML = '<div style="max-width:440px"><div style="font-family:\'DM Serif Display\',serif;font-size:28px;margin-bottom:12px">'+
+    titel+'</div><p style="font-size:15px;color:var(--t2,#555);margin-bottom:24px;line-height:1.5">'+tekst+
+    '</p><button id="vkCinabRetry" class="btn btn-orange btn-lg">'+opnw+'</button></div>';
+  document.body.appendChild(o);
+  document.getElementById('vkCinabRetry').addEventListener('click', ()=>{ vkCinabRemoveOverlay(); vkCinabGateFase5(); });
+}
+function vkCinabRemoveOverlay(){ const o=document.getElementById('vkCinabPaywall'); if(o) o.remove(); }
+
+function navPhase(n){
+  const file=n===4?'visiekaart_fase4.html':'visiekaart_fase0.html';
+  window.location.href=file;
+}
+
+// Override goScreen for owners button + publiceer stage 'owners'
+document.addEventListener('click',e=>{
+  if(e.target.id==='t-toOwners'||e.target.closest('#t-toOwners')?.id==='t-toOwners'){
+    publishStage('owners');
+    goScreen('sOwners');
+    buildOwnersScreen();
+  }
+});
+
+/* ══════════════════════════════════════
+   INIT
+══════════════════════════════════════ */
+/* Deelnemer-rol: forceer pView en volg de globale stage uit RTDB.
+   Een deelnemer raakt de betaalpoort nooit (de facilitator rekent af). */
+function vkRoleInit(){
+  if(!VK_IS_PARTICIPANT) return;
+  showPView();
+  if(!(VK_LIVE && window.vkFb)) return;
+  try{
+    vkFb.stageListen(vkLiveCode(), function(raw){ applyStageToPView(vkParseStage(raw)); });
+  }catch(e){}
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  vkApplyEnvironmentRules();
+  loadData();
+  initLang();
+  applyT();
+  initIntro();
+  buildQSteps();
+  renderSessPanel();
+  updatePSummary();
+  applyStageToPView();
+  // Initieer pre-wait als er nog geen stage is gepubliceerd (alleen facilitator).
+  if (!VK_IS_PARTICIPANT && !readStage()) publishStage('preWait');
+  // Cluster B: betaalpoort op de start van fase 5 (alleen live, alleen facilitator).
+  if (VK_LIVE && window.VK_CINAB && !VK_IS_PARTICIPANT) vkCinabGateFase5();
+  // Deelnemer: forceer pView en luister naar de globale stage.
+  vkRoleInit();
+});
+</script>
+<!-- ═══════════════ PLATFORM / FIREBASE / CINAB (Blok 1, identiek in fase 0-5 + rapport) ═══════════════ -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script type="module">
+  // De ONGEWIJZIGDE module-client; we bridgen alleen zijn publieke API naar window.
+  import { startCinabSession, createCinabClient, CinabError } from './cinab-tool-client.js';
+  window.__cinabLib = { startCinabSession, createCinabClient, CinabError };
+  window.dispatchEvent(new Event('cinab-lib-ready'));
+</script>
+<script>
+/* ── ingebouwde vk-firebase.js ── */
+/* ══════════════════════════════════════════════════════════════════════════
+   vk-firebase.js — Cluster B / Firebase-integratie (niveau B)
+   Wordt straks INGEBOUWD per fase (zelf-bevattend), net als vk-ai.js.
+
+   Levert:
+   - omgevings-config (staging vs productie; NOOIT databaseURL hardcoden in code)
+   - anonieme auth
+   - server-side sessie-state in RTDB  (/sessions/{code}/state)   — vervangt localStorage op B
+   - stage-sync                        (/sessions/{code}/stage)
+   - live-listeners + append           (/sessions/{code}/phaseN/...)
+   - session/clear                     (wist de RTDB-tak; stateless-at-rest)
+
+   ALLES degradeert netjes: ontbreekt de SDK/config of faalt het netwerk, dan
+   rejecten de helpers en de fase valt terug op de bestaande localStorage/demo-flow.
+   De beveiliging zit in database.rules.json, niet in deze config (geen secret).
+   ══════════════════════════════════════════════════════════════════════════ */
+(function (global) {
+  'use strict';
+
+  /* ── Omgevings-config (per omgeving inlezen; productie schoon omwisselbaar) ── */
+  var VK_FB_STAGING = {
+    apiKey: "AIzaSyCer_6Y7f-jUXygHnBF_UdtpTxPTEIvaoA",
+    authDomain: "visiekaart.firebaseapp.com",
+    databaseURL: "https://visiekaart-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "visiekaart",
+    storageBucket: "visiekaart.firebasestorage.app",
+    messagingSenderId: "757784606494",
+    appId: "1:757784606494:web:6f47e48fc85f15f6257b0f"
+  };
+  // Vul in zodra het schone productieproject (europe-west1, CINAB-account) staat:
+  var VK_FB_PROD = null; // bv. { apiKey:"…", databaseURL:"https://…-prod-….europe-west1.firebasedatabase.app", … }
+
+  function vkFbEnv() {
+    var h = (global.location && global.location.hostname) || '';
+    var staging = (h === 'localhost' || h.indexOf('127.') === 0 || h.indexOf('192.168.') === 0 ||
+                   h.indexOf('.local') !== -1 || h.indexOf('.web.app') !== -1 ||
+                   h.indexOf('.firebaseapp.com') !== -1 || h.indexOf('staging.') === 0);
+    return staging ? 'staging' : 'production';
+  }
+  function vkFbConfig() { return vkFbEnv() === 'production' ? VK_FB_PROD : VK_FB_STAGING; }
+
+  /* ── Init + anonieme auth ── */
+  var _readyPromise = null;
+  function vkFbInit() {
+    if (_readyPromise) return _readyPromise;
+    _readyPromise = new Promise(function (resolve, reject) {
+      try {
+        if (typeof global.firebase === 'undefined' || !global.firebase.initializeApp) {
+          return reject(new Error('firebase_sdk_missing'));
+        }
+        var cfg = vkFbConfig();
+        if (!cfg || !cfg.databaseURL) return reject(new Error('firebase_config_missing'));
+        if (!global.firebase.apps || !global.firebase.apps.length) global.firebase.initializeApp(cfg);
+        global.firebase.auth().signInAnonymously()
+          .then(function () { resolve(global.firebase); })
+          .catch(reject);
+      } catch (e) { reject(e); }
+    });
+    return _readyPromise;
+  }
+
+  function db() { return global.firebase.database(); }
+  function sessRef(code, sub) { return db().ref('sessions/' + code + (sub ? '/' + sub : '')); }
+  function nowUTC() { return Date.now(); }
+
+  /* ── Sessie-state (server-side; vervangt localStorage op niveau B) ── */
+  // payload = opaak object (volledige tool-state). WordPress leest dit nooit (data_ref).
+  function stateSave(code, payload) {
+    return vkFbInit().then(function () {
+      return sessRef(code, 'state').set({ updatedAt: nowUTC(), payload: payload });
+    });
+  }
+  function stateLoad(code) {
+    return vkFbInit().then(function () {
+      return sessRef(code, 'state').once('value').then(function (s) {
+        var v = s.val(); return v ? v.payload : null;
+      });
+    });
+  }
+  function stateClear(code) {
+    return vkFbInit().then(function () { return sessRef(code, 'state').remove(); });
+  }
+
+  /* ── Stage-sync (facilitator schrijft, deelnemer leest) ── */
+  function stageSet(code, stage) {
+    return vkFbInit().then(function () { return sessRef(code, 'stage').set(String(stage)); });
+  }
+  function stageListen(code, cb) {
+    return vkFbInit().then(function () {
+      var ref = sessRef(code, 'stage');
+      ref.on('value', function (s) { cb(s.val()); });
+      return function off() { ref.off(); };
+    });
+  }
+
+  /* ── Live inzendingen: listener (facilitator) + append (deelnemer) ── */
+  // sub bv. 'phase4/scores'. cb krijgt een array van waarden (chronologisch).
+  function liveListen(code, sub, cb) {
+    return vkFbInit().then(function () {
+      var ref = sessRef(code, sub);
+      ref.on('value', function (snap) {
+        var arr = []; snap.forEach(function (ch) { var v = ch.val(); if (v) arr.push(v); });
+        cb(arr);
+      });
+      return function off() { ref.off(); };
+    });
+  }
+  function push(code, sub, obj) {
+    return vkFbInit().then(function () {
+      obj = obj || {}; if (typeof obj.at === 'undefined') obj.at = nowUTC();
+      return sessRef(code, sub).push(obj);
+    });
+  }
+
+  /* ── Facilitator: sessie aanmaken / content publiceren / hele tak wissen ── */
+  function ensureSession(code, lang) {
+    return vkFbInit().then(function (fb) {
+      var uid = fb.auth().currentUser.uid;
+      return sessRef(code, 'meta').transaction(function (cur) {
+        if (cur) return cur; // bestaat al → niet overschrijven
+        return { createdAt: nowUTC(), lang: lang || 'nl', facilitatorUid: uid };
+      }).then(function () { return uid; });
+    });
+  }
+  function contentSet(code, content) {
+    return vkFbInit().then(function () { return sessRef(code, 'content').set(content); });
+  }
+  function contentListen(code, cb) {
+    return vkFbInit().then(function () {
+      var ref = sessRef(code, 'content');
+      ref.on('value', function (s) { cb(s.val()); });
+      return function off() { ref.off(); };
+    });
+  }
+  function sessionClear(code) {
+    return vkFbInit().then(function () { return sessRef(code).remove(); });
+  }
+
+  global.vkFb = {
+    env: vkFbEnv, config: vkFbConfig, init: vkFbInit,
+    stateSave: stateSave, stateLoad: stateLoad, stateClear: stateClear,
+    stageSet: stageSet, stageListen: stageListen,
+    liveListen: liveListen, push: push,
+    ensureSession: ensureSession, contentSet: contentSet, contentListen: contentListen,
+    sessionClear: sessionClear
+  };
+})(window);
+
+</script>
+<script>
+/* ── ingebouwde vk-cinab.js ── */
+/* ══════════════════════════════════════════════════════════════════════════
+   vk-cinab.js — Cluster B / Blok 1: koppeling, betaalmuur, rapport-opslaan
+   Glue tussen de ONGEWIJZIGDE module-client (cinab-tool-client.js) en de
+   inline fase-scripts. De client wordt NIET herschreven; deze laag roept
+   alleen zijn publieke API aan en bridget naar window.VK_CINAB.
+
+   Vereist (per fase, in deze volgorde geladen):
+     <script type="module">
+       import { startCinabSession, createCinabClient, CinabError }
+         from './cinab-tool-client.js';
+       window.__cinabLib = { startCinabSession, createCinabClient, CinabError };
+       window.dispatchEvent(new Event('cinab-lib-ready'));
+     <\/script>
+   Optioneel (voor RTDB-state t.b.v. pay-resume): vk-firebase.js (window.vkFb).
+
+   Alles draait ALLEEN in VK_LIVE; ontbreekt platform/lib, dan geeft elke functie
+   netjes null/false terug en draait de tool zelfstandig verder (demo/lokaal).
+   ══════════════════════════════════════════════════════════════════════════ */
+(function (global) {
+  'use strict';
+
+  var SS_KEY = 'vk_cinab';   // sessionStorage: token (capability) + poortconfig — NIET in URL/localStorage-at-rest
+
+  function libReady() {
+    return new Promise(function (resolve) {
+      if (global.__cinabLib) return resolve(global.__cinabLib);
+      var done = false;
+      global.addEventListener('cinab-lib-ready', function () { if (!done) { done = true; resolve(global.__cinabLib); } }, { once: true });
+      setTimeout(function () { if (!done) { done = true; resolve(global.__cinabLib || null); } }, 8000);
+    });
+  }
+
+  function saveCtx(ctx) { try { sessionStorage.setItem(SS_KEY, JSON.stringify(ctx)); } catch (e) {} }
+  function loadCtx()    { try { return JSON.parse(sessionStorage.getItem(SS_KEY) || 'null'); } catch (e) { return null; } }
+  function clearCtx()   { try { sessionStorage.removeItem(SS_KEY); } catch (e) {} }
+  function urlParam(n)  { try { return new URLSearchParams(global.location.search).get(n); } catch (e) { return null; } }
+
+  /* ── Fase 0: verse start (launch→token) of resume → client + context bewaren ── */
+  async function bootstrap() {
+    var lib = await libReady();
+    if (!lib) return null;
+    try {
+      var client = await lib.startCinabSession();           // leest ?launch/?token/?cinab/?action; wist ze uit de URL
+      saveCtx({
+        apiBase: client.apiBase, token: client.token,
+        betaalVanafFase: client.betaalVanafFase, credits: client.credits,
+        parentRapportId: client.parentRapportId || null
+      });
+      try { client.notifyLoaded(); } catch (e) {}
+      return client;
+    } catch (e) { return null; }                            // geen platform-context → tool draait zelfstandig
+  }
+
+  /* ── Andere fasen: client herstellen uit sessionStorage (token reist niet in de URL) ── */
+  async function restore() {
+    var lib = await libReady(); if (!lib) return null;
+    var ctx = loadCtx(); if (!ctx || !ctx.token || !ctx.apiBase) return null;
+    try {
+      return lib.createCinabClient({
+        apiBase: ctx.apiBase, token: ctx.token,
+        betaalVanafFase: ctx.betaalVanafFase, credits: ctx.credits,
+        parentRapportId: ctx.parentRapportId, action: urlParam('action')
+      });
+    } catch (e) { return null; }
+  }
+
+  /* ── Betaalpoort op de start van faseNr (werkboek §5.2). ──
+     resolve(true) = door; resolve(false) = stop/navigeert weg (koop of afbreken). */
+  async function gate(client, faseNr, opts) {
+    opts = opts || {};
+    if (!client || client.betaalVanafFase == null || faseNr < client.betaalVanafFase) return true;
+
+    // Terugkeer na betaling: idempotente retry (al betaald → no-op → door)
+    if (client.isResume) {
+      try { await client.settleSession(); return true; } catch (e) { /* val door naar de poort */ }
+    }
+
+    try { await client.getSaldo(); } catch (e) {}           // advisory, alleen UX
+
+    var credits = (client.credits != null) ? client.credits : null;
+    var vraag = opts.confirmText ||
+      ('Verder naar deze fase? ' + (credits != null ? ('Er worden ' + credits + ' credits afgeschreven.') : 'Er wordt saldo afgeschreven.'));
+    if (!global.confirm(vraag)) return false;               // gebruiker stopt → niets afgeschreven, sessie blijft (TTL)
+
+    try {
+      await client.settleSession();                         // bindend: atomisch + idempotent
+      return true;
+    } catch (e) {
+      if (e && e.isPaymentRequired) {
+        if (opts.beforePay) { try { await opts.beforePay(); } catch (_) {} }   // state persistent zetten vóór de redirect
+        try { global.VK_CINAB.__paying = true; } catch (_) {}                   // signaal voor de poort-UI (redirect ≠ annuleren)
+        client.goToPayment(e, { returnUrl: opts.returnUrl || global.location.href });
+        return false;                                       // navigeert weg naar de shop (window.top.location)
+      }
+      throw e;
+    }
+  }
+
+  /* ── Rapport opslaan (consumeert het token) + WordPress laten doorschakelen ── */
+  async function saveReport(client, wrapper) {
+    var out = await client.saveReport(wrapper);             // → { rapport_id, rapport_url }
+    if (out && out.rapport_url) { try { client.notifyCompleted(out.rapport_url); } catch (e) {} }
+    return out;
+  }
+
+  /* ── Wrapper bouwen uit de tool-state: 20 INK-dimensies + data_ref naar RTDB ── */
+  var INK_IDS = ['A1','A2','A3','A4','A5','A6','A7','A8','A9','A10','B1','B2','B3','B4','B5','B6','B7','B8','B9','B10'];
+
+  function buildWrapper(opts) {
+    opts = opts || {};
+    var p4 = {}; try { p4 = JSON.parse(localStorage.getItem('vk_phase4_scores') || '{}'); } catch (e) {}
+    var all = (p4 && p4.allScores && typeof p4.allScores === 'object') ? p4.allScores : {};
+    var scores = {};
+    INK_IDS.forEach(function (id) {
+      var r = all[id] || {}; var k = +r.k || 0, n = +r.n || 0, a = +r.a || 0; var tot = k + n + a;
+      scores[id.toLowerCase()] = tot ? Math.round((k * 100 + n * 50 + a * 0) / tot) : 50;  // geen stemmen → neutraal 50
+    });
+
+    var sess = {}; try { sess = JSON.parse(localStorage.getItem('vk_session') || '{}'); } catch (e) {}
+    var deelnemers = Array.isArray(sess.participants) ? sess.participants.length : (opts.deelnemers || 0);
+    var meta = {
+      organisatie: sess.org || sess.organisatie || '',
+      datum: new Date().toISOString().slice(0, 10),          // UTC ISO YYYY-MM-DD
+      deelnemers: deelnemers,
+      facilitator: sess.facilitator || sess.facilitatorName || sess.sessionName || ''
+    };
+    if (sess.sector) meta.sector = sess.sector;              // e-mailvrij: geen e-mail in meta
+
+    var code = sess.sessionCode || opts.sessionCode || '';
+    var data = { data_ref: { store: 'firebase-rtdb', path: '/sessions/' + code } };
+    if (opts.includeExport) data.export = collectExport();   // opaak; platform leest dit niet
+
+    return {
+      template_id: 'visiekaart',
+      schema_version: '1.0',
+      scores: scores,
+      meta: meta,
+      data: data,
+      parent_rapport_id: null                                // _cinab_is_vergelijkbaar = false
+    };
+  }
+
+  function collectExport() {
+    var keys = ['vk_session','vk_vision_sentence','vk_vision_keywords','vk_selected_themes',
+      'vk_confirmed_actions','vk_versnellers','vk_remmers','vk_phase4_scores','vk_roadmap_actions'];
+    var out = {};
+    keys.forEach(function (k) {
+      try {
+        var v = localStorage.getItem(k);
+        if (v == null) return;
+        try { out[k] = JSON.parse(v); } catch(e){ out[k] = v; }   // niet-JSON (bv. de visiezin) als ruwe string bewaren, niet droppen
+      } catch (e) {}
+    });
+    return out;
+  }
+
+  global.VK_CINAB = {
+    libReady: libReady, bootstrap: bootstrap, restore: restore, gate: gate,
+    saveReport: saveReport, buildWrapper: buildWrapper, collectExport: collectExport,
+    loadCtx: loadCtx, clearCtx: clearCtx
+  };
+})(window);
+
+</script>
+</body>
+</html>

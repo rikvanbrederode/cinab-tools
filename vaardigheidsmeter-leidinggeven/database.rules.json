@@ -1,0 +1,82 @@
+{
+  "rules": {
+    "sessions": {
+      "$code": {
+
+        // ── meta ──────────────────────────────────────────────────────────
+        // Alleen de initiatiefnemer schrijft en leest meta.
+        // facilitatorUid wordt bij sessie-aanmaak ingevuld.
+        "meta": {
+          ".read":  "auth != null && data.child('facilitatorUid').val() === auth.uid",
+          ".write": "auth != null && (!data.exists() || data.child('facilitatorUid').val() === auth.uid)",
+          ".validate": "newData.hasChildren(['createdAt', 'facilitatorUid', 'lang']) &&
+                        newData.child('createdAt').isNumber() &&
+                        newData.child('facilitatorUid').isString() &&
+                        newData.child('lang').val().length <= 5"
+        },
+
+        // ── content ───────────────────────────────────────────────────────
+        // Sessie-inhoud (naam, perspectief, organisatie, …).
+        // Alleen de initiatiefnemer leest en schrijft.
+        "content": {
+          ".read":  "auth != null && root.child('sessions').child($code).child('meta').child('facilitatorUid').val() === auth.uid",
+          ".write": "auth != null && root.child('sessions').child($code).child('meta').child('facilitatorUid').val() === auth.uid",
+          ".validate": "newData.isString() === false && newData.val().length <= 10000"
+        },
+
+        // ── raters ────────────────────────────────────────────────────────
+        // Lijst van uitgenodigde beoordelaars (naam, optioneel e-mail).
+        // De initiatiefnemer schrijft via sendInvites(); alleen hij leest.
+        // E-mailadressen mogen hier maximaal 30 dagen staan (AVG-bewaartermijn).
+        "raters": {
+          ".read":  "auth != null && root.child('sessions').child($code).child('meta').child('facilitatorUid').val() === auth.uid",
+          "$raterId": {
+            ".write": "auth != null && !data.exists() && root.child('sessions').child($code).child('meta').child('facilitatorUid').val() === auth.uid",
+            ".validate": "newData.hasChildren(['name', 'naamZichtbaar', 'at']) &&
+                          newData.child('name').val().length >= 1 &&
+                          newData.child('name').val().length <= 100 &&
+                          newData.child('naamZichtbaar').isBoolean() &&
+                          newData.child('at').isNumber() &&
+                          (!newData.hasChild('email') ||
+                           (newData.child('email').val().length >= 3 &&
+                            newData.child('email').val().length <= 254))"
+          }
+        },
+
+        // ── answers ───────────────────────────────────────────────────────
+        // Ingevulde vragenlijsten van beoordelaars.
+        // Elke beoordelaar schrijft één keer (append-only: !data.exists()).
+        // Alleen de initiatiefnemer leest alle antwoorden.
+        // Anonieme auth volstaat voor beoordelaars (geen platformaccount nodig).
+        "answers": {
+          ".read":  "auth != null && root.child('sessions').child($code).child('meta').child('facilitatorUid').val() === auth.uid",
+          "$answerId": {
+            ".write": "auth != null && !data.exists()",
+            ".validate": "newData.hasChildren(['vals', 'naamZichtbaar', 'at']) &&
+                          newData.child('naamZichtbaar').isBoolean() &&
+                          newData.child('at').isNumber() &&
+                          newData.child('vals').hasChildren(['LV1','LV2','LV3','LV4','LV5',
+                                                             'LV6','LV7','LV8','LV9','LV10',
+                                                             'LV11','LV12','LV13','LV14','LV15',
+                                                             'LV16','LV17','LV18','LV19','LV20']) &&
+                          (!newData.hasChild('name') ||
+                           newData.child('name').val().length <= 100)"
+          }
+        },
+
+        // ── state ─────────────────────────────────────────────────────────
+        // Persistente sessie-state voor resume (data_ref, payload).
+        // Alleen de initiatiefnemer leest en schrijft.
+        "state": {
+          ".read":  "auth != null && root.child('sessions').child($code).child('meta').child('facilitatorUid').val() === auth.uid",
+          ".write": "auth != null && root.child('sessions').child($code).child('meta').child('facilitatorUid').val() === auth.uid",
+          ".validate": "newData.hasChildren(['updatedAt', 'payload']) &&
+                        newData.child('updatedAt').isNumber() &&
+                        newData.child('payload').isString() &&
+                        newData.child('payload').val().length <= 50000"
+        }
+
+      }
+    }
+  }
+}

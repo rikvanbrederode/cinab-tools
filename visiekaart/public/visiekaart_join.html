@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visiekaart — Deelnemen</title>
+
+<!-- Firebase compat SDK (zelfde API als VK-handover-2: firebase.database().ref(...)) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display:ital@0;1&display=swap');
+
+/* ── LOCKED TOKENS (gelijk aan de fasebestanden) ── */
+:root{
+  --orange: #FAA833;
+  --orange-hover: #D8901E;
+  --orange-light: rgba(250,168,51,0.12);
+  --orange-border: rgba(250,168,51,0.35);
+  --green: #BDD24D;
+  --green-light: rgba(189,210,77,0.20);
+  --green-dark: #7B8E1E;
+  --purple: #9666AA;
+  --purple-light: rgba(150,102,170,0.14);
+  --coral: #F05736;
+  --red: #E8423F;
+  --coral-light: rgba(240,87,54,0.10);
+  --teal: #2A9791;
+  --teal-light: rgba(42,151,145,0.14);
+  --bg: #F9F8F5;
+  --surface: #FFFFFF;
+  --border: rgba(0,0,0,0.09);
+  --border-md: rgba(0,0,0,0.14);
+  --border-strong: rgba(0,0,0,0.20);
+  --text: #262A36;
+  --text-2: #5A5956;
+  --text-3: #9A9894;
+  --r: 10px;
+  --r-sm: 6px;
+  --r-lg: 16px;
+  --r-xl: 22px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 4px 12px rgba(0,0,0,0.05);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  font-size:15px;line-height:1.55;
+  display:flex;justify-content:center;
+  padding:24px 16px;
+}
+.wrap{width:100%;max-width:520px}
+
+/* ── CARDS (deelnemer-stijl uit fase 0) ── */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r-xl);
+  padding:32px 28px;
+  box-shadow:var(--shadow);
+  margin-bottom:16px;
+}
+.sun{
+  width:56px;height:56px;background:var(--orange);border-radius:50%;
+  margin:0 auto 16px;display:flex;align-items:center;justify-content:center;
+}
+.title{font-family:'DM Serif Display',serif;font-size:22px;text-align:center;margin-bottom:4px}
+.subtitle{font-size:13px;color:var(--text-2);text-align:center;margin-bottom:22px}
+
+.field{margin-bottom:16px}
+label.lbl{display:block;font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:6px}
+input[type=text],input[type=email],textarea{
+  width:100%;padding:10px 12px;border:1.5px solid var(--border-md);border-radius:var(--r-sm);
+  font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:var(--surface);
+  transition:border-color .13s;
+}
+input:focus,textarea:focus{outline:none;border-color:var(--orange)}
+textarea{resize:vertical;min-height:64px}
+
+.btn{
+  width:100%;padding:11px;background:var(--orange);border:none;border-radius:var(--r-sm);
+  color:#fff;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;
+  transition:background .13s;
+}
+.btn:hover{background:var(--orange-hover)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-sub{margin-top:10px}
+.note{font-size:11px;color:var(--text-3);text-align:center;margin-top:12px}
+
+/* ── STATUS / BANNERS ── */
+.status{font-size:12px;color:var(--text-3);text-align:center;margin-bottom:14px}
+.status .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--text-3);margin-right:5px;vertical-align:middle}
+.status.ok .dot{background:var(--green-dark)}
+.status.err{color:var(--red)}
+.status.err .dot{background:var(--red)}
+.banner{
+  background:var(--green-light);border:1px solid rgba(123,142,30,.3);color:var(--green-dark);
+  border-radius:var(--r-sm);padding:10px 12px;font-size:13px;font-weight:600;margin-bottom:14px;display:none;
+}
+.banner.show{display:block}
+
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- JOIN FORM -->
+  <div class="card" id="joinCard">
+    <div class="sun">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="11" fill="none" stroke="white" stroke-width="2.5"/>
+        <circle cx="14" cy="14" r="5" fill="white"/>
+      </svg>
+    </div>
+    <h2 class="title" id="joinTitle">Welkom bij de sessie</h2>
+    <p class="subtitle" id="joinSub">Vul je naam en e-mailadres in om deel te nemen.</p>
+    <div class="status" id="connStatus"><span class="dot"></span><span id="connText">Verbinden…</span></div>
+    <div class="field">
+      <label class="lbl" for="pName" id="lblName">Jouw naam</label>
+      <input type="text" id="pName" maxlength="80" placeholder="Voornaam Achternaam">
+    </div>
+    <div class="field">
+      <label class="lbl" for="pEmail" id="lblEmail">E-mailadres</label>
+      <input type="email" id="pEmail" maxlength="120" placeholder="naam@organisatie.nl">
+    </div>
+    <button class="btn" id="joinBtn" onclick="doJoin()">Deelnemen</button>
+    <p class="note" id="joinNote">Je gegevens worden alleen gebruikt voor deze sessie.</p>
+  </div>
+
+  <div class="banner" id="banner"></div>
+
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════
+   VISIEKAART — DEELNEMER-/JOIN-PAGINA (test-brug, write-side)
+   Conform VK-handover-2 (RTDB-structuur + dichte regels).
+   Schrijft per fase naar /sessions/{code}/phaseN/... met push().
+   ════════════════════════════════════════════════════════════════ */
+
+/* ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   VUL HIER JE FIREBASE-WEBCONFIG IN
+   (Firebase console → Project settings → Web app → SDK config).
+   databaseURL is verplicht voor de RTDB. Gebruik je EU-instance als
+   die er is (AVG, zie handover-2 §5).
+   ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ */
+const firebaseConfig = {
+  apiKey: "AIzaSyCer_6Y7f-jUXygHnBF_UdtpTxPTEIvaoA",
+  authDomain: "visiekaart.firebaseapp.com",
+  databaseURL: "https://visiekaart-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "visiekaart",
+  storageBucket: "visiekaart.firebasestorage.app",
+  messagingSenderId: "757784606494",
+  appId: "1:757784606494:web:6f47e48fc85f15f6257b0f"
+};
+
+/* ══════════ SESSIECODE: pad /join/{code} óf ?join= / ?code= (test-brug) ══════════ */
+function readSessionCode(){
+  const qs = new URLSearchParams(location.search);
+  const fromQuery = qs.get('join') || qs.get('code');
+  if (fromQuery) return fromQuery.trim();
+  // pad: /join/{code}
+  const m = location.pathname.match(/\/join\/([^\/?#]+)/i);
+  if (m && m[1]) return decodeURIComponent(m[1]).trim();
+  return '';
+}
+
+/* ══════════ STATE ══════════ */
+let lang = 'nl';
+let sessionCode = readSessionCode();
+let db = null, uid = null, dbReady = false;
+let me = { name:'', email:'' };
+
+/* ══════════ I18N (deelnemer-facing) ══════════ */
+const T = {
+  nl:{
+    joinTitle:'Welkom bij de sessie', joinSub:'Vul je naam en e-mailadres in om deel te nemen.',
+    lblName:'Jouw naam', lblEmail:'E-mailadres', joinBtn:'Deelnemen',
+    joinNote:'Je gegevens worden alleen gebruikt voor deze sessie.',
+    connecting:'Verbinden…', connected:'Verbonden met de sessie', noCode:'Geen sessiecode gevonden in de link.',
+    connErr:'Verbinden mislukt. Controleer de link of probeer opnieuw.',
+    needNameEmail:'Vul je naam en e-mailadres in.'
+  },
+  en:{
+    joinTitle:'Welcome to the session', joinSub:'Enter your name and email address to join.',
+    lblName:'Your name', lblEmail:'Email address', joinBtn:'Join',
+    joinNote:'Your details are used only for this session.',
+    connecting:'Connecting…', connected:'Connected to the session', noCode:'No session code found in the link.',
+    connErr:'Connection failed. Check the link or try again.',
+    needNameEmail:'Enter your name and email address.'
+  }
+}
+
+/* ══════════ HELPERS ══════════ */
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function setStatus(text, kind){ const el=$('connStatus'); el.className='status'+(kind?(' '+kind):''); $('connText').textContent=text; }
+function banner(text){ const b=$('banner'); b.textContent=text; b.classList.add('show'); setTimeout(()=>b.classList.remove('show'), 3000); }
+function t(){ return T[lang]; }
+function ref(path){ return db.ref('sessions/'+sessionCode+'/'+path); }
+function now(){ return Date.now(); }
+
+/* ══════════ INIT ══════════ */
+function init(){
+  applyLang();
+  if(!sessionCode){ setStatus(t().noCode, 'err'); $('joinBtn').disabled=true; return; }
+  try{
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.database();
+  }catch(e){ setStatus(t().connErr, 'err'); return; }
+  setStatus(t().connecting);
+  firebase.auth().signInAnonymously()
+    .then(()=> firebase.auth().onAuthStateChanged(u=>{
+      if(!u) return;
+      uid = u.uid; dbReady = true;
+      setStatus(t().connected, 'ok');
+      // Best-effort: sessie-taal volgen
+      ref('meta/lang').once('value').then(s=>{ const v=s.val(); if(v && T[v]){ lang=v; applyLang(); } }).catch(()=>{});
+    }))
+    .catch(()=> setStatus(t().connErr, 'err'));
+}
+
+function applyLang(){
+  const x=t();
+  $('joinTitle').textContent=x.joinTitle; $('joinSub').textContent=x.joinSub;
+  $('lblName').textContent=x.lblName; $('lblEmail').textContent=x.lblEmail;
+  $('joinBtn').textContent=x.joinBtn; $('joinNote').textContent=x.joinNote;
+}
+
+/* ══════════ JOIN ══════════ */
+function doJoin(){
+  const name=$('pName').value.trim(), email=$('pEmail').value.trim();
+  if(!name || !email){ banner(t().needNameEmail); return; }
+  me.name=name; me.email=email;
+
+  // Identiteit bewaren voor de fase-deelnemer-view. join.html en de fasebestanden
+  // draaien op dezelfde origin (visiekaart.web.app), dus vk_joined is daar leesbaar
+  // (fase1 leest {name} via localStorage 'vk_joined' bij het versturen van een antwoord).
+  try { localStorage.setItem('vk_joined', JSON.stringify({ code: sessionCode, name: me.name, email: me.email, at: now() })); } catch(e){}
+
+  // Optie A: deelnemers volgen de stage-gestuurde deelnemer-view die al in de
+  // fasebestanden zit (welkom/wachtscherm → één vraag per keer → automatisch mee
+  // door alle fasen via de RTDB-stage). Daarom sturen we na de join door naar
+  // fase 1 met ?join={code}; deze pagina toont zelf geen fasevragen meer.
+  const goFase1 = function(){
+    // Root-absoluut pad (leidende /) zodat we het /join/-rewritepad verlaten.
+    // Een relatief pad zou vanaf /join/{code} naar /join/visiekaart_fase1.html
+    // resolven, waar de /join/**-rewrite opnieuw join.html serveert (welkomscherm-loop).
+    window.location.href = '/visiekaart_fase1.html?join=' + encodeURIComponent(sessionCode);
+  };
+
+  // Registreer de deelnemer in de RTDB zodat de facilitator (fase 0) 'm live
+  // ziet binnenkomen. Fase 0 luistert op sessions/{code}/participants en
+  // verwacht push-children {name, email, at}. Append-only (regels: !data.exists).
+  // We wachten best-effort op de schrijfbevestiging vóór het doorsturen, met een
+  // vangnet-timeout: de join blokkeert nooit, ook niet bij een schrijffout.
+  if (dbReady && sessionCode) {
+    let navigated = false;
+    const once = function(){ if(!navigated){ navigated = true; goFase1(); } };
+    try {
+      ref('participants').push({ name: me.name, email: me.email, at: now() }).then(once).catch(once);
+    } catch(e){ once(); }
+    setTimeout(once, 1500);
+  } else {
+    goFase1();
+  }
+}
+
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

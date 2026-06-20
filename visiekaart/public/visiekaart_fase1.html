@@ -1,0 +1,3344 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visiekaart v4 — Fase 1: Stip op de horizon bepalen</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display:ital@0;1&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --orange:#FAA833;--orange-h:#D8901E;--orange-l:rgba(250,168,51,0.12);--orange-b:rgba(250,168,51,.3);
+  --green:#BDD24D;--green-l:rgba(189,210,77,0.20);--green-d:#7B8E1E;
+  --purple:#9666AA;--purple-l:rgba(150,102,170,0.14);
+  --coral:#F05736;--red:#E8423F;--coral-l:rgba(240,87,54,0.10);
+  --teal:#2A9791;--teal-l:rgba(42,151,145,0.14);
+  --blue:#70A2D7;--blue-l:rgba(112,162,215,0.15);
+  --amber:#FAA833;--amber-l:rgba(250,168,51,0.12);
+  --bg:#F9F8F5;--surface:#FFF;
+  --b0:rgba(0,0,0,.07);--b1:rgba(0,0,0,.11);--b2:rgba(0,0,0,.18);
+  --text:#262A36;--t2:#5A5956;--t3:#9A9894;
+  --r:10px;--rsm:6px;--rlg:16px;--rxl:22px;
+  --sh:0 1px 3px rgba(0,0,0,.07),0 4px 14px rgba(0,0,0,.05);
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.55}
+.serif{font-family:'DM Serif Display',serif}
+
+/* ── HEADER ── */
+.hdr{background:var(--surface);border-bottom:1px solid var(--b0);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;cursor:pointer}
+.hdr-r{display:flex;align-items:center;gap:8px}
+.phase-pill{background:var(--orange-l);color:var(--orange-h);font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;border:1px solid var(--orange-b);letter-spacing:.06em;text-transform:uppercase}
+.lang-toggle{display:flex;border:1px solid var(--b2);border-radius:var(--rsm);overflow:hidden}
+.lang-btn{padding:5px 11px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;border:none;background:transparent;cursor:pointer;color:var(--t3);transition:all .13s;letter-spacing:.04em}
+.lang-btn.on{background:var(--orange);color:#fff}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border-radius:var(--rsm);border:1px solid var(--b2);background:var(--surface);color:var(--t2);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .13s}
+.btn:hover{background:var(--bg);color:var(--text)}
+.btn-orange{background:var(--orange);border-color:var(--orange-h);color:#fff}
+.btn-orange:hover{background:var(--orange-h)}
+.btn-orange:disabled{opacity:.35;cursor:not-allowed;transform:none!important}
+.btn-green{background:var(--green);border-color:var(--green-d);color:#fff}
+.btn-green:hover{background:var(--green-d)}
+.btn-lg{padding:12px 28px;font-size:15px;font-weight:600;border-radius:var(--r);box-shadow:0 2px 8px rgba(250,168,51,.3)}
+.btn-lg:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 14px rgba(250,168,51,.4)}
+
+/* ── LAYOUT ── */
+.wrap{max-width:860px;margin:0 auto;padding:32px 24px 100px}
+.card{background:var(--surface);border:1px solid var(--b0);border-radius:var(--rxl);padding:28px 30px;margin-bottom:16px;box-shadow:var(--sh)}
+.card-sm{padding:20px 22px}
+.divider{height:1px;background:var(--b0);margin:18px 0}
+
+/* ── PROGRESS BAR ── */
+.progress-track{height:6px;background:var(--b0);border-radius:3px;margin:12px 0}
+.progress-fill{height:100%;border-radius:3px;background:var(--orange);transition:width .4s ease}
+.q-steps{display:flex;gap:6px}
+.q-step{flex:1;height:6px;border-radius:3px;background:var(--b0);transition:background .3s}
+.q-step.done{background:var(--orange)}
+.q-step.active{background:var(--orange)}
+
+/* ── QUESTION DISPLAY ── */
+.q-meta{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.q-num{width:36px;height:36px;border-radius:50%;background:var(--orange);color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.q-counter{font-size:12px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
+.q-text{font-family:'DM Serif Display',serif;font-size:26px;color:var(--text);line-height:1.3;margin-bottom:8px}
+.q-hint{font-size:13px;color:var(--t2);margin-bottom:22px;padding:10px 14px;background:var(--orange-l);border-radius:var(--rsm);border-left:3px solid var(--orange)}
+
+/* ── ANSWER INPUT (participant) ── */
+.big-input{width:100%;padding:14px 16px;border:2px solid var(--b2);border-radius:var(--r);font-size:15px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--surface);transition:border-color .13s,box-shadow .13s;resize:vertical;min-height:80px}
+.big-input:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 4px rgba(250,168,51,.12)}
+
+/* ── ANSWER FEED ── */
+.answer-count{display:flex;align-items:center;gap:8px;margin-bottom:16px;font-size:13px;color:var(--t2)}
+.count-chip{background:var(--orange-l);color:var(--orange-h);border:1px solid var(--orange-b);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:700}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--orange);animation:pulse 2s ease-in-out infinite;display:inline-block}
+
+/* ── CLUSTER DISPLAY ── */
+.cluster-area{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.cluster-group{border:1px solid var(--b1);border-radius:var(--r);overflow:hidden}
+.cluster-head{padding:8px 14px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:8px}
+.cluster-body{padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.answer-card{padding:10px 13px;border-radius:var(--rsm);font-size:13px;line-height:1.5;position:relative;border:1px solid transparent}
+.answer-card .a-name{font-size:11px;font-weight:600;opacity:.7;margin-top:4px}
+
+/* cluster colors */
+.cl-a .cluster-head{background:var(--teal-l);color:var(--teal)}
+.cl-a .answer-card{background:rgba(42,151,145,.06);border-color:rgba(42,151,145,.15)}
+.cl-b .cluster-head{background:var(--purple-l);color:var(--purple)}
+.cl-b .answer-card{background:rgba(107,95,212,.06);border-color:rgba(107,95,212,.15)}
+.cl-c .cluster-head{background:var(--amber-l);color:var(--amber)}
+.cl-c .answer-card{background:rgba(250,168,51,.06);border-color:rgba(250,168,51,.15)}
+.cl-d .cluster-head{background:var(--blue-l);color:var(--blue)}
+.cl-d .answer-card{background:rgba(112,162,215,.06);border-color:rgba(112,162,215,.15)}
+
+/* ── KEYWORD INPUT ── */
+.keyword-block{background:var(--bg);border:1px dashed var(--b2);border-radius:var(--r);padding:18px;margin-top:8px}
+.kw-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.kw-label::after{content:'';flex:1;height:1px;background:var(--b1)}
+.tag-input-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.kw-tag{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer}
+.kw-add{display:flex;gap:8px;margin-top:6px}
+.kw-add input{flex:1;padding:7px 11px;border:1px solid var(--b2);border-radius:var(--rsm);font-size:13px;font-family:'DM Sans',sans-serif}
+.kw-add input:focus{outline:none;border-color:var(--orange)}
+
+/* keyword color variants */
+.kw-q1{background:var(--teal-l);color:var(--teal);border:1px solid rgba(42,151,145,.25)}
+.kw-q2{background:var(--purple-l);color:var(--purple);border:1px solid rgba(107,95,212,.25)}
+.kw-q3{background:var(--amber-l);color:var(--amber);border:1px solid rgba(250,168,51,.25)}
+.kw-q4{background:var(--blue-l);color:var(--blue);border:1px solid rgba(112,162,215,.25)}
+.kw-q5{background:var(--orange-l);color:var(--orange-h);border:1px solid var(--orange-b)}
+.kw-q6{background:var(--green-l);color:var(--green-d);border:1px solid rgba(189,210,77,.25)}
+
+/* ── SENTENCE SCREEN ── */
+.sentence-shell{border:2px solid var(--orange-b);border-radius:var(--rxl);padding:28px;background:var(--orange-l);margin-bottom:20px}
+.sentence-intro{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--orange-h);margin-bottom:12px}
+.sentence-parts{display:flex;flex-direction:column;gap:8px}
+.sentence-part{display:flex;align-items:baseline;gap:10px}
+.sp-prefix{font-size:14px;color:var(--t2);white-space:nowrap;min-width:180px}
+.sp-value{flex:1;padding:6px 10px;border-radius:var(--rsm);border:1.5px solid var(--orange-b);background:var(--surface);font-size:14px;font-weight:600;color:var(--text);font-family:'DM Sans',sans-serif;transition:border-color .13s}
+.sp-value:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(250,168,51,.12)}
+
+/* ── FINAL SCREEN ── */
+.final-card{background:var(--surface);border-radius:var(--rxl);border:1px solid var(--b0);box-shadow:var(--sh);overflow:hidden}
+.final-top{background:linear-gradient(135deg,#FAA833 0%,#E8930A 100%);padding:40px 40px 48px;text-align:center;position:relative}
+.final-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:16px}
+.final-sentence{font-family:'DM Serif Display',serif;font-size:24px;line-height:1.5;color:#fff;max-width:660px;margin:0 auto}
+.final-sentence em{color:rgba(255,255,255,.75);font-style:normal}
+.final-deco{position:absolute;bottom:-1px;left:0;right:0;height:30px}
+.final-keywords{padding:28px 32px}
+.kw-row{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.kw-row:last-child{margin-bottom:0}
+.kw-row-label{font-size:12px;font-weight:600;color:var(--t3);min-width:100px;padding-top:5px}
+.kw-row-tags{display:flex;flex-wrap:wrap;gap:6px}
+.kw-badge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.final-actions{padding:20px 32px;border-top:1px solid var(--b0);display:flex;justify-content:space-between;align-items:center;gap:12px}
+
+/* ── CANVAS VIEW ── */
+.canvas-wrap{background:var(--surface);border-radius:var(--rxl);border:1px solid var(--b0);box-shadow:var(--sh);overflow:hidden}
+.canvas-header{padding:18px 24px;border-bottom:1px solid var(--b0);display:flex;justify-content:space-between;align-items:center}
+.canvas-title{font-size:15px;font-weight:600}
+.canvas-body{padding:0}
+.canvas-svg{width:100%;display:block}
+.canvas-note{padding:14px 24px;background:var(--bg);border-top:1px solid var(--b0);font-size:12px;color:var(--t3);text-align:center}
+
+/* ── BOTTOM BAR ── */
+.bot-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.93);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--b0);padding:12px 28px;display:flex;justify-content:space-between;align-items:center;z-index:100}
+.bot-info{font-size:13px;color:var(--t2)}
+
+/* ── PARTICIPANT VIEW ── */
+.pview{display:none;min-height:100vh;background:var(--bg);padding:32px 20px}
+.pview.open{display:block}
+.pcard{background:var(--surface);border-radius:var(--rxl);border:1px solid var(--b0);box-shadow:var(--sh);padding:32px;max-width:480px;margin:0 auto}
+.wait-screen{text-align:center;padding:40px 20px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:24px;height:24px;border:2.5px solid var(--b1);border-top-color:var(--orange);border-radius:50%;animation:spin .9s linear infinite;margin:0 auto 14px}
+.wait-title{font-size:17px;font-weight:700;margin-bottom:6px}
+.wait-sub{font-size:13px;color:var(--t2)}
+
+/* ── INTRO SCREEN ── */
+.intro-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:20px 0}
+.intro-item{padding:14px 16px;background:var(--bg);border:1px solid var(--b1);border-radius:var(--r);display:flex;gap:10px;align-items:flex-start}
+.intro-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;font-weight:700}
+.intro-item-title{font-size:13px;font-weight:600;margin-bottom:2px}
+.intro-item-sub{font-size:12px;color:var(--t2)}
+
+/* ── STATES: show/hide ── */
+.screen{display:none}.screen.open{display:block}
+/* ═══ VK SHARED SCROLL WRAPPER (v4b) ═══ */
+/* Lost de schermafkapping op: de inhoud van het actieve scherm scrollt nu
+   onafhankelijk binnen het zichtbare gebied, bóven de vaste bot-bar. Hierdoor
+   valt geen tekst meer weg — robuust in zowel test/preview-iframe als live. */
+.screen.open{max-height:calc(100vh - 168px);overflow-y:auto;overflow-x:hidden;padding-right:6px;scrollbar-width:thin;scrollbar-color:var(--b1) transparent}
+.screen.open::-webkit-scrollbar{width:8px}
+.screen.open::-webkit-scrollbar-track{background:transparent}
+.screen.open::-webkit-scrollbar-thumb{background:var(--b1);border-radius:4px}
+.screen.open::-webkit-scrollbar-thumb:hover{background:var(--t3)}
+body.sess-open .screen.open{max-height:calc(100vh - 250px)}
+@media(max-width:640px){.screen.open{max-height:calc(100vh - 190px)}}
+/* ═══ END VK SHARED SCROLL WRAPPER (v4b) ═══ */
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes reveal{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+.anim-fadeup{animation:fadeUp .35s ease forwards}
+.anim-reveal{animation:reveal .4s ease forwards}
+
+/* ── LOADING (AI) ── */
+.ai-loading{text-align:center;padding:48px 24px}
+.ai-dots{display:flex;gap:8px;justify-content:center;margin-bottom:20px}
+.ai-dot{width:10px;height:10px;border-radius:50%;background:var(--orange)}
+.ai-dot:nth-child(1){animation:pulse .9s ease-in-out infinite}
+.ai-dot:nth-child(2){animation:pulse .9s ease-in-out .2s infinite}
+.ai-dot:nth-child(3){animation:pulse .9s ease-in-out .4s infinite}
+
+/* ── VOTE CONFIRM ── */
+.confirm-row{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--green-l);border:1px solid rgba(189,210,77,.3);border-radius:var(--r);margin-bottom:12px}
+.confirm-icon{width:28px;height:28px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center}
+
+/* ── TOGGLE SWITCH ── */
+.view-toggle{display:flex;background:var(--bg);border:1px solid var(--b2);border-radius:var(--r);padding:3px;gap:2px;width:fit-content}
+.vt-btn{padding:7px 18px;border-radius:var(--rsm);font-size:13px;font-weight:500;border:none;background:transparent;cursor:pointer;color:var(--t2);transition:all .13s}
+.vt-btn.on{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+
+@media(max-width:620px){
+  .intro-grid{grid-template-columns:1fr}
+  .sentence-part{flex-direction:column;gap:4px}
+  .sp-prefix{min-width:auto}
+  .hdr{padding:0 16px}
+  .wrap{padding:24px 16px 90px}
+  .card{padding:20px}
+  .bot-bar{padding:10px 16px}
+  .final-sentence{font-size:18px}
+  .final-top{padding:28px 20px 36px}
+}
+
+/* ── CINAB LOGO ── */
+.logo-img{height:32px;width:auto;display:block}
+.logo{padding-left:6px}
+/* ═══ VK SHARED LOGO STYLES ═══ */
+.logo-img .fil-logo-main   { fill:#2A9791; }
+.logo-img .fil-logo-shadow { fill:#2A9791; filter:brightness(0.5); }
+.logo-img .fil-logo-line   { fill:none; stroke:#F7A710; stroke-width:300; stroke-miterlimit:22.9256; }
+.logo-img .fil-logo-bar    { fill:#F7A710; }
+/* ═══ END VK SHARED LOGO STYLES ═══ */
+
+/* ── SESSIE-INFO PANEEL (opvouwbaar) ── */
+.sess-bar{background:var(--surface);border-bottom:1px solid var(--b0);padding:0 28px}
+.sess-toggle{display:flex;align-items:center;gap:8px;padding:8px 0;font-size:12px;font-weight:600;color:var(--t2);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:.02em}
+.sess-toggle:hover{color:var(--text)}
+.sess-toggle .chev{transition:transform .2s ease}
+.sess-toggle.open .chev{transform:rotate(180deg)}
+.sess-toggle .sess-mini{color:var(--t3);font-weight:500;margin-left:6px}
+.sess-panel{max-height:0;overflow:hidden;transition:max-height .25s ease,padding .25s ease;padding:0 0;border-top:0 solid transparent}
+.sess-panel.open{max-height:240px;padding:14px 0 16px;border-top:1px solid var(--b0)}
+.sess-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 18px}
+.sess-item{display:flex;flex-direction:column;gap:2px;min-width:0}
+.sess-k{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3)}
+.sess-v{font-size:13px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sess-empty{font-size:12px;color:var(--t3);padding:4px 0}
+@media(max-width:620px){.sess-bar{padding:0 16px}}
+
+/* ── INFO ICON (popovers vervangen door verenigde Tip-popup, zie onder) ── */
+.info-icon{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--surface);border:1.5px solid var(--b2);color:var(--t2);font-size:11px;font-weight:700;font-style:italic;font-family:Georgia,serif;cursor:pointer;transition:all .13s;user-select:none;line-height:1;flex-shrink:0}
+.info-icon:hover{background:var(--orange-l);border-color:var(--orange-b);color:var(--orange-h)}
+.info-icon.on{background:var(--orange);border-color:var(--orange-h);color:#fff}
+
+/* ── BTN-GHOST (aanvulling voor reset-knop) ── */
+.btn-ghost{background:transparent;border-color:var(--b1);color:var(--t3)}
+.btn-ghost:hover{background:var(--bg);color:var(--text)}
+
+/* ── INTRO ICOON SVG (people) ── */
+.intro-icon svg{width:18px;height:18px}
+
+/* ── INTRO BLOK: "Wat is de stip" ── */
+.intro-block{padding:14px 16px;background:var(--bg);border:1px solid var(--b1);border-radius:var(--r);margin-bottom:14px}
+.intro-block-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.intro-block-title .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);flex-shrink:0}
+.intro-block p{font-size:13px;color:var(--t2);line-height:1.6}
+
+/* ── AI-SUGGESTIE-BOX ── */
+.ai-suggest-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;padding:12px 14px;background:rgba(150,102,170,.08);border:1px dashed rgba(150,102,170,.4);border-radius:var(--r)}
+.ai-suggest-bar .lbl{font-size:12px;font-weight:600;color:var(--purple);display:flex;align-items:center;gap:8px}
+.ai-suggest-box{margin-top:14px;padding:16px 18px;background:var(--surface);border:2px solid var(--purple);border-radius:var(--r);box-shadow:0 2px 8px rgba(150,102,170,.12)}
+.ai-suggest-box-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.ai-suggest-box-head .b{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--purple)}
+.ai-suggest-box-desc{font-size:12px;color:var(--t2);margin-bottom:12px}
+.ai-suggest-parts{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.ai-suggest-part{padding:8px 10px;background:var(--purple-l);border-radius:var(--rsm);font-size:13px;line-height:1.5}
+.ai-suggest-part .pre{color:var(--purple);font-weight:600;margin-right:6px}
+.ai-suggest-actions{display:flex;gap:8px;justify-content:flex-end}
+.btn-purple{background:var(--purple);border-color:var(--purple);color:#fff}
+.btn-purple:hover{background:#7e5395}
+
+/* ── AFTER-CONFIRM UITLEG-BLOK ── */
+.after-confirm{margin-top:18px;padding:20px 22px;background:var(--bg);border:1px solid var(--b1);border-radius:var(--r)}
+.after-confirm-head{font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.after-confirm-head svg{width:16px;height:16px;color:var(--orange)}
+.after-confirm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.after-confirm-item{padding:12px 14px;background:var(--surface);border:1px solid var(--b0);border-radius:var(--rsm)}
+.after-confirm-item h4{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.after-confirm-item p{font-size:12.5px;color:var(--t2);line-height:1.55}
+
+/* ═══ VK SHARED TIP POPUP (verenigde stijl voor 'i'-popovers en grote Onderbouwing-modal) ═══ */
+.vk-tip-backdrop{display:none;position:fixed;inset:0;background:rgba(38,42,54,.55);z-index:999}
+.vk-tip-backdrop.open{display:block}
+.vk-tip-popup{display:none;position:fixed;background:var(--surface);border-radius:var(--rxl);box-shadow:0 12px 40px rgba(0,0,0,.22);z-index:1000;font-family:'DM Sans',sans-serif;animation:vkTipIn .18s ease}
+@keyframes vkTipIn{from{opacity:0;transform:translateY(6px) scale(.985)}to{opacity:1;transform:none}}
+.vk-tip-popup.open{display:flex;flex-direction:column}
+.vk-tip-popup[data-size="lg"]{top:5vh;left:50%;transform:translateX(-50%);max-width:640px;width:calc(100% - 40px);max-height:90vh;padding:32px 36px 28px}
+.vk-tip-popup[data-size="lg"].open{transform:translateX(-50%)}
+.vk-tip-popup[data-size="sm"]{max-width:340px;padding:14px 16px 12px}
+.vk-tip-popup .vk-tip-close{position:absolute;top:10px;right:12px;width:30px;height:30px;background:var(--surface);border:1px solid var(--b1);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--t2);padding:0;line-height:1;transition:all .13s}
+.vk-tip-popup .vk-tip-close:hover{background:var(--bg);color:var(--text)}
+.vk-tip-popup[data-size="sm"] .vk-tip-close{width:22px;height:22px;font-size:14px;top:6px;right:6px;border-color:var(--b0)}
+.vk-tip-popup .vk-tip-title{font-family:'DM Serif Display',serif;color:var(--text);margin:0 36px 4px 0;letter-spacing:-0.01em}
+.vk-tip-popup[data-size="lg"] .vk-tip-title{font-size:22px}
+.vk-tip-popup[data-size="sm"] .vk-tip-title{font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;margin-right:28px}
+.vk-tip-popup .vk-tip-sub{font-size:13px;color:var(--t2);margin-bottom:22px}
+.vk-tip-popup[data-size="sm"] .vk-tip-sub{display:none}
+.vk-tip-popup .vk-tip-body{color:var(--t2);line-height:1.7;overflow-y:auto}
+.vk-tip-popup[data-size="lg"] .vk-tip-body{font-size:13.5px;max-height:calc(90vh - 140px)}
+.vk-tip-popup[data-size="sm"] .vk-tip-body{font-size:12.5px;line-height:1.55}
+.vk-tip-popup .vk-tip-body p{margin:0 0 10px}
+.vk-tip-popup .vk-tip-body p:last-child{margin-bottom:0}
+.vk-tip-popup .vk-tip-h{font-size:14px;font-weight:700;color:var(--orange-h);margin:16px 0 5px;display:flex;align-items:center;gap:7px}
+.vk-tip-popup .vk-tip-h:first-child{margin-top:0}
+.vk-tip-popup .vk-tip-h::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--orange);flex-shrink:0}
+.vk-tip-popup .vk-tip-actions{display:flex;justify-content:flex-end;margin-top:18px}
+.vk-tip-popup[data-size="sm"] .vk-tip-actions{display:none}
+@media(max-width:520px){
+  .vk-tip-popup[data-size="sm"]{left:20px !important;right:20px !important;max-width:none;width:auto}
+  .vk-tip-popup[data-size="lg"]{padding:24px 22px 20px}
+}
+/* ═══ END VK SHARED TIP POPUP ═══ */
+
+/* ═══ VK DRAG-AND-DROP CLUSTER ANSWERS (v4) ═══ */
+.cluster-body{min-height:50px;padding:6px;border-radius:6px;transition:background .15s ease,box-shadow .15s ease}
+.cluster-body.vk-drop-target{background:rgba(250,168,51,.10);box-shadow:inset 0 0 0 2px var(--orange);outline:none}
+.cluster-body.vk-empty{font-size:12px;color:var(--t3);text-align:center;padding:14px 6px;border:1px dashed var(--b1);border-radius:6px}
+.answer-card[draggable="true"]{cursor:grab;transition:transform .12s ease,opacity .12s ease,box-shadow .15s ease}
+.answer-card[draggable="true"]:hover{box-shadow:0 2px 8px rgba(0,0,0,.10)}
+.answer-card.vk-dragging{opacity:.45;cursor:grabbing}
+.answer-card .vk-drag-handle{display:inline-flex;align-items:center;margin-right:6px;color:var(--t3);opacity:.5;cursor:grab;vertical-align:middle}
+.answer-card[draggable="true"]:hover .vk-drag-handle{opacity:.85}
+/* ═══ END VK DRAG-AND-DROP CLUSTER ANSWERS ═══ */
+
+/* ═══ VK KEYWORD BLOCK EMPHASIS (kernwoorden-kader meer nadruk) ═══ */
+.keyword-block{position:relative;padding:18px 20px;background:var(--orange-l);border:2px solid var(--orange-b);border-radius:var(--r);margin-top:16px}
+.keyword-block::before{content:'';position:absolute;left:-2px;top:-2px;bottom:-2px;width:4px;background:var(--orange);border-radius:2px 0 0 2px}
+.kw-label{font-size:14px;font-weight:700;color:var(--orange-h);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;gap:7px}
+.kw-label::before{content:'★';font-size:13px;color:var(--orange);font-style:normal}
+/* ═══ END VK KEYWORD BLOCK EMPHASIS ═══ */
+
+/* ═══ VK SHARED CUMULATIVE RESULTS STYLES (alleen stip in F1) ═══ */
+.vk-cum-wrap{margin-top:18px;padding-top:18px;border-top:1px solid var(--b0)}
+.vk-cum-section{margin-bottom:18px}
+.vk-cum-section:last-child{margin-bottom:0}
+.vk-cum-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:8px}
+.vk-cum-stip{font-size:14.5px;line-height:1.55;color:var(--text);padding:10px 14px;background:rgba(252,196,41,.12);border-left:3px solid #FCC429;border-radius:6px}
+/* ═══ END VK SHARED CUMULATIVE RESULTS STYLES ═══ */
+
+/* ═══ VK SHARED FINAL ACTIONS STYLES (eindscherm met aanpassen-knop) ═══ */
+.vk-final-actions{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-top:0}
+.vk-back-edit-btn{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;color:var(--t2)}
+.vk-back-edit-btn:hover{color:var(--text);background:var(--bg)}
+.vk-back-edit-btn svg{color:var(--t3)}
+.vk-back-edit-btn:hover svg{color:var(--text)}
+/* ═══ END VK SHARED FINAL ACTIONS STYLES ═══ */
+
+/* ── DEELNEMER-VIEW HEADER (uniform met facilitator) ── */
+.phdr{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border-bottom:1px solid var(--b0);padding:0 28px;height:58px;margin:-32px -20px 24px}
+@media(max-width:620px){.phdr{padding:0 16px;margin:-32px -16px 18px}}
+
+/* ── DEELNEMER SESSIE-SAMENVATTING-BLOK ── */
+.p-summary{padding:14px 16px;background:var(--orange-l);border:1px solid var(--orange-b);border-radius:var(--r);margin-bottom:16px}
+.p-summary-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--orange-h);margin-bottom:6px}
+.p-summary-text{font-size:13.5px;color:var(--text);line-height:1.55}
+
+/* ── CLUSTER-NAAM editable ── */
+.cluster-head input.cl-name-input{background:transparent;border:none;border-bottom:1px dashed transparent;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:inherit;font-family:inherit;outline:none;padding:2px 4px;width:100%;cursor:text}
+.cluster-head input.cl-name-input:hover{border-bottom-color:currentColor}
+.cluster-head input.cl-name-input:focus{border-bottom-color:currentColor;background:rgba(255,255,255,.5)}
+.cluster-edit-hint{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;background:var(--orange-l);border:1px solid var(--orange-b);border-radius:var(--rsm);font-size:12.5px;color:var(--text);margin-bottom:14px;line-height:1.5}
+.cluster-edit-hint svg{flex-shrink:0;margin-top:1px;color:var(--orange-h)}
+
+
+/* ═══ VK FASE-EXPRESSIE VARS (fase-specifiek) ═══ */
+:root{ --fase-accent:#FAA833; --fase-accent-text:#262A36; --fase-nummer:"1"; }
+
+/* ═══ VK SHARED EXPRESSIE (v1) — byte-identiek in alle fasebestanden, in één keer wijzigen ═══
+   Expressielaag conform CINAB-EXPRESSIE-STIJL: uitsluitend tokens, geen gradients,
+   geen alpha-kleurtinten, betekenis nooit alleen via kleur, reduced-motion gerespecteerd.
+   Methodiek-DNA Visiekaart: de oranje stip op de horizon + vijf vaste themakleuren. */
+:root{
+  --vk-ex-stip:#FAA833;   /* signatuurkleur: de stip op de horizon (zon) */
+  --vk-ex-line:#E5E3DB;   /* tone-on-tone watermerk- en rasterkleur */
+  --vk-ex-card:#FFFFFF;
+  --vk-ex-t1:#70A2D7;     /* thema 1 · Klantgerichtheid */
+  --vk-ex-t2:#BDD24D;     /* thema 2 · Kwaliteit & processen */
+  --vk-ex-t3:#F05736;     /* thema 3 · Medewerkers & ontwikkeling */
+  --vk-ex-t4:#9666AA;     /* thema 4 · Digitalisering */
+  --vk-ex-t5:#2A9791;     /* thema 5 · Samenwerking */
+  --vk-ex-inset:inset 0 0 0 1px rgba(0,0,0,.12); /* goedgekeurde speelstuk-schaduw */
+}
+
+/* ── E1 · fase-accent ── */
+.hdr,.header,.phdr,.print-bar{border-bottom:3px solid var(--fase-accent)}
+.phase-pill{background:var(--fase-accent);color:var(--fase-accent-text);border:1px solid var(--fase-accent)}
+.phase-num,.step-num,.phase-icon,.q-num{background:var(--fase-accent);color:var(--fase-accent-text);box-shadow:var(--vk-ex-inset)}
+
+/* ── E2 · methodiek-DNA in micro-vormen ── */
+.card,.pcard{border-left:6px solid var(--fase-accent)}
+.card-title::before{content:'';display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--vk-ex-stip);box-shadow:var(--vk-ex-inset);margin-right:7px;vertical-align:1px}
+.card-head,.q-meta{position:relative;border-bottom:2px dotted var(--vk-ex-line);padding-bottom:16px;margin-bottom:22px}
+
+/* ── F2 · themaladder als ornament op de bordlijn ── */
+.card-head::before,.q-meta::before{content:'';position:absolute;left:0;bottom:-5px;width:8px;height:8px;border-radius:50%;background:var(--vk-ex-t1);box-shadow:14px 0 0 var(--vk-ex-t2),28px 0 0 var(--vk-ex-t3),42px 0 0 var(--vk-ex-t4),56px 0 0 var(--vk-ex-t5)}
+
+/* ── E3 + F1 · watermerk en accentstreep (DM Serif Display, afsprakenblad leidend) ── */
+.phase-header{position:relative}
+/* Twee-staps-start (zoals fase 0): na de bevestig-popup wordt de knop groen ('armed'). */
+#introStartBtn.armed{background:var(--teal);border-color:var(--teal);box-shadow:0 2px 8px rgba(42,151,145,.35)}
+#introStartBtn.armed:hover:not(:disabled){background:var(--teal);filter:brightness(.92);box-shadow:0 4px 14px rgba(42,151,145,.45)}
+/* Groot fasecijfer (Optie 1): uitsluitend op de startpagina van elke fase.
+   Fase 1-5 = introscherm (#sIntro); fase 0 = .phase-header (eigen startpagina).
+   Geen wisselende tekens (?, 123, vinkje) meer en niet meer op werkschermen,
+   dus geen overlap met fase-gegevens. */
+#sIntro .card:first-of-type{position:relative}
+#sIntro .card:first-of-type::after,.phase-header::after{content:var(--fase-nummer);position:absolute;font-family:'DM Serif Display',serif;font-weight:600;font-size:84px;line-height:1;letter-spacing:-.025em;color:var(--vk-ex-line);pointer-events:none;user-select:none;z-index:0}
+.phase-header::after{right:0;top:-10px}
+#sIntro .card:first-of-type::after{right:22px;top:16px}
+.card:first-of-type .card-head .card-title::after,.card:first-of-type .q-text::after,.phase-title::after{content:'';display:block;width:56px;height:5px;border-radius:3px;background:var(--fase-accent);margin-top:8px}
+@media(max-width:900px){#sIntro .card:first-of-type::after,.phase-header::after{display:none!important}}
+
+/* ── E4 + F3 · beweging en voortgang ── */
+.card,.pcard{transition:transform .15s ease,box-shadow .15s ease}
+.card:hover,.pcard:hover{transform:translateY(-2px);box-shadow:0 2px 5px rgba(0,0,0,.08),0 8px 22px rgba(0,0,0,.09)}
+.btn:hover:not(:disabled){transform:translateY(-1px)}
+.q-steps{align-items:center}
+.q-step{flex:0 0 11px;height:11px;border-radius:50%;background:var(--vk-ex-line);box-shadow:var(--vk-ex-inset)}
+.q-step.done{background:var(--vk-ex-stip)}
+.q-step.active{background:var(--fase-accent);box-shadow:var(--vk-ex-inset),0 0 0 2px var(--vk-ex-card),0 0 0 3px var(--fase-accent)}
+
+/* ── F4 · wachtschermen: trio speelstukken (zon + twee themacirkels) ── */
+@keyframes vkExPulse{0%,100%{opacity:1}50%{opacity:.45}}
+.wait-screen .spinner{width:16px;height:16px;border:none;border-radius:50%;background:var(--vk-ex-stip);box-shadow:var(--vk-ex-inset),12px 0 0 var(--vk-ex-t1),24px 0 0 var(--vk-ex-t2);position:relative;left:-12px;margin:0 auto 16px;animation:vkExPulse 1.6s ease-in-out infinite}
+
+/* ── F5 · rasterwatermerk + R-watermerk (alleen rapport; klassen bestaan alleen daar) ── */
+.section-head{position:relative;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Cpath d='M14 0H0v14' fill='none' stroke='%23E5E3DB' stroke-width='1'/%3E%3C/svg%3E")}
+.section-head::after{content:var(--fase-nummer);position:absolute;right:16px;top:50%;transform:translateY(-50%);font-family:'DM Serif Display',serif;font-weight:600;font-size:44px;line-height:1;color:var(--vk-ex-line);pointer-events:none;user-select:none;z-index:0}
+@media(max-width:900px){.section-head::after{display:none!important}}
+
+/* ── A11y · reduced motion ── */
+@media (prefers-reduced-motion:reduce){
+  .card,.pcard,.btn,.q-step{transition:none!important}
+  .card:hover,.pcard:hover,.btn:hover:not(:disabled){transform:none!important}
+  .wait-screen .spinner{animation:none!important}
+}
+/* ═══ END VK SHARED EXPRESSIE (v1) ═══ */
+</style>
+</head>
+<body>
+
+<!-- ═══════ FACILITATOR VIEW ═══════ -->
+<div id="facView">
+  <header class="hdr">
+    <div class="logo" onclick="goPhase0()">
+      <svg class="logo-img" xmlns="http://www.w3.org/2000/svg" viewBox="6392 11502 7040 7040" aria-hidden="true" focusable="false">
+        <rect class="fil-logo-shadow" x="6542.13" y="11652.68" width="6840.47" height="6840.47" rx="625.64" ry="625.64"/>
+        <rect class="fil-logo-main"   x="6492.13" y="11602.68" width="6840.47" height="6840.47" rx="625.64" ry="625.64"/>
+        <path class="fil-logo-line" d="M8459.51 11340.66l6.77 2886.05c0.53,225.18 44.93,223.19 131.76,299.11 64.53,56.42 712.98,613.44 1067.73,922.39m279.67 498.36c-3.85,335.14 -17.51,1600.45 -22.09,2025.82m-1460.38 -5160.51l785.98 4.94m3662.81 274.39l-6.72 591.26 -710.88 10.16 0 978.81m-1557.05 3300.95c-5.59,-19.68 -10.23,-41.55 -13.66,-65.97 -40.62,-289.42 -55.5,-1603.06 -55.5,-1603.06m0 0l-12.4 -1458.25c0,0 -44.42,-161.55 137.32,-169.63 181.74,-8.08 658.3,-4.04 658.3,-4.04l-3.77 -1608.68m459.06 3230.04l-615.21 -562.61m1311.37 -167.26l-1179.41 -4.13m-1388.18 1333.84l1210.17 -1126.72c0,0 173.66,-113.07 201.93,-286.74 28.27,-173.67 4.04,-807.74 4.04,-807.74l1579.11 0c0,0 10.18,8.09 137.31,-44.42 53.21,-21.98 127.68,-100.56 196.29,-184.51m-4091.56 3529.88c18.68,-34.96 33.6,-74 38.36,-114.44 16.15,-137.31 24.23,-1514.5 24.23,-1514.5 0,0 -4.03,-137.32 -72.69,-185.78 -68.66,-48.46 -665.89,-556.18 -665.89,-556.18m-467.07 653.4l469.73 -451.59c0,0 69.04,-77 -2.66,-201.81m-1213.8 -2.13l1213.8 2.13 -29.21 -897.55 -563.22 -1.72m-1022.85 -1671.85l3.28 541.68c0,0 -10.23,140.69 117.67,140.69 127.9,0 600.9,26.88 600.9,26.88l-1 659.21m-302.89 299.12l-178.2 -1.97c0,0 -220.41,18.58 -300.07,-21.25 -41.28,-20.64 -175.23,-151.79 -294.75,-273.38m1035.23 -2176.98l5.68 516.43 895.89 -2.1m2.16 920.01l2255.42 21.86m-1471.05 -1258.2l-0.37 394.45 -2.13 2268.51m2268.36 -3395.11c-121.47,117.05 -302.96,241.2 -548.07,278.79m-1062.71 -1009.16l-14.83 1611m313.94 307.52l452.12 4 9.35 -663.77m8.52 -604.84l5.09 -361.34m1408.26 1081.76l-2065.77 2035.4c-50.75,50 -106.04,79.05 -108.71,151.99 -1.64,44.93 10.93,491.27 20.85,827.53m-1774.69 2623.29l879.79 0 134 0 720.63 0 30.4 0 713.76 0 217.25 0 802.66 0 0 323.39 -3498.49 0 0 -323.39zm4646.55 -2710.87c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -167.05,0 -302.47,-135.42 -302.47,-302.47l0.01 -1.06 0 -0.03c0.59,-166.54 135.77,-301.38 302.46,-301.38zm-4993.86 900.52c73.14,0 140.21,25.95 192.51,69.16 8.96,7.4 17.48,15.32 25.53,23.69 52.28,54.37 84.43,128.24 84.43,209.62 0,167.05 -135.42,302.47 -302.47,302.47 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm4491.08 -4342.61c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -64.31,0 -123.92,-20.09 -172.94,-54.31 -15.25,-10.65 -29.49,-22.67 -42.51,-35.88 -53.81,-54.61 -87.02,-129.56 -87.02,-212.28 0,-167.05 135.42,-302.47 302.47,-302.47zm-2395.12 -1464.48c167.05,0 302.47,135.42 302.47,302.47 0,165.17 -132.38,299.39 -296.83,302.4l-5.64 0.07 -2.78 -0.04c-165.76,-1.5 -299.69,-136.31 -299.69,-302.43 0,-167.05 135.42,-302.47 302.47,-302.47zm762.06 1258.76l4.26 0.05c150.23,2.08 273.95,113.65 295.02,258.52 2.08,14.34 3.19,28.99 3.19,43.9 0,18.02 -1.58,35.68 -4.6,52.83 -24.99,141.86 -148.84,249.64 -297.87,249.64l-4.26 -0.05c-93.14,-1.29 -176.09,-44.66 -230.72,-111.98 -42.19,-51.99 -67.49,-118.26 -67.49,-190.44 0,-132.48 85.19,-245.05 203.76,-285.98 30.94,-10.67 64.14,-16.49 98.71,-16.49zm13.61 -966.18c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47l-4.26 -0.05c-23.15,-0.32 -45.66,-3.25 -67.28,-8.49 -132.52,-32.14 -230.93,-151.53 -230.93,-293.93 0,-167.05 135.42,-302.47 302.47,-302.47zm1020.61 503.5c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -71.19,0 -136.62,-24.6 -188.28,-65.75 -33.47,-26.66 -61.16,-60.25 -80.89,-98.62 -21.28,-41.4 -33.3,-88.35 -33.3,-138.1 0,-167.05 135.42,-302.47 302.47,-302.47zm1211.74 1335.28c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47l-3.44 -0.04c-34.1,-0.38 -66.83,-6.4 -97.33,-17.17 -117.5,-41.5 -201.7,-153.55 -201.7,-285.26 0,-167.05 135.42,-302.47 302.47,-302.47zm527.99 1410.14c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -67.13,0 -129.13,-21.88 -179.31,-58.88 -22.76,-16.78 -43.08,-36.67 -60.34,-59.05 -39.39,-51.06 -62.82,-115.06 -62.82,-184.54 0,-167.05 135.42,-302.47 302.47,-302.47zm-1413.53 2298c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-78.67 30.04,-150.32 79.27,-204.12l3.35 -3.6c55.14,-58.34 133.24,-94.75 219.85,-94.75zm-2137.51 -848.14c13.94,0 27.64,0.96 41.07,2.79 75.93,10.31 142.9,48.79 190.05,104.58 44.51,52.66 71.35,120.75 71.35,195.1 0,148.87 -107.54,272.61 -249.18,297.79 -17.3,3.08 -35.11,4.68 -53.29,4.68 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-76.96 28.76,-147.19 76.09,-200.57 55.41,-62.5 136.29,-101.9 226.38,-101.9zm8.96 -2775.7c167.05,0 302.47,135.42 302.47,302.47l-0.07 5.29c-2.82,164.61 -137.12,297.18 -302.4,297.18 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-163.19 129.23,-296.17 290.93,-302.23 3.83,-0.15 7.68,-0.24 11.54,-0.24zm-651.5 -753.18c167.05,0 302.47,135.42 302.47,302.47 0,164.14 -130.75,297.74 -293.77,302.34 -2.89,0.08 -5.79,0.13 -8.7,0.13l-0.29 0c-166.92,-0.16 -302.18,-135.52 -302.18,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm-790.81 -1081.7c167.05,0 302.47,135.42 302.47,302.47 0,142.36 -98.36,261.74 -230.82,293.91 -22.75,5.53 -46.5,8.49 -70.94,8.55l-0.71 0.01c-167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm-900.9 883.74c167.05,0 302.47,135.42 302.47,302.47 0,76.14 -28.14,145.7 -74.58,198.87 -54.77,62.7 -135,102.6 -224.57,103.56l-3.32 0.04c-167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm-678.68 805.98c167.05,0 302.47,135.42 302.47,302.47 0,121.65 -71.83,226.52 -175.38,274.53 -38.12,17.68 -80.54,27.66 -125.26,27.92l-1.83 0.02c-167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm722.22 1973.37l0.46 0.01c166.84,0.25 302.01,135.56 302.01,302.46l-0.01 0.93c-0.5,166.62 -135.72,301.54 -302.46,301.54 -34.45,0 -67.56,-5.77 -98.41,-16.38 -118.74,-40.84 -204.06,-153.49 -204.06,-286.09l0.04 -3.34c1.79,-165.5 136.5,-299.13 302.43,-299.13zm-1285.24 -517.82c39.12,0 76.51,7.43 110.83,20.95 112.22,44.21 191.64,153.59 191.64,281.52 0,85.58 -35.55,162.85 -92.68,217.88 -54.39,52.37 -128.32,84.59 -209.79,84.59 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm663.87 1415.36c66.12,0 127.28,21.24 177.05,57.23 75.98,54.95 125.42,144.31 125.42,245.24l-0.01 0.53c-0.29,166.81 -135.59,301.94 -302.46,301.94 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47z"/>
+        <rect class="fil-logo-bar" x="8158.53" y="17972.39" width="3395.02" height="332.88"/>
+      </svg>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="q-steps" id="qStepsBar" style="width:180px"></div>
+      <span class="phase-pill" id="t-phasePill">Fase 1 · Stip op de horizon</span>
+    </div>
+    <div class="hdr-r">
+      <button class="btn" data-env="dev-only" onclick="showPView()" style="font-size:12px;color:var(--t3)" id="t-pvBtn" aria-label="Open deelnemer-view">Deelnemer-view →</button>
+      <button class="btn btn-ghost" data-env="dev-only" onclick="resetDemoData()" title="Reset demo-data" aria-label="Reset demo-data" style="padding:6px 10px"><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M2 7a5 5 0 0 1 8.5-3.5L12 5M12 2v3h-3M12 7a5 5 0 0 1-8.5 3.5L2 9M2 12V9h3"/></svg></button>
+      <div class="lang-toggle" role="group" aria-label="Taalkeuze">
+        <button class="lang-btn on" id="lNL" onclick="setLang('nl')" aria-label="Nederlands">NL</button>
+        <button class="lang-btn" id="lEN" onclick="setLang('en')" aria-label="English">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ──────── SESSIE-INFO PANEEL ──────── -->
+  <div class="sess-bar" id="sessBar" style="display:none">
+    <button class="sess-toggle" id="sessToggle" onclick="toggleSessPanel()" aria-expanded="false" aria-controls="sessPanel">
+      <svg class="chev" width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 4.5L6 7.5L9 4.5"/></svg>
+      <span id="t-sessTitle">Sessie-info</span>
+      <span class="sess-mini" id="sessMini"></span>
+    </button>
+    <div class="sess-panel" id="sessPanel" role="region" aria-label="Sessiecontext">
+      <div class="sess-grid" id="sessGrid"></div>
+    </div>
+  </div>
+
+  <main class="wrap">
+
+    <!-- ──────── INTRO SCREEN ──────── -->
+    <div id="sIntro" class="screen open">
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--b0)">
+          <div style="width:44px;height:44px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="white" stroke-width="1.8"/><circle cx="10" cy="10" r="3.5" fill="white"/></svg>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px">
+              <h2 class="serif" style="font-size:24px;letter-spacing:-.01em" id="t-introTitle">Fase 1 — Stip op de horizon bepalen</h2>
+              <span class="info-icon" onclick="event.stopPropagation();vkInfoOpen('infoIntro',this)" aria-label="Uitleg over de stip-op-de-horizon-methode" role="button" tabindex="0">i</span>
+            </div>
+            <p style="font-size:13px;color:var(--t2)" id="t-introSub">5 vragen, co-creatief, AI-geclusterd, 1 definitieve zin</p>
+          </div>
+        </div>
+
+        <!-- WAT-blok: uitleg over stip op de horizon -->
+        <div class="intro-block">
+          <div class="intro-block-title"><span class="dot"></span><span id="t-introWhatTitle">Wat is de stip op de horizon?</span></div>
+          <p id="t-introWhatBody">De stip op de horizon is het gedeelde beeld waar jullie samen naartoe werken. Het beschrijft in één heldere volzin waar het plan of het project voor staat, voor wie het werkt en wat jullie er de komende periode mee willen bereiken. Deze stip is geen rigide routebeschrijving, maar dient als richtinggevend kompas: alle keuzes in latere fasen (thema's, acties, prioriteiten en roadmap) worden hieraan getoetst.</p>
+        </div>
+
+        <!-- HOE-blok: werkinstructie -->
+        <div class="intro-block">
+          <div class="intro-block-title"><span class="dot"></span><span id="t-introHowTitle">Hoe komen we tot de stip?</span></div>
+          <p id="t-introBody">Deelnemers beantwoorden vijf gerichte vragen op hun eigen device. AI clustert de antwoorden op overeenkomst en het team bespreekt per vraag welke kernwoorden de stip echt raken. Van de bevestigde kernwoorden wordt één zin gemaakt, die jullie stip op de horizon verwoordt. Deze zin (en vooral de door jullie ingebrachte elementen) vormt de toetssteen voor alle volgende fases.</p>
+        </div>
+
+        <div class="intro-grid" id="introGrid"></div>
+      </div>
+      <div class="bot-bar">
+        <div class="bot-info" id="t-introBotInfo">Alle deelnemers zijn aangemeld en gereed</div>
+        <button class="btn btn-orange btn-lg" id="introStartBtn" onclick="vkF1StartGated()">
+          <span id="t-introStart">Starten met vraag 1</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3.5 8h9M9 4l4 4-4 4"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ──────── QUESTION / WAIT SCREEN ──────── -->
+    <div id="sWait" class="screen">
+      <div class="card">
+        <div class="q-meta">
+          <div class="q-num" id="qNumBadge">1</div>
+          <div>
+            <div class="q-counter" id="qCounterLabel">Vraag 1 van 5</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px">
+          <div class="q-text" id="qTextFac" style="flex:1;min-width:0;margin-bottom:0"></div>
+          <span class="info-icon" onclick="event.stopPropagation();vkInfoQOpen(this)" aria-label="Theoretische toelichting op dit visie-component" role="button" tabindex="0" style="margin-top:8px">i</span>
+        </div>
+        <div class="q-hint" id="qHintFac"></div>
+        <div class="answer-count">
+          <span class="live-dot"></span>
+          <span id="t-waiting">Wachten op antwoorden</span>
+          <span class="count-chip" id="ansCountChip">0 / 0</span>
+        </div>
+        <div style="text-align:center;padding:20px 0;color:var(--t3);font-size:13px" id="waitMsg"></div>
+      </div>
+      <div class="bot-bar">
+        <div class="bot-info" id="waitBotInfo"></div>
+        <button class="btn btn-orange" onclick="showCluster()" id="showClusterBtn">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><circle cx="4" cy="7" r="2"/><circle cx="11" cy="4" r="2"/><circle cx="11" cy="10" r="2"/><path d="M6 6.5L9 4.5M6 7.5L9 9.5"/></svg>
+          <span id="t-showCluster">Toon antwoorden & clusters</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ──────── CLUSTER SCREEN ──────── -->
+    <div id="sCluster" class="screen">
+      <div class="card">
+        <div class="q-meta">
+          <div class="q-num" id="clNumBadge">1</div>
+          <div>
+            <div class="q-counter" id="clCounterLabel"></div>
+            <div style="font-size:12px;color:var(--t3)" id="t-aiNote">AI heeft de antwoorden geclusterd op overeenkomst</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:16px">
+          <div class="q-text" id="clQText" style="flex:1;min-width:0;font-size:18px;margin-bottom:0"></div>
+          <span class="info-icon" onclick="event.stopPropagation();vkInfoQOpen(this)" aria-label="Theoretische toelichting op dit visie-component" role="button" tabindex="0" style="margin-top:6px">i</span>
+        </div>
+
+        <!-- Hint over editable clusters + verschuiven -->
+        <div class="cluster-edit-hint" role="note">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="5.5"/><path d="M7 9.5V7M7 4.5h.01"/></svg>
+          <span id="t-clusterEditHint">Pas clusternamen aan als ze de inhoud niet helemaal raken, en versleep antwoorden naar het cluster waar ze beter passen.</span>
+        </div>
+
+        <div class="cluster-area" id="clusterArea"></div>
+
+        <div class="keyword-block">
+          <div class="kw-label" id="t-kwLabel">Kernwoorden vastleggen</div>
+          <p style="font-size:12px;color:var(--t2);margin-bottom:12px" id="t-kwDesc">Voeg de kernwoorden toe die het team belangrijk vindt. Deze worden opgenomen in de stip-op-de-horizon-zin. Druk op Enter of Tab om toe te voegen.</p>
+          <div class="tag-input-row" id="kwTagRow"></div>
+          <div class="kw-add">
+            <input type="text" id="kwInput" placeholder="Voeg kernwoord toe..." data-t-placeholder="kwInputPh" onkeydown="kwKeydown(event)" aria-label="Nieuw kernwoord">
+            <button class="btn btn-orange" onclick="addKw()" id="t-kwAdd">Toevoegen</button>
+          </div>
+        </div>
+      </div>
+      <div class="bot-bar">
+        <div class="bot-info">
+          <span class="live-dot" style="background:var(--green);animation:none"></span>
+          &nbsp;<span id="clBotLabel"></span>
+        </div>
+        <button class="btn btn-green btn-lg" onclick="confirmQ()" id="confirmQBtn">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M2.5 8l4 4L12.5 3.5"/></svg>
+          <span id="t-confirmQ">Bevestigen & volgende vraag</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ──────── AI LOADING ──────── -->
+    <div id="sAILoad" class="screen">
+      <div class="card">
+        <div class="ai-loading">
+          <div class="ai-dots">
+            <div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>
+          </div>
+          <p class="serif" style="font-size:22px;margin-bottom:8px" id="t-aiLoadTitle">Stip-zin wordt samengesteld...</p>
+          <p style="font-size:13px;color:var(--t2)" id="t-aiLoadSub">AI verbindt de bevestigde kernwoorden tot een coherente zin</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────── SENTENCE EDIT SCREEN ──────── -->
+    <div id="sSentence" class="screen">
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--b0)">
+          <div style="width:32px;height:32px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5.5" stroke="white" stroke-width="1.4"/><circle cx="7" cy="7" r="2" fill="white"/></svg>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:15px;font-weight:700" id="t-sentEditTitle">Onze stip op de horizon — voorgestelde formulering</div>
+            <div style="font-size:12px;color:var(--t2);margin-top:2px" id="t-sentEditSub">Pas de zin aan zodat hij goed loopt, met behoud van de kernwoorden.</div>
+          </div>
+        </div>
+
+        <!-- Uitdaging om aan te passen + AI-knop — v4: AI-knop verborgen, code behouden voor latere reactivatie -->
+        <div class="ai-suggest-bar" style="display:none" id="aiSuggestBar">
+          <div class="lbl">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M7 1.5v3M7 9.5v3M1.5 7h3M9.5 7h3M3 3l2 2M9 9l2 2M3 11l2-2M9 5l2-2"/></svg>
+            <span id="t-sentEditChallenge">Lees de zin hardop en vraag jezelf af: dekt deze de lading?</span>
+          </div>
+          <button class="btn btn-purple" onclick="generateAISuggestion()" id="aiSuggestBtnEl" aria-label="Genereer AI-voorstel voor de stip-zin">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6.5 1.5l1.2 3.3L11 6l-3.3 1.2L6.5 10.5l-1.2-3.3L2 6l3.3-1.2z"/></svg>
+            <span id="t-aiSuggestBtn">AI-voorstel maken</span>
+          </button>
+        </div>
+
+        <!-- AI-suggestie-box (verborgen tot gegenereerd) -->
+        <div class="ai-suggest-box" id="aiSuggestBox" style="display:none">
+          <div class="ai-suggest-box-head">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--purple)" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M7 1.5v3M7 9.5v3M1.5 7h3M9.5 7h3"/></svg>
+            <span class="b" id="t-aiSuggestLabel">AI-voorstel</span>
+          </div>
+          <div class="ai-suggest-box-desc" id="t-aiSuggestDesc">Op basis van de gekozen kernwoorden (met behoud van de startwoorden).</div>
+          <div class="ai-suggest-parts" id="aiSuggestParts"></div>
+          <div class="ai-suggest-actions">
+            <button class="btn" onclick="dismissAISuggestion()" id="t-aiSuggestDiscard">Negeren</button>
+            <button class="btn btn-purple" onclick="applyAISuggestion()" id="t-aiSuggestReplace">Vervang door dit voorstel</button>
+          </div>
+        </div>
+
+        <div class="sentence-shell">
+          <div class="sentence-intro" id="t-sentIntro">Voorgestelde formulering</div>
+          <div class="sentence-parts" id="sentParts"></div>
+        </div>
+
+        <div style="margin-bottom:20px">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:12px" id="t-kwPerQ">Kernwoorden per vraag (onderliggende inbreng blijft bewaard)</div>
+          <div id="kwSummary"></div>
+        </div>
+      </div>
+      <div class="bot-bar">
+        <div class="bot-info" id="t-sentBotInfo">Bespreek de zin en pas aan waar nodig</div>
+        <button class="btn btn-orange btn-lg" onclick="confirmSentence()" id="t-sentConfirm">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2.5 8l4 4L12.5 3.5"/></svg>
+          <span id="t-sentConfirmLabel">Stip op de horizon bevestigen</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ──────── FINAL SCREEN ──────── -->
+    <div id="sFinal" class="screen">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div>
+          <div class="phase-pill" style="margin-bottom:6px" id="t-finalBadge">Fase 1 voltooid</div>
+          <h2 class="serif" style="font-size:26px;letter-spacing:-.01em" id="t-finalTitle">Stip op de horizon bepaald</h2>
+        </div>
+        <div class="view-toggle">
+          <button class="vt-btn on" onclick="switchFinalView('vision')" id="vt-vision"><span id="t-vtVision">Visiezin</span></button>
+          <button class="vt-btn" onclick="switchFinalView('canvas')" id="vt-canvas"><span id="t-vtCanvas">Visuele rapportage</span></button>
+        </div>
+      </div>
+
+      <!-- Vision view -->
+      <div id="fvVision">
+        <div class="final-card anim-reveal">
+          <div class="final-top">
+            <div class="final-label" id="t-finalLabel">Onze stip op de horizon</div>
+            <div class="final-sentence" id="finalSentenceDisplay"></div>
+            <svg class="final-deco" viewBox="0 0 860 30" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M0 30 Q430 0 860 30 L860 30 L0 30Z" fill="white"/>
+            </svg>
+          </div>
+          <div class="final-keywords" id="finalKeywords"></div>
+
+          <!-- Na-bevestiging uitleg -->
+          <div class="after-confirm" id="afterConfirmBlock">
+            <div class="after-confirm-head">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="6"/><path d="M8 5v3M8 11h.01"/></svg>
+              <span id="t-afterConfirmTitle">Wat doet deze stip op de horizon?</span>
+            </div>
+            <div class="after-confirm-grid" id="afterConfirmGrid"></div>
+          </div>
+
+          <div class="final-actions">
+            <p style="font-size:13px;color:var(--t2)" id="t-finalNote">Deze stip-zin vormt de toetssteen voor fase 2 en verder.</p>
+            <div class="vk-final-actions">
+              <button class="btn btn-ghost vk-back-edit-btn" onclick="vkBackToEdit()" type="button" id="vkBackEditBtn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                <span id="t-vkBackEdit">Aanpassen</span>
+              </button>
+              <button class="btn btn-orange btn-lg" onclick="goPhase2()" id="t-toPhase2">Naar fase 2 →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Canvas view -->
+      <div id="fvCanvas" style="display:none">
+        <div class="canvas-wrap anim-reveal">
+          <div class="canvas-header">
+            <div class="canvas-title serif" id="t-canvasTitle">Visiekaart canvas — fase 1</div>
+            <div style="font-size:12px;color:var(--t3)" id="t-canvasSub">Thema's worden toegevoegd in fase 2</div>
+          </div>
+          <div class="canvas-body">
+            <svg id="vkCanvas" class="canvas-svg" viewBox="0 0 800 440" xmlns="http://www.w3.org/2000/svg"></svg>
+          </div>
+          <div class="canvas-note" id="t-canvasNote">Klik op 'Visuele rapportage' om terug te keren naar de visiezin</div>
+        </div>
+      </div>
+
+      <div class="bot-bar" style="display:none" id="botFinal"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══════ PARTICIPANT VIEW ═══════ -->
+<div id="pView" class="pview">
+
+  <!-- Header: uniform met facilitator (logo · progressie · pill · NL/EN) -->
+  <header class="phdr" role="banner">
+    <div class="logo" style="cursor:default" aria-label="Visiekaart">
+      <svg class="logo-img" xmlns="http://www.w3.org/2000/svg" viewBox="6392 11502 7040 7040" aria-hidden="true" focusable="false">
+        <rect class="fil-logo-shadow" x="6542.13" y="11652.68" width="6840.47" height="6840.47" rx="625.64" ry="625.64"/>
+        <rect class="fil-logo-main"   x="6492.13" y="11602.68" width="6840.47" height="6840.47" rx="625.64" ry="625.64"/>
+        <path class="fil-logo-line" d="M8459.51 11340.66l6.77 2886.05c0.53,225.18 44.93,223.19 131.76,299.11 64.53,56.42 712.98,613.44 1067.73,922.39m279.67 498.36c-3.85,335.14 -17.51,1600.45 -22.09,2025.82m-1460.38 -5160.51l785.98 4.94m3662.81 274.39l-6.72 591.26 -710.88 10.16 0 978.81m-1557.05 3300.95c-5.59,-19.68 -10.23,-41.55 -13.66,-65.97 -40.62,-289.42 -55.5,-1603.06 -55.5,-1603.06m0 0l-12.4 -1458.25c0,0 -44.42,-161.55 137.32,-169.63 181.74,-8.08 658.3,-4.04 658.3,-4.04l-3.77 -1608.68m459.06 3230.04l-615.21 -562.61m1311.37 -167.26l-1179.41 -4.13m-1388.18 1333.84l1210.17 -1126.72c0,0 173.66,-113.07 201.93,-286.74 28.27,-173.67 4.04,-807.74 4.04,-807.74l1579.11 0c0,0 10.18,8.09 137.31,-44.42 53.21,-21.98 127.68,-100.56 196.29,-184.51m-4091.56 3529.88c18.68,-34.96 33.6,-74 38.36,-114.44 16.15,-137.31 24.23,-1514.5 24.23,-1514.5 0,0 -4.03,-137.32 -72.69,-185.78 -68.66,-48.46 -665.89,-556.18 -665.89,-556.18m-467.07 653.4l469.73 -451.59c0,0 69.04,-77 -2.66,-201.81m-1213.8 -2.13l1213.8 2.13 -29.21 -897.55 -563.22 -1.72m-1022.85 -1671.85l3.28 541.68c0,0 -10.23,140.69 117.67,140.69 127.9,0 600.9,26.88 600.9,26.88l-1 659.21m-302.89 299.12l-178.2 -1.97c0,0 -220.41,18.58 -300.07,-21.25 -41.28,-20.64 -175.23,-151.79 -294.75,-273.38m1035.23 -2176.98l5.68 516.43 895.89 -2.1m2.16 920.01l2255.42 21.86m-1471.05 -1258.2l-0.37 394.45 -2.13 2268.51m2268.36 -3395.11c-121.47,117.05 -302.96,241.2 -548.07,278.79m-1062.71 -1009.16l-14.83 1611m313.94 307.52l452.12 4 9.35 -663.77m8.52 -604.84l5.09 -361.34m1408.26 1081.76l-2065.77 2035.4c-50.75,50 -106.04,79.05 -108.71,151.99 -1.64,44.93 10.93,491.27 20.85,827.53m-1774.69 2623.29l879.79 0 134 0 720.63 0 30.4 0 713.76 0 217.25 0 802.66 0 0 323.39 -3498.49 0 0 -323.39z"/>
+        <rect class="fil-logo-bar" x="8158.53" y="17972.39" width="3395.02" height="332.88"/>
+      </svg>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="q-steps" id="pQStepsBar" style="width:180px"></div>
+      <span class="phase-pill" id="t-pPhasePill">Fase 1 · Stip op de horizon</span>
+    </div>
+    <div class="hdr-r">
+      <button class="btn" data-env="dev-only" onclick="hidePView()" style="font-size:12px;color:var(--t3)" id="t-pBack" aria-label="Terug naar facilitator-view">← Facilitator-view</button>
+      <div class="lang-toggle" role="group" aria-label="Taalkeuze">
+        <button class="lang-btn on" id="pLNL" onclick="setLang('nl')" aria-label="Nederlands">NL</button>
+        <button class="lang-btn" id="pLEN" onclick="setLang('en')" aria-label="English">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Participant: pre-wait (vóór facilitator start; nu met intro-overzicht) -->
+  <div id="pPreWait" class="pcard" style="max-width:640px">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--b0)">
+      <div style="width:40px;height:40px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="8" stroke="white" stroke-width="1.8"/><circle cx="10" cy="10" r="3.5" fill="white"/></svg>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div class="serif" style="font-size:20px;letter-spacing:-.01em" id="t-pPreWaitTitle">Welkom bij de sessie</div>
+        <p style="font-size:12.5px;color:var(--t2)" id="t-pPreWaitSub">Hieronder een korte uitleg van wat we vandaag samen doen. De vragen verschijnen zodra de facilitator fase 1 start.</p>
+      </div>
+    </div>
+
+    <!-- ═══ VK EXPRESSIE F8: mini-canvas-illustratie (enige DOM-toevoeging expressielaag) ═══ -->
+    <div style="display:flex;justify-content:center;margin:2px 0 18px">
+      <svg width="220" height="110" viewBox="0 0 220 110" role="img" aria-label="Het Visiekaart-canvas: vijf thema's rond de stip op de horizon" focusable="false">
+        <rect x="1" y="1" width="218" height="108" rx="10" style="fill:var(--surface,#FFFFFF);stroke:var(--b1,#E5E3DB);stroke-width:1.5"/>
+        <path d="M60 109 A50 50 0 0 1 160 109 Z" style="fill:var(--orange,#FAA833)"/>
+        <circle cx="40" cy="78" r="15" style="fill:var(--blue,#70A2D7)"/>
+        <circle cx="64" cy="46" r="15" style="fill:var(--green,#BDD24D)"/>
+        <circle cx="110" cy="31" r="15" style="fill:var(--coral,#F05736)"/>
+        <circle cx="156" cy="46" r="15" style="fill:var(--purple,#9666AA)"/>
+        <circle cx="180" cy="78" r="15" style="fill:var(--teal,#2A9791)"/>
+      </svg>
+    </div>
+    <!-- ═══ END VK EXPRESSIE F8 ═══ -->
+
+    <!-- Sessie-samenvatting (verschijnt zodra fac sessie heeft gestart) -->
+    <div class="p-summary" id="pSummaryBlock" style="display:none">
+      <div class="p-summary-label" id="t-summaryLabel">Wat we vandaag doen</div>
+      <div class="p-summary-text" id="pSummaryText"></div>
+    </div>
+
+    <!-- Wat-blok -->
+    <div class="intro-block">
+      <div class="intro-block-title"><span class="dot"></span><span id="t-pIntroWhatTitle">Wat is de stip op de horizon?</span></div>
+      <p id="t-pIntroWhatBody"></p>
+    </div>
+
+    <!-- Hoe-blok -->
+    <div class="intro-block">
+      <div class="intro-block-title"><span class="dot"></span><span id="t-pIntroHowTitle">Hoe komen we tot de stip?</span></div>
+      <p id="t-pIntroBody"></p>
+    </div>
+
+    <div class="intro-grid" id="pIntroGrid" style="margin-bottom:16px"></div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:12px;border-top:1px solid var(--b0)">
+      <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--t2)">
+        <span class="live-dot"></span>
+        <span id="t-pPreWaitWaiting">Wachten op de facilitator...</span>
+      </div>
+      <button class="btn" onclick="openOnderbouwing()" id="pOnderbouwingBtn1" aria-label="Open onderbouwing">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="5.5"/><path d="M7 9.5V7M7 4.5h.01"/></svg>
+        <span id="t-pOnderbouwingBtnLabel">Onderbouwing</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Participant: question input -->
+  <div id="pQuestion" class="pcard" style="display:none">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px">
+      <div class="q-num" id="pQNum" style="width:28px;height:28px;font-size:12px">1</div>
+      <div style="font-size:12px;color:var(--t3)" id="pQCounter">Vraag 1 van 5</div>
+    </div>
+    <div class="q-text" id="pQText" style="font-size:20px;margin-bottom:8px"></div>
+    <div class="q-hint" id="pQHint" style="margin-bottom:18px"></div>
+    <label style="font-size:13px;font-weight:600;display:block;margin-bottom:7px" id="t-pAnswerLabel">Jouw antwoord</label>
+    <textarea class="big-input" id="pAnswer" rows="3" data-t-placeholder="pAnswerPh" aria-label="Jouw antwoord op de huidige vraag"></textarea>
+    <div style="margin-top:12px;text-align:right">
+      <button class="btn btn-orange btn-lg" onclick="submitAnswer()" id="t-pSubmit" aria-label="Antwoord versturen">Versturen</button>
+    </div>
+  </div>
+
+  <!-- Participant: wait screen -->
+  <div id="pWait" class="pcard" style="display:none">
+    <div class="wait-screen">
+      <div class="spinner"></div>
+      <div class="wait-title" id="t-pWaitTitle">Antwoord verstuurd</div>
+      <div class="wait-sub" id="t-pWaitSub">De facilitator verwerkt de antwoorden. Even wachten...</div>
+    </div>
+  </div>
+
+  <!-- Participant: final vision -->
+  <div id="pFinal" class="pcard" style="display:none">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="width:52px;height:52px;background:var(--orange);border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="white" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="white"/></svg>
+      </div>
+      <div class="serif" style="font-size:20px;margin-bottom:6px" id="t-pFinalTitle">Stip op de horizon bepaald!</div>
+      <div style="font-size:13px;color:var(--t2)" id="t-pFinalSub">Dit is de stip op de horizon van jullie team</div>
+    </div>
+    <div style="background:var(--orange-l);border:1px solid var(--orange-b);border-radius:var(--r);padding:18px;text-align:center">
+      <div class="serif" style="font-size:16px;line-height:1.6;color:var(--text)" id="pFinalSentence"></div>
+    </div>
+    <div style="margin-top:16px;text-align:center;font-size:12px;color:var(--t3)" id="t-pNextPhase">Fase 2 start zodra de facilitator aangeeft</div>
+  </div>
+</div>
+
+<!-- ═══════ VK SHARED TIP POPUP (DOM) ═══════ -->
+<div id="vkTipBackdrop" class="vk-tip-backdrop" onclick="vkCloseTip()"></div>
+<div id="vkTipPopup" class="vk-tip-popup" role="dialog" aria-modal="true" aria-labelledby="vkTipTitle">
+  <button class="vk-tip-close" onclick="vkCloseTip()" aria-label="Sluiten" type="button">×</button>
+  <h3 class="vk-tip-title" id="vkTipTitle"></h3>
+  <p class="vk-tip-sub" id="vkTipSub"></p>
+  <div class="vk-tip-body" id="vkTipBody"></div>
+  <div class="vk-tip-actions" id="vkTipActions">
+    <button class="btn btn-orange" onclick="vkCloseTip()" id="vkTipCloseBtn" type="button">Sluiten</button>
+  </div>
+</div>
+
+<script>
+/* ═══ VK SHARED CANVAS BUILDER (injected) ═══ */
+/* ══════════════════════════════════════════════════════════════════════
+   VISIEKAART CANVAS — shared blueprint (used in fase 1 t/m 5 + rapport)
+   ──────────────────────────────────────────────────────────────────────
+   Geometry is faithful to bijlage_-_visiekaart_v2.svg.
+   ViewBox: 0 0 67733 38100 (CorelDRAW mm × 100).
+   Colors are mapped to standaard kleurcodes (Option B).
+   Font: DM Sans throughout.
+   ══════════════════════════════════════════════════════════════════════ */
+
+const VK_THEME_COLORS = ['#70A2D7','#BDD24D','#E8423F','#9666AA','#2A9791'];
+const VK_SUN = '#FCC429';
+const VK_BAND = '#BDD24D';
+const VK_DOTS = '#C5D93D';
+const VK_DARK = '#262A36';
+const VK_WHITE = '#FFFFFF';
+
+const VK_GEOM = {
+  sun: { cx: 33748, cy: 17537, r: 10421 },
+  band: { x: 2464, y: 17751, w: 62569, h: 19058, r: 886 },
+  themes: [
+    { cx: 20071, cy: 14057 },
+    { cx: 24285, cy:  7294 },
+    { cx: 33748, cy:  3625 },
+    { cx: 43161, cy:  7294 },
+    { cx: 47403, cy: 14057 }
+  ],
+  themeR: 3312,
+  triangle: 'M11768 35254 L33477 17752 L55186 35254 Z',
+  triApex: { x: 33477, y: 17751 },
+  triLeft: { x: 11768, y: 35254 },
+  triRight: { x: 55186, y: 35254 },
+  numbers: [
+    { x: 15205, y: 33897 },
+    { x: 18205, y: 31295 },
+    { x: 21439, y: 28632 },
+    { x: 24286, y: 25980 },
+    { x: 27496, y: 23474 }
+  ],
+  dots: [
+    { cx: 16229, cy: 14135 },
+    { cx: 64191, cy: 14135 },
+    { cx: 21013, cy:  9466 }
+  ]
+};
+
+function vkEscape(s){
+  return String(s||'').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function vkWrap(text, maxChars){
+  const words = String(text||'').split(/\s+/).filter(Boolean);
+  const out = [];
+  let line = '';
+  for (const w of words) {
+    const cand = line ? line + ' ' + w : w;
+    if (cand.length > maxChars && line) { out.push(line); line = w; }
+    else line = cand;
+  }
+  if (line) out.push(line);
+  return out;
+}
+
+function vkTruncate(text, maxChars){
+  text = String(text||'');
+  if (text.length <= maxChars) return text;
+  return text.substring(0, maxChars - 1).trimEnd() + '…';
+}
+
+/* Right edge of triangle at a given y */
+function vkTriRightX(y){
+  const apex = VK_GEOM.triApex, br = VK_GEOM.triRight;
+  if (y <= apex.y) return apex.x;
+  if (y >= br.y) return br.x;
+  return apex.x + (y - apex.y) / (br.y - apex.y) * (br.x - apex.x);
+}
+
+/*
+  data = {
+    visionSentence:  string | '',
+    themeNames:      array[5] of string | [],
+    themeActions:    array[5] of array[5] of string | [],
+    versnellers:     array of string,
+    remmers:         array of string,
+    roadmapTop5:     array of {text, themeIdx} | [],
+    lang:            'nl' | 'en',
+    stickyMode:      'numbers'  // show numbered chips in phase 3+
+  }
+*/
+function vkBuildCanvas(data){
+  const d = Object.assign({
+    visionSentence: '', themeNames: [], themeActions: [],
+    versnellers: [], remmers: [], roadmapTop5: [],
+    lang: 'nl', stickyMode: 'numbers'
+  }, data || {});
+  const isEN = d.lang === 'en';
+
+  const stoereLine1 = isEN ? 'bold steps' : 'stoere stappen';
+  const stoereLine2 = isEN ? 'to our dot' : 'naar onze stip';
+  const versnLabel = isEN ? 'accelerators' : 'versnellers';
+  const remmLabel  = isEN ? 'obstacles'    : 'remmers';
+  const placeholderPrefix = isEN ? 'theme' : 'thema';
+  const visionPlaceholder = isEN ? ['our dot on','the horizon'] : ['onze stip op','de horizon'];
+
+  let svg = '';
+
+  svg += `<rect x="0" y="0" width="67733" height="38100" fill="${VK_WHITE}"/>`;
+
+  const sun = VK_GEOM.sun;
+  svg += `<circle cx="${sun.cx}" cy="${sun.cy}" r="${sun.r}" fill="${VK_SUN}"/>`;
+
+  {
+    const visTop = sun.cy - sun.r;
+    const bandTop = VK_GEOM.band.y;
+    const visCenterY = (visTop + bandTop) / 2;
+    const sentence = d.visionSentence ? d.visionSentence : visionPlaceholder.join(' ');
+    let lines = vkWrap(sentence, 24).slice(0, 5);
+    if (!lines.length) lines = visionPlaceholder;
+    const fontSize = lines.length > 3 ? 900 : 1050;
+    const lineH = fontSize * 1.2;
+    const totalH = lines.length * lineH;
+    const startY = visCenterY - totalH/2 + lineH/2;
+    svg += lines.map((ln, i) =>
+      `<text x="${sun.cx}" y="${startY + i*lineH}" text-anchor="middle" dominant-baseline="central" font-size="${fontSize}" fill="${VK_WHITE}" font-weight="500">${vkEscape(ln)}</text>`
+    ).join('');
+  }
+
+  const b = VK_GEOM.band;
+  svg += `<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="${b.r}" ry="${b.r}" fill="${VK_BAND}"/>`;
+
+  VK_GEOM.dots.forEach(p => {
+    svg += `<circle cx="${p.cx}" cy="${p.cy}" r="80" fill="${VK_DOTS}"/>`;
+  });
+
+  VK_GEOM.themes.forEach((p, i) => {
+    const color = VK_THEME_COLORS[i];
+    const name = d.themeNames[i];
+    const isPlaceholder = !name;
+    const opacity = isPlaceholder ? 0.35 : 1;
+    svg += `<circle cx="${p.cx}" cy="${p.cy}" r="${VK_GEOM.themeR}" fill="${color}" opacity="${opacity}"/>`;
+    const numberLabel = String(i+1);
+    const display = name || `${placeholderPrefix} ${i+1}`;
+    const wrapped = vkWrap(display, 10).slice(0, 3).map(ln => vkTruncate(ln, 12));
+    const lineH = wrapped.length > 2 ? 560 : 680;
+    const blockH = wrapped.length * lineH;
+    const numberH = 1100;
+    const totalH = numberH + 200 + blockH;
+    const startY = p.cy - totalH/2 + numberH/2;
+    svg += `<text x="${p.cx}" y="${startY}" text-anchor="middle" dominant-baseline="central" font-size="${numberH}" fill="${VK_WHITE}" font-weight="700">${numberLabel}</text>`;
+    const nameTop = startY + numberH/2 + 200 + lineH/2;
+    svg += wrapped.map((ln, li) =>
+      `<text x="${p.cx}" y="${nameTop + li*lineH}" text-anchor="middle" dominant-baseline="central" font-size="${lineH}" fill="${VK_WHITE}" font-weight="600">${vkEscape(ln)}</text>`
+    ).join('');
+  });
+
+  VK_GEOM.themes.forEach((p, i) => {
+    const actions = d.themeActions[i];
+    if (!actions || !actions.length) return;
+    const n = Math.min(actions.length, 5);
+    const color = VK_THEME_COLORS[i];
+    // v4b: stickies vergroot en naar de buitenzijde van elke themabol gespreid
+    // (conform referentie 'visiekaart actiebeeld' B). Links-thema's → rij links,
+    // rechts-thema's → rij rechts, top-thema (2) → links/rechts geflankeerd.
+    const w = 1300, h = 1100, gap = 200, rx = 150, numFont = 620, strokeW = 80;
+    const R = VK_GEOM.themeR;
+    const drawSticky = (x, y, label) => {
+      svg += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" ry="${rx}" fill="${color}" stroke="${VK_WHITE}" stroke-width="${strokeW}"/>`
+           + `<text x="${x + w/2}" y="${y + h/2}" text-anchor="middle" dominant-baseline="central" font-size="${numFont}" fill="${VK_WHITE}" font-weight="700">${label}</text>`;
+    };
+    const rowLeftOf = (rightEdge, cy, count, start) => {
+      let x = rightEdge - (count * w + (count - 1) * gap);
+      const y = cy - h / 2;
+      for (let s = 0; s < count; s++){ drawSticky(x, y, start + s); x += w + gap; }
+    };
+    const rowRightOf = (leftEdge, cy, count, start) => {
+      let x = leftEdge;
+      const y = cy - h / 2;
+      for (let s = 0; s < count; s++){ drawSticky(x, y, start + s); x += w + gap; }
+    };
+    if (i === 0 || i === 1){
+      rowLeftOf(p.cx - R - 250, p.cy, n, 1);
+    } else if (i === 3 || i === 4){
+      rowRightOf(p.cx + R + 250, p.cy, n, 1);
+    } else {
+      const leftN = Math.ceil(n / 2), rightN = n - leftN;
+      const fy = p.cy - 260;
+      if (leftN)  rowLeftOf(p.cx - R - 250, fy, leftN, 1);
+      if (rightN) rowRightOf(p.cx + R + 250, fy, rightN, leftN + 1);
+    }
+  });
+
+  svg += `<path d="${VK_GEOM.triangle}" fill="${VK_WHITE}"/>`;
+
+  {
+    const apex = VK_GEOM.triApex;
+    const headY = apex.y + 1850;
+    svg += `<text x="${apex.x}" y="${headY}" text-anchor="middle" font-size="900" fill="${VK_DARK}" font-weight="600">${stoereLine1}</text>
+      <text x="${apex.x}" y="${headY + 1100}" text-anchor="middle" font-size="900" fill="${VK_DARK}" font-weight="400">${stoereLine2}</text>`;
+  }
+
+  VK_GEOM.numbers.forEach((p, i) => {
+    svg += `<text x="${p.x}" y="${p.y}" font-size="900" fill="${VK_DARK}" font-weight="600">${i+1}</text>`;
+    const action = d.roadmapTop5[i];
+    if (!action) return;
+    const themeIdx = (typeof action.themeIdx === 'number' ? action.themeIdx : 0);
+    const themeColor = VK_THEME_COLORS[themeIdx] || VK_DARK;
+    const bx = p.x + 1200;
+    const by = p.y - 280;
+    const br = 380;
+    svg += `<circle cx="${bx}" cy="${by}" r="${br}" fill="${themeColor}"/>
+      <text x="${bx}" y="${by}" text-anchor="middle" dominant-baseline="central" font-size="500" fill="${VK_WHITE}" font-weight="700">${themeIdx+1}</text>`;
+    const tx = bx + br + 200;
+    const xRight = vkTriRightX(p.y);
+    const maxW = xRight - tx - 500;
+    const charBudget = Math.max(8, Math.floor(maxW / 340));
+    const text = vkTruncate(action.text || '', charBudget);
+    svg += `<text x="${tx}" y="${p.y}" font-size="600" fill="${VK_DARK}" font-weight="400">${vkEscape(text)}</text>`;
+  });
+
+  {
+    const headX = 3360;
+    const headY = 18950;
+    svg += `<text x="${headX}" y="${headY}" font-size="1100" fill="${VK_DARK}" font-weight="700">${versnLabel}</text>`;
+    d.versnellers.slice(0, 5).forEach((v, i) => {
+      const t = typeof v === 'string' ? v : (v && (v.title || v.name) || '');
+      svg += `<text x="${headX}" y="${headY + 1700 + i*1500}" font-size="700" fill="${VK_DARK}" font-weight="400">${i+1}. ${vkEscape(vkTruncate(t, 28))}</text>`;
+    });
+  }
+
+  {
+    const headX = 64374;
+    const headY = 18950;
+    svg += `<text x="${headX}" y="${headY}" text-anchor="end" font-size="1100" fill="${VK_DARK}" font-weight="700">${remmLabel}</text>`;
+    d.remmers.slice(0, 5).forEach((r, i) => {
+      const t = typeof r === 'string' ? r : (r && (r.title || r.name) || '');
+      svg += `<text x="${headX}" y="${headY + 1700 + i*1500}" text-anchor="end" font-size="700" fill="${VK_DARK}" font-weight="400">${i+1}. ${vkEscape(vkTruncate(t, 28))}</text>`;
+    });
+  }
+
+  return svg;
+}
+
+/* Apply to an <svg> element: sets viewBox + innerHTML */
+function vkRenderInto(svgEl, data){
+  if (!svgEl) return;
+  svgEl.setAttribute('viewBox', '0 0 67733 38100');
+  svgEl.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+  svgEl.style.fontFamily = "'DM Sans', sans-serif";
+  svgEl.innerHTML = vkBuildCanvas(data);
+}
+
+/* ═══ END VK SHARED CANVAS BUILDER ═══ */
+
+/* ══════════════════════════════════
+   STATE
+══════════════════════════════════ */
+let lang = 'nl';
+let curQ = 0;
+let answers = [[],[],[],[],[]];
+let keywords = [[],[],[],[],[]];
+let clusterNames = [{},{},{},{},{}]; // per-vraag, per-cluster naam-overrides
+let clusterMap   = [null,null,null,null,null]; // v4: per-vraag een array [clusterIdx voor elk antwoord]
+let clusterDefs  = [null,null,null,null,null]; // Cluster A: per-vraag dynamische kolomdefinities [{label}] (AI of lokale terugval; demo = QD.clusters)
+let vkDragSrc    = null; // v4: actieve drag-bron-antwoordkaart
+let confirmedSentence = '';
+let facView = true;
+
+const QCOLORS = ['kw-q1','kw-q2','kw-q3','kw-q4','kw-q5'];
+const CLUSTERCLS = ['cl-a','cl-b','cl-c','cl-d'];
+
+/* ══════════════════════════════════
+   DATA
+══════════════════════════════════ */
+const QD = {
+  nl: [
+    {
+      heading:'Noodzaak',
+      q:'Welk vraagstuk of probleem maakt dat dit {type} nodig is?',
+      hint:'Denk aan de aanleiding, het gat in de markt, het maatschappelijk probleem of de kans die nog niet is benut.',
+      slot:'bestaansreden',
+      prefix:'Omdat',
+      demos:[
+        ['Wij toegankelijke zorg dichtbij huis willen brengen voor mensen die thuis willen blijven wonen','Lisa'],
+        ['Wij kwetsbare mensen sterker willen verbinden door samenwerking tussen organisaties','Pieter'],
+        ['De vraag naar persoonlijke, nabije zorg sterk groeit en wij dat aanbod willen versterken','Sara'],
+        ['Wij de aansluiting tussen zorgvraag en zorgaanbod beter willen organiseren','Tom'],
+        ['Wij mensen met een ondersteuningsvraag sneller naar de juiste hulp willen brengen','Aisha'],
+        ['Wij goede zorg betaalbaar en begrijpelijk willen maken voor een brede groep','Marc'],
+      ],
+      clusters:[
+        {label:'Toegankelijkheid & nabijheid', ids:[0,2,4]},
+        {label:'Samenwerking & aansluiting', ids:[1,3,5]},
+      ]
+    },
+    {
+      heading:'Doelgroep',
+      q:'Wie hebben straks het meeste profijt van de resultaten van dit {type}?',
+      hint:'Wees zo concreet mogelijk. Tip: meestal zijn dit de groepen of personen die het probleem momenteel het meest acuut ervaren.',
+      slot:'doelgroep',
+      prefix:'richten wij ons op',
+      demos:[
+        ['Ouderen die zelfstandig willen wonen maar dagelijkse ondersteuning nodig hebben','Lisa'],
+        ['Mensen met een lichamelijke beperking die regie over hun eigen leven willen houden','Pieter'],
+        ['Chronisch zieken die zorg en begeleiding thuis nodig hebben','Sara'],
+        ['Gezinnen die behoefte hebben aan integrale ondersteuning op meerdere leefgebieden','Tom'],
+        ['Mensen met een licht verstandelijke beperking die ondersteuning bij zelfredzaamheid wensen','Aisha'],
+      ],
+      clusters:[
+        {label:'Zelfstandigheid & regie', ids:[0,1,2]},
+        {label:'Integrale ondersteuning', ids:[3,4]},
+      ]
+    },
+    {
+      heading:'Behoefte',
+      q:'Welke verbeteringen ervaart de doelgroep als jullie {type} is gerealiseerd?',
+      hint:'Wat houdt hen bezig? Welk gevoel of verlangen drijft hen, ook als ze dat zelf niet altijd zo benoemen?',
+      slot:'behoefte',
+      prefix:'die behoefte heeft aan',
+      demos:[
+        ['Een vertrouwd gezicht dat elke dag langskomt en begrijpt hoe ze in elkaar zitten','Lisa'],
+        ['Regie over het eigen leven, ook als je ondersteuning nodig hebt','Pieter'],
+        ['Zekerheid dat er iemand voor hen is als het misgaat','Sara'],
+        ['Zorg die aansluit op hun dagelijkse ritme en persoonlijke situatie','Tom'],
+        ['Eenvoud: één loket, één contactpersoon, één plan','Aisha'],
+      ],
+      clusters:[
+        {label:'Vertrouwen & nabijheid', ids:[0,2,3]},
+        {label:'Autonomie & eenvoud', ids:[1,4]},
+      ]
+    },
+    {
+      heading:'Ambitie',
+      q:'Welke concrete verandering willen wij bereiken?',
+      hint:'Beschrijf de verandering die je teweeg wilt brengen. Wat is er anders voor de doelgroep als jullie slagen?',
+      slot:'ambitie',
+      prefix:'Wij willen bereiken dat',
+      demos:[
+        ['Mensen met een zorgvraag zoveel mogelijk hun eigen leven kunnen leiden','Lisa'],
+        ['Iedere cliënt de zorg en aandacht krijgt die hij of zij verdient','Pieter'],
+        ['Onze doelgroep altijd de juiste hulp en aandacht ontvangt op het juiste moment','Sara'],
+        ['Zorg persoonlijker, sneller en dichter bij de mensen thuis wordt georganiseerd','Tom'],
+        ['De aansluiting tussen zorgvraag en zorgaanbod in onze regio structureel verbetert','Aisha'],
+      ],
+      clusters:[
+        {label:'Regie & waardigheid', ids:[0,1]},
+        {label:'Structurele verbetering', ids:[2,3,4]},
+      ]
+    },
+    {
+      heading:'Focus',
+      q:'Wat is de ene opgave die wij de komende periode als eerste moeten aanpakken?',
+      hint:'Kies de meest urgente of bepalende prioriteit. Wat maakt (als je het goed aanpakt) alles daarna makkelijker?',
+      slot:'focus',
+      prefix:'Daarom ligt onze focus de komende periode op',
+      demos:[
+        ['Het moderniseren van onze werkprocessen zodat medewerkers meer tijd hebben voor cliënten','Lisa'],
+        ['Het aantrekken en binden van voldoende gekwalificeerd personeel','Pieter'],
+        ['Het verbeteren van de samenwerking met andere zorgpartners in de regio','Sara'],
+        ['Het verhogen van de kwaliteit en herkenbaarheid van ons zorgaanbod','Tom'],
+        ['Het bouwen van een digitale omgeving die cliënten en medewerkers ondersteunt','Aisha'],
+      ],
+      clusters:[
+        {label:'Mensen & samenwerking', ids:[1,2]},
+        {label:'Kwaliteit & digitalisering', ids:[0,3,4]},
+      ]
+    },
+  ],
+  en: [
+    {
+      heading:'Necessity',
+      q:'What issue or problem makes this {type} necessary?',
+      hint:'Think about the trigger, the gap in the market, the societal problem or the untapped opportunity.',
+      slot:'reason',prefix:'Because',
+      demos:[
+        ['We want to bring accessible care close to home for people who want to remain living at home','Lisa'],
+        ['We want to strengthen vulnerable people through better collaboration between organisations','Pieter'],
+        ['Demand for personal, nearby care is growing strongly and we want to strengthen that supply','Sara'],
+        ['We want to better organise the connection between care demand and care supply','Tom'],
+        ['We want to bring people with support needs to the right help more quickly','Aisha'],
+        ['We want to make good care affordable and understandable for a broad group','Marc'],
+      ],
+      clusters:[{label:'Accessibility & proximity',ids:[0,2,4]},{label:'Collaboration & connection',ids:[1,3,5]}]
+    },
+    {
+      heading:'Target group',
+      q:'Who will benefit most from the results of this {type}?',
+      hint:'Be as concrete as possible. Tip: usually these are the groups or people who currently experience the problem most acutely.',
+      slot:'audience',prefix:'we focus on',
+      demos:[
+        ['Elderly people who want to live independently but need daily support','Lisa'],
+        ['People with physical disabilities who want to remain in control of their own lives','Pieter'],
+        ['Chronically ill people who need care and guidance at home','Sara'],
+        ['Families who need integrated support across multiple areas of life','Tom'],
+        ['People with mild intellectual disabilities who want support with self-sufficiency','Aisha'],
+      ],
+      clusters:[{label:'Independence & control',ids:[0,1,2]},{label:'Integrated support',ids:[3,4]}]
+    },
+    {
+      heading:'Need',
+      q:'What improvements does the target group experience once your {type} has been realised?',
+      hint:'What occupies their minds? What feeling or desire drives them, even if they don\'t always name it that way?',
+      slot:'need',prefix:'who needs',
+      demos:[
+        ['A familiar face who visits every day and understands them','Lisa'],
+        ['Control over their own life, even when needing support','Pieter'],
+        ['Certainty that someone will be there for them when things go wrong','Sara'],
+        ['Care that fits their daily rhythm and personal situation','Tom'],
+        ['Simplicity: one point of contact, one plan','Aisha'],
+      ],
+      clusters:[{label:'Trust & proximity',ids:[0,2,3]},{label:'Autonomy & simplicity',ids:[1,4]}]
+    },
+    {
+      heading:'Ambition',
+      q:'What concrete change do we want to achieve?',
+      hint:'Describe the change you want to bring about. What is different for the target group when you succeed?',
+      slot:'ambition',prefix:'We want to achieve that',
+      demos:[
+        ['People with care needs can lead their own lives as much as possible','Lisa'],
+        ['Every client receives the care and attention they deserve','Pieter'],
+        ['Our target group always receives the right help and attention at the right moment','Sara'],
+        ['Care is organised in a more personal, faster and closer-to-home way','Tom'],
+        ['The connection between care demand and care supply in our region structurally improves','Aisha'],
+      ],
+      clusters:[{label:'Dignity & control',ids:[0,1]},{label:'Structural improvement',ids:[2,3,4]}]
+    },
+    {
+      heading:'Focus',
+      q:'What is the one priority we must tackle first in the coming period?',
+      hint:'Choose the most urgent or defining priority. What will (if done well) make everything else easier?',
+      slot:'focus',prefix:'Therefore our focus in the coming period is on',
+      demos:[
+        ['Modernising our work processes so staff have more time for clients','Lisa'],
+        ['Attracting and retaining sufficient qualified staff','Pieter'],
+        ['Improving collaboration with other care partners in the region','Sara'],
+        ['Raising the quality and recognisability of our care offering','Tom'],
+        ['Building a digital environment that supports clients and staff','Aisha'],
+      ],
+      clusters:[{label:'People & collaboration',ids:[1,2]},{label:'Quality & digitalisation',ids:[0,3,4]}]
+    },
+  ]
+};
+
+/* ══════════════════════════════════
+   TRANSLATIONS
+══════════════════════════════════ */
+const T = {
+  nl:{
+    phasePill:'Fase 1 · Stip op de horizon',
+    pvBtn:'Deelnemer-view →',
+    introTitle:'Fase 1 — Stip op de horizon bepalen',
+    introSub:'5 vragen, co-creatief, AI-geclusterd, 1 definitieve zin',
+    introWhatTitle:'Wat is de stip op de horizon?',
+    introWhatBody:'De stip op de horizon is het gedeelde beeld waar we samen naartoe werken. Het beschrijft onze doelstelling in één heldere volzin. Waar dit {type} voor staat, voor wie het werkt en wat wij er de komende periode mee willen bereiken. Deze stip is geen rigide routebeschrijving, maar dient als richtinggevend kompas: alle keuzes in latere fasen (thema\'s, acties, prioriteiten en roadmap) worden hieraan getoetst.',
+    introHowTitle:'Hoe komen we tot de stip?',
+    introBody:'Alle deelnemers beantwoorden vijf gerichte vragen op hun eigen device. AI clustert de antwoorden op overeenkomst en het team bespreekt per vraag welke kernwoorden onze doelstelling écht raken. Van de bevestigde kernwoorden wordt één zin gemaakt, die onze gezamenlijke stip op de horizon verwoordt. Deze zin (en vooral de door jullie ingebrachte elementen) vormt de toetssteen voor alle volgende fases.',
+    pIntroBodyText:'We gaan eerst de doelstelling van ons {type} vaststellen. Beantwoord hiertoe de vijf vragen. Van alle ingezonden antwoorden maken we straks één gezamenlijke stip op de horizon.',
+    clusterConfirmTitle:'Nog niet iedereen heeft gereageerd',
+    clusterConfirmBody:'Nog niet alle deelnemers hebben deze vraag beantwoord. Weet je zeker dat je de clustering wilt starten? Klik deze melding weg en klik nogmaals op "Toon antwoorden & clusters" om door te gaan.',
+    introBotInfo:'Alle deelnemers zijn aangemeld en gereed',
+    introStart:'Starten met vraag 1',
+    startConfirmTitle:'Hebben alle deelnemers de toelichting gelezen en is de vervolgaanpak voor iedereen duidelijk?',
+    startConfirmBody:'Klik deze melding weg als dat zo is. De knop wordt dan groen; klik daarna nogmaals op "Starten met vraag 1" om te beginnen.',
+    startConfirmBtn:'Akkoord',
+    introItems:[
+      {icon:'5',title:'Vijf vragen',sub:'Elk gericht op één onderdeel van de stip op de horizon'},
+      {icon:'people-svg',title:'Iedereen doet mee',sub:'Deelnemers typen hun antwoord op eigen device'},
+      {icon:'AI',title:'AI clustert',sub:'Overeenkomstige antwoorden worden automatisch gegroepeerd'},
+      {icon:'✓',title:'Samen kiezen',sub:'Team bespreekt en bevestigt de kernwoorden'},
+    ],
+    waiting:'Wachten op antwoorden',
+    showCluster:'Toon antwoorden & clusters',
+    aiNote:'AI heeft de antwoorden geclusterd op overeenkomst',
+    clusterEditHint:'Voor jullie gemak hebben we alvast een voorstel gedaan voor de clustering van jullie antwoorden. Dit is gedaan op basis van overeenkomst. Maar jullie bepalen. Dus pas clusternamen aan als ze de inhoud niet helemaal raken. En versleep antwoorden naar een ander cluster als jullie vinden dat ze daar beter passen.',
+    clusterNameEditTitle:'Klik om de clusternaam te wijzigen',
+    kwLabel:'Kernwoorden vastleggen',
+    kwDesc:'Noteer kernwoorden of korte zinnen die het team belangrijk vindt uit de antwoorden in bovenstaande clusters. Dat mogen ook de clusternamen zijn. Of voeg kernwoorden toe die niet zijn vermeld, als jullie dat belangrijk vinden. Druk op Enter of Tab om toe te voegen. Kernwoorden worden opgenomen in de stip-op-de-horizon-zin.',
+    kwAdd:'Toevoegen',
+    kwInputPh:'Voeg kernwoord toe...',
+    confirmQ:'Bevestigen & volgende vraag',
+    confirmQLast:'Bevestigen & stip-zin opmaken',
+    aiLoadTitle:'Stip-zin wordt samengesteld...',
+    aiLoadSub:'AI verbindt de bevestigde kernwoorden tot een coherente zin',
+    sentEditTitle:'Onze stip op de horizon — voorgestelde formulering',
+    sentEditSub:'Pas de zin aan zodat hij goed loopt, uiteraard met behoud van de kern. Probeer je zoveel als mogelijk te beperken tot wat écht de basis raakt. Dus als je de zin korter en krachtiger kunt maken dan zul je ervaren dat jullie stip op de horizon meer inspirerend wordt. De onderliggende (niet-gekozen) woorden blijven hieronder altijd zichtbaar. Ze kunnen later nog nuttig zijn.',
+    sentEditChallenge:'Lees de zin hardop en vraag jezelf af: dekt deze de lading? Klopt de toon? Past de volgorde? Pas aan waar nodig.',
+    sentIntro:'Voorgestelde formulering',
+    aiSuggestBtn:'AI-voorstel maken',
+    aiSuggestBusy:'AI denkt mee...',
+    aiSuggestLabel:'AI-voorstel',
+    aiSuggestDesc:'Op basis van de gekozen kernwoorden (met behoud van de startwoorden).',
+    aiSuggestReplace:'Vervang door dit voorstel',
+    aiSuggestDiscard:'Negeren',
+    aiSuggestEmpty:'Voeg eerst kernwoorden toe in de vorige stappen om een voorstel te genereren.',
+    kwPerQ:'Kernwoorden per vraag (onderliggende inbreng blijft bewaard)',
+    sentBotInfo:'Bespreek de zin en pas aan waar nodig',
+    sentConfirmLabel:'Stip op de horizon bevestigen',
+    finalBadge:'Fase 1 voltooid',
+    finalTitle:'Stip op de horizon bepaald',
+    finalLabel:'Onze stip op de horizon',
+    finalNote:'Deze stip-zin vormt de toetssteen voor fase 2 en verder.',
+    afterConfirmTitle:'Wat doet deze stip op de horizon?',
+    afterConfirmItems:[
+      {h:'Richtinggevend doel',b:'De zin maakt expliciet waar jullie de komende periode naartoe willen werken, voor wie en met welke focus.'},
+      {h:'Toetssteen voor keuzes',b:'In elke volgende fase wordt aan deze zin getoetst: dragen het thema, de actie of de prioriteit bij aan onze stip op de horizon?'},
+      {h:'Invloed op volgende fasen',b:'De kernwoorden bepalen mede welke thema\'s, sterktes en remmers het meeste aandacht krijgen, en hoe de roadmap wordt geprioriteerd.'},
+    ],
+    toPhase2:'Naar fase 2 →',
+    vtVision:'Stip-zin',
+    vtCanvas:'Visuele rapportage',
+    canvasTitle:'Visiekaart canvas — fase 1',
+    canvasSub:'Thema\'s worden toegevoegd in fase 2',
+    canvasNote:'Thema-bollen verschijnen in fase 2, roadmap verschijnt in fase 5',
+    pBack:'← Facilitator-view',
+    pAnswerLabel:'Jouw antwoord',
+    pAnswerPh:'Typ je antwoord op de huidige vraag...',
+    pSubmit:'Versturen',
+    pPreWaitTitle:'Welkom bij de sessie',
+    pPreWaitSub:'Hieronder een korte uitleg van wat we vandaag samen doen. De vragen verschijnen zodra de facilitator fase 1 start.',
+    pPreWaitWaiting:'Wachten op de facilitator...',
+    pWaitTitle:'Antwoord verstuurd',
+    pWaitSub:'De clustering vindt nu centraal plaats en wordt door de facilitator begeleid.',
+    pFinalTitle:'Stip op de horizon bepaald!',
+    pFinalSub:'Dit is de stip op de horizon van jullie team',
+    pNextPhase:'Fase 2 start zodra de facilitator aangeeft',
+    onderbouwingBtn:'Onderbouwing',
+    onderbouwingTitle:'Theoretische onderbouwing — fase 1',
+    onderbouwingBody:'Visiekaart start met het creëren van een gedeeld beeld: wat is de bestaansgrond van dit plan of dit project. En hoe wordt het gepositioneerd? Visualiseren helpt om een abstracte richting concreet en bespreekbaar te maken zodat iedereen hetzelfde beeld voor ogen krijgt. In deze fase bespreken de deelnemers gezamenlijk de gewenste doelstelling, toegevoegde waarde en betekenis. De inzichten worden samengebracht en aangescherpt tot één krachtige volzin: het gezamenlijke punt op de horizon. Het is een helder streefpunt waar alle latere thema\'s en activiteiten aan worden getoetst.',
+    onderbouwingClose:'Sluiten',
+    summaryLabel:'Wat we vandaag doen',
+    summaryTpl:'Vandaag stellen we een {type} op, op {scale}, onder de naam \'{name}\'. Het is een plan met {urg} urgentie, waarvoor we {bud} budget hebben en met een tijdshorizon van {hor}.',
+    summaryTplNoName:'Vandaag stellen we een {type} op, op {scale}. Het is een plan met {urg} urgentie, waarvoor we {bud} budget hebben en met een tijdshorizon van {hor}.',
+    summaryFallback:'De facilitator heeft de sessie gestart. Hieronder een korte uitleg.',
+    qOf:'van',
+    vraag:'Vraag',
+    answersOf:'antwoorden van',
+    kwRemove:'×',
+    sentParts:[
+      {prefix:'Omdat',ph:'bestaansreden...'},
+      {prefix:'richten wij ons op',ph:'doelgroep...'},
+      {prefix:'die behoefte heeft aan',ph:'behoefte...'},
+      {prefix:'Wij willen bereiken dat',ph:'ambitie...'},
+      {prefix:'Daarom ligt onze focus de komende periode op',ph:'focus...'},
+    ],
+    kwRowLabels:['Bestaansreden','Doelgroep','Behoefte','Ambitie','Focus'],
+    clusterOf:'Cluster',
+    answersLabel:'antwoorden',
+    waitBotMsg:'Deelnemers zijn bezig met hun antwoord',
+    noKw:'Nog geen kernwoorden, voeg er hieronder toe',
+    kwAtLeastOnePh:'Voeg minimaal één kernwoord toe',
+    // Sessie-info paneel
+    sessTitle:'Sessie-info',
+    sessOrg:'Organisatie',
+    sessName:'Sessienaam',
+    sessType:'Type sessie',
+    sessScale:'Schaal',
+    sessUrgency:'Urgentie',
+    sessBudget:'Budget',
+    sessHorizon:'Tijdshorizon',
+    sessNoData:'Geen sessiedata, open fase 0 om een sessie aan te maken.',
+    sessMiniTpl:'{org} · {name}',
+    // Labels uit fase 0 (hergebruikt, conform werkboek §8 punt 2)
+    sessTypeLbl:{strategisch:'strategisch plan',jaarplan:'jaarplan',project:'project',anders:'sessie'},
+    sessTypeLblFull:{strategisch:'Strategisch plan',jaarplan:'Jaarplan',project:'Project',anders:'Anders'},
+    scaleLbl:{team:'teamniveau',afdeling:'afdelingsniveau',organisatie:'organisatieniveau',netwerk:'netwerk- of ketenniveau'},
+    scaleLblFull:{team:'Team',afdeling:'Afdeling',organisatie:'Organisatie',netwerk:'Netwerk / keten'},
+    urgLbl:{laag:'lage',medium:'gemiddelde',hoog:'hoge'},
+    urgLblFull:{laag:'Laag',medium:'Medium',hoog:'Hoog'},
+    budLbl:{beperkt:'beperkt',voldoende:'voldoende',ruim:'ruim',onbekend:'nog onbekend'},
+    budLblFull:{beperkt:'Beperkt',voldoende:'Voldoende',ruim:'Ruim',onbekend:'Onbekend'},
+    horLbl:{'<1jr':'minder dan 1 jaar','1-3jr':'1 tot 3 jaar','3-5jr':'3 tot 5 jaar','5+jr':'5 jaar of meer'},
+    horLblFull:{'<1jr':'< 1 jaar','1-3jr':'1 tot 3 jaar','3-5jr':'3 tot 5 jaar','5+jr':'5 jaar of meer'},
+    unnamedSession:'Naamloze sessie',
+    // Alerts en confirms
+    resetConfirm:'Alle sessiedata wissen (stip-zin, thema\'s, acties, scores, roadmap)?\n\nDe demo-defaults worden hersteld bij de volgende pagina.',
+    resetDone:'Demo-data gewist. Pagina wordt herladen.',
+    goPhase0Confirm:'Terug naar fase 0? Sessie-data blijft bewaard.',
+    // Info-popover teksten
+    infoIntro:'De stip op de horizon is het gedeelde toekomstbeeld. Vijf vragen brengen de bestaansreden, doelgroep, behoefte, ambitie en focus in beeld. Per vraag schrijft iedereen zijn antwoord; AI groepeert vergelijkbare antwoorden; het team bespreekt de clusters en kiest gezamenlijk de kernwoorden. Die kernwoorden vormen samen één krachtige volzin: de toetssteen voor alle volgende keuzes.',
+    infoQ:[
+      'Bestaansreden, de aanleiding waarom dit project nodig is. Denk aan het probleem dat opgelost moet worden, de kans die wordt benut, of het maatschappelijke vraagstuk dat speelt. Dit vak begint met "Omdat..." en legt de urgentie vast.',
+      'Doelgroep, voor wie we dit doen en waarom juist voor hen. Wees concreet over de groep die het probleem het meest acuut ervaart. Ben zo specifiek mogelijk, en benoem de belangrijkste doelgroepen (beperk je tot 2). Leg een verband met de stip-op-de-horizon-zin, zoals je dat ook bij vraag 1 hebt gedaan (achter het \u2018i\u2019 symbool).',
+      'Het gaat hier om de belangrijkste behoefte, frustratie of ambitie van deze doelgroep. Wat houdt hen bezig? Welk gevoel of verlangen drijft hen, ook als ze dat zelf niet altijd zo benoemen? Deze laag maakt de doelgroep menselijk en bespreekbaar. Leg een verband met de stip-op-de-horizon-zin, zoals je dat ook bij vraag 1 hebt gedaan (achter het \u2018i\u2019 symbool).',
+      'Ambitie gaat over de concrete verandering die wij willen bereiken. Beschrijf wat er anders is voor de doelgroep als jullie slagen. Een goede ambitie is toekomstgericht, inspirerend en bruikbaar als toetssteen voor keuzes. Leg een verband met de stip-op-de-horizon-zin, zoals je dat ook bij vraag 1 hebt gedaan (achter het \u2018i\u2019 symbool).',
+      'Focus betreft de ene opgave die de komende periode als eerste moet worden aangepakt. Kies de meest urgente of bepalende prioriteit. Wat maakt (als je het goed aanpakt) alles daarna makkelijker? Leg een verband met de stip-op-de-horizon-zin, zoals je dat ook bij vraag 1 hebt gedaan (achter het \u2018i\u2019 symbool).',
+    ],
+    // Cross-fase shared keys (v4)
+    tipClose:'Sluiten',
+    vkBackEdit:'Aanpassen',
+    pOnderbouwingBtnLabel:'Onderbouwing',
+  },
+  en:{
+    phasePill:'Phase 1 · Dot on the horizon',
+    pvBtn:'Participant view →',
+    introTitle:'Phase 1 — Determine the dot on the horizon',
+    introSub:'5 questions, co-creative, AI-clustered, 1 final sentence',
+    introWhatTitle:'What is the dot on the horizon?',
+    introWhatBody:'The dot on the horizon is the shared image we are working towards together. It describes our objective in one clear sentence. What this {type} stands for, who it serves, and what we want to achieve with it in the coming period. The dot is not a rigid route description, but serves as a directional compass: all later choices (themes, actions, priorities, roadmap) are checked against it.',
+    introHowTitle:'How do we get there?',
+    introBody:'All participants answer five focused questions on their own device. AI clusters the answers by similarity and the team discusses, per question, which keywords truly capture our objective. The confirmed keywords are composed into a single sentence that voices our shared dot on the horizon. That sentence (and especially the elements you brought in) becomes the touchstone for all subsequent phases.',
+    pIntroBodyText:'First we will define the objective of our {type}. To do so, answer the five questions. From all submitted answers we will then create one shared dot on the horizon.',
+    clusterConfirmTitle:'Not everyone has responded yet',
+    clusterConfirmBody:'Not all participants have answered this question yet. Are you sure you want to start clustering? Dismiss this message and click "Show answers & clusters" again to continue.',
+    introBotInfo:'All participants are registered and ready',
+    introStart:'Start with question 1',
+    startConfirmTitle:'Have all participants read the explanation and is the next approach clear to everyone?',
+    startConfirmBody:'Dismiss this message if so. The button then turns green; click "Start with question 1" again to begin.',
+    startConfirmBtn:'Agreed',
+    introItems:[
+      {icon:'5',title:'Five questions',sub:'Each focused on one component of the dot on the horizon'},
+      {icon:'people-svg',title:'Everyone participates',sub:'Participants type their answer on their own device'},
+      {icon:'AI',title:'AI clusters',sub:'Similar answers are automatically grouped together'},
+      {icon:'✓',title:'Choose together',sub:'Team discusses and confirms the keywords'},
+    ],
+    waiting:'Waiting for answers',
+    showCluster:'Show answers & clusters',
+    aiNote:'AI has clustered the answers by similarity',
+    clusterEditHint:'For your convenience we have already made a proposal for clustering your answers. This was done based on similarity. But you decide. So adjust cluster names if they don\'t quite capture the content. And drag answers to a different cluster if you think they fit better there.',
+    clusterNameEditTitle:'Click to edit the cluster name',
+    kwLabel:'Record keywords',
+    kwDesc:'Write down keywords or short phrases the team considers important from the answers in the clusters above. These may also be the cluster names. Or add keywords that weren\'t mentioned, if you find them important. Press Enter or Tab to add. Keywords will be included in the dot-on-the-horizon sentence.',
+    kwAdd:'Add',
+    kwInputPh:'Add keyword...',
+    confirmQ:'Confirm & next question',
+    confirmQLast:'Confirm & compose dot-sentence',
+    aiLoadTitle:'Composing the dot-sentence...',
+    aiLoadSub:'AI connects the confirmed keywords into a coherent sentence',
+    sentEditTitle:'Our dot on the horizon — proposed formulation',
+    sentEditSub:'Refine the sentence so it reads well, of course while keeping the essence. Try to limit yourself as much as possible to what truly captures the basis. So if you can make the sentence shorter and more powerful, you will experience that your dot on the horizon becomes more inspiring. The underlying (non-selected) words remain visible below. They may still be useful later.',
+    sentEditChallenge:'Read the sentence aloud and ask: does it cover the essence? Is the tone right? Is the order logical? Adjust where needed.',
+    sentIntro:'Proposed formulation',
+    aiSuggestBtn:'Generate AI proposal',
+    aiSuggestBusy:'AI is thinking...',
+    aiSuggestLabel:'AI proposal',
+    aiSuggestDesc:'Based on the chosen keywords (keeping the leading words).',
+    aiSuggestReplace:'Replace with this proposal',
+    aiSuggestDiscard:'Discard',
+    aiSuggestEmpty:'Add keywords in the previous steps first to generate a proposal.',
+    kwPerQ:'Keywords per question (underlying input remains preserved)',
+    sentBotInfo:'Discuss the sentence and adjust where needed',
+    sentConfirmLabel:'Confirm dot on the horizon',
+    finalBadge:'Phase 1 complete',
+    finalTitle:'Dot on the horizon determined',
+    finalLabel:'Our dot on the horizon',
+    finalNote:'This dot-sentence is the benchmark for phase 2 and beyond.',
+    afterConfirmTitle:'What does this dot on the horizon do?',
+    afterConfirmItems:[
+      {h:'Directional goal',b:'The sentence makes explicit where you want to go in the coming period, for whom, and with what focus.'},
+      {h:'Touchstone for choices',b:'In every later phase the question is checked: do this theme, action or priority contribute to our dot on the horizon?'},
+      {h:'Influence on later phases',b:'The keywords help decide which themes, strengths and obstacles get the most attention, and how the roadmap is prioritised.'},
+    ],
+    toPhase2:'To phase 2 →',
+    vtVision:'Dot-sentence',
+    vtCanvas:'Visual report',
+    canvasTitle:'Visiekaart canvas — phase 1',
+    canvasSub:'Themes will be added in phase 2',
+    canvasNote:'Theme bubbles appear in phase 2, roadmap appears in phase 5',
+    pBack:'← Facilitator view',
+    pAnswerLabel:'Your answer',
+    pAnswerPh:'Type your answer to the current question...',
+    pSubmit:'Submit',
+    pPreWaitTitle:'Welcome to the session',
+    pPreWaitSub:'Below a brief explanation of what we will do together today. The questions appear as soon as the facilitator starts phase 1.',
+    pPreWaitWaiting:'Waiting for the facilitator...',
+    pWaitTitle:'Answer submitted',
+    pWaitSub:'Clustering now takes place centrally, guided by the facilitator.',
+    pFinalTitle:'Dot on the horizon determined!',
+    pFinalSub:'This is the dot on the horizon of your team',
+    pNextPhase:'Phase 2 will start when the facilitator indicates',
+    onderbouwingBtn:'Theory',
+    onderbouwingTitle:'Theoretical background — phase 1',
+    onderbouwingBody:'Visiekaart starts by creating a shared image: what is the reason for existence of this plan or project? And how is it positioned? Visualising helps to make an abstract direction concrete and discussable, so that everyone has the same picture in mind. In this phase, participants discuss together the desired objective, added value and meaning. The insights are gathered and sharpened into one strong sentence: the shared dot on the horizon. It is a clear target against which all later themes and activities are tested.',
+    onderbouwingClose:'Close',
+    summaryLabel:'What we are doing today',
+    summaryTpl:'Today we are creating a {type}, at {scale} level, under the name \'{name}\'. It is a plan with {urg} urgency, for which we have {bud} budget, and a time horizon of {hor}.',
+    summaryTplNoName:'Today we are creating a {type}, at {scale} level. It is a plan with {urg} urgency, for which we have {bud} budget, and a time horizon of {hor}.',
+    summaryFallback:'The facilitator has started the session. Below a brief explanation.',
+    qOf:'of',
+    vraag:'Question',
+    answersOf:'answers from',
+    kwRemove:'×',
+    sentParts:[
+      {prefix:'Because',ph:'reason for existence...'},
+      {prefix:'we focus on',ph:'target audience...'},
+      {prefix:'who needs',ph:'need...'},
+      {prefix:'We want to achieve that',ph:'ambition...'},
+      {prefix:'Therefore our focus in the coming period is on',ph:'focus...'},
+    ],
+    kwRowLabels:['Reason for existence','Target group','Need','Ambition','Focus'],
+    clusterOf:'Cluster',
+    answersLabel:'answers',
+    waitBotMsg:'Participants are working on their answer',
+    noKw:'No keywords yet, add them below',
+    kwAtLeastOnePh:'Add at least one keyword',
+    sessTitle:'Session info',
+    sessOrg:'Organisation',
+    sessName:'Session name',
+    sessType:'Session type',
+    sessScale:'Scale',
+    sessUrgency:'Urgency',
+    sessBudget:'Budget',
+    sessHorizon:'Horizon',
+    sessNoData:'No session data, open phase 0 to create a session.',
+    sessMiniTpl:'{org} · {name}',
+    sessTypeLbl:{strategisch:'strategic plan',jaarplan:'annual plan',project:'project',anders:'session'},
+    sessTypeLblFull:{strategisch:'Strategic plan',jaarplan:'Annual plan',project:'Project',anders:'Other'},
+    scaleLbl:{team:'team',afdeling:'department',organisatie:'organisation',netwerk:'network or chain'},
+    scaleLblFull:{team:'Team',afdeling:'Department',organisatie:'Organisation',netwerk:'Network / chain'},
+    urgLbl:{laag:'low',medium:'medium',hoog:'high'},
+    urgLblFull:{laag:'Low',medium:'Medium',hoog:'High'},
+    budLbl:{beperkt:'limited',voldoende:'sufficient',ruim:'generous',onbekend:'as yet unknown'},
+    budLblFull:{beperkt:'Limited',voldoende:'Sufficient',ruim:'Generous',onbekend:'Unknown'},
+    horLbl:{'<1jr':'less than 1 year','1-3jr':'1 to 3 years','3-5jr':'3 to 5 years','5+jr':'5 years or more'},
+    horLblFull:{'<1jr':'< 1 year','1-3jr':'1 to 3 years','3-5jr':'3 to 5 years','5+jr':'5 years or more'},
+    unnamedSession:'Unnamed session',
+    resetConfirm:'Clear all session data (dot-sentence, themes, actions, scores, roadmap)?\n\nDefaults will reload on the next page.',
+    resetDone:'Demo data cleared. Page will reload.',
+    goPhase0Confirm:'Back to phase 0? Session data is preserved.',
+    infoIntro:'The dot on the horizon is the shared image of the future. Five questions cover the reason for existence, target group, need, ambition and focus. For each question everyone writes their answer; AI groups similar answers; the team discusses the clusters and jointly selects the keywords. Those keywords together form one strong sentence: the touchstone for all later choices.',
+    infoQ:[
+      'Reason for existence, the trigger why this project is needed. Think of the problem to solve, the opportunity to seize, or the societal issue at play. This box starts with "Because..." and captures the urgency.',
+      'Target group, for whom we do this and why specifically for them. Be concrete about the group that experiences the problem most acutely. Be as specific as possible, and name the most important target groups (limit yourself to 2). Link it to the dot-on-the-horizon sentence, as you also did for question 1 (behind the \u2018i\u2019 symbol).',
+      'This is about the most important need, frustration or ambition of this target group. What occupies their minds? Which feeling or desire drives them, even if they do not always name it? This layer makes the target group human and discussable. Link it to the dot-on-the-horizon sentence, as you also did for question 1 (behind the \u2018i\u2019 symbol).',
+      'Ambition is about the concrete change we want to achieve. Describe what is different for the target group when you succeed. A good ambition is future-oriented, inspiring and usable as a touchstone for choices. Link it to the dot-on-the-horizon sentence, as you also did for question 1 (behind the \u2018i\u2019 symbol).',
+      'Focus concerns the one task that must be tackled first in the coming period. Choose the most urgent or defining priority. What, when done well, makes everything afterwards easier? Link it to the dot-on-the-horizon sentence, as you also did for question 1 (behind the \u2018i\u2019 symbol).',
+    ],
+    // Cross-fase shared keys (v4)
+    tipClose:'Close',
+    vkBackEdit:'Edit',
+    pOnderbouwingBtnLabel:'Theory',
+  }
+};
+
+/* ══════════════════════════════════
+   VK SHARED ENVIRONMENT DETECTION (v4)
+══════════════════════════════════ */
+function isProductionMode(){
+  const host = (window.location.hostname || '').toLowerCase();
+  const protocol = window.location.protocol;
+  if (protocol === 'file:') return false;
+  if (host === '' || host === 'localhost' || host === '127.0.0.1' || host === '::1') return false;
+  if (/^192\.168\./.test(host)) return false;
+  if (/^10\./.test(host)) return false;
+  if (/^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(host)) return false;
+  if (/\.local$/.test(host)) return false;
+  return true;
+}
+function vkApplyEnvironmentRules(){
+  if (!isProductionMode()) return;
+  document.querySelectorAll('[data-env="dev-only"]').forEach(el => { el.style.display = 'none'; });
+  window.__VK_PROD = true;
+}
+
+/* ══════════ VK LIVE-MODE SWITCH (Cluster A / B1) ══════════
+   VK_LIVE = echte data + AI; false = demo-simulatie. Eén bron-van-waarheid voor alle fasen. */
+const VK_LIVE = isProductionMode();
+if (typeof window.__VK_TOKEN === 'undefined') window.__VK_TOKEN = '';
+
+/* ── Rol- en sessiedetectie (Blok 2) ──
+   Deelnemer landt met ?join={code}; de code komt uit de URL. Facilitator
+   leest de code uit vk_session. Eén bron van waarheid voor de RTDB-tak. */
+const VK_JOIN_CODE = (function(){
+  try {
+    // Fasebestanden worden uitsluitend bereikt met ?join={code} in de query
+    // (via join.html en fase-naar-fase-navigatie), nooit onder een /join/-pad.
+    // Code alleen uit de query lezen voorkomt dat de /join/{seg}-regex per
+    // ongeluk de bestandsnaam (bv. 'visiekaart_fase1') als sessiecode oppikt.
+    const q = new URLSearchParams(location.search);
+    return q.get('join') || q.get('code') || null;
+  } catch(e){ return null; }
+})();
+const VK_IS_PARTICIPANT = !!VK_JOIN_CODE;
+function vkLiveCode(){
+  if (VK_JOIN_CODE) return VK_JOIN_CODE;
+  try { return (JSON.parse(localStorage.getItem('vk_session')||'{}')).sessionCode || ''; } catch(e){ return ''; }
+}
+function vkParseStage(raw){
+  if (raw == null) return null;
+  if (typeof raw === 'object') return raw;
+  try { return JSON.parse(raw); } catch(e){ return { stage: String(raw) }; }
+}
+
+/* {type sessie}: het woord uit fase 0 (anders → 'project'). Default 'project'. */
+function vkSessieWoord(){
+  let st='';
+  try{ st=(JSON.parse(localStorage.getItem('vk_session')||'{}')).sessionType||''; }catch(e){}
+  const nl={ strategisch:'strategisch plan', jaarplan:'jaarplan', project:'project', anders:'project' };
+  const en={ strategisch:'strategic plan', jaarplan:'annual plan', project:'project', anders:'project' };
+  const map=(typeof lang!=='undefined' && lang==='en')?en:nl;
+  return map[st] || 'project';
+}
+function vkTypeSub(s){ return (typeof s==='string') ? s.split('{type}').join(vkSessieWoord()) : s; }
+/* Verwachte aantal deelnemers (roster vastgelegd bij sessiestart in fase 0). */
+function vkExpectedParticipants(){
+  try{ const s=JSON.parse(localStorage.getItem('vk_session')||'{}'); return Array.isArray(s.participants)?s.participants.length:0; }catch(e){ return 0; }
+}
+let _clusterArmed = false;   // twee-staps: clusteren ondanks onvolledige respons
+
+/* ══════════ VK AI-HELPER (Cluster A) — ingebouwde vk-ai.js ══════════
+   Roept de server-side proxy (/vk-ai-proxy.php) aan met timeout en NETTE TERUGVAL:
+   bij elke fout (offline, geen token, parse-fout) reject → de aanroeper gebruikt de
+   bestaande lokale berekening, zodat een sessie nooit vastloopt. De Anthropic-sleutel
+   zit NOOIT hier (werkboek §2/§7.3); de prompt wordt server-side opgebouwd. */
+(function (global) {
+  'use strict';
+  var VK_AI_ENDPOINT = '/vk-ai-proxy.php';
+  var VK_AI_TIMEOUT_MS = 30000;
+  function vkSessionToken() {
+    try { return global.__VK_TOKEN || ''; } catch (e) { return ''; }
+  }
+  function vkCallAI(task, data, opts) {
+    opts = opts || {};
+    var lang = opts.lang || (global.lang) || 'nl';
+    var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var timer = setTimeout(function () { if (controller) controller.abort(); }, opts.timeout || VK_AI_TIMEOUT_MS);
+    return fetch(VK_AI_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CINAB-Token': vkSessionToken() },
+      body: JSON.stringify({ task: task, lang: lang, token: vkSessionToken(), data: data }),
+      signal: controller ? controller.signal : undefined
+    }).then(function (res) {
+      clearTimeout(timer);
+      if (!res.ok) { return res.json().catch(function(){return{};}).then(function(j){ throw mkErr(res.status, j); }); }
+      return res.json();
+    }).then(function (out) {
+      var text = (out && out.text) ? out.text : '';
+      try { return JSON.parse(stripFences(text)); }
+      catch (e) { throw mkErr(0, { error: 'ai_unparsable' }); }
+    }).catch(function (err) {
+      clearTimeout(timer);
+      throw (err && err.__vk) ? err : mkErr(0, { error: 'ai_unreachable' });
+    });
+  }
+  function stripFences(s) { return String(s).replace(/```json/gi, '').replace(/```/g, '').trim(); }
+  function mkErr(status, j) { var e = new Error((j && j.error) || 'ai_error'); e.__vk = true; e.status = status; e.body = j; return e; }
+  global.vkCallAI = vkCallAI;
+})(window);
+
+/* ══════════════════════════════════
+   VK SHARED HELPERS (v4)
+══════════════════════════════════ */
+// vkEscape() bestaat al bij de canvas-builder. Hier niet opnieuw definiëren.
+
+function vkFillSentenceTemplate(template, vars){
+  let s = template;
+  for (const k in vars){
+    const v = (vars[k] == null) ? '' : String(vars[k]);
+    s = s.split('{' + k + '}').join(v);
+  }
+  // Schoonmaak bij lege variabelen:
+  s = s.replace(/\b(op|at)\s+(?=[,\.])/g, '');
+  s = s.replace(/,\s*,/g, ',');
+  s = s.replace(/\s+([,\.])/g, '$1');
+  s = s.replace(/[ \t]+/g, ' ');
+  s = s.replace(/\s*\u2018\s*\u2019\s*/g, ' ');
+  s = s.replace(/\s*''\s*/g, ' ');
+  return s.trim();
+}
+
+/* ══════════════════════════════════
+   VK SHARED TIP POPUP (v4)
+══════════════════════════════════ */
+function vkOpenTip(opts){
+  // opts: { size:'sm'|'lg', title?, sub?, body:string|array, anchor?:HTMLElement, closeLabel? }
+  const popup    = document.getElementById('vkTipPopup');
+  const backdrop = document.getElementById('vkTipBackdrop');
+  const titleEl  = document.getElementById('vkTipTitle');
+  const subEl    = document.getElementById('vkTipSub');
+  const bodyEl   = document.getElementById('vkTipBody');
+  const closeBtn = document.getElementById('vkTipCloseBtn');
+  if (!popup) return;
+
+  const size = opts.size === 'sm' ? 'sm' : 'lg';
+  popup.setAttribute('data-size', size);
+
+  if (opts.title){ titleEl.textContent = opts.title; titleEl.style.display = ''; }
+  else           { titleEl.textContent = ''; titleEl.style.display = 'none'; }
+  if (opts.sub && size === 'lg'){ subEl.textContent = opts.sub; subEl.style.display = ''; }
+  else                          { subEl.textContent = ''; subEl.style.display = 'none'; }
+
+  const bodyArr = Array.isArray(opts.body) ? opts.body : [opts.body];
+  bodyEl.innerHTML = bodyArr.map(item => {
+    if (item == null) return '';
+    if (typeof item === 'string') return '<p>' + vkEscape(item) + '</p>';
+    if (typeof item === 'object'){
+      let html = '';
+      if (item.h) html += '<div class="vk-tip-h">' + vkEscape(item.h) + '</div>';
+      if (item.p) html += '<p>' + vkEscape(item.p) + '</p>';
+      return html;
+    }
+    return '';
+  }).join('');
+
+  if (closeBtn) closeBtn.textContent = opts.closeLabel || (T[lang] && T[lang].tipClose) || 'Sluiten';
+
+  if (size === 'lg'){
+    backdrop.classList.add('open');
+    popup.style.top = '';
+    popup.style.left = '';
+    popup.style.transform = '';
+  } else {
+    backdrop.classList.remove('open');
+    if (opts.anchor){
+      const r = opts.anchor.getBoundingClientRect();
+      const popW = 340;
+      let left = r.left;
+      if (left + popW > window.innerWidth - 16) left = window.innerWidth - popW - 16;
+      if (left < 16) left = 16;
+      popup.style.left = left + 'px';
+      popup.style.top  = (r.bottom + 12) + 'px';
+      popup.style.transform = '';
+    } else {
+      popup.style.left = '50%';
+      popup.style.top  = '40%';
+      popup.style.transform = 'translate(-50%, -50%)';
+    }
+  }
+
+  popup.classList.add('open');
+  setTimeout(() => popup.querySelector('.vk-tip-close')?.focus(), 50);
+}
+
+function vkCloseTip(){
+  const popup    = document.getElementById('vkTipPopup');
+  const backdrop = document.getElementById('vkTipBackdrop');
+  if (popup)    popup.classList.remove('open');
+  if (backdrop) backdrop.classList.remove('open');
+}
+
+// ── INFO ICON WRAPPERS (v4 BUG FIX) ───────────────────────────────────────
+// Inline onclick="..." kan T/lang/curQ (const/let) niet zien.
+// Daarom: 'i'-iconen roepen vkInfoOpen()/vkInfoQOpen() aan.
+// Function declarations zijn wél global-bereikbaar én zien T/lang/curQ lexically.
+function vkInfoOpen(key, anchor){
+  if (typeof T === 'undefined' || !T[lang]) return;
+  const body = T[lang][key];
+  if (body == null) return;
+  vkOpenTip({ size: 'sm', body: body, anchor: anchor });
+}
+function vkInfoQOpen(anchor){
+  if (typeof T === 'undefined' || !T[lang] || !T[lang].infoQ) return;
+  const idx = Math.max(0, Math.min(4, (typeof curQ === 'number' ? curQ : 0)));
+  vkOpenTip({ size: 'sm', body: T[lang].infoQ[idx] || '', anchor: anchor });
+}
+
+// Esc-toets sluit popup
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') vkCloseTip();
+});
+// Klik buiten sm-popup sluit
+document.addEventListener('click', e => {
+  const popup = document.getElementById('vkTipPopup');
+  if (!popup || !popup.classList.contains('open')) return;
+  if (popup.getAttribute('data-size') !== 'sm') return;
+  if (popup.contains(e.target)) return;
+  if (e.target.classList && e.target.classList.contains('info-icon')) return;
+  vkCloseTip();
+});
+
+/* ══════════════════════════════════
+   LANGUAGE
+══════════════════════════════════ */
+function setLang(l, opts){
+  lang=l;
+  vkCloseTip();
+  document.documentElement.lang=l;
+  document.getElementById('lNL').classList.toggle('on',l==='nl');
+  document.getElementById('lEN').classList.toggle('on',l==='en');
+  // Deelnemer-header taaltoggle ook syncen
+  const pNL=document.getElementById('pLNL'); if(pNL) pNL.classList.toggle('on',l==='nl');
+  const pEN=document.getElementById('pLEN'); if(pEN) pEN.classList.toggle('on',l==='en');
+  applyT();
+  // Persist + signal cross-tab (tenzij wijziging zelf van storage-event kwam)
+  if(!opts || !opts.fromStorage){
+    try{ localStorage.setItem('vk_lang', l); }catch(e){}
+  }
+}
+
+/* Robuuste applyT: vervangt eerste tekst-node bij elementen met kinderen,
+   plus data-t-placeholder en data-t-info ondersteuning. Werkboek §5.2. */
+function applyT(){
+  const t=T[lang];
+  Object.keys(t).forEach(k=>{
+    if(typeof t[k]!=='string') return;
+    const el=document.getElementById('t-'+k);
+    if(!el) return;
+    const val=vkTypeSub(t[k]);
+    if(el.children.length>0){
+      let textNode=null;
+      for(const n of el.childNodes){
+        if(n.nodeType===3 && n.textContent.trim()){ textNode=n; break; }
+      }
+      if(textNode) textNode.textContent=val+' ';
+      else el.insertBefore(document.createTextNode(val+' '), el.firstChild);
+    } else {
+      el.textContent=val;
+    }
+  });
+  document.querySelectorAll('[data-t-placeholder]').forEach(el=>{
+    const key=el.dataset.tPlaceholder;
+    if(t[key]) el.placeholder=t[key];
+  });
+
+  /* ── Deelnemer-view aliassen (id-paren waarbij p-versie hetzelfde toont als fac-versie) ── */
+  const aliases = [
+    ['pIntroWhatTitle','introWhatTitle'],
+    ['pIntroWhatBody','introWhatBody'],
+    ['pIntroHowTitle','introHowTitle'],
+    ['pIntroBody','pIntroBodyText'],
+    ['pPhasePill','phasePill'],
+  ];
+  aliases.forEach(([elId, key])=>{
+    const el=document.getElementById('t-'+elId);
+    if(el && typeof t[key]==='string'){
+      const aval=vkTypeSub(t[key]);
+      if(el.children.length>0){
+        let tn=null;
+        for(const n of el.childNodes){ if(n.nodeType===3 && n.textContent.trim()){ tn=n; break; } }
+        if(tn) tn.textContent=aval+' '; else el.insertBefore(document.createTextNode(aval+' '), el.firstChild);
+      } else {
+        el.textContent=aval;
+      }
+    }
+  });
+
+  /* ── after-confirm grid renderen (taal-afhankelijk) ── */
+  const acg=document.getElementById('afterConfirmGrid');
+  if(acg && t.afterConfirmItems){
+    acg.innerHTML = t.afterConfirmItems.map(it=>`
+      <div class="after-confirm-item">
+        <h4>${escapeHtml(it.h)}</h4>
+        <p>${escapeHtml(it.b)}</p>
+      </div>`).join('');
+  }
+
+  /* ── Fase-specifieke renders ── */
+  buildIntroGrid();
+  renderSessPanel();
+  refreshQPopovers();
+  refreshQuestionTexts();   /* v4b: vraag-blok + kernwoorden volgen nu de taalwissel */
+  /* v4b: visuele weergave (thema, "stoere stappen naar onze stip", versnellers, remmers)
+     mee laten vertalen — vkBuildCanvas is taalbewust maar werd niet herbouwd bij switch. */
+  if (typeof buildCanvas==='function' && document.getElementById('vkCanvas')) { try{ buildCanvas(); }catch(e){} }
+  updatePSummary();
+
+  /* ── Document-title in de juiste taal ── */
+  document.title = lang==='nl' ? 'Visiekaart — Fase 1: Stip op de horizon bepalen' : 'Visiekaart — Phase 1: Dot on the horizon';
+}
+
+/* ══════════════════════════════════
+   QUESTION I-POPOVER (v4: handled via vkOpenTip in inline onclick;
+   refreshQPopovers is no-op kept as alias for back-compat with calls in setLang/showCluster)
+══════════════════════════════════ */
+function refreshQPopovers(){ /* no-op in v4 — info-popover divs zijn verwijderd, 'i'-iconen lezen T[lang].infoQ[curQ] direct */ }
+
+/* ══════════════════════════════════
+   QUESTION-BLOK HERTAAL (v4b)
+   Het vraag-blok (heading, vraagtekst, voorbeeld/hint, teller) en de
+   kernwoorden worden dynamisch met taal-afhankelijke data gerenderd in
+   startQ()/showCluster()/renderKwTags(). Die elementen dragen géén id="t-…",
+   dus applyT() raakte ze niet aan en de tekst bleef "hangen" in de taal die
+   als eerste werd geopend. Deze functie herbouwt uitsluitend de tekst van de
+   actuele vraag in de huidige taal, zónder antwoord-/clusterstatus te resetten.
+══════════════════════════════════ */
+function refreshQuestionTexts(){
+  if (typeof curQ !== 'number' || typeof QD === 'undefined' || !QD[lang] || !QD[lang][curQ]) return;
+  const t=T[lang];
+  const qd=QD[lang][curQ];
+  const setTxt=(id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=val; };
+  const counter=`${t.vraag} ${curQ+1} ${t.qOf} 5 — ${qd.heading}`;
+  // Facilitator wacht-scherm
+  setTxt('qCounterLabel', counter);
+  setTxt('qTextFac', qd.q);
+  setTxt('qHintFac', qd.hint);
+  // Deelnemer-scherm
+  setTxt('pQCounter', counter);
+  setTxt('pQText', qd.q);
+  setTxt('pQHint', qd.hint);
+  // Cluster-scherm
+  setTxt('clCounterLabel', counter);
+  setTxt('clQText', qd.q);
+  const cq=document.getElementById('t-confirmQ'); if(cq) cq.textContent = (curQ===5 ? t.confirmQLast : t.confirmQ);
+  // Kernwoorden (incl. lege-staat "Nog geen kernwoorden…") in de juiste taal
+  if (typeof renderKwTags==='function' && typeof keywords!=='undefined' && keywords[curQ]) renderKwTags();
+}
+
+/* ══════════════════════════════════
+   SESSIE-INFO PANEEL
+══════════════════════════════════ */
+function readSession(){
+  try{
+    const raw=localStorage.getItem('vk_session');
+    return raw?JSON.parse(raw):null;
+  }catch(e){ return null; }
+}
+
+function toggleSessPanel(){
+  const tog=document.getElementById('sessToggle');
+  const pan=document.getElementById('sessPanel');
+  const open=!pan.classList.contains('open');
+  pan.classList.toggle('open', open);
+  tog.classList.toggle('open', open);
+  tog.setAttribute('aria-expanded', open?'true':'false');
+}
+
+function renderSessPanel(){
+  const bar=document.getElementById('sessBar');
+  const grid=document.getElementById('sessGrid');
+  const mini=document.getElementById('sessMini');
+  if(!bar||!grid) return;
+  const s=readSession();
+  if(!s){
+    bar.style.display='none';
+    return;
+  }
+  bar.style.display='block';
+  const t=T[lang];
+  const org=s.org||'—';
+  const name=s.sessionName||t.unnamedSession;
+  // Mini-samenvatting in toggle-knop
+  if(mini) mini.textContent=t.sessMiniTpl.replace('{org}',org).replace('{name}',name);
+  // Volledig grid
+  const items=[
+    {k:t.sessOrg, v:org},
+    {k:t.sessName, v:name},
+    {k:t.sessType, v:(t.sessTypeLbl&&t.sessTypeLbl[s.sessionType])||s.sessionType||'—'},
+    {k:t.sessScale, v:(t.scaleLbl&&t.scaleLbl[s.scale])||s.scale||'—'},
+    {k:t.sessUrgency, v:(t.urgLbl&&t.urgLbl[s.urgency])||s.urgency||'—'},
+    {k:t.sessBudget, v:(t.budLbl&&t.budLbl[s.budget])||s.budget||'—'},
+    {k:t.sessHorizon, v:(t.horLbl&&t.horLbl[s.horizon])||s.horizon||'—'},
+  ];
+  grid.innerHTML=items.map(it=>`
+    <div class="sess-item">
+      <span class="sess-k">${it.k}</span>
+      <span class="sess-v" title="${String(it.v).replace(/"/g,'&quot;')}">${it.v}</span>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════
+   CROSS-TAB SYNC (facilitator → deelnemer)
+══════════════════════════════════ */
+// Schrijver: bij elke schermwissel in facilitator-view publiceren we de stage
+let _vkRestoring = false;   // niveau 1: onderdrukt (her)publicatie van de stage tijdens facilitator-herstel
+function publishStage(stage, payload){
+  if (_vkRestoring) return;   // herstel na verversing → niet (her)publiceren; deelnemers ongemoeid
+  try{
+    const obj={stage, curQ, at:Date.now()};
+    if(payload) Object.assign(obj, payload);
+    localStorage.setItem('vk_phase1_stage', JSON.stringify(obj));
+  }catch(e){}
+  // Cross-device: zet de globale stage in RTDB zodat deelnemer-apparaten meebewegen.
+  if (VK_LIVE && window.vkFb){
+    try {
+      const g = Object.assign({ phase: 1, stage: stage, curQ: curQ, at: Date.now() }, payload || {});
+      vkFb.stageSet(vkLiveCode(), JSON.stringify(g));
+    } catch(e){}
+  }
+}
+
+// Lezer: deelnemer-view past zich aan de huidige stage aan
+function readStage(){
+  try{
+    const raw=localStorage.getItem('vk_phase1_stage');
+    return raw?JSON.parse(raw):null;
+  }catch(e){ return null; }
+}
+
+function vkRestoreFacilitatorView(){
+  // Niveau 1: na verversing de facilitator op het live werkscherm van deze fase
+  // terugzetten i.p.v. het introscherm. Publicatie is onderdrukt (_vkRestoring),
+  // zodat de globale stage en de deelnemer-apparaten ongemoeid blijven.
+  if (VK_IS_PARTICIPANT) return false;
+  const st = readStage();
+  const s = st && st.stage;
+  if (s==='question' || s==='cluster' || s==='ai'){
+    _vkRestoring = true;
+    try { curQ = (typeof st.curQ==='number' ? st.curQ : 0); startQ(curQ); }
+    catch(e){ _vkRestoring = false; return false; }
+    _vkRestoring = false;
+    return true;
+  }
+  return false;   // intro/sentence/final/geen stage → introscherm blijft staan
+}
+
+function applyStageToPView(stObj){
+  // Roep alleen aan als pView open is
+  if(facView) return;
+  const st = stObj || readStage();
+  // Cross-device: facilitator is naar een latere fase → deelnemer volgt mee.
+  if(st && Number(st.phase) > 1){
+    window.location.href = 'visiekaart_fase' + Number(st.phase) + '.html?join=' + encodeURIComponent(vkLiveCode());
+    return;
+  }
+  if(!st || !st.stage || st.stage==='idle'){
+    showPStage('preWait');
+    return;
+  }
+  if(st.stage==='question'){
+    // Sync curQ + render vraag
+    if(typeof st.curQ==='number') curQ=st.curQ;
+    const qd=QD[lang][curQ];
+    if(qd){
+      const t=T[lang];
+      document.getElementById('pQNum').textContent=curQ+1;
+      document.getElementById('pQCounter').textContent=`${t.vraag} ${curQ+1} ${t.qOf} 5 — ${qd.heading}`;
+      document.getElementById('pQText').textContent=vkTypeSub(qd.q);
+      document.getElementById('pQHint').textContent=qd.hint;
+      // Antwoord-veld leegmaken bij nieuwe vraag
+      const ta=document.getElementById('pAnswer');
+      if(ta && ta.dataset.qIdx!==String(curQ)){
+        ta.value='';
+        ta.dataset.qIdx=String(curQ);
+      }
+    }
+    showPStage('question');
+    return;
+  }
+  if(st.stage==='cluster'||st.stage==='ai'||st.stage==='sentence'){
+    showPStage('postWait');
+    return;
+  }
+  if(st.stage==='final'){
+    const vs=st.sentence || localStorage.getItem('vk_vision_sentence') || confirmedSentence || '';
+    document.getElementById('pFinalSentence').textContent=vs;
+    showPStage('final');
+    return;
+  }
+  if(st.stage==='done'){
+    // Facilitator is door naar fase 2; deelnemer ziet eindvisie nog
+    showPStage('final');
+    return;
+  }
+  // Vangnet: elke andere/onbekende stage ('prewait', 'preWait', leeg, …) toont het
+  // wachtscherm. Een vraag verschijnt UITSLUITEND bij een expliciete 'question'-stage.
+  showPStage('preWait');
+}
+
+function showPStage(stage){
+  const map={
+    preWait:'pPreWait',
+    question:'pQuestion',
+    postWait:'pWait',
+    final:'pFinal'
+  };
+  ['pPreWait','pQuestion','pWait','pFinal'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display = (id===map[stage]?'block':'none');
+  });
+}
+
+// Storage-event: andere tab heeft iets veranderd
+window.addEventListener('storage', e=>{
+  if(!e.key) return;
+  if(e.key==='vk_lang' && e.newValue && e.newValue!==lang){
+    setLang(e.newValue, {fromStorage:true});
+  }
+  if(e.key==='vk_session' || e.key==='vk_session_started'){
+    renderSessPanel();
+    updatePSummary();
+  }
+  if(e.key==='vk_phase1_stage' || e.key==='vk_vision_sentence'){
+    applyStageToPView();
+  }
+});
+
+
+function buildIntroGrid(){
+  const t=T[lang];
+  const g=document.getElementById('introGrid');
+  if(!g) return;
+  g.innerHTML=t.introItems.map(item=>{
+    let iconHtml;
+    if(item.icon==='people-svg'){
+      iconHtml = `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="6.5" r="2.3"/><circle cx="13" cy="6.5" r="2.3"/><path d="M3 16c0-2.4 1.8-4 4-4s4 1.6 4 4"/><path d="M9 16c0-2.4 1.8-4 4-4s4 1.6 4 4"/></svg>`;
+    } else {
+      iconHtml = item.icon;
+    }
+    return `
+    <div class="intro-item">
+      <div class="intro-icon" style="background:var(--orange-l);color:var(--orange-h)">${iconHtml}</div>
+      <div>
+        <div class="intro-item-title">${item.title}</div>
+        <div class="intro-item-sub">${item.sub}</div>
+      </div>
+    </div>`;
+  }).join('');
+  buildQSteps();
+  // Ook de deelnemer-pre-wait intro vullen
+  const gp=document.getElementById('pIntroGrid');
+  if(gp) gp.innerHTML=g.innerHTML;
+}
+
+function buildQSteps(){
+  const bar=document.getElementById('qStepsBar');
+  const pbar=document.getElementById('pQStepsBar');
+  const html = QD[lang].map((_,i)=>`<div class="q-step" id="qs${i}"></div>`).join('');
+  const phtml = QD[lang].map((_,i)=>`<div class="q-step" id="pqs${i}"></div>`).join('');
+  if(bar) bar.innerHTML=html;
+  if(pbar) pbar.innerHTML=phtml;
+  updateQSteps();
+}
+
+function updateQSteps(){
+  for(let i=0;i<5;i++){
+    const el=document.getElementById('qs'+i);
+    if(el) el.className='q-step'+(i<curQ?' done':i===curQ?' active':'');
+    const pel=document.getElementById('pqs'+i);
+    if(pel) pel.className='q-step'+(i<curQ?' done':i===curQ?' active':'');
+  }
+}
+
+/* ══════════════════════════════════
+   SCREENS
+══════════════════════════════════ */
+function showScreen(id){
+  ['sIntro','sWait','sCluster','sAILoad','sSentence','sFinal'].forEach(s=>{
+    const el=document.getElementById(s);
+    if(el) el.classList.toggle('open',s===id);
+  });
+}
+
+/* ══════════════════════════════════
+   START QUESTION
+══════════════════════════════════ */
+function startQ(qi){
+  curQ=qi;
+  _clusterArmed = false;   // nieuwe vraag → clusterwaarschuwing weer actief
+  updateQSteps();
+  const t=T[lang];
+  const qd=QD[lang][qi];
+  // Update facilitator wait screen
+  document.getElementById('qNumBadge').textContent=qi+1;
+  document.getElementById('qCounterLabel').textContent=`${t.vraag} ${qi+1} ${t.qOf} 5 — ${qd.heading}`;
+  document.getElementById('qTextFac').textContent=vkTypeSub(qd.q);
+  document.getElementById('qHintFac').textContent=qd.hint;
+  document.getElementById('waitMsg').textContent='';
+  document.getElementById('ansCountChip').textContent=`0 / ${answers[qi].length||'?'}`;
+  document.getElementById('waitBotInfo').textContent=t.waitBotMsg;
+
+  // Update participant screen
+  document.getElementById('pQNum').textContent=qi+1;
+  document.getElementById('pQCounter').textContent=`${t.vraag} ${qi+1} ${t.qOf} 5 — ${qd.heading}`;
+  document.getElementById('pQText').textContent=vkTypeSub(qd.q);
+  document.getElementById('pQHint').textContent=qd.hint;
+  const ta=document.getElementById('pAnswer');
+  ta.value='';
+  ta.dataset.qIdx=String(qi);
+
+  // Reset participant view stages voor deze vraag (in-tab demo)
+  showPStage('question');
+
+  // Refresh info-popovers voor q-component
+  refreshQPopovers();
+  // Sluit een eventueel open tip-popup bij wisselen van vraag (v4)
+  vkCloseTip();
+
+  showScreen('sWait');
+  // Cross-tab: publiceer dat we bij vraag qi zijn
+  publishStage('question');
+  // Demo-antwoorden alleen in test/preview; in productie komt de echte data binnen (B2)
+  if (!VK_LIVE) simulateAnswers(qi);
+}
+
+function simulateAnswers(qi){
+  const demos=QD[lang][qi].demos;
+  let idx=0;
+  answers[qi]=[];
+  const t=T[lang];
+  const interval=setInterval(()=>{
+    if(idx>=demos.length){clearInterval(interval);return;}
+    answers[qi].push({text:demos[idx][0],name:demos[idx][1]});
+    idx++;
+    const chip=document.getElementById('ansCountChip');
+    if(chip) chip.textContent=`${answers[qi].length} / ${demos.length}`;
+  },700);
+}
+
+/* ══════════════════════════════════
+   SHOW CLUSTER (v4: met drag-and-drop tussen clusters)
+══════════════════════════════════ */
+function showCluster(){
+  // Twee-staps: heeft nog niet iedereen gereageerd, eerst waarschuwen.
+  // Wegklikken + nogmaals op "Toon antwoorden & clusters" → door naar clustering.
+  const _expected = vkExpectedParticipants();
+  const _answered = (answers[curQ]||[]).length;
+  if(!_clusterArmed && _expected>0 && _answered < _expected){
+    vkOpenTip({ size:'lg', title:T[lang].clusterConfirmTitle, body:T[lang].clusterConfirmBody, closeLabel:(T[lang].tipClose||'Sluiten') });
+    _clusterArmed = true;
+    return;
+  }
+  _clusterArmed = false;
+  const t=T[lang];
+  const qd=QD[lang][curQ];
+  document.getElementById('clNumBadge').textContent=curQ+1;
+  document.getElementById('clCounterLabel').textContent=`${t.vraag} ${curQ+1} ${t.qOf} 5 — ${qd.heading}`;
+  document.getElementById('clQText').textContent=vkTypeSub(qd.q);
+  document.getElementById('t-confirmQ').textContent=curQ===5?t.confirmQLast:t.confirmQ;
+
+  // Resolve antwoorden (live als ingevuld, anders demo's)
+  const curAnswers = answers[curQ].length ? answers[curQ] : QD[lang][curQ].demos.map(d=>({text:d[0],name:d[1]}));
+  const live = answers[curQ].length > 0;   // echte antwoorden aanwezig → AI-clustering zinvol
+
+  // Initialiseer clusterMap[curQ] indien nog niet bepaald voor dit aantal antwoorden
+  if (!Array.isArray(clusterMap[curQ]) || clusterMap[curQ].length !== curAnswers.length){
+    if (live){
+      // Lokale terugval-clustering meteen (toont direct iets zinnigs; AI verfijnt hieronder)
+      vkLocalCluster(curQ, curAnswers);
+    } else {
+      // Demo/test: vaste QD-clusters — ongewijzigd gedrag
+      const map = new Array(curAnswers.length).fill(0);
+      qd.clusters.forEach((cl,ci)=>{ cl.ids.forEach(i => { if (i < map.length) map[i] = ci; }); });
+      clusterMap[curQ] = map;
+      clusterDefs[curQ] = qd.clusters.map(c=>({label:c.label}));
+    }
+  }
+
+  vkRenderClusters();
+
+  document.getElementById('clBotLabel').textContent=`${t.vraag} ${curQ+1}: ${vkTypeSub(qd.q).substring(0,40)}...`;
+  renderKwTags();
+  refreshQPopovers();
+  showScreen('sCluster');
+  publishStage('cluster');
+
+  // Live: probeer AI-clustering en verfijn; faalt het (offline/geen token) → lokale terugval blijft staan
+  if (live){
+    vkCallAI('cluster', { items: curAnswers.map(a=>a.text) }, { lang })
+      .then(ai=>{
+        if (ai && Array.isArray(ai.clusters) && ai.clusters.length){
+          vkApplyAICluster(curQ, curAnswers, ai.clusters);
+          vkRenderClusters();
+        }
+      })
+      .catch(()=>{ /* lokale clustering blijft leidend */ });
+  }
+}
+
+/* ═══ Cluster A: dynamische clusterdefinities + lokale terugval + AI-overlay ═══ */
+function vkClusterDefs(qi){
+  if (Array.isArray(clusterDefs[qi]) && clusterDefs[qi].length) return clusterDefs[qi];
+  const qd = QD[lang][qi];
+  return (qd && qd.clusters) ? qd.clusters.map(c=>({label:c.label})) : [{label:''}];
+}
+
+// Deterministische lokale clustering op woord-overlap (terugval als AI onbereikbaar is). Max 4 kolommen.
+function vkLocalCluster(qi, curAnswers){
+  const STOP = new Set(('de het een en of van voor met aan op in te dat die deze wij we ons onze je jij u uw is zijn worden willen meer beter goede goed naar bij om als ook nog dan zodat omdat hun '+
+    'the a an and or of for to with on in that this these we our you your is are be being more better good so because their them they').split(' '));
+  const tok = s => String(s||'').toLowerCase().replace(/[^a-zà-ÿ0-9\s]/g,' ').split(/\s+/).filter(w=>w.length>3 && !STOP.has(w));
+  const groups = []; // {words:Set, label, members:[]}
+  curAnswers.forEach((a,i)=>{
+    const words = tok(a.text);
+    let best=-1, bestScore=0;
+    groups.forEach((g,gi)=>{ const sc = words.filter(w=>g.words.has(w)).length; if (sc>bestScore){ bestScore=sc; best=gi; } });
+    if (best>=0 && bestScore>0){
+      groups[best].members.push(i); words.forEach(w=>groups[best].words.add(w));
+    } else if (groups.length<4){
+      groups.push({words:new Set(words), label:(words[0]||(lang==='nl'?'Overig':'Other')), members:[i]});
+    } else {
+      let sm=0; groups.forEach((g,gi)=>{ if(g.members.length<groups[sm].members.length) sm=gi; });
+      groups[sm].members.push(i);
+    }
+  });
+  if (!groups.length) groups.push({label:(lang==='nl'?'Antwoorden':'Answers'), members:curAnswers.map((_,i)=>i), words:new Set()});
+  const map = new Array(curAnswers.length).fill(0);
+  groups.forEach((g,gi)=>g.members.forEach(i=>map[i]=gi));
+  clusterMap[qi]  = map;
+  clusterDefs[qi] = groups.map(g=>({label:(g.label.charAt(0).toUpperCase()+g.label.slice(1))}));
+  clusterNames[qi] = {};
+}
+
+// AI-output ({clusters:[{label,members:[idx]}]}) → clusterMap + clusterDefs. Max 4 kolommen.
+function vkApplyAICluster(qi, curAnswers, clusters){
+  const cl = clusters.slice(0,4);
+  const map = new Array(curAnswers.length).fill(0);
+  cl.forEach((c,ci)=>{ (c.members||[]).forEach(idx=>{ const i=+idx; if(i>=0 && i<map.length) map[i]=ci; }); });
+  clusterMap[qi]  = map;
+  clusterDefs[qi] = cl.map((c,ci)=>({label:String(c.label || ('Cluster '+(ci+1)))}));
+  clusterNames[qi] = {};   // AI levert nieuwe labels; eerdere overrides vervallen
+}
+
+/* ═══ VK CLUSTER RENDERING + DRAG-AND-DROP (v4) ═══ */
+function vkRenderClusters(){
+  const t  = T[lang];
+  const qd = QD[lang][curQ];
+  const area = document.getElementById('clusterArea');
+  if (!area) return;
+
+  const curAnswers = answers[curQ].length ? answers[curQ] : QD[lang][curQ].demos.map(d=>({text:d[0],name:d[1]}));
+  const map = clusterMap[curQ] || [];
+
+  area.innerHTML = '';
+
+  vkClusterDefs(curQ).forEach((cl, ci) => {
+    const cls = CLUSTERCLS[ci % CLUSTERCLS.length];
+    // Verzamel alle antwoorden die volgens de map in dit cluster horen
+    const clAnswerIdx = [];
+    for (let i = 0; i < curAnswers.length; i++){
+      if ((map[i] ?? 0) === ci) clAnswerIdx.push(i);
+    }
+    const savedName = (clusterNames[curQ] && clusterNames[curQ][ci]) || cl.label;
+
+    const div = document.createElement('div');
+    div.className = `cluster-group ${cls}`;
+    div.dataset.clusterIdx = String(ci);
+    div.innerHTML = `
+      <div class="cluster-head">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><circle cx="3" cy="6" r="2" fill="currentColor" opacity=".5"/><circle cx="9" cy="3" r="2" fill="currentColor" opacity=".5"/><circle cx="9" cy="9" r="2" fill="currentColor" opacity=".5"/><path d="M5 6h1.5M5 6L8 3.5M5 6L8 8.5" stroke="currentColor" stroke-width="1"/></svg>
+        <input type="text" class="cl-name-input" value="${escapeHtml(savedName)}" title="${T[lang].clusterNameEditTitle}" aria-label="${T[lang].clusterNameEditTitle}" onchange="updateClusterName(${ci}, this.value)">
+        <span style="opacity:.5;font-weight:400;white-space:nowrap;margin-left:6px">(${clAnswerIdx.length} ${t.answersLabel})</span>
+      </div>
+      <div class="cluster-body" data-cluster-idx="${ci}">
+        ${clAnswerIdx.length
+          ? clAnswerIdx.map(i => {
+              const a = curAnswers[i];
+              return `<div class="answer-card" draggable="true" data-ans-idx="${i}" tabindex="0" aria-grabbed="false">
+                <span class="vk-drag-handle" aria-hidden="true">
+                  <svg width="10" height="14" viewBox="0 0 10 14" fill="currentColor"><circle cx="3" cy="3" r="1.2"/><circle cx="7" cy="3" r="1.2"/><circle cx="3" cy="7" r="1.2"/><circle cx="7" cy="7" r="1.2"/><circle cx="3" cy="11" r="1.2"/><circle cx="7" cy="11" r="1.2"/></svg>
+                </span>${escapeHtml(a.text)}<div class="a-name">${escapeHtml(a.name||'')}</div>
+              </div>`;
+            }).join('')
+          : `<div class="vk-empty">${lang==='nl'?'Sleep een antwoord hierheen':'Drag an answer here'}</div>`
+        }
+      </div>`;
+    area.appendChild(div);
+  });
+
+  // Bind drag-handlers
+  area.querySelectorAll('.answer-card[draggable="true"]').forEach(card => {
+    card.addEventListener('dragstart', vkOnDragStart);
+    card.addEventListener('dragend',   vkOnDragEnd);
+    card.addEventListener('keydown',   vkOnAnswerKeydown);
+  });
+  area.querySelectorAll('.cluster-body').forEach(body => {
+    body.addEventListener('dragover',  vkOnDragOver);
+    body.addEventListener('dragleave', vkOnDragLeave);
+    body.addEventListener('drop',      vkOnDrop);
+  });
+}
+
+function vkOnDragStart(e){
+  vkDragSrc = e.currentTarget;
+  vkDragSrc.classList.add('vk-dragging');
+  vkDragSrc.setAttribute('aria-grabbed','true');
+  if (e.dataTransfer){
+    e.dataTransfer.effectAllowed = 'move';
+    try { e.dataTransfer.setData('text/plain', vkDragSrc.dataset.ansIdx); } catch(_){}
+  }
+}
+function vkOnDragEnd(e){
+  if (vkDragSrc) vkDragSrc.classList.remove('vk-dragging');
+  if (vkDragSrc) vkDragSrc.setAttribute('aria-grabbed','false');
+  document.querySelectorAll('.cluster-body.vk-drop-target').forEach(b => b.classList.remove('vk-drop-target'));
+  vkDragSrc = null;
+}
+function vkOnDragOver(e){
+  if (!vkDragSrc) return;
+  e.preventDefault();
+  if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('vk-drop-target');
+}
+function vkOnDragLeave(e){
+  // Alleen state-wissen als de cursor het body-element echt verlaat
+  if (e.currentTarget.contains(e.relatedTarget)) return;
+  e.currentTarget.classList.remove('vk-drop-target');
+}
+function vkOnDrop(e){
+  e.preventDefault();
+  e.currentTarget.classList.remove('vk-drop-target');
+  if (!vkDragSrc) return;
+  const targetCi = Number(e.currentTarget.dataset.clusterIdx);
+  const ansIdx   = Number(vkDragSrc.dataset.ansIdx);
+  if (!Number.isFinite(targetCi) || !Number.isFinite(ansIdx)) return;
+  if (!clusterMap[curQ]) return;
+  if (clusterMap[curQ][ansIdx] === targetCi) return; // geen verandering
+  clusterMap[curQ][ansIdx] = targetCi;
+  vkRenderClusters();
+}
+// Toetsenbord-fallback voor toegankelijkheid: pijl ←/→ verplaatst tussen clusters
+function vkOnAnswerKeydown(e){
+  if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+  const card = e.currentTarget;
+  const ansIdx = Number(card.dataset.ansIdx);
+  if (!Number.isFinite(ansIdx) || !clusterMap[curQ]) return;
+  const total = QD[lang][curQ].clusters.length;
+  const cur = clusterMap[curQ][ansIdx] ?? 0;
+  const next = e.key === 'ArrowRight'
+    ? (cur + 1) % total
+    : (cur - 1 + total) % total;
+  if (next !== cur){
+    e.preventDefault();
+    clusterMap[curQ][ansIdx] = next;
+    vkRenderClusters();
+    // Focus terug op verplaatste kaart
+    setTimeout(() => {
+      const moved = document.querySelector(`.answer-card[data-ans-idx="${ansIdx}"]`);
+      if (moved) moved.focus();
+    }, 30);
+  }
+}
+/* ═══ END VK CLUSTER RENDERING + DRAG-AND-DROP ═══ */
+
+/* ══════════════════════════════════
+   KEYWORDS
+══════════════════════════════════ */
+function renderKwTags(){
+  const row=document.getElementById('kwTagRow');
+  const kws=keywords[curQ];
+  const colorCls=QCOLORS[curQ];
+  const t=T[lang];
+  if(!kws.length){
+    row.innerHTML=`<span style="font-size:12px;color:var(--t3)">${t.noKw}</span>`;
+    return;
+  }
+  const rmLbl = lang==='nl'?'Verwijder kernwoord':'Remove keyword';
+  row.innerHTML=kws.map((kw,i)=>`
+    <span class="kw-tag ${colorCls}">
+      ${escapeHtml(kw)}
+      <span style="cursor:pointer;margin-left:2px;opacity:.6" onclick="removeKw(${i})" role="button" tabindex="0" aria-label="${rmLbl}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();removeKw(${i});}">×</span>
+    </span>`).join('');
+}
+
+function escapeHtml(s){
+  return String(s||'').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function addKw(){
+  const inp=document.getElementById('kwInput');
+  const val=inp.value.trim();
+  if(!val) return;
+  keywords[curQ].push(val);
+  inp.value='';
+  renderKwTags();
+  document.getElementById('confirmQBtn').disabled=false;
+}
+
+function removeKw(i){
+  keywords[curQ].splice(i,1);
+  renderKwTags();
+}
+
+function kwKeydown(e){
+  // Enter én Tab voegen kernwoord toe (Tab alleen als veld niet leeg, anders normaal tab-gedrag)
+  if(e.key==='Enter'){
+    e.preventDefault();
+    addKw();
+  } else if(e.key==='Tab'){
+    const val=e.target.value.trim();
+    if(val){
+      e.preventDefault();
+      addKw();
+    }
+  }
+}
+
+/* ══════════════════════════════════
+   CONFIRM QUESTION
+══════════════════════════════════ */
+function confirmQ(){
+  if(!keywords[curQ].length){
+    document.getElementById('kwInput').placeholder=T[lang].kwAtLeastOnePh;
+    document.getElementById('kwInput').focus();
+    return;
+  }
+  if(curQ<4){
+    curQ++;
+    startQ(curQ);
+  } else {
+    // Laatste vraag bevestigd, genereer visiezin
+    buildQSteps();
+    showAILoad();
+  }
+}
+
+/* ══════════════════════════════════
+   AI LOAD → SENTENCE
+══════════════════════════════════ */
+function showAILoad(){
+  showScreen('sAILoad');
+  publishStage('ai');
+  setTimeout(()=>buildSentenceScreen(),1800);
+}
+
+function buildSentenceScreen(){
+  const t=T[lang];
+  const parts=document.getElementById('sentParts');
+  // Build editable sentence fields
+  const sentParts=t.sentParts;
+  parts.innerHTML=sentParts.map((p,i)=>`
+    <div class="sentence-part">
+      <span class="sp-prefix">${p.prefix}</span>
+      <input class="sp-value" id="sp${i}" value="${escapeHtml((keywords[i]||[]).join(', '))}" placeholder="${escapeHtml(p.ph)}" aria-label="${escapeHtml(p.prefix)}">
+    </div>`).join('');
+
+  // Build keyword summary
+  const kwSum=document.getElementById('kwSummary');
+  kwSum.innerHTML=T[lang].kwRowLabels.map((label,i)=>`
+    <div class="kw-row">
+      <span class="kw-row-label">${label}</span>
+      <div class="kw-row-tags">
+        ${(keywords[i]||[]).map(kw=>`<span class="kw-badge ${QCOLORS[i]}">${escapeHtml(kw)}</span>`).join('')||`<span style="font-size:12px;color:var(--t3)">—</span>`}
+      </div>
+    </div>`).join('');
+
+  showScreen('sSentence');
+  publishStage('sentence');
+}
+
+
+/* ══════════ RESET DEMO DATA ══════════ */
+/* ══════════════════════════════════
+   AI-SUGGESTIE (regelgebaseerde generator)
+══════════════════════════════════ */
+function generateAISuggestion(){
+  const t=T[lang];
+  const box=document.getElementById('aiSuggestBox');
+  const partsEl=document.getElementById('aiSuggestParts');
+  const btn=document.getElementById('aiSuggestBtnEl');
+  // Check of er kernwoorden zijn
+  const allEmpty = keywords.every(arr=>!arr || !arr.length);
+  if(allEmpty){
+    partsEl.innerHTML = `<div class="ai-suggest-part" style="font-style:italic;color:var(--t3)">${escapeHtml(t.aiSuggestEmpty)}</div>`;
+    box.style.display='block';
+    return;
+  }
+  // Toon "busy" kort
+  const origLabel = btn.querySelector('span').textContent;
+  btn.querySelector('span').textContent = t.aiSuggestBusy;
+  btn.disabled = true;
+  // Bouw voorstel: per component pak top-kernwoorden, voeg verbindingswoorden toe
+  setTimeout(()=>{
+    const parts = t.sentParts.map((p,i)=>{
+      const kws = keywords[i]||[];
+      let value;
+      if(!kws.length){
+        value = `[${t.kwRowLabels[i].toLowerCase()}]`;
+      } else if(kws.length===1){
+        value = kws[0];
+      } else if(kws.length===2){
+        value = lang==='nl'
+          ? `${kws[0]} en ${kws[1]}`
+          : `${kws[0]} and ${kws[1]}`;
+      } else {
+        // 3+ kernwoorden: list met komma's, laatste met "en/and"
+        const last = kws[kws.length-1];
+        const rest = kws.slice(0,-1).join(', ');
+        value = lang==='nl' ? `${rest} en ${last}` : `${rest} and ${last}`;
+      }
+      return {prefix:p.prefix, value};
+    });
+    partsEl.innerHTML = parts.map(p=>`
+      <div class="ai-suggest-part">
+        <span class="pre">${escapeHtml(p.prefix)}</span>
+        <span>${escapeHtml(p.value)}</span>
+      </div>`).join('');
+    // Bewaar de waarden zodat applyAISuggestion ze kan invullen
+    box.dataset.values = JSON.stringify(parts.map(p=>p.value));
+    box.style.display='block';
+    btn.querySelector('span').textContent = origLabel || t.aiSuggestBtn;
+    btn.disabled = false;
+  }, 600);
+}
+
+function dismissAISuggestion(){
+  const box=document.getElementById('aiSuggestBox');
+  if(box) box.style.display='none';
+}
+
+function applyAISuggestion(){
+  const box=document.getElementById('aiSuggestBox');
+  if(!box || !box.dataset.values) return;
+  let vals;
+  try{ vals = JSON.parse(box.dataset.values); }catch(e){ return; }
+  vals.forEach((v,i)=>{
+    const inp = document.getElementById('sp'+i);
+    if(inp) inp.value = v;
+  });
+  box.style.display='none';
+}
+
+/* ══════════════════════════════════
+   ONDERBOUWING-MODAL (theorie)
+══════════════════════════════════ */
+/* ══════════════════════════════════
+   ONDERBOUWING (v4: via vkOpenTip)
+══════════════════════════════════ */
+function openOnderbouwing(){
+  const t = T[lang];
+  vkOpenTip({
+    size: 'lg',
+    title: t.onderbouwingTitle,
+    body: t.onderbouwingBody,
+    closeLabel: t.tipClose || t.onderbouwingClose
+  });
+}
+
+/* ══════════════════════════════════
+   VK BACK-TO-EDIT (eindscherm → terug naar zin-editor)
+══════════════════════════════════ */
+function vkBackToEdit(){
+  try{ localStorage.setItem('vk_phase1_state', 'editing'); }catch(e){}
+  showScreen('sSentence');
+}
+
+/* ══════════════════════════════════
+   CLUSTER-NAAM EDIT
+══════════════════════════════════ */
+function updateClusterName(ci, newName){
+  if(!clusterNames[curQ]) clusterNames[curQ]={};
+  clusterNames[curQ][ci] = String(newName||'').trim();
+}
+
+/* ══════════════════════════════════
+   DEELNEMER SESSIE-SAMENVATTING
+══════════════════════════════════ */
+function updatePSummary(){
+  const block=document.getElementById('pSummaryBlock');
+  const text=document.getElementById('pSummaryText');
+  if(!block || !text) return;
+  const sess=readSession();
+  // Toon alleen als facilitator sessie heeft "gestart" (vk_session_started)
+  // OF als er gewoon sessie-data is — pragmatisch: vraagt om vk_session_started
+  let started=false;
+  try{ started = !!localStorage.getItem('vk_session_started'); }catch(e){}
+  if(!sess){
+    block.style.display='none';
+    return;
+  }
+  const t=T[lang];
+  // Bouw vertaalde labels
+  const typeLbl=(t.sessTypeLbl&&t.sessTypeLbl[sess.sessionType])||sess.sessionType||'sessie';
+  const scaleLbl=(t.scaleLbl&&t.scaleLbl[sess.scale])||sess.scale||'';
+  const urgLbl=(t.urgLbl&&t.urgLbl[sess.urgency])||sess.urgency||'';
+  const budLbl=(t.budLbl&&t.budLbl[sess.budget])||sess.budget||'';
+  const horLbl=(t.horLbl&&t.horLbl[sess.horizon])||sess.horizon||'';
+  const name=(sess.sessionName||'').trim();
+  let tpl = name ? t.summaryTpl : t.summaryTplNoName;
+  if(!tpl){ block.style.display='none'; return; }
+  const filled = vkFillSentenceTemplate(tpl, {
+    type:  typeLbl,
+    scale: scaleLbl,
+    name:  name,
+    urg:   urgLbl,
+    bud:   budLbl,
+    hor:   horLbl
+  });
+  text.textContent = filled;
+  block.style.display = 'block';
+}
+
+
+/* ══════════════════════════════════
+   RESET DEMO DATA
+══════════════════════════════════ */
+function resetDemoData(){
+  if (window.__VK_PROD) return;
+  if(!confirm(T[lang].resetConfirm)) return;
+  const keys = ['vk_session','vk_session_started','vk_vision_sentence','vk_vision_keywords','vk_phase1_answers',
+                'vk_selected_themes','vk_phase2_submissions','vk_confirmed_actions',
+                'vk_phase3_submissions','vk_versnellers','vk_remmers','vk_phase4_scores',
+                'vk_roadmap_actions','vk_phase1_stage','vk_phase1_live_answers'];
+  keys.forEach(k=>localStorage.removeItem(k));
+  alert(T[lang].resetDone);
+  location.reload();
+}
+
+/* ══════════════════════════════════
+   CONFIRM SENTENCE
+══════════════════════════════════ */
+function confirmSentence(){
+  const t=T[lang];
+  // Collect sentence parts from inputs
+  const vals=[];
+  for(let i=0;i<5;i++){
+    vals.push(document.getElementById('sp'+i).value.trim()||'—');
+  }
+  if(lang==='nl'){
+    confirmedSentence=`Omdat ${vals[0]}, richten wij ons op ${vals[1]}, die behoefte heeft aan ${vals[2]}. Wij willen bereiken dat ${vals[3]}. Daarom ligt onze focus de komende periode op ${vals[4]}.`;
+  } else {
+    confirmedSentence=`Because ${vals[0]}, we focus on ${vals[1]}, who needs ${vals[2]}. We want to achieve that ${vals[3]}. Therefore our focus in the coming period is on ${vals[4]}.`;
+  }
+  // ── Persist phase 1 outputs ─────────────────────────
+  try{
+    localStorage.setItem('vk_vision_sentence', confirmedSentence);
+    localStorage.setItem('vk_vision_keywords', JSON.stringify(keywords));
+    localStorage.setItem('vk_phase1_answers', JSON.stringify(answers));
+    localStorage.setItem('vk_phase1_state', 'confirmed');
+  }catch(e){}
+  buildFinalScreen();
+  showScreen('sFinal');
+  updateQSteps();
+  publishStage('final', {sentence: confirmedSentence});
+}
+
+/* ══════════════════════════════════
+   FINAL SCREEN
+══════════════════════════════════ */
+function buildFinalScreen(){
+  const t=T[lang];
+  document.getElementById('finalSentenceDisplay').textContent=confirmedSentence;
+  document.getElementById('pFinalSentence').textContent=confirmedSentence;
+
+  // Keywords per question
+  const kw=document.getElementById('finalKeywords');
+  kw.innerHTML=T[lang].kwRowLabels.map((label,i)=>`
+    <div class="kw-row">
+      <span class="kw-row-label">${label}</span>
+      <div class="kw-row-tags">
+        ${(keywords[i]||[]).map(k=>`<span class="kw-badge ${QCOLORS[i]}">${k}</span>`).join('')||'<span style="font-size:12px;color:var(--t3)">—</span>'}
+      </div>
+    </div>`).join('');
+
+  buildCanvas();
+}
+
+/* ══════════════════════════════════
+   FINAL VIEW TOGGLE
+══════════════════════════════════ */
+function switchFinalView(v){
+  const isVision=v==='vision';
+  document.getElementById('fvVision').style.display=isVision?'block':'none';
+  document.getElementById('fvCanvas').style.display=isVision?'none':'block';
+  document.getElementById('vt-vision').classList.toggle('on',isVision);
+  document.getElementById('vt-canvas').classList.toggle('on',!isVision);
+}
+
+/* ══════════════════════════════════
+   VISIEKAART CANVAS SVG
+══════════════════════════════════ */
+function buildCanvas(){
+  vkRenderInto(document.getElementById('vkCanvas'), {
+    visionSentence: (typeof confirmedSentence!=='undefined' ? confirmedSentence : '') || '',
+    lang: lang
+  });
+}
+
+/* ══════════════════════════════════
+   PARTICIPANT VIEW
+══════════════════════════════════ */
+function showPView(){
+  facView=false;
+  document.getElementById('facView').style.display='none';
+  document.getElementById('pView').classList.add('open');
+  // Pas pView-stage aan op basis van huidige facilitator-stage (uit localStorage)
+  applyStageToPView();
+}
+
+function hidePView(){
+  facView=true;
+  document.getElementById('pView').classList.remove('open');
+  document.getElementById('facView').style.display='';
+}
+
+function submitAnswer(){
+  const val=document.getElementById('pAnswer').value.trim();
+  if(!val) return;
+  // Echte deelnemernaam (uit join) waar beschikbaar, anders generiek.
+  let myName = (lang==='nl'?'Jij':'You');
+  try{ const j=JSON.parse(localStorage.getItem('vk_joined')||'null'); if(j && j.name) myName=j.name; }catch(e){}
+  const sub={text:val,name:myName,qi:curQ,at:Date.now()};
+  if (VK_LIVE && window.vkFb){
+    // Cross-device: stuur naar RTDB; de facilitator-leeskant pikt 't live op.
+    try{ vkFb.push(vkLiveCode(),'phase1/answers', sub); }catch(e){}
+  } else {
+    // Demo/lokaal: zelfde browser → via localStorage en lokale state.
+    answers[curQ]=answers[curQ]||[];
+    answers[curQ].push(sub);
+    try{
+      const key='vk_phase1_live_answers';
+      const cur=JSON.parse(localStorage.getItem(key)||'[]');
+      cur.push(sub);
+      localStorage.setItem(key, JSON.stringify(cur));
+    }catch(e){}
+    const chip=document.getElementById('ansCountChip');
+    if(chip) chip.textContent=`${answers[curQ].length} / ${QD[lang][curQ].demos.length+1}`;
+  }
+  // Eigen input verdwijnt; deelnemer ziet het wachtscherm (clustering volgt centraal).
+  showPStage('postWait');
+}
+
+/* ══════════════════════════════════
+   NAVIGATION
+══════════════════════════════════ */
+function goPhase0(){
+  window.location.href='visiekaart_fase0.html';
+}
+
+function goPhase2(){
+  // Signal cross-tab dat fase 1 klaar is, dan navigeer
+  try{ localStorage.setItem('vk_phase1_stage', JSON.stringify({stage:'done', at:Date.now()})); }catch(e){}
+  // Cross-device: zet globale stage naar fase 2 zodat deelnemer-apparaten meegaan.
+  if (VK_LIVE && window.vkFb){
+    try{ vkFb.stageSet(vkLiveCode(), JSON.stringify({phase:2, stage:'preWait', at:Date.now()})); }catch(e){}
+  }
+  window.location.href='visiekaart_fase2.html';
+}
+
+/* ══════════════════════════════════
+   INIT
+══════════════════════════════════ */
+function initLang(){
+  // Voorkeur: vk_lang. Fallback: vk_session_started.lang. Default: 'nl'.
+  let init=null;
+  try{
+    const stored=localStorage.getItem('vk_lang');
+    if(stored==='nl'||stored==='en') init=stored;
+    if(!init){
+      const ss=localStorage.getItem('vk_session_started');
+      if(ss){ const o=JSON.parse(ss); if(o && (o.lang==='nl'||o.lang==='en')) init=o.lang; }
+    }
+  }catch(e){}
+  if(init && init!==lang){
+    setLang(init, {fromStorage:true});
+  }
+}
+
+/* Deelnemer-rol: forceer pView en volg de globale stage uit RTDB.
+   Lost op: deelnemer zag de facilitator-flow (alle vragen) i.p.v. één-voor-één,
+   en een refresh viel terug naar het verkeerde scherm. */
+function vkPublishSessionContent(){
+  // Optie A: facilitator publiceert de sessievelden naar de RTDB-content-tak,
+  // zodat deelnemer-apparaten het samenvatting-blok in het welkomscherm kunnen vullen.
+  if (VK_IS_PARTICIPANT) return;
+  if (!(VK_LIVE && window.vkFb)) return;
+  var sObj=null;
+  try{ sObj=JSON.parse(localStorage.getItem('vk_session')||'null'); }catch(e){ sObj=null; }
+  if(!sObj) return;
+  var content = {
+    sessionName: sObj.sessionName || '',
+    sessionType: sObj.sessionType || '',
+    scale:       sObj.scale || '',
+    urgency:     sObj.urgency || '',
+    budget:      sObj.budget || '',
+    horizon:     sObj.horizon || '',
+    lang:        (typeof lang!=='undefined' ? lang : 'nl')
+  };
+  try { vkFb.contentSet(vkLiveCode(), content); } catch(e){}
+}
+
+function vkRoleInit(){
+  if(!VK_IS_PARTICIPANT) return;
+  showPView();   // forceer deelnemer-view (verbergt de facilitator-flow)
+  if(!(VK_LIVE && window.vkFb)) return;
+  try{
+    vkFb.stageListen(vkLiveCode(), function(raw){
+      applyStageToPView(vkParseStage(raw));   // stuurt één-voor-één, fase-navigatie en refresh-herstel
+    });
+  }catch(e){}
+  // Optie A: live sessie-inhoud ontvangen -> lokaal als vk_session zetten, zodat het
+  // welkomscherm (incl. blok "Wat we vandaag doen") zich op het deelnemer-apparaat vult.
+  try{
+    vkFb.contentListen(vkLiveCode(), function(content){
+      if(!content || typeof content!=='object') return;
+      try{
+        var cur={};
+        try{ cur=JSON.parse(localStorage.getItem('vk_session')||'{}')||{}; }catch(e){}
+        localStorage.setItem('vk_session', JSON.stringify(Object.assign({}, cur, content)));
+      }catch(e){}
+      try{ updatePSummary(); }catch(e){}
+      try{ renderSessPanel(); }catch(e){}
+    });
+  }catch(e){}
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  vkApplyEnvironmentRules();
+  initLang();
+  applyT();
+  buildQSteps();
+  // Sessie-paneel renderen op basis van vk_session (paneel start gesloten)
+  renderSessPanel();
+  // Cluster B (Blok 1): platform-context herstellen uit sessionStorage (geen poort;
+  // de betaalmuur ligt uitsluitend op fase 5 — VK_BETAAL_VANAF_FASE, bevroren door CINAB).
+  if (VK_LIVE && window.VK_CINAB && !VK_IS_PARTICIPANT){ try { VK_CINAB.restore(); } catch(e){} }
+  vkRoleInit();
+  vkRestoreFacilitatorView();
+  vkPublishSessionContent();
+});
+</script>
+
+<!-- ═══════════════ PLATFORM / FIREBASE / CINAB (Blok 1, identiek in fase 0-5 + rapport) ═══════════════ -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script type="module">
+  // De ONGEWIJZIGDE module-client; we bridgen alleen zijn publieke API naar window.
+  import { startCinabSession, createCinabClient, CinabError } from './cinab-tool-client.js';
+  window.__cinabLib = { startCinabSession, createCinabClient, CinabError };
+  window.dispatchEvent(new Event('cinab-lib-ready'));
+</script>
+<script>
+/* ── ingebouwde vk-firebase.js ── */
+/* ══════════════════════════════════════════════════════════════════════════
+   vk-firebase.js — Cluster B / Firebase-integratie (niveau B)
+   Wordt straks INGEBOUWD per fase (zelf-bevattend), net als vk-ai.js.
+
+   Levert:
+   - omgevings-config (staging vs productie; NOOIT databaseURL hardcoden in code)
+   - anonieme auth
+   - server-side sessie-state in RTDB  (/sessions/{code}/state)   — vervangt localStorage op B
+   - stage-sync                        (/sessions/{code}/stage)
+   - live-listeners + append           (/sessions/{code}/phaseN/...)
+   - session/clear                     (wist de RTDB-tak; stateless-at-rest)
+
+   ALLES degradeert netjes: ontbreekt de SDK/config of faalt het netwerk, dan
+   rejecten de helpers en de fase valt terug op de bestaande localStorage/demo-flow.
+   De beveiliging zit in database.rules.json, niet in deze config (geen secret).
+   ══════════════════════════════════════════════════════════════════════════ */
+(function (global) {
+  'use strict';
+
+  /* ── Omgevings-config (per omgeving inlezen; productie schoon omwisselbaar) ── */
+  var VK_FB_STAGING = {
+    apiKey: "AIzaSyCer_6Y7f-jUXygHnBF_UdtpTxPTEIvaoA",
+    authDomain: "visiekaart.firebaseapp.com",
+    databaseURL: "https://visiekaart-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "visiekaart",
+    storageBucket: "visiekaart.firebasestorage.app",
+    messagingSenderId: "757784606494",
+    appId: "1:757784606494:web:6f47e48fc85f15f6257b0f"
+  };
+  // Vul in zodra het schone productieproject (europe-west1, CINAB-account) staat:
+  var VK_FB_PROD = null; // bv. { apiKey:"…", databaseURL:"https://…-prod-….europe-west1.firebasedatabase.app", … }
+
+  function vkFbEnv() {
+    var h = (global.location && global.location.hostname) || '';
+    var staging = (h === 'localhost' || h.indexOf('127.') === 0 || h.indexOf('192.168.') === 0 ||
+                   h.indexOf('.local') !== -1 || h.indexOf('.web.app') !== -1 ||
+                   h.indexOf('.firebaseapp.com') !== -1 || h.indexOf('staging.') === 0);
+    return staging ? 'staging' : 'production';
+  }
+  function vkFbConfig() { return vkFbEnv() === 'production' ? VK_FB_PROD : VK_FB_STAGING; }
+
+  /* ── Init + anonieme auth ── */
+  var _readyPromise = null;
+  function vkFbInit() {
+    if (_readyPromise) return _readyPromise;
+    _readyPromise = new Promise(function (resolve, reject) {
+      try {
+        if (typeof global.firebase === 'undefined' || !global.firebase.initializeApp) {
+          return reject(new Error('firebase_sdk_missing'));
+        }
+        var cfg = vkFbConfig();
+        if (!cfg || !cfg.databaseURL) return reject(new Error('firebase_config_missing'));
+        if (!global.firebase.apps || !global.firebase.apps.length) global.firebase.initializeApp(cfg);
+        global.firebase.auth().signInAnonymously()
+          .then(function () { resolve(global.firebase); })
+          .catch(reject);
+      } catch (e) { reject(e); }
+    });
+    return _readyPromise;
+  }
+
+  function db() { return global.firebase.database(); }
+  function sessRef(code, sub) { return db().ref('sessions/' + code + (sub ? '/' + sub : '')); }
+  function nowUTC() { return Date.now(); }
+
+  /* ── Sessie-state (server-side; vervangt localStorage op niveau B) ── */
+  // payload = opaak object (volledige tool-state). WordPress leest dit nooit (data_ref).
+  function stateSave(code, payload) {
+    return vkFbInit().then(function () {
+      return sessRef(code, 'state').set({ updatedAt: nowUTC(), payload: payload });
+    });
+  }
+  function stateLoad(code) {
+    return vkFbInit().then(function () {
+      return sessRef(code, 'state').once('value').then(function (s) {
+        var v = s.val(); return v ? v.payload : null;
+      });
+    });
+  }
+  function stateClear(code) {
+    return vkFbInit().then(function () { return sessRef(code, 'state').remove(); });
+  }
+
+  /* ── Stage-sync (facilitator schrijft, deelnemer leest) ── */
+  function stageSet(code, stage) {
+    return vkFbInit().then(function () { return sessRef(code, 'stage').set(String(stage)); });
+  }
+  function stageListen(code, cb) {
+    return vkFbInit().then(function () {
+      var ref = sessRef(code, 'stage');
+      ref.on('value', function (s) { cb(s.val()); });
+      return function off() { ref.off(); };
+    });
+  }
+
+  /* ── Live inzendingen: listener (facilitator) + append (deelnemer) ── */
+  // sub bv. 'phase4/scores'. cb krijgt een array van waarden (chronologisch).
+  function liveListen(code, sub, cb) {
+    return vkFbInit().then(function () {
+      var ref = sessRef(code, sub);
+      ref.on('value', function (snap) {
+        var arr = []; snap.forEach(function (ch) { var v = ch.val(); if (v) arr.push(v); });
+        cb(arr);
+      });
+      return function off() { ref.off(); };
+    });
+  }
+  function push(code, sub, obj) {
+    return vkFbInit().then(function () {
+      obj = obj || {}; if (typeof obj.at === 'undefined') obj.at = nowUTC();
+      return sessRef(code, sub).push(obj);
+    });
+  }
+
+  /* ── Facilitator: sessie aanmaken / content publiceren / hele tak wissen ── */
+  function ensureSession(code, lang) {
+    return vkFbInit().then(function (fb) {
+      var uid = fb.auth().currentUser.uid;
+      return sessRef(code, 'meta').transaction(function (cur) {
+        if (cur) return cur; // bestaat al → niet overschrijven
+        return { createdAt: nowUTC(), lang: lang || 'nl', facilitatorUid: uid };
+      }).then(function () { return uid; });
+    });
+  }
+  function contentSet(code, content) {
+    return vkFbInit().then(function () { return sessRef(code, 'content').set(content); });
+  }
+  function contentListen(code, cb) {
+    return vkFbInit().then(function () {
+      var ref = sessRef(code, 'content');
+      ref.on('value', function (s) { cb(s.val()); });
+      return function off() { ref.off(); };
+    });
+  }
+  function sessionClear(code) {
+    return vkFbInit().then(function () { return sessRef(code).remove(); });
+  }
+
+  global.vkFb = {
+    env: vkFbEnv, config: vkFbConfig, init: vkFbInit,
+    stateSave: stateSave, stateLoad: stateLoad, stateClear: stateClear,
+    stageSet: stageSet, stageListen: stageListen,
+    liveListen: liveListen, push: push,
+    ensureSession: ensureSession, contentSet: contentSet, contentListen: contentListen,
+    sessionClear: sessionClear
+  };
+})(window);
+
+</script>
+<script>
+/* ── ingebouwde vk-cinab.js ── */
+/* ══════════════════════════════════════════════════════════════════════════
+   vk-cinab.js — Cluster B / Blok 1: koppeling, betaalmuur, rapport-opslaan
+   Glue tussen de ONGEWIJZIGDE module-client (cinab-tool-client.js) en de
+   inline fase-scripts. De client wordt NIET herschreven; deze laag roept
+   alleen zijn publieke API aan en bridget naar window.VK_CINAB.
+
+   Vereist (per fase, in deze volgorde geladen):
+     <script type="module">
+       import { startCinabSession, createCinabClient, CinabError }
+         from './cinab-tool-client.js';
+       window.__cinabLib = { startCinabSession, createCinabClient, CinabError };
+       window.dispatchEvent(new Event('cinab-lib-ready'));
+     <\/script>
+   Optioneel (voor RTDB-state t.b.v. pay-resume): vk-firebase.js (window.vkFb).
+
+   Alles draait ALLEEN in VK_LIVE; ontbreekt platform/lib, dan geeft elke functie
+   netjes null/false terug en draait de tool zelfstandig verder (demo/lokaal).
+   ══════════════════════════════════════════════════════════════════════════ */
+(function (global) {
+  'use strict';
+
+  var SS_KEY = 'vk_cinab';   // sessionStorage: token (capability) + poortconfig — NIET in URL/localStorage-at-rest
+
+  function libReady() {
+    return new Promise(function (resolve) {
+      if (global.__cinabLib) return resolve(global.__cinabLib);
+      var done = false;
+      global.addEventListener('cinab-lib-ready', function () { if (!done) { done = true; resolve(global.__cinabLib); } }, { once: true });
+      setTimeout(function () { if (!done) { done = true; resolve(global.__cinabLib || null); } }, 8000);
+    });
+  }
+
+  function saveCtx(ctx) { try { sessionStorage.setItem(SS_KEY, JSON.stringify(ctx)); } catch (e) {} }
+  function loadCtx()    { try { return JSON.parse(sessionStorage.getItem(SS_KEY) || 'null'); } catch (e) { return null; } }
+  function clearCtx()   { try { sessionStorage.removeItem(SS_KEY); } catch (e) {} }
+  function urlParam(n)  { try { return new URLSearchParams(global.location.search).get(n); } catch (e) { return null; } }
+
+  /* ── Fase 0: verse start (launch→token) of resume → client + context bewaren ── */
+  async function bootstrap() {
+    var lib = await libReady();
+    if (!lib) return null;
+    try {
+      var client = await lib.startCinabSession();           // leest ?launch/?token/?cinab/?action; wist ze uit de URL
+      saveCtx({
+        apiBase: client.apiBase, token: client.token,
+        betaalVanafFase: client.betaalVanafFase, credits: client.credits,
+        parentRapportId: client.parentRapportId || null
+      });
+      try { client.notifyLoaded(); } catch (e) {}
+      return client;
+    } catch (e) { return null; }                            // geen platform-context → tool draait zelfstandig
+  }
+
+  /* ── Andere fasen: client herstellen uit sessionStorage (token reist niet in de URL) ── */
+  async function restore() {
+    var lib = await libReady(); if (!lib) return null;
+    var ctx = loadCtx(); if (!ctx || !ctx.token || !ctx.apiBase) return null;
+    try {
+      return lib.createCinabClient({
+        apiBase: ctx.apiBase, token: ctx.token,
+        betaalVanafFase: ctx.betaalVanafFase, credits: ctx.credits,
+        parentRapportId: ctx.parentRapportId, action: urlParam('action')
+      });
+    } catch (e) { return null; }
+  }
+
+  /* ── Betaalpoort op de start van faseNr (werkboek §5.2). ──
+     resolve(true) = door; resolve(false) = stop/navigeert weg (koop of afbreken). */
+  async function gate(client, faseNr, opts) {
+    opts = opts || {};
+    if (!client || client.betaalVanafFase == null || faseNr < client.betaalVanafFase) return true;
+
+    // Terugkeer na betaling: idempotente retry (al betaald → no-op → door)
+    if (client.isResume) {
+      try { await client.settleSession(); return true; } catch (e) { /* val door naar de poort */ }
+    }
+
+    try { await client.getSaldo(); } catch (e) {}           // advisory, alleen UX
+
+    var credits = (client.credits != null) ? client.credits : null;
+    var vraag = opts.confirmText ||
+      ('Verder naar deze fase? ' + (credits != null ? ('Er worden ' + credits + ' credits afgeschreven.') : 'Er wordt saldo afgeschreven.'));
+    if (!global.confirm(vraag)) return false;               // gebruiker stopt → niets afgeschreven, sessie blijft (TTL)
+
+    try {
+      await client.settleSession();                         // bindend: atomisch + idempotent
+      return true;
+    } catch (e) {
+      if (e && e.isPaymentRequired) {
+        if (opts.beforePay) { try { await opts.beforePay(); } catch (_) {} }   // state persistent zetten vóór de redirect
+        try { global.VK_CINAB.__paying = true; } catch (_) {}                   // signaal voor de poort-UI (redirect ≠ annuleren)
+        client.goToPayment(e, { returnUrl: opts.returnUrl || global.location.href });
+        return false;                                       // navigeert weg naar de shop (window.top.location)
+      }
+      throw e;
+    }
+  }
+
+  /* ── Rapport opslaan (consumeert het token) + WordPress laten doorschakelen ── */
+  async function saveReport(client, wrapper) {
+    var out = await client.saveReport(wrapper);             // → { rapport_id, rapport_url }
+    if (out && out.rapport_url) { try { client.notifyCompleted(out.rapport_url); } catch (e) {} }
+    return out;
+  }
+
+  /* ── Wrapper bouwen uit de tool-state: 20 INK-dimensies + data_ref naar RTDB ── */
+  var INK_IDS = ['A1','A2','A3','A4','A5','A6','A7','A8','A9','A10','B1','B2','B3','B4','B5','B6','B7','B8','B9','B10'];
+
+  function buildWrapper(opts) {
+    opts = opts || {};
+    var p4 = {}; try { p4 = JSON.parse(localStorage.getItem('vk_phase4_scores') || '{}'); } catch (e) {}
+    var all = (p4 && p4.allScores && typeof p4.allScores === 'object') ? p4.allScores : {};
+    var scores = {};
+    INK_IDS.forEach(function (id) {
+      var r = all[id] || {}; var k = +r.k || 0, n = +r.n || 0, a = +r.a || 0; var tot = k + n + a;
+      scores[id.toLowerCase()] = tot ? Math.round((k * 100 + n * 50 + a * 0) / tot) : 50;  // geen stemmen → neutraal 50
+    });
+
+    var sess = {}; try { sess = JSON.parse(localStorage.getItem('vk_session') || '{}'); } catch (e) {}
+    var deelnemers = Array.isArray(sess.participants) ? sess.participants.length : (opts.deelnemers || 0);
+    var meta = {
+      organisatie: sess.org || sess.organisatie || '',
+      datum: new Date().toISOString().slice(0, 10),          // UTC ISO YYYY-MM-DD
+      deelnemers: deelnemers,
+      facilitator: sess.facilitator || sess.facilitatorName || sess.sessionName || ''
+    };
+    if (sess.sector) meta.sector = sess.sector;              // e-mailvrij: geen e-mail in meta
+
+    var code = sess.sessionCode || opts.sessionCode || '';
+    var data = { data_ref: { store: 'firebase-rtdb', path: '/sessions/' + code } };
+    if (opts.includeExport) data.export = collectExport();   // opaak; platform leest dit niet
+
+    return {
+      template_id: 'visiekaart',
+      schema_version: '1.0',
+      scores: scores,
+      meta: meta,
+      data: data,
+      parent_rapport_id: null                                // _cinab_is_vergelijkbaar = false
+    };
+  }
+
+  function collectExport() {
+    var keys = ['vk_session','vk_vision_sentence','vk_vision_keywords','vk_selected_themes',
+      'vk_confirmed_actions','vk_versnellers','vk_remmers','vk_phase4_scores','vk_roadmap_actions'];
+    var out = {};
+    keys.forEach(function (k) {
+      try {
+        var v = localStorage.getItem(k);
+        if (v == null) return;
+        try { out[k] = JSON.parse(v); } catch(e){ out[k] = v; }   // niet-JSON (bv. de visiezin) als ruwe string bewaren, niet droppen
+      } catch (e) {}
+    });
+    return out;
+  }
+
+  global.VK_CINAB = {
+    libReady: libReady, bootstrap: bootstrap, restore: restore, gate: gate,
+    saveReport: saveReport, buildWrapper: buildWrapper, collectExport: collectExport,
+    loadCtx: loadCtx, clearCtx: clearCtx
+  };
+})(window);
+
+</script>
+<script>
+/* ── Blok 2 leeskant: live deelnemer-antwoorden (fase 1) ── */
+(function(){
+  if (!VK_LIVE) return;
+  if (typeof VK_IS_PARTICIPANT !== 'undefined' && VK_IS_PARTICIPANT) return;  // alleen facilitator leest
+  function code(){ try { return (JSON.parse(localStorage.getItem('vk_session')||'{}')).sessionCode||''; } catch(e){ return ''; } }
+  function start(){
+    if (!window.vkFb) return;
+    var c=code(); if(!c) return;
+    vkFb.ensureSession(c,(typeof lang!=='undefined'?lang:'nl'))
+      .then(function(){ return vkFb.liveListen(c,'phase1/answers',function(arr){
+        var b=[[],[],[],[],[]];
+        (arr||[]).forEach(function(a){ var qi=(a&&typeof a.qi==='number')?a.qi:0; if(qi>=0&&qi<5) b[qi].push({text:(a&&a.text)||'',name:(a&&a.name)||''}); });
+        answers=b;
+        try{ if(typeof curQ==='number'&&answers[curQ]){ var ch=document.getElementById('ansCountChip'); if(ch) ch.textContent=answers[curQ].length+' / '+answers[curQ].length; } }catch(e){}
+      }); })
+      .catch(function(){});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
+})();
+</script>
+
+<!-- Twee-staps-start: eenmalige bevestig-popup vóór 'Starten met vraag 1' (zoals fase 0) -->
+<div id="startConfirmBackdrop" class="vk-tip-backdrop" onclick="vkF1ConfirmDismiss()"></div>
+<div id="startConfirmModal" class="vk-tip-popup" data-size="lg" role="dialog" aria-modal="true" aria-labelledby="t-startConfirmTitle">
+  <h3 class="vk-tip-title" id="t-startConfirmTitle">Hebben alle deelnemers de toelichting gelezen en is de vervolgaanpak voor iedereen duidelijk?</h3>
+  <div class="vk-tip-body"><p id="t-startConfirmBody"></p></div>
+  <div class="vk-tip-actions">
+    <button class="btn btn-orange" id="t-startConfirmBtn" onclick="vkF1ConfirmDismiss()" type="button">Akkoord</button>
+  </div>
+</div>
+<script>
+/* Twee-staps-start fase 1 (analoog aan fase 0): eerste klik op 'Starten met vraag 1'
+   toont eenmalig de bevestig-popup; na 'Akkoord' wordt de knop groen (armed) en
+   start de tweede klik vraag 1. Functiedeclaraties = globaal bereikbaar voor onclick. */
+var f1StartArmed = false;
+function vkF1StartGated(){
+  if (!f1StartArmed){ vkF1ConfirmShow(); return; }
+  startQ(0);
+}
+function vkF1ConfirmShow(){
+  var modal = document.getElementById('startConfirmModal');
+  var back  = document.getElementById('startConfirmBackdrop');
+  if (!modal || !back){ vkF1Arm(); return; }
+  back.classList.add('open');
+  modal.classList.add('open');
+  setTimeout(function(){ var b = document.getElementById('t-startConfirmBtn'); if (b) b.focus(); }, 50);
+}
+function vkF1ConfirmDismiss(){
+  var modal = document.getElementById('startConfirmModal');
+  var back  = document.getElementById('startConfirmBackdrop');
+  if (modal) modal.classList.remove('open');
+  if (back)  back.classList.remove('open');
+  vkF1Arm();
+}
+function vkF1Arm(){
+  f1StartArmed = true;
+  var btn = document.getElementById('introStartBtn');
+  if (btn){ btn.classList.add('armed'); btn.setAttribute('aria-pressed','true'); }
+}
+</script>
+</body>
+</html>

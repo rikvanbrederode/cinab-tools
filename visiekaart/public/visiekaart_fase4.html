@@ -1,0 +1,3286 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visiekaart v4 — Fase 4: Versnellers & remmers</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display:ital@0;1&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --orange:#FAA833;--oh:#D8901E;--ol:rgba(250,168,51,0.12);--ob:rgba(250,168,51,.28);
+  --green:#BDD24D;--gl:rgba(189,210,77,0.16);--gb:rgba(189,210,77,.32);--gd:#7B8E1E;
+  --purple:#9666AA;--pl:rgba(150,102,170,0.14);--pb:rgba(150,102,170,.28);--pd:#7E4F92;
+  --coral:#F05736;--red:#E8423F;--cll:rgba(240,87,54,0.10);--clb:rgba(240,87,54,.28);--cd:#B23B22;
+  --teal:#2A9791;--tl:rgba(42,151,145,0.14);--tb:rgba(42,151,145,.28);--td:#1F6E6A;
+  --blue:#70A2D7;--bl:rgba(112,162,215,0.15);
+  --amber:#FAA833;--al:rgba(250,168,51,0.12);
+  --bg:#F9F8F5;--surface:#FFF;
+  --b0:rgba(0,0,0,.07);--b1:rgba(0,0,0,.11);--b2:rgba(0,0,0,.18);
+  --text:#262A36;--t2:#5A5956;--t3:#9A9894;
+  --r:10px;--rsm:6px;--rlg:16px;--rxl:22px;
+  --sh:0 1px 3px rgba(0,0,0,.07),0 4px 14px rgba(0,0,0,.05);
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.55}
+.serif{font-family:'DM Serif Display',serif}
+
+/* ── HEADER ── */
+.hdr{background:var(--surface);border-bottom:1px solid var(--b0);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;cursor:pointer;padding-left:6px}
+.logo-img{height:32px;width:auto;display:block}
+/* ═══ VK SHARED LOGO STYLES ═══ */
+.logo-img .fil-logo-main   { fill:#2A9791; }
+.logo-img .fil-logo-shadow { fill:#2A9791; filter:brightness(0.5); }
+.logo-img .fil-logo-line   { fill:none; stroke:#F7A710; stroke-width:300; stroke-miterlimit:22.9256; }
+.logo-img .fil-logo-bar    { fill:#F7A710; }
+/* ═══ END VK SHARED LOGO STYLES ═══ */
+.hdr-mid{display:flex;align-items:center;gap:12px}
+.phase-pill{background:var(--gl);color:var(--gd);font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;border:1px solid var(--gb);letter-spacing:.06em;text-transform:uppercase}
+.q-steps{display:flex;gap:5px;width:180px}
+.q-step{flex:1;height:6px;border-radius:3px;background:var(--b0);transition:background .3s}
+.q-step.done{background:var(--green)}
+.q-step.active{background:var(--green)}
+.hdr-r{display:flex;align-items:center;gap:8px}
+.lang-toggle{display:flex;border:1px solid var(--b2);border-radius:var(--rsm);overflow:hidden}
+.lang-btn{padding:5px 11px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;border:none;background:transparent;cursor:pointer;color:var(--t3);letter-spacing:.04em;transition:all .13s}
+.lang-btn.on{background:var(--green);color:#fff}
+
+/* ── SESSIE-INFO PANEEL ── */
+.sess-bar{background:var(--surface);border-bottom:1px solid var(--b0);padding:0 28px}
+.sess-toggle{display:flex;align-items:center;gap:8px;padding:8px 0;font-size:12px;font-weight:600;color:var(--t2);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:.02em}
+.sess-toggle:hover{color:var(--text)}
+.sess-toggle .chev{transition:transform .2s ease}
+.sess-toggle.open .chev{transform:rotate(180deg)}
+.sess-toggle .sess-mini{color:var(--t3);font-weight:500;margin-left:6px}
+.sess-panel{max-height:0;overflow:hidden;transition:max-height .25s ease,padding .25s ease;padding:0 0;border-top:0 solid transparent}
+.sess-panel.open{max-height:240px;padding:14px 0 16px;border-top:1px solid var(--b0)}
+.sess-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 18px}
+.sess-item{display:flex;flex-direction:column;gap:2px;min-width:0}
+.sess-k{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3)}
+.sess-v{font-size:13px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border-radius:var(--rsm);border:1px solid var(--b2);background:var(--surface);color:var(--t2);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .13s}
+.btn:hover{background:var(--bg);color:var(--text)}
+.btn-green{background:var(--green);border-color:var(--gd);color:#fff}
+.btn-green:hover:not(:disabled){background:var(--gd);color:#fff}
+.btn-orange{background:var(--orange);border-color:var(--oh);color:#fff}
+.btn-orange:hover:not(:disabled){background:var(--oh);color:#fff}
+.btn-coral{background:var(--coral);border-color:var(--cd);color:#fff}
+.btn-coral:hover:not(:disabled){background:var(--cd);color:#fff}
+.btn-ghost{background:transparent;border-color:var(--b1);color:var(--t3);font-size:12px}
+.btn-ghost:hover{border-color:var(--b2);color:var(--t2);background:var(--bg)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important}
+.btn-lg{padding:12px 28px;font-size:15px;font-weight:600;border-radius:var(--r);box-shadow:0 2px 8px rgba(189,210,77,.25)}
+.btn-lg:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 14px rgba(189,210,77,.35)}
+
+/* ── LAYOUT ── */
+.wrap{max-width:920px;margin:0 auto;padding:30px 24px 100px}
+.card{background:var(--surface);border:1px solid var(--b0);border-radius:var(--rxl);padding:26px 28px;margin-bottom:16px;box-shadow:var(--sh)}
+.card-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid var(--b0)}
+.phase-num{width:38px;height:38px;border-radius:50%;background:var(--green);color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.card-title{font-size:16px;font-weight:600;color:var(--text)}
+.card-sub{font-size:13px;color:var(--t2);margin-top:2px}
+.divider{height:1px;background:var(--b0);margin:18px 0}
+
+/* ── INFO ICON + POPOVER ── */
+.info-icon{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--surface);border:1.5px solid var(--b2);color:var(--t2);font-size:11px;font-weight:700;font-style:italic;font-family:Georgia,serif;cursor:pointer;transition:all .13s;user-select:none;line-height:1;flex-shrink:0}
+.info-icon:hover{background:var(--gl);border-color:var(--gb);color:var(--gd)}
+.info-icon.on{background:var(--green);border-color:var(--gd);color:#fff}
+.info-popover{display:none;margin-top:10px;padding:12px 14px;background:var(--gl);border:1px solid var(--gb);border-radius:var(--rsm);font-size:12.5px;line-height:1.55;color:var(--text)}
+.info-popover.open{display:block;animation:fadeUp .22s ease forwards}
+
+/* ── VISION BOX ── */
+.vision-box{background:var(--ol);border:1px solid var(--ob);border-radius:var(--r);padding:14px 18px;margin-bottom:18px;display:flex;align-items:flex-start;gap:10px}
+.vision-icon{width:26px;height:26px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.vision-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--oh);margin-bottom:4px}
+.vision-text{font-size:14px;font-weight:500;color:var(--text);line-height:1.5}
+
+/* ── INTRO BLOK ── */
+.intro-block{padding:14px 16px;background:var(--bg);border:1px solid var(--b1);border-radius:var(--r);margin-bottom:14px}
+.intro-block-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.intro-block-title .dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+.intro-block-title .dot-r{background:var(--coral)}
+.intro-block p{font-size:13px;color:var(--t2);line-height:1.6}
+
+/* Two-column concept */
+.concept-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+.concept-col{border-radius:var(--r);padding:14px 16px;border:1px solid transparent}
+.concept-col.v{background:var(--gl);border-color:var(--gb)}
+.concept-col.r{background:var(--cll);border-color:var(--clb)}
+.cc-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.cc-title.v{color:var(--gd)}
+.cc-title.r{color:var(--cd)}
+.cc-body{font-size:13px;color:var(--t2);line-height:1.6}
+
+/* ── INTRO GRID (4 tiles) ── */
+.intro-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:18px 0}
+.intro-item{padding:14px 16px;background:var(--bg);border:1px solid var(--b1);border-radius:var(--r);display:flex;gap:10px;align-items:flex-start}
+.intro-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;font-weight:700;background:var(--gl);color:var(--gd)}
+.intro-icon svg{width:18px;height:18px}
+.intro-item-title{font-size:13px;font-weight:600;margin-bottom:2px}
+.intro-item-sub{font-size:12px;color:var(--t2)}
+
+/* ── THEMES OVERVIEW IN INTRO ── */
+.intro-themes-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.intro-theme-chip{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:20px;font-size:13px;font-weight:600}
+
+/* ── INSTRUCTION BOX ── */
+.instruction-box{background:var(--bl);border:1px solid rgba(112,162,215,.2);border-radius:var(--r);padding:16px 18px;margin-bottom:18px}
+.instruction-title{font-size:13px;font-weight:700;color:var(--blue);margin-bottom:8px;display:flex;align-items:center;gap:7px}
+.instruction-text{font-size:13px;color:var(--t2);line-height:1.7}
+
+/* ── STATEMENT CARDS ── */
+.section-head{display:flex;align-items:center;gap:10px;margin:20px 0 12px;padding:10px 14px;border-radius:var(--r);border:1px solid transparent}
+.sh-letter{width:32px;height:32px;border-radius:50%;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}
+.sh-title{font-size:14px;font-weight:700}
+.sh-sub{font-size:12px;color:var(--t2);margin-top:2px}
+.section-head.sec-A{background:var(--pl);border-color:var(--pb)}
+.section-head.sec-A .sh-letter{background:var(--purple)}
+.section-head.sec-A .sh-title{color:var(--purple)}
+.section-head.sec-B{background:var(--tl);border-color:var(--tb)}
+.section-head.sec-B .sh-letter{background:var(--teal)}
+.section-head.sec-B .sh-title{color:var(--teal)}
+
+.statement-card{background:var(--surface);border:1.5px solid var(--b1);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;transition:border-color .13s}
+.statement-card.answered-kracht{border-color:var(--gb);background:rgba(189,210,77,.05)}
+.statement-card.answered-aandachtspunt{border-color:var(--clb);background:rgba(240,87,54,.04)}
+.statement-card.answered-neutraal{border-color:var(--b2)}
+.sc-num{font-size:11px;font-weight:700;color:var(--t3);margin-bottom:4px;letter-spacing:.04em}
+.sc-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.sc-text{font-size:13px;color:var(--t2);line-height:1.5;margin-bottom:10px}
+.sc-options{display:flex;gap:7px;flex-wrap:wrap}
+.sc-opt{padding:5px 12px;border-radius:20px;border:1.5px solid var(--b2);font-size:12px;font-weight:600;cursor:pointer;transition:all .13s;font-family:'DM Sans',sans-serif;background:transparent;color:var(--t2)}
+.sc-opt:hover{border-color:var(--b2);background:var(--bg)}
+.sc-opt.selected-k{background:var(--green);border-color:var(--gd);color:#fff}
+.sc-opt.selected-n{background:var(--b2);border-color:var(--b2);color:var(--text)}
+.sc-opt.selected-a{background:var(--coral);border-color:var(--cd);color:#fff}
+
+/* ── DYNAMISCHE EIGEN INVOER ── */
+.custom-block{background:var(--surface);border:1.5px solid var(--b1);border-radius:var(--r);padding:14px 16px;margin-bottom:12px}
+.custom-block.v{border-left:4px solid var(--green)}
+.custom-block.r{border-left:4px solid var(--coral)}
+.custom-block-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.cb-icon{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}
+.cb-icon.v{background:var(--green)}
+.cb-icon.r{background:var(--coral)}
+.cb-title{font-size:13px;font-weight:700}
+.cb-title.v{color:var(--gd)}
+.cb-title.r{color:var(--cd)}
+.cb-sub{font-size:12px;color:var(--t2);margin-top:2px;width:100%}
+.custom-fields{display:flex;flex-direction:column;gap:8px}
+.custom-field{display:flex;align-items:center;gap:8px}
+.custom-num{width:22px;height:22px;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}
+.custom-num.v{background:var(--green)}
+.custom-num.r{background:var(--coral)}
+.custom-input{flex:1;padding:9px 13px;border:1.5px solid var(--b2);border-radius:var(--rsm);font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--surface);transition:border-color .13s}
+.custom-input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(189,210,77,.12)}
+.custom-input::placeholder{color:var(--t3)}
+.custom-remove{background:none;border:none;color:var(--t3);cursor:pointer;padding:2px 4px;font-size:16px;line-height:1;border-radius:var(--rsm)}
+.custom-remove:hover{color:var(--coral);background:var(--cll)}
+.add-custom-btn{margin-top:8px;border:1.5px dashed var(--b2);background:transparent;border-radius:var(--rsm);padding:8px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;font-size:12.5px;color:var(--t3);cursor:pointer;transition:all .13s;font-family:'DM Sans',sans-serif}
+.add-custom-btn:hover{border-color:var(--green);color:var(--gd);background:var(--gl)}
+.add-custom-btn.r:hover{border-color:var(--coral);color:var(--cd);background:var(--cll)}
+
+/* ── PROGRESS ── */
+.prog-wrap{height:5px;background:var(--b0);border-radius:3px;margin:6px 0}
+.prog-fill{height:100%;border-radius:3px;background:var(--green);transition:width .4s}
+
+/* ── LIVE COUNT ── */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite;display:inline-block}
+.count-chip{background:var(--gl);color:var(--gd);border:1px solid var(--gb);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:700}
+.count-row{display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+
+/* ── RANKING VIEW ── */
+.rank-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.rank-panel{border-radius:var(--rxl);border:1px solid transparent;overflow:hidden}
+.rank-panel-head{padding:16px 20px;display:flex;align-items:center;gap:10px}
+.rph-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rph-title{font-size:15px;font-weight:700}
+.rph-sub{font-size:12px;opacity:.85;margin-top:1px}
+.rank-list{padding:8px 12px 14px}
+/* versnellers panel */
+.vp{background:var(--gl);border-color:var(--gb)}
+.vp .rank-panel-head{background:rgba(189,210,77,.18)}
+.vp .rph-icon{background:var(--green)}
+.vp .rph-title,.vp .rph-sub{color:var(--gd)}
+/* remmers panel */
+.rp{background:var(--cll);border-color:var(--clb)}
+.rp .rank-panel-head{background:rgba(240,87,54,.1)}
+.rp .rph-icon{background:var(--coral)}
+.rp .rph-title,.rp .rph-sub{color:var(--cd)}
+/* rank items */
+.rank-item{display:flex;align-items:flex-start;gap:10px;padding:9px 10px;border-radius:var(--rsm);margin-bottom:5px;cursor:grab;transition:border-color .15s,box-shadow .15s,opacity .15s;border:1px solid transparent;background:var(--surface)}
+.rank-item:hover{border-color:var(--b1);box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.rank-item.dragging{opacity:.4}
+.rank-item.drag-over{border-color:var(--green);background:rgba(189,210,77,.06)}
+.rank-item.top5{background:var(--surface);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.rank-item.below5{opacity:.72}
+.ri-rank{width:24px;height:24px;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.top5 .ri-rank-v{background:var(--green);color:#fff}
+.top5 .ri-rank-r{background:var(--coral);color:#fff}
+.below5 .ri-rank-v{background:rgba(189,210,77,.18);color:var(--gd)}
+.below5 .ri-rank-r{background:rgba(240,87,54,.14);color:var(--cd)}
+.ri-body{flex:1;min-width:0}
+.ri-title{font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:2px;word-break:break-word;line-height:1.4}
+.ri-meta{display:flex;align-items:center;gap:6px;margin-top:4px}
+.ri-bar{flex:1;height:5px;border-radius:3px;background:var(--b0);overflow:hidden}
+.ri-bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.ri-bar-fill-v{background:var(--green)}
+.ri-bar-fill-r{background:var(--coral)}
+.ri-count{font-size:11px;font-weight:600;white-space:nowrap}
+.ri-src{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-left:6px}
+.ri-drag{color:var(--t3);font-size:14px;letter-spacing:-1px;cursor:grab;padding:0 2px;flex-shrink:0;margin-top:2px;user-select:none}
+.top5-divider{height:2px;border-radius:2px;margin:8px 0}
+.top5-divider-v{background:linear-gradient(90deg,var(--gb),transparent)}
+.top5-divider-r{background:linear-gradient(90deg,var(--clb),transparent)}
+.rank-empty{font-size:12px;color:var(--t3);font-style:italic;text-align:center;padding:14px}
+
+/* ── AI LOADING ── */
+.ai-load{text-align:center;padding:44px 20px}
+.ai-dots{display:flex;gap:8px;justify-content:center;margin-bottom:18px}
+.ai-dot{width:10px;height:10px;border-radius:50%;background:var(--green)}
+.ai-dot:nth-child(1){animation:pulse .9s ease-in-out infinite}
+.ai-dot:nth-child(2){animation:pulse .9s .2s ease-in-out infinite}
+.ai-dot:nth-child(3){animation:pulse .9s .4s ease-in-out infinite}
+
+/* ── BOT BAR ── */
+.bot-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.93);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--b0);padding:12px 28px;display:flex;justify-content:space-between;align-items:center;z-index:100;gap:12px}
+.bot-info{font-size:13px;color:var(--t2);flex:1;text-align:center}
+
+/* ── FINAL ── */
+.view-toggle{display:flex;background:var(--bg);border:1px solid var(--b2);border-radius:var(--r);padding:3px;gap:2px;width:fit-content}
+.vt-btn{padding:7px 18px;border-radius:var(--rsm);font-size:13px;font-weight:500;border:none;background:transparent;cursor:pointer;color:var(--t2);transition:all .13s;font-family:'DM Sans',sans-serif}
+.vt-btn.on{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.final-two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+.final-list-block{background:var(--surface);border-radius:var(--r);padding:16px 18px;border:1px solid var(--b0)}
+.flb-head{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.flb-head.v{color:var(--gd)}
+.flb-head.r{color:var(--cd)}
+.final-list-item{display:flex;align-items:baseline;gap:8px;padding:7px 0;border-bottom:1px solid var(--b0);font-size:13px;line-height:1.4}
+.final-list-item:last-child{border-bottom:none}
+.fli-num{font-size:11px;font-weight:700;flex-shrink:0;width:18px}
+.fli-num.v{color:var(--green)}
+.fli-num.r{color:var(--coral)}
+.fli-src{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-left:6px;white-space:nowrap}
+.outcome-block{background:var(--bl);border:1px solid rgba(112,162,215,.22);border-radius:var(--r);padding:14px 18px;margin:14px 0;font-size:13px;color:var(--t2);line-height:1.65}
+.outcome-block strong{color:var(--text)}
+
+/* ── CANVAS ── */
+.canvas-wrap{background:var(--surface);border-radius:var(--rxl);border:1px solid var(--b0);box-shadow:var(--sh);overflow:hidden}
+.canvas-note{padding:11px 20px;background:var(--bg);border-top:1px solid var(--b0);font-size:12px;color:var(--t3);text-align:center}
+.canvas-legend{padding:16px 22px;background:var(--bg);border-top:1px solid var(--b0)}
+.canvas-legend-title{font-size:12px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.canvas-legend-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.cl-col-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.cl-col-title.v{color:var(--gd)}
+.cl-col-title.r{color:var(--cd)}
+.cl-list-item{display:flex;gap:6px;font-size:12px;color:var(--t2);line-height:1.5;padding:3px 0}
+.cl-list-num{font-weight:700;flex-shrink:0;min-width:18px}
+.cl-list-num.v{color:var(--green)}
+.cl-list-num.r{color:var(--coral)}
+.cl-themes-list{display:flex;flex-direction:column;gap:6px;margin-top:14px;padding-top:14px;border-top:1px dashed var(--b0)}
+.cl-theme-row{display:flex;align-items:center;gap:8px;font-size:12px}
+.cl-theme-bullet{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+.cl-theme-name{font-weight:600}
+
+/* ── SCREENS ── */
+.screen{display:none}.screen.open{display:block}
+/* ═══ VK SHARED SCROLL WRAPPER (v4b) ═══ */
+/* Lost de schermafkapping op: de inhoud van het actieve scherm scrollt nu
+   onafhankelijk binnen het zichtbare gebied, bóven de vaste bot-bar. Hierdoor
+   valt geen tekst meer weg — robuust in zowel test/preview-iframe als live. */
+.screen.open{max-height:calc(100vh - 168px);overflow-y:auto;overflow-x:hidden;padding-right:6px;scrollbar-width:thin;scrollbar-color:var(--b1) transparent}
+.screen.open::-webkit-scrollbar{width:8px}
+.screen.open::-webkit-scrollbar-track{background:transparent}
+.screen.open::-webkit-scrollbar-thumb{background:var(--b1);border-radius:4px}
+.screen.open::-webkit-scrollbar-thumb:hover{background:var(--t3)}
+body.sess-open .screen.open{max-height:calc(100vh - 250px)}
+@media(max-width:640px){.screen.open{max-height:calc(100vh - 190px)}}
+/* ═══ END VK SHARED SCROLL WRAPPER (v4b) ═══ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.anim{animation:fadeUp .3s ease forwards}
+/* v4b-fix: schermen faden zónder transform — een transform-animatie maakt het
+   scherm tot containing-block, waardoor de vaste .bot-bar in het scrollgebied
+   gevangen raakt en inhoud bedekt. Alleen schermen krijgen deze fade; de
+   slide-animatie (fadeUp) blijft voor alle overige .anim-elementen behouden. */
+@keyframes vkScreenFade{from{opacity:0}to{opacity:1}}
+.screen.anim{animation:vkScreenFade .3s ease forwards}
+
+/* ── PARTICIPANT VIEW ── */
+.pview{display:none;min-height:100vh;background:var(--bg);padding:26px 18px}
+.pview.open{display:block}
+.pcard{background:var(--surface);border-radius:var(--rxl);border:1px solid var(--b0);box-shadow:var(--sh);padding:24px;max-width:560px;margin:0 auto}
+.pcard-wide{max-width:640px}
+.p-back{display:block;text-align:right;max-width:640px;margin:0 auto 12px}
+.wait-screen{text-align:center;padding:36px 20px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:24px;height:24px;border:2.5px solid var(--b1);border-top-color:var(--green);border-radius:50%;animation:spin .9s linear infinite;margin:0 auto 14px}
+.p-summary{background:var(--gl);border:1px solid var(--gb);border-radius:var(--r);padding:14px 16px;margin-bottom:14px}
+.p-summary-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gd);margin-bottom:5px}
+.p-summary-text{font-size:13px;color:var(--text);line-height:1.55}
+.p-facilitator{font-size:12px;color:var(--t2);margin-top:8px}
+
+/* ── POPUP + MODAL ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.overlay.open{display:flex;animation:fadeUp .2s ease forwards}
+.popup{background:var(--surface);border-radius:var(--rxl);padding:28px 30px;max-width:480px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.popup-icon{width:46px;height:46px;border-radius:50%;background:var(--al);color:var(--amber);font-size:24px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.popup-title{font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:8px;text-align:center}
+.popup-body{font-size:14px;color:var(--t2);line-height:1.6;margin-bottom:16px}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.modal.open{display:flex;animation:fadeUp .2s ease forwards}
+.modal-card{background:var(--surface);border-radius:var(--rxl);padding:30px 32px;max-width:560px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2);max-height:80vh;overflow-y:auto}
+.modal-card h3{font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:14px;color:var(--text)}
+.modal-card p{font-size:14px;color:var(--t2);line-height:1.7;margin-bottom:14px}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+
+/* ═══ VK SHARED TIP POPUP (verenigde stijl, accent: green voor F4) ═══ */
+.vk-tip-backdrop{display:none;position:fixed;inset:0;background:rgba(38,42,54,.55);z-index:999}
+.vk-tip-backdrop.open{display:block}
+.vk-tip-popup{display:none;position:fixed;background:var(--surface);border-radius:var(--rxl);box-shadow:0 12px 40px rgba(0,0,0,.22);z-index:1000;font-family:'DM Sans',sans-serif;animation:vkTipIn .18s ease}
+@keyframes vkTipIn{from{opacity:0;transform:translateY(6px) scale(.985)}to{opacity:1;transform:none}}
+.vk-tip-popup.open{display:flex;flex-direction:column}
+.vk-tip-popup[data-size="lg"]{top:5vh;left:50%;transform:translateX(-50%);max-width:640px;width:calc(100% - 40px);max-height:90vh;padding:32px 36px 28px}
+.vk-tip-popup[data-size="lg"].open{transform:translateX(-50%)}
+.vk-tip-popup[data-size="sm"]{max-width:340px;padding:14px 16px 12px}
+.vk-tip-popup .vk-tip-close{position:absolute;top:10px;right:12px;width:30px;height:30px;background:var(--surface);border:1px solid var(--b1);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--t2);padding:0;line-height:1;transition:all .13s}
+.vk-tip-popup .vk-tip-close:hover{background:var(--bg);color:var(--text)}
+.vk-tip-popup[data-size="sm"] .vk-tip-close{width:22px;height:22px;font-size:14px;top:6px;right:6px;border-color:var(--b0)}
+.vk-tip-popup .vk-tip-title{font-family:'DM Serif Display',serif;color:var(--text);margin:0 36px 4px 0;letter-spacing:-0.01em}
+.vk-tip-popup[data-size="lg"] .vk-tip-title{font-size:22px}
+.vk-tip-popup[data-size="sm"] .vk-tip-title{font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;margin-right:28px}
+.vk-tip-popup .vk-tip-sub{font-size:13px;color:var(--t2);margin-bottom:22px}
+.vk-tip-popup[data-size="sm"] .vk-tip-sub{display:none}
+.vk-tip-popup .vk-tip-body{color:var(--t2);line-height:1.7;overflow-y:auto}
+.vk-tip-popup[data-size="lg"] .vk-tip-body{font-size:13.5px;max-height:calc(90vh - 140px)}
+.vk-tip-popup[data-size="sm"] .vk-tip-body{font-size:12.5px;line-height:1.55}
+.vk-tip-popup .vk-tip-body p{margin:0 0 10px}
+.vk-tip-popup .vk-tip-body p:last-child{margin-bottom:0}
+.vk-tip-popup .vk-tip-h{font-size:14px;font-weight:700;color:var(--green);margin:16px 0 5px;display:flex;align-items:center;gap:7px}
+.vk-tip-popup .vk-tip-h:first-child{margin-top:0}
+.vk-tip-popup .vk-tip-h::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--green);flex-shrink:0}
+.vk-tip-popup .vk-tip-actions{display:flex;justify-content:flex-end;margin-top:18px}
+.vk-tip-popup[data-size="sm"] .vk-tip-actions{display:none}
+@media(max-width:520px){
+  .vk-tip-popup[data-size="sm"]{left:20px !important;right:20px !important;max-width:none;width:auto}
+  .vk-tip-popup[data-size="lg"]{padding:24px 22px 20px}
+}
+/* ═══ END VK SHARED TIP POPUP ═══ */
+
+/* ═══ VK SHARED CUMULATIVE RESULTS STYLES (F4: stip → thema's → versnellers/remmers → acties) ═══ */
+.vk-cum-wrap{margin-top:18px;padding-top:18px;border-top:1px solid var(--b0)}
+.vk-cum-section{margin-bottom:18px}
+.vk-cum-section:last-child{margin-bottom:0}
+.vk-cum-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:8px}
+.vk-cum-stip{font-size:14.5px;line-height:1.55;color:var(--text);padding:10px 14px;background:rgba(252,196,41,.12);border-left:3px solid #FCC429;border-radius:6px}
+.vk-cum-themes{display:flex;flex-wrap:wrap;gap:6px}
+.vk-cum-theme-pill{padding:4px 10px;border-radius:14px;font-size:12px;font-weight:600;color:#fff}
+.vk-cum-vr-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.vk-cum-vr-grid{grid-template-columns:1fr}}
+.vk-cum-vr-block{padding:10px 12px;border-radius:6px;background:var(--bg);border-left:3px solid var(--b2)}
+.vk-cum-vr-block.v{border-left-color:var(--green)}
+.vk-cum-vr-block.r{border-left-color:var(--coral, #E8423F)}
+.vk-cum-vr-label{font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
+.vk-cum-vr-list{font-size:12.5px;color:var(--t2);line-height:1.5;padding-left:18px;margin:0}
+.vk-cum-vr-list li{list-style:disc;margin-bottom:2px}
+.vk-cum-actions-block{margin-bottom:12px;padding:10px 12px;border-radius:6px;background:var(--bg);border-left:3px solid var(--b2)}
+.vk-cum-actions-block:last-child{margin-bottom:0}
+.vk-cum-actions-theme{font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:4px}
+.vk-cum-actions-list{font-size:12.5px;color:var(--t2);line-height:1.6;padding-left:18px;margin:0}
+.vk-cum-actions-list li{list-style:disc}
+/* ═══ END VK SHARED CUMULATIVE RESULTS STYLES ═══ */
+
+/* ═══ VK SHARED FINAL ACTIONS STYLES (eindscherm met aanpassen-knop) ═══ */
+.vk-final-actions{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.vk-back-edit-btn{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;color:var(--t2)}
+.vk-back-edit-btn:hover{color:var(--text);background:var(--bg)}
+.vk-back-edit-btn svg{color:var(--t3)}
+.vk-back-edit-btn:hover svg{color:var(--text)}
+/* ═══ END VK SHARED FINAL ACTIONS STYLES ═══ */
+
+@media(max-width:640px){
+  .rank-cols{grid-template-columns:1fr}
+  .concept-grid{grid-template-columns:1fr}
+  .final-two-col{grid-template-columns:1fr}
+  .canvas-legend-cols{grid-template-columns:1fr}
+  .intro-grid{grid-template-columns:1fr}
+  .hdr{padding:0 14px}.wrap{padding:20px 14px 100px}
+  .card{padding:18px 16px}.bot-bar{padding:10px 14px;flex-wrap:wrap;gap:8px}
+  .sess-bar{padding:0 14px}
+}
+
+/* ═══ VK FASE-EXPRESSIE VARS (fase-specifiek) ═══ */
+:root{ --fase-accent:#F05736; --fase-accent-text:#262A36; --fase-nummer:"4"; }
+
+/* ═══ VK SHARED EXPRESSIE (v1) — byte-identiek in alle fasebestanden, in één keer wijzigen ═══
+   Expressielaag conform CINAB-EXPRESSIE-STIJL: uitsluitend tokens, geen gradients,
+   geen alpha-kleurtinten, betekenis nooit alleen via kleur, reduced-motion gerespecteerd.
+   Methodiek-DNA Visiekaart: de oranje stip op de horizon + vijf vaste themakleuren. */
+:root{
+  --vk-ex-stip:#FAA833;   /* signatuurkleur: de stip op de horizon (zon) */
+  --vk-ex-line:#E5E3DB;   /* tone-on-tone watermerk- en rasterkleur */
+  --vk-ex-card:#FFFFFF;
+  --vk-ex-t1:#70A2D7;     /* thema 1 · Klantgerichtheid */
+  --vk-ex-t2:#BDD24D;     /* thema 2 · Kwaliteit & processen */
+  --vk-ex-t3:#F05736;     /* thema 3 · Medewerkers & ontwikkeling */
+  --vk-ex-t4:#9666AA;     /* thema 4 · Digitalisering */
+  --vk-ex-t5:#2A9791;     /* thema 5 · Samenwerking */
+  --vk-ex-inset:inset 0 0 0 1px rgba(0,0,0,.12); /* goedgekeurde speelstuk-schaduw */
+}
+
+/* ── E1 · fase-accent ── */
+.hdr,.header,.phdr,.print-bar{border-bottom:3px solid var(--fase-accent)}
+.phase-pill{background:var(--fase-accent);color:var(--fase-accent-text);border:1px solid var(--fase-accent)}
+.phase-num,.step-num,.phase-icon,.q-num{background:var(--fase-accent);color:var(--fase-accent-text);box-shadow:var(--vk-ex-inset)}
+
+/* ── E2 · methodiek-DNA in micro-vormen ── */
+.card,.pcard{border-left:6px solid var(--fase-accent)}
+.card-title::before{content:'';display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--vk-ex-stip);box-shadow:var(--vk-ex-inset);margin-right:7px;vertical-align:1px}
+.card-head,.q-meta{position:relative;border-bottom:2px dotted var(--vk-ex-line);padding-bottom:16px;margin-bottom:22px}
+
+/* ── F2 · themaladder als ornament op de bordlijn ── */
+.card-head::before,.q-meta::before{content:'';position:absolute;left:0;bottom:-5px;width:8px;height:8px;border-radius:50%;background:var(--vk-ex-t1);box-shadow:14px 0 0 var(--vk-ex-t2),28px 0 0 var(--vk-ex-t3),42px 0 0 var(--vk-ex-t4),56px 0 0 var(--vk-ex-t5)}
+
+/* ── E3 + F1 · watermerk en accentstreep (DM Serif Display, afsprakenblad leidend) ── */
+.phase-header{position:relative}
+/* Groot fasecijfer (Optie 1): uitsluitend op de startpagina van elke fase.
+   Fase 1-5 = introscherm (#sIntro); fase 0 = .phase-header (eigen startpagina).
+   Geen wisselende tekens (?, 123, vinkje) meer en niet meer op werkschermen,
+   dus geen overlap met fase-gegevens. */
+#sIntro .card:first-of-type{position:relative}
+#sIntro .card:first-of-type::after,.phase-header::after{content:var(--fase-nummer);position:absolute;font-family:'DM Serif Display',serif;font-weight:600;font-size:84px;line-height:1;letter-spacing:-.025em;color:var(--vk-ex-line);pointer-events:none;user-select:none;z-index:0}
+.phase-header::after{right:0;top:-10px}
+#sIntro .card:first-of-type::after{right:22px;top:16px}
+.card:first-of-type .card-head .card-title::after,.card:first-of-type .q-text::after,.phase-title::after{content:'';display:block;width:56px;height:5px;border-radius:3px;background:var(--fase-accent);margin-top:8px}
+@media(max-width:900px){#sIntro .card:first-of-type::after,.phase-header::after{display:none!important}}
+
+/* ── E4 + F3 · beweging en voortgang ── */
+.card,.pcard{transition:transform .15s ease,box-shadow .15s ease}
+.card:hover,.pcard:hover{transform:translateY(-2px);box-shadow:0 2px 5px rgba(0,0,0,.08),0 8px 22px rgba(0,0,0,.09)}
+.btn:hover:not(:disabled){transform:translateY(-1px)}
+.q-steps{align-items:center}
+.q-step{flex:0 0 11px;height:11px;border-radius:50%;background:var(--vk-ex-line);box-shadow:var(--vk-ex-inset)}
+.q-step.done{background:var(--vk-ex-stip)}
+.q-step.active{background:var(--fase-accent);box-shadow:var(--vk-ex-inset),0 0 0 2px var(--vk-ex-card),0 0 0 3px var(--fase-accent)}
+
+/* ── F4 · wachtschermen: trio speelstukken (zon + twee themacirkels) ── */
+@keyframes vkExPulse{0%,100%{opacity:1}50%{opacity:.45}}
+.wait-screen .spinner{width:16px;height:16px;border:none;border-radius:50%;background:var(--vk-ex-stip);box-shadow:var(--vk-ex-inset),12px 0 0 var(--vk-ex-t1),24px 0 0 var(--vk-ex-t2);position:relative;left:-12px;margin:0 auto 16px;animation:vkExPulse 1.6s ease-in-out infinite}
+
+/* ── F5 · rasterwatermerk + R-watermerk (alleen rapport; klassen bestaan alleen daar) ── */
+.section-head{position:relative;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Cpath d='M14 0H0v14' fill='none' stroke='%23E5E3DB' stroke-width='1'/%3E%3C/svg%3E")}
+.section-head::after{content:var(--fase-nummer);position:absolute;right:16px;top:50%;transform:translateY(-50%);font-family:'DM Serif Display',serif;font-weight:600;font-size:44px;line-height:1;color:var(--vk-ex-line);pointer-events:none;user-select:none;z-index:0}
+@media(max-width:900px){.section-head::after{display:none!important}}
+
+/* ── A11y · reduced motion ── */
+@media (prefers-reduced-motion:reduce){
+  .card,.pcard,.btn,.q-step{transition:none!important}
+  .card:hover,.pcard:hover,.btn:hover:not(:disabled){transform:none!important}
+  .wait-screen .spinner{animation:none!important}
+}
+/* ═══ END VK SHARED EXPRESSIE (v1) ═══ */
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ FACILITATOR VIEW ═══════════════ -->
+<div id="facView">
+  <header class="hdr">
+    <a class="logo" onclick="goPhase3()" role="button" tabindex="0" aria-label="Terug naar fase 3">
+      <svg class="logo-img" xmlns="http://www.w3.org/2000/svg" viewBox="6392 11502 7040 7040" aria-hidden="true" focusable="false">
+        <rect class="fil-logo-shadow" x="6542.13" y="11652.68" width="6840.47" height="6840.47" rx="625.64" ry="625.64"/>
+        <rect class="fil-logo-main"   x="6492.13" y="11602.68" width="6840.47" height="6840.47" rx="625.64" ry="625.64"/>
+        <path class="fil-logo-line" d="M8459.51 11340.66l6.77 2886.05c0.53,225.18 44.93,223.19 131.76,299.11 64.53,56.42 712.98,613.44 1067.73,922.39m279.67 498.36c-3.85,335.14 -17.51,1600.45 -22.09,2025.82m-1460.38 -5160.51l785.98 4.94m3662.81 274.39l-6.72 591.26 -710.88 10.16 0 978.81m-1557.05 3300.95c-5.59,-19.68 -10.23,-41.55 -13.66,-65.97 -40.62,-289.42 -55.5,-1603.06 -55.5,-1603.06m0 0l-12.4 -1458.25c0,0 -44.42,-161.55 137.32,-169.63 181.74,-8.08 658.3,-4.04 658.3,-4.04l-3.77 -1608.68m459.06 3230.04l-615.21 -562.61m1311.37 -167.26l-1179.41 -4.13m-1388.18 1333.84l1210.17 -1126.72c0,0 173.66,-113.07 201.93,-286.74 28.27,-173.67 4.04,-807.74 4.04,-807.74l1579.11 0c0,0 10.18,8.09 137.31,-44.42 53.21,-21.98 127.68,-100.56 196.29,-184.51m-4091.56 3529.88c18.68,-34.96 33.6,-74 38.36,-114.44 16.15,-137.31 24.23,-1514.5 24.23,-1514.5 0,0 -4.03,-137.32 -72.69,-185.78 -68.66,-48.46 -665.89,-556.18 -665.89,-556.18m-467.07 653.4l469.73 -451.59c0,0 69.04,-77 -2.66,-201.81m-1213.8 -2.13l1213.8 2.13 -29.21 -897.55 -563.22 -1.72m-1022.85 -1671.85l3.28 541.68c0,0 -10.23,140.69 117.67,140.69 127.9,0 600.9,26.88 600.9,26.88l-1 659.21m-302.89 299.12l-178.2 -1.97c0,0 -220.41,18.58 -300.07,-21.25 -41.28,-20.64 -175.23,-151.79 -294.75,-273.38m1035.23 -2176.98l5.68 516.43 895.89 -2.1m2.16 920.01l2255.42 21.86m-1471.05 -1258.2l-0.37 394.45 -2.13 2268.51m2268.36 -3395.11c-121.47,117.05 -302.96,241.2 -548.07,278.79m-1062.71 -1009.16l-14.83 1611m313.94 307.52l452.12 4 9.35 -663.77m8.52 -604.84l5.09 -361.34m1408.26 1081.76l-2065.77 2035.4c-50.75,50 -106.04,79.05 -108.71,151.99 -1.64,44.93 10.93,491.27 20.85,827.53m-1774.69 2623.29l879.79 0 134 0 720.63 0 30.4 0 713.76 0 217.25 0 802.66 0 0 323.39 -3498.49 0 0 -323.39z"/>
+        <rect class="fil-logo-bar" x="8158.53" y="17972.39" width="3395.02" height="332.88"/>
+      </svg>
+    </a>
+    <div class="hdr-mid">
+      <div class="q-steps" id="qStepsBar"></div>
+      <span class="phase-pill" id="t-phasePill">Fase 4 · Versnellers &amp; remmers</span>
+    </div>
+    <div class="hdr-r">
+      <button class="btn btn-ghost" data-env="dev-only" onclick="showPView()" id="t-pvBtn" aria-label="Open deelnemer-view">Deelnemer-view →</button>
+      <button class="btn btn-ghost" data-env="dev-only" onclick="resetDemoData()" aria-label="Reset demo-data" title="Reset demo-data" style="padding:6px 10px">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M2 7a5 5 0 0 1 8.5-3.5L12 5M12 2v3h-3M12 7a5 5 0 0 1-8.5 3.5L2 9M2 12V9h3"/></svg>
+      </button>
+      <div class="lang-toggle" role="group" aria-label="Taalkeuze">
+        <button class="lang-btn on" id="lNL" onclick="setLang('nl')" aria-label="Nederlands">NL</button>
+        <button class="lang-btn" id="lEN" onclick="setLang('en')" aria-label="English">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ──────── SESSIE-INFO PANEEL ──────── -->
+  <div class="sess-bar" id="sessBar" style="display:none">
+    <button class="sess-toggle" id="sessToggle" onclick="toggleSessPanel()" aria-expanded="false" aria-controls="sessPanel">
+      <svg class="chev" width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 4.5L6 7.5L9 4.5"/></svg>
+      <span id="t-sessTitle">Sessie-info</span>
+      <span class="sess-mini" id="sessMini"></span>
+    </button>
+    <div class="sess-panel" id="sessPanel" role="region" aria-label="Sessiecontext">
+      <div class="sess-grid" id="sessGrid"></div>
+    </div>
+  </div>
+
+  <main class="wrap">
+
+    <!-- ──── INTRO ──── -->
+    <div id="sIntro" class="screen open anim">
+      <div class="card">
+        <div class="card-head">
+          <div class="phase-num">4</div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="card-title serif" style="font-size:22px" id="t-introTitle">Fase 4 — Versnellers &amp; remmers</div>
+              <span class="info-icon" onclick="event.stopPropagation();vkInfoOpen('infoIntro',this)" role="button" tabindex="0" aria-label="Uitleg over deze fase">i</span>
+            </div>
+            <div class="card-sub" id="t-introSub">Individueel scoren, eigen toevoegingen, gezamenlijke rangorde, input voor de roadmap</div>
+          </div>
+        </div>
+
+        <div class="vision-box">
+          <div class="vision-icon">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="5" stroke="white" stroke-width="1.3"/><circle cx="6" cy="6" r="2" fill="white"/></svg>
+          </div>
+          <div>
+            <div class="vision-label" id="t-visionLabel">Onze stip op de horizon</div>
+            <div class="vision-text" id="visionSentence">Laden…</div>
+          </div>
+        </div>
+
+        <!-- Wat-blok -->
+        <div class="intro-block">
+          <div class="intro-block-title"><span class="dot"></span><span id="t-introWhatTitle">Wat zijn versnellers en remmers?</span></div>
+          <p id="t-introWhatBody"></p>
+        </div>
+
+        <!-- Concept versnellers + remmers naast elkaar -->
+        <div class="concept-grid">
+          <div class="concept-col v">
+            <div class="cc-title v">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 12V4M3 8l4-4 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span id="t-versnellersTitle">Versnellers</span>
+            </div>
+            <div class="cc-body" id="t-versnellersBody"></div>
+          </div>
+          <div class="concept-col r">
+            <div class="cc-title r">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 2v8M3 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span id="t-remmersTitle">Remmers</span>
+            </div>
+            <div class="cc-body" id="t-remmersBody"></div>
+          </div>
+        </div>
+
+        <!-- Hoe-blok -->
+        <div class="intro-block">
+          <div class="intro-block-title"><span class="dot"></span><span id="t-introHowTitle">Hoe werken we deze fase?</span></div>
+          <p id="t-introHowBody"></p>
+        </div>
+
+        <!-- 4 tiles -->
+        <div class="intro-grid" id="introGrid"></div>
+
+        <!-- Thema-overzicht -->
+        <div style="margin-top:14px">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:8px" id="t-themesLabel">Strategische thema's uit fase 2</div>
+          <div id="introThemesList" class="intro-themes-list"></div>
+        </div>
+      </div>
+      <div class="bot-bar">
+        <div class="bot-info" id="t-introBotInfo">Deelnemers zien het scoringformulier zodra je start</div>
+        <button class="btn btn-green btn-lg" onclick="goStep('wait')">
+          <span id="t-introStart">Fase 4 starten</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3.5 8h9M9 4l4 4-4 4"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ──── WAIT FOR INPUT ──── -->
+    <div id="sWait" class="screen anim">
+      <div class="card">
+        <div class="card-head">
+          <div class="phase-num">4</div>
+          <div>
+            <div class="card-title" id="t-waitTitle">Deelnemers scoren versnellers en remmers</div>
+            <div class="card-sub" id="t-waitSub">Elke deelnemer beoordeelt de stellingen en kan eigen versnellers en remmers toevoegen</div>
+          </div>
+        </div>
+        <div class="vision-box">
+          <div class="vision-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="5" stroke="white" stroke-width="1.3"/><circle cx="6" cy="6" r="2" fill="white"/></svg></div>
+          <div><div class="vision-label" id="t-visionLabel2">Onze stip op de horizon</div><div class="vision-text" id="visionSentence2">—</div></div>
+        </div>
+        <div class="count-row">
+          <span class="live-dot"></span>
+          <span style="font-size:13px;color:var(--t2)" id="t-deelLabel">Deelnemers</span>
+          <span class="count-chip" id="deelCount">0</span>
+          <span style="font-size:13px;color:var(--t2)" id="t-scoreLabel">Beoordelingen</span>
+          <span class="count-chip" id="scoreCount">0</span>
+          <span style="font-size:13px;color:var(--t2)" id="t-customLabel2">Eigen toevoegingen</span>
+          <span class="count-chip" id="customCount">0</span>
+        </div>
+        <div id="waitFeed" style="display:flex;flex-direction:column;gap:6px;min-height:48px"></div>
+      </div>
+      <div class="bot-bar">
+        <div class="bot-info" id="t-waitBot">Klik op 'Analyse starten' zodra je voldoende input hebt</div>
+        <button class="btn btn-green btn-lg" onclick="onClickAnalyse()" id="t-analyseBtn">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2 4h11M2 8h7M2 12h9"/></svg>
+          <span id="t-analyseLabel">Analyse starten</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ──── AI LOAD ──── -->
+    <div id="sAILoad" class="screen anim">
+      <div class="card">
+        <div class="ai-load">
+          <div class="ai-dots"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>
+          <p class="serif" style="font-size:22px;margin-bottom:8px" id="t-aiTitle">Scores worden geanalyseerd…</p>
+          <p style="font-size:13px;color:var(--t2)" id="t-aiSub">De stemmen worden geteld en de versnellers en remmers worden gerangschikt</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──── RANKING ──── -->
+    <div id="sRanking" class="screen anim">
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-head">
+          <div class="phase-num">4</div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="card-title" id="t-rankTitle">Rangorde versnellers &amp; remmers</div>
+              <span class="info-icon" onclick="event.stopPropagation();vkInfoOpen('infoRanking',this)" role="button" tabindex="0" aria-label="Uitleg over de rangorde">i</span>
+            </div>
+            <div class="card-sub" id="t-rankSub">Sleep items omhoog of omlaag om de volgorde aan te passen na discussie · top 5 is prominent weergegeven</div>
+          </div>
+        </div>
+        <div class="rank-cols" id="rankCols"></div>
+      </div>
+      <div class="bot-bar">
+        <div class="bot-info" id="t-rankBot">Bespreek de rangorde en pas aan waar nodig. De top 5 van beide lijsten weegt mee in de roadmap.</div>
+        <button class="btn btn-green btn-lg" onclick="confirmRanking()">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2.5 8l4 4L12.5 3.5"/></svg>
+          <span id="t-rankConfirm">Top 5 bevestigen</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ──── FINAL ──── -->
+    <div id="sFinal" class="screen anim">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+        <div>
+          <div class="phase-pill" style="margin-bottom:6px;display:inline-flex" id="t-finalBadge">Fase 4 voltooid</div>
+          <h2 class="serif" style="font-size:26px;letter-spacing:-.01em" id="t-finalTitle">Versnellers &amp; remmers vastgesteld</h2>
+        </div>
+        <div class="view-toggle">
+          <button class="vt-btn on" id="vt-results" onclick="switchView('results')"><span id="t-vtResults">Uitkomsten</span></button>
+          <button class="vt-btn" id="vt-canvas" onclick="switchView('canvas')"><span id="t-vtCanvas">Visuele weergave</span></button>
+        </div>
+      </div>
+
+      <div id="fvResults">
+        <div class="card">
+          <div class="vision-box">
+            <div class="vision-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="5" stroke="white" stroke-width="1.3"/><circle cx="6" cy="6" r="2" fill="white"/></svg></div>
+            <div><div class="vision-label" id="t-vl1">Onze stip op de horizon</div><div class="vision-text" id="visionSentence3">—</div></div>
+          </div>
+          <div class="final-two-col" id="finalContent"></div>
+          <div class="outcome-block" id="outcomeBlock"></div>
+          <!-- VK CUMULATIVE RESULTS (stip + thema's + versnellers/remmers + acties) — gevuld door vkRenderCumulativeF4() -->
+          <div class="vk-cum-wrap" id="vkCumWrap"></div>
+          <div style="padding-top:14px;border-top:1px solid var(--b0);margin-top:4px">
+            <div class="vk-final-actions">
+              <button class="btn btn-ghost vk-back-edit-btn" onclick="vkBackToEdit()" type="button" id="vkBackEditBtn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                <span id="t-vkBackEdit">Aanpassen</span>
+              </button>
+              <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+                <p style="font-size:13px;color:var(--t2);margin:0" id="t-finalNote">De top 5 versnellers en remmers worden meegenomen in de roadmap van fase 5.</p>
+                <button class="btn btn-orange btn-lg" onclick="goPhase5()" id="t-toPhase5">Naar fase 5 →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="fvCanvas" style="display:none">
+        <div class="canvas-wrap">
+          <div style="padding:14px 20px;border-bottom:1px solid var(--b0);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+            <span class="serif" style="font-size:15px" id="t-canvasTitle">Visiekaart canvas — volledig beeld</span>
+            <span style="font-size:12px;color:var(--t3)" id="t-canvasSub">Versnellers links · remmers rechts in het groene vlak</span>
+          </div>
+          <svg id="vkCanvas" viewBox="0 0 67733 38100" width="100%" xmlns="http://www.w3.org/2000/svg" aria-label="Visiekaart canvas"></svg>
+          <div class="canvas-legend">
+            <div class="canvas-legend-title" id="t-legendTitle">Volledige top-5 lijsten</div>
+            <div class="canvas-legend-cols">
+              <div>
+                <div class="cl-col-title v" id="t-legendVTitle">Versnellers</div>
+                <div id="legendVList"></div>
+              </div>
+              <div>
+                <div class="cl-col-title r" id="t-legendRTitle">Remmers</div>
+                <div id="legendRList"></div>
+              </div>
+            </div>
+            <div class="cl-themes-list" id="legendThemes"></div>
+          </div>
+          <div class="canvas-note" id="t-canvasNote">De roadmap met de top-5 acties wordt opgebouwd in fase 5.</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══════════════ PARTICIPANT VIEW ═══════════════ -->
+<div id="pView" class="pview">
+  <div class="p-back" data-env="dev-only"><button class="btn btn-ghost" onclick="hidePView()" id="t-pBack">← Facilitator-view</button></div>
+
+  <!-- Pre-wait scherm -->
+  <div id="p4PreWait" class="pcard pcard-wide">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--b0)">
+      <div style="width:40px;height:40px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-weight:700">4</div>
+      <div style="flex:1;min-width:0">
+        <div class="serif" style="font-size:20px;letter-spacing:-.01em" id="t-pPreWaitTitle">Fase 4 — Versnellers &amp; remmers</div>
+        <p style="font-size:12.5px;color:var(--t2)" id="t-pPreWaitSub">Korte uitleg over wat we in deze fase doen. De stellingen verschijnen zodra de facilitator de fase start.</p>
+      </div>
+    </div>
+
+    <div class="p-summary" id="pSummaryBlock" style="display:none">
+      <div class="p-summary-label" id="t-summaryLabel">Wat we vandaag doen</div>
+      <div class="p-summary-text" id="pSummaryText"></div>
+      <div class="p-facilitator" id="pFacilitatorBlock" style="display:none"><span id="t-pFacLabel">Begeleid door:</span> <strong id="pFacilitatorName"></strong></div>
+    </div>
+
+    <div class="vision-box">
+      <div class="vision-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="5" stroke="white" stroke-width="1.3"/><circle cx="6" cy="6" r="2" fill="white"/></svg></div>
+      <div><div class="vision-label" id="t-pvl">Onze stip op de horizon</div><div class="vision-text" id="pVisionTextPre">—</div></div>
+    </div>
+
+    <div class="intro-block">
+      <div class="intro-block-title"><span class="dot"></span><span id="t-pIntroWhatTitle">Wat zijn versnellers en remmers?</span></div>
+      <p id="t-pIntroWhatBody"></p>
+    </div>
+
+    <div class="intro-block">
+      <div class="intro-block-title"><span class="dot"></span><span id="t-pIntroHowTitle">Hoe werkt deze fase?</span></div>
+      <p id="t-pIntroHowBody"></p>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:12px;border-top:1px solid var(--b0);flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--t2)">
+        <span class="live-dot"></span>
+        <span id="t-pPreWaitWaiting">Wachten op de facilitator…</span>
+      </div>
+      <button class="btn" onclick="openOnderbouwing()" id="pOnderbouwingBtn1" aria-label="Open onderbouwing">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="5.5"/><path d="M7 9.5V7M7 4.5h.01"/></svg>
+        <span id="t-pOnderbouwingBtnLabel">Onderbouwing</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Scoring form -->
+  <div id="p4Form" class="pcard pcard-wide" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0">4</div>
+        <span style="font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.05em" id="t-p4phase">Fase 4 · Versnellers &amp; remmers</span>
+      </div>
+      <div style="font-size:12px;color:var(--t2)"><span id="answeredCount" style="font-weight:700;color:var(--gd)">0</span><span id="t-ofTotal"> van 20 beoordeeld</span></div>
+    </div>
+    <div class="prog-wrap"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+
+    <!-- Instructie-box -->
+    <div class="instruction-box">
+      <div class="instruction-title">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="5.5"/><path d="M7 9.5V7M7 4.5h.01"/></svg>
+        <span id="t-pInstrTitle">Hoe scoor je?</span>
+        <span class="info-icon" onclick="event.stopPropagation();vkInfoOpen('infoPInstr',this)" role="button" tabindex="0" aria-label="Meer uitleg over scoren" style="margin-left:auto">i</span>
+      </div>
+      <div class="instruction-text" id="t-pInstrBody"></div>
+    </div>
+
+    <!-- Legend -->
+    <div style="display:flex;gap:14px;margin:0 0 16px;flex-wrap:wrap;font-size:12px;color:var(--t2)">
+      <div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;border-radius:50%;background:var(--green)"></div><span id="t-legendK">Versneller</span></div>
+      <div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;border-radius:50%;background:var(--b2)"></div><span id="t-legendN">Neutraal</span></div>
+      <div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;border-radius:50%;background:var(--coral)"></div><span id="t-legendA">Remmer</span></div>
+    </div>
+
+    <div id="statementsContainer"></div>
+
+    <!-- Custom additions: aparte blokken voor versnellers en remmers -->
+    <div class="section-head sec-A" style="margin-top:22px">
+      <div class="sh-letter">+</div>
+      <div><div class="sh-title" id="t-customSecTitle">Eigen toevoegingen (optioneel)</div><div class="sh-sub" id="t-customSecSub">Mis je een belangrijke versneller of remmer? Voeg deze hieronder toe.</div></div>
+    </div>
+
+    <div class="custom-block v" id="customBlockV">
+      <div class="custom-block-head">
+        <div class="cb-icon v"><svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 11V4M3.5 7.5l3.5-3.5L10.5 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="cb-title v" id="t-customVTitle">Eigen versnellers</div>
+        <div class="cb-sub" id="t-customVSub">Factoren die jullie kunnen benutten om de stip op de horizon makkelijker te bereiken.</div>
+      </div>
+      <div class="custom-fields" id="customFieldsV"></div>
+      <button class="add-custom-btn" onclick="pAddCustom('v')" id="t-addCustomV" aria-label="Voeg een eigen versneller toe">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6.5 2v9M2 6.5h9"/></svg>
+        <span id="t-addCustomVLabel">Versneller toevoegen</span>
+      </button>
+    </div>
+
+    <div class="custom-block r" id="customBlockR">
+      <div class="custom-block-head">
+        <div class="cb-icon r"><svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 3v7M3.5 6.5L7 10l3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="cb-title r" id="t-customRTitle">Eigen remmers</div>
+        <div class="cb-sub" id="t-customRSub">Obstakels die jullie expliciet moeten adresseren in de roadmap.</div>
+      </div>
+      <div class="custom-fields" id="customFieldsR"></div>
+      <button class="add-custom-btn r" onclick="pAddCustom('r')" id="t-addCustomR" aria-label="Voeg een eigen remmer toe">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6.5 2v9M2 6.5h9"/></svg>
+        <span id="t-addCustomRLabel">Remmer toevoegen</span>
+      </button>
+    </div>
+
+    <div style="margin-top:22px;text-align:right">
+      <button class="btn btn-green btn-lg" onclick="submitScores()" id="t-pSubmit">Definitief versturen</button>
+    </div>
+  </div>
+
+  <!-- Wait screen -->
+  <div id="p4Wait" class="pcard" style="display:none">
+    <div class="wait-screen">
+      <div class="spinner"></div>
+      <div style="font-size:17px;font-weight:700;margin-bottom:6px" id="t-p4WaitTitle">Scores verstuurd</div>
+      <div style="font-size:13px;color:var(--t2)" id="t-p4WaitSub">De facilitator analyseert de resultaten. Even geduld…</div>
+    </div>
+  </div>
+
+  <!-- Final participant -->
+  <div id="p4Final" class="pcard pcard-wide" style="display:none">
+    <div style="text-align:center;margin-bottom:18px">
+      <div style="width:52px;height:52px;background:var(--green);border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M4 13l5 5L20 6"/></svg>
+      </div>
+      <div class="serif" style="font-size:20px;margin-bottom:4px" id="t-p4FinalTitle">Versnellers &amp; remmers bepaald</div>
+      <div style="font-size:13px;color:var(--t2)" id="t-p4FinalSub">Dit zijn de gekozen top-5 versnellers en remmers</div>
+    </div>
+    <div id="p4FinalContent"></div>
+    <div style="margin-top:14px;text-align:center;font-size:12px;color:var(--t3)" id="t-p4Next">Fase 5 (roadmap) start zodra de facilitator aangeeft</div>
+  </div>
+</div>
+
+<!-- ═══════════════ ONDERBOUWING MODAL ═══════════════ -->
+<!-- ═══════════════ VK SHARED TIP POPUP (DOM) ═══════════════ -->
+<div id="vkTipBackdrop" class="vk-tip-backdrop" onclick="vkCloseTip()"></div>
+<div id="vkTipPopup" class="vk-tip-popup" role="dialog" aria-modal="true" aria-labelledby="vkTipTitle">
+  <button class="vk-tip-close" onclick="vkCloseTip()" aria-label="Sluiten" type="button">×</button>
+  <h3 class="vk-tip-title" id="vkTipTitle"></h3>
+  <p class="vk-tip-sub" id="vkTipSub"></p>
+  <div class="vk-tip-body" id="vkTipBody"></div>
+  <div class="vk-tip-actions" id="vkTipActions">
+    <button class="btn btn-green" onclick="vkCloseTip()" id="vkTipCloseBtn" type="button">Sluiten</button>
+  </div>
+</div>
+
+<!-- ═══════════════ INCOMPLETE SUBMIT (deelnemer) ═══════════════ -->
+<div class="overlay" id="incompleteConfirm" role="dialog" aria-modal="true" aria-labelledby="t-incTitle" onclick="if(event.target===this)closeIncompleteConfirm()">
+  <div class="popup">
+    <div class="popup-icon" aria-hidden="true">?</div>
+    <h3 class="popup-title" id="t-incTitle">Alles beoordeeld?</h3>
+    <p class="popup-body" id="t-incBody">Je hebt nog niet alle stellingen beoordeeld. Wil je toch versturen met wat je hebt ingevuld?</p>
+    <div style="display:flex;justify-content:flex-end;gap:8px">
+      <button class="btn" onclick="closeIncompleteConfirm()" id="t-incCancel">Terug naar invullen</button>
+      <button class="btn btn-green" onclick="confirmIncompleteSubmit()" id="t-incConfirm">Toch versturen</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ ANALYSE-CONFIRM (facilitator, niet alle deelnemers klaar) ═══════════════ -->
+<div class="overlay" id="analyseConfirm" role="dialog" aria-modal="true" aria-labelledby="t-anTitle" onclick="if(event.target===this)closeAnalyseConfirm()">
+  <div class="popup">
+    <div class="popup-icon" aria-hidden="true">?</div>
+    <h3 class="popup-title" id="t-anTitle">Doorgaan met beschikbare input?</h3>
+    <p class="popup-body" id="t-anBody">Niet alle deelnemers hebben input gegeven. Wil je doorgaan met de beschikbare input?</p>
+    <div style="display:flex;justify-content:flex-end;gap:8px">
+      <button class="btn" onclick="closeAnalyseConfirm()" id="t-anCancel">Nog even wachten</button>
+      <button class="btn btn-green" onclick="confirmAnalyse()" id="t-anConfirm">Doorgaan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══ VK SHARED CANVAS BUILDER (injected) ═══ */
+/* ══════════════════════════════════════════════════════════════════════
+   VISIEKAART CANVAS — shared blueprint (used in fase 1 t/m 5 + rapport)
+   Geometry faithful to bijlage_-_visiekaart_v2.svg.
+   ViewBox: 0 0 67733 38100 (CorelDRAW mm × 100).
+   Font: DM Sans throughout.
+   ══════════════════════════════════════════════════════════════════════ */
+
+const VK_THEME_COLORS = ['#70A2D7','#BDD24D','#E8423F','#9666AA','#2A9791'];
+const VK_SUN = '#FCC429';
+const VK_BAND = '#BDD24D';
+const VK_DOTS = '#C5D93D';
+const VK_DARK = '#262A36';
+const VK_WHITE = '#FFFFFF';
+
+const VK_GEOM = {
+  sun: { cx: 33748, cy: 17537, r: 10421 },
+  band: { x: 2464, y: 17751, w: 62569, h: 19058, r: 886 },
+  themes: [
+    { cx: 20071, cy: 14057 },
+    { cx: 24285, cy:  7294 },
+    { cx: 33748, cy:  3625 },
+    { cx: 43161, cy:  7294 },
+    { cx: 47403, cy: 14057 }
+  ],
+  themeR: 3312,
+  triangle: 'M11768 35254 L33477 17752 L55186 35254 Z',
+  triApex: { x: 33477, y: 17751 },
+  triLeft: { x: 11768, y: 35254 },
+  triRight: { x: 55186, y: 35254 },
+  numbers: [
+    { x: 15205, y: 33897 },
+    { x: 18205, y: 31295 },
+    { x: 21439, y: 28632 },
+    { x: 24286, y: 25980 },
+    { x: 27496, y: 23474 }
+  ],
+  dots: [
+    { cx: 16229, cy: 14135 },
+    { cx: 64191, cy: 14135 },
+    { cx: 21013, cy:  9466 }
+  ]
+};
+
+function vkEscape(s){
+  return String(s||'').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function vkWrap(text, maxChars){
+  const words = String(text||'').split(/\s+/).filter(Boolean);
+  const out = [];
+  let line = '';
+  for (const w of words) {
+    const cand = line ? line + ' ' + w : w;
+    if (cand.length > maxChars && line) { out.push(line); line = w; }
+    else line = cand;
+  }
+  if (line) out.push(line);
+  return out;
+}
+function vkTruncate(text, maxChars){
+  text = String(text||'');
+  if (text.length <= maxChars) return text;
+  return text.substring(0, maxChars - 1).trimEnd() + '…';
+}
+function vkTriRightX(y){
+  const apex = VK_GEOM.triApex, br = VK_GEOM.triRight;
+  if (y <= apex.y) return apex.x;
+  if (y >= br.y) return br.x;
+  return apex.x + (y - apex.y) / (br.y - apex.y) * (br.x - apex.x);
+}
+
+function vkBuildCanvas(data){
+  const d = Object.assign({
+    visionSentence: '', themeNames: [], themeActions: [],
+    versnellers: [], remmers: [], roadmapTop5: [],
+    lang: 'nl', stickyMode: 'numbers'
+  }, data || {});
+  const isEN = d.lang === 'en';
+
+  const stoereLine1 = isEN ? 'bold steps' : 'stoere stappen';
+  const stoereLine2 = isEN ? 'to our dot' : 'naar onze stip';
+  const versnLabel = isEN ? 'accelerators' : 'versnellers';
+  const remmLabel  = isEN ? 'obstacles'    : 'remmers';
+  const placeholderPrefix = isEN ? 'theme' : 'thema';
+  const visionPlaceholder = isEN ? ['our dot on','the horizon'] : ['onze stip op','de horizon'];
+
+  let svg = '';
+
+  svg += `<rect x="0" y="0" width="67733" height="38100" fill="${VK_WHITE}"/>`;
+
+  const sun = VK_GEOM.sun;
+  svg += `<circle cx="${sun.cx}" cy="${sun.cy}" r="${sun.r}" fill="${VK_SUN}"/>`;
+
+  {
+    const visTop = sun.cy - sun.r;
+    const bandTop = VK_GEOM.band.y;
+    const visCenterY = (visTop + bandTop) / 2;
+    const sentence = d.visionSentence ? d.visionSentence : visionPlaceholder.join(' ');
+    let lines = vkWrap(sentence, 24).slice(0, 5);
+    if (!lines.length) lines = visionPlaceholder;
+    const fontSize = lines.length > 3 ? 900 : 1050;
+    const lineH = fontSize * 1.2;
+    const totalH = lines.length * lineH;
+    const startY = visCenterY - totalH/2 + lineH/2;
+    svg += lines.map((ln, i) =>
+      `<text x="${sun.cx}" y="${startY + i*lineH}" text-anchor="middle" dominant-baseline="central" font-size="${fontSize}" fill="${VK_WHITE}" font-weight="500">${vkEscape(ln)}</text>`
+    ).join('');
+  }
+
+  const b = VK_GEOM.band;
+  svg += `<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="${b.r}" ry="${b.r}" fill="${VK_BAND}"/>`;
+
+  VK_GEOM.dots.forEach(p => {
+    svg += `<circle cx="${p.cx}" cy="${p.cy}" r="80" fill="${VK_DOTS}"/>`;
+  });
+
+  VK_GEOM.themes.forEach((p, i) => {
+    const color = VK_THEME_COLORS[i];
+    const name = d.themeNames[i];
+    const isPlaceholder = !name;
+    const opacity = isPlaceholder ? 0.35 : 1;
+    svg += `<circle cx="${p.cx}" cy="${p.cy}" r="${VK_GEOM.themeR}" fill="${color}" opacity="${opacity}"/>`;
+    const numberLabel = String(i+1);
+    const display = name || `${placeholderPrefix} ${i+1}`;
+    const wrapped = vkWrap(display, 10).slice(0, 3).map(ln => vkTruncate(ln, 12));
+    const lineH = wrapped.length > 2 ? 560 : 680;
+    const blockH = wrapped.length * lineH;
+    const numberH = 1100;
+    const totalH = numberH + 200 + blockH;
+    const startY = p.cy - totalH/2 + numberH/2;
+    svg += `<text x="${p.cx}" y="${startY}" text-anchor="middle" dominant-baseline="central" font-size="${numberH}" fill="${VK_WHITE}" font-weight="700">${numberLabel}</text>`;
+    const nameTop = startY + numberH/2 + 200 + lineH/2;
+    svg += wrapped.map((ln, li) =>
+      `<text x="${p.cx}" y="${nameTop + li*lineH}" text-anchor="middle" dominant-baseline="central" font-size="${lineH}" fill="${VK_WHITE}" font-weight="600">${vkEscape(ln)}</text>`
+    ).join('');
+  });
+
+  VK_GEOM.themes.forEach((p, i) => {
+    const actions = d.themeActions[i];
+    if (!actions || !actions.length) return;
+    const n = Math.min(actions.length, 5);
+    const color = VK_THEME_COLORS[i];
+    // v4b: stickies vergroot en naar de buitenzijde van elke themabol gespreid
+    // (conform referentie 'visiekaart actiebeeld' B). Links-thema's → rij links,
+    // rechts-thema's → rij rechts, top-thema (2) → links/rechts geflankeerd.
+    const w = 1300, h = 1100, gap = 200, rx = 150, numFont = 620, strokeW = 80;
+    const R = VK_GEOM.themeR;
+    const drawSticky = (x, y, label) => {
+      svg += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" ry="${rx}" fill="${color}" stroke="${VK_WHITE}" stroke-width="${strokeW}"/>`
+           + `<text x="${x + w/2}" y="${y + h/2}" text-anchor="middle" dominant-baseline="central" font-size="${numFont}" fill="${VK_WHITE}" font-weight="700">${label}</text>`;
+    };
+    const rowLeftOf = (rightEdge, cy, count, start) => {
+      let x = rightEdge - (count * w + (count - 1) * gap);
+      const y = cy - h / 2;
+      for (let s = 0; s < count; s++){ drawSticky(x, y, start + s); x += w + gap; }
+    };
+    const rowRightOf = (leftEdge, cy, count, start) => {
+      let x = leftEdge;
+      const y = cy - h / 2;
+      for (let s = 0; s < count; s++){ drawSticky(x, y, start + s); x += w + gap; }
+    };
+    if (i === 0 || i === 1){
+      rowLeftOf(p.cx - R - 250, p.cy, n, 1);
+    } else if (i === 3 || i === 4){
+      rowRightOf(p.cx + R + 250, p.cy, n, 1);
+    } else {
+      const leftN = Math.ceil(n / 2), rightN = n - leftN;
+      const fy = p.cy - 260;
+      if (leftN)  rowLeftOf(p.cx - R - 250, fy, leftN, 1);
+      if (rightN) rowRightOf(p.cx + R + 250, fy, rightN, leftN + 1);
+    }
+  });
+
+  svg += `<path d="${VK_GEOM.triangle}" fill="${VK_WHITE}"/>`;
+
+  {
+    const apex = VK_GEOM.triApex;
+    const headY = apex.y + 1850;
+    svg += `<text x="${apex.x}" y="${headY}" text-anchor="middle" font-size="900" fill="${VK_DARK}" font-weight="600">${stoereLine1}</text>
+      <text x="${apex.x}" y="${headY + 1100}" text-anchor="middle" font-size="900" fill="${VK_DARK}" font-weight="400">${stoereLine2}</text>`;
+  }
+
+  VK_GEOM.numbers.forEach((p, i) => {
+    svg += `<text x="${p.x}" y="${p.y}" font-size="900" fill="${VK_DARK}" font-weight="600">${i+1}</text>`;
+    const action = d.roadmapTop5[i];
+    if (!action) return;
+    const themeIdx = (typeof action.themeIdx === 'number' ? action.themeIdx : 0);
+    const themeColor = VK_THEME_COLORS[themeIdx] || VK_DARK;
+    const bx = p.x + 1200;
+    const by = p.y - 280;
+    const br = 380;
+    svg += `<circle cx="${bx}" cy="${by}" r="${br}" fill="${themeColor}"/>
+      <text x="${bx}" y="${by}" text-anchor="middle" dominant-baseline="central" font-size="500" fill="${VK_WHITE}" font-weight="700">${themeIdx+1}</text>`;
+    const tx = bx + br + 200;
+    const xRight = vkTriRightX(p.y);
+    const maxW = xRight - tx - 500;
+    const charBudget = Math.max(8, Math.floor(maxW / 340));
+    const text = vkTruncate(action.text || '', charBudget);
+    svg += `<text x="${tx}" y="${p.y}" font-size="600" fill="${VK_DARK}" font-weight="400">${vkEscape(text)}</text>`;
+  });
+
+  {
+    const headX = 3360;
+    const headY = 18950;
+    svg += `<text x="${headX}" y="${headY}" font-size="1100" fill="${VK_DARK}" font-weight="700">${versnLabel}</text>`;
+    d.versnellers.slice(0, 5).forEach((v, i) => {
+      const t = typeof v === 'string' ? v : (v && (v.title || v.name) || '');
+      svg += `<text x="${headX}" y="${headY + 1700 + i*1500}" font-size="700" fill="${VK_DARK}" font-weight="400">${i+1}. ${vkEscape(vkTruncate(t, 28))}</text>`;
+    });
+  }
+
+  {
+    const headX = 64374;
+    const headY = 18950;
+    svg += `<text x="${headX}" y="${headY}" text-anchor="end" font-size="1100" fill="${VK_DARK}" font-weight="700">${remmLabel}</text>`;
+    d.remmers.slice(0, 5).forEach((r, i) => {
+      const t = typeof r === 'string' ? r : (r && (r.title || r.name) || '');
+      svg += `<text x="${headX}" y="${headY + 1700 + i*1500}" text-anchor="end" font-size="700" fill="${VK_DARK}" font-weight="400">${i+1}. ${vkEscape(vkTruncate(t, 28))}</text>`;
+    });
+  }
+
+  return svg;
+}
+
+function vkRenderInto(svgEl, data){
+  if (!svgEl) return;
+  svgEl.setAttribute('viewBox', '0 0 67733 38100');
+  svgEl.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+  svgEl.style.fontFamily = "'DM Sans', sans-serif";
+  svgEl.innerHTML = vkBuildCanvas(data);
+}
+/* ═══ END VK SHARED CANVAS BUILDER ═══ */
+
+/* ══════════════════════════════════════════
+   STATE
+══════════════════════════════════════════ */
+let lang = 'nl';
+let step = 'intro'; // intro → wait → ai → ranking → final
+let visionSentence = '';
+let selectedThemes = [];
+let confirmedActions = {};
+let facView = true;
+
+// Submitted scores per participant
+// [{name, scores:{statementId:'kracht'|'neutraal'|'aandachtspunt'}, customV:[strings], customR:[strings]}]
+let allScores = [];
+
+// Eigen toevoegingen deelnemer-view (lokaal)
+let pScores = {};      // {statementId: 'kracht'|'neutraal'|'aandachtspunt'}
+let pCustomV = [''];   // dynamische versneller-velden
+let pCustomR = [''];   // dynamische remmer-velden
+let pSubmitted = false;
+
+// Ranglijsten — volledige arrays (top-5 is afgeleide)
+// Item-vorm: {id, title, count, source:'stmt-A'|'stmt-B'|'custom'}
+let versnellersRanked = [];
+let remmersRanked = [];
+
+// Drag-state
+let draggedItemIdx = null;
+let draggedList = null; // 'V' of 'R'
+
+const THEME_COLORS_CANVAS = ['#70A2D7','#BDD24D','#E8423F','#9666AA','#2A9791'];
+
+const STEPS = ['intro','wait','ranking','final'];
+
+/* ══════════════════════════════════════════
+   INK-STATEMENTS (A: Executiekracht, B: Organisatie-elementen)
+   Inhoud onveranderd, alleen toonregister positief afgestemd
+══════════════════════════════════════════ */
+const STATEMENTS = {
+  nl: {
+    A: {
+      label: 'Executiekracht',
+      sub: 'Gedrag, sturing en executiediscipline',
+      items: [
+        {id:'A1', title:'Richting & strategische scherpte', text:'Wij hebben een heldere koers die door management en medewerkers op dezelfde manier wordt begrepen.'},
+        {id:'A2', title:'Prioritering & focus', text:'Wij maken scherpe keuzes in wat wel en niet prioriteit krijgt.'},
+        {id:'A3', title:'Besluitvorming & mandaat', text:'Besluiten worden tijdig genomen door de mensen die daarvoor het juiste mandaat hebben.'},
+        {id:'A4', title:'Eigenaarschap & accountability', text:'Voor belangrijke doelen is duidelijk wie eigenaar is en wie aanspreekbaar is op voortgang.'},
+        {id:'A5', title:'Voortgangssturing & ritme', text:'Wij volgen de voortgang van doelen structureel en sturen tijdig bij.'},
+        {id:'A6', title:'Samenwerking over grenzen heen', text:'Teams en afdelingen werken effectief samen aan gezamenlijke doelen.'},
+        {id:'A7', title:'Leiderschap & voorbeeldgedrag', text:'Leidinggevenden geven zichtbaar richting, maken keuzes en nemen belemmeringen weg.'},
+        {id:'A8', title:'Verandervermogen', text:'Wij zijn in staat veranderingen daadwerkelijk te vertalen naar nieuw gedrag en nieuwe routines.'},
+        {id:'A9', title:'Leren & verbeteren', text:'Wij leren systematisch van resultaten, ervaringen en feedback om onze aanpak te verbeteren.'},
+        {id:'A10',title:'Klant- en stakeholdergerichtheid', text:'Wij toetsen regelmatig of ons werk daadwerkelijk waarde oplevert voor klanten, gebruikers of andere belanghebbenden.'},
+      ]
+    },
+    B: {
+      label: 'Organisatie-elementen',
+      sub: 'Structuur, middelen, processen en capaciteit (naar INK)',
+      items: [
+        {id:'B1', title:'Organisatiestructuur', text:'Onze organisatiestructuur is logisch ingericht voor het werk dat wij moeten leveren.'},
+        {id:'B2', title:'Rollen & verantwoordelijkheden', text:'Taken, rollen en verantwoordelijkheden zijn helder vastgelegd.'},
+        {id:'B3', title:'Personele capaciteit (aantallen)', text:'Wij hebben voldoende mensen beschikbaar om het reguliere werk en de belangrijkste opgaven uit te voeren.'},
+        {id:'B4', title:'Personele kwaliteit (vaardigheden)', text:'Wij beschikken over de juiste kennis, ervaring en vaardigheden voor onze kerntaken.'},
+        {id:'B5', title:'Werkprocessen', text:'Onze belangrijkste werkprocessen zijn duidelijk beschreven, actueel en bekend bij betrokkenen.'},
+        {id:'B6', title:'Procesbeheersing & kwaliteit', text:'Wij hebben duidelijke normen, controles en werkwijzen om kwaliteit en betrouwbaarheid te borgen.'},
+        {id:'B7', title:'ICT & digitale ondersteuning', text:'Onze ICT-systemen zijn modern, betrouwbaar en ondersteunen het werk goed.'},
+        {id:'B8', title:'Data & managementinformatie', text:'Wij beschikken over actuele en betrouwbare data om prestaties, capaciteit en kwaliteit te volgen.'},
+        {id:'B9', title:'Financiële middelen & budgetten', text:'Budgetten en financiële middelen zijn passend bij de doelen en taken van de organisatie.'},
+        {id:'B10',title:'Huisvesting, faciliteiten & hulpmiddelen', text:'Werkplekken, faciliteiten, materialen en hulpmiddelen zijn geschikt om het werk goed uit te voeren.'},
+      ]
+    }
+  },
+  en: {
+    A: {
+      label: 'Execution power',
+      sub: 'Behaviour, steering and execution discipline',
+      items: [
+        {id:'A1', title:'Direction & strategic clarity', text:'We have a clear course understood the same way by management and staff.'},
+        {id:'A2', title:'Prioritisation & focus', text:'We make sharp choices about what does and does not get priority.'},
+        {id:'A3', title:'Decision-making & mandate', text:'Decisions are made timely by the people with the right mandate.'},
+        {id:'A4', title:'Ownership & accountability', text:'For important goals it is clear who owns them and who is accountable for progress.'},
+        {id:'A5', title:'Progress management & rhythm', text:'We monitor goal progress structurally and adjust in time.'},
+        {id:'A6', title:'Cross-boundary collaboration', text:'Teams and departments work effectively together on shared goals.'},
+        {id:'A7', title:'Leadership & role modelling', text:'Leaders visibly give direction, make choices and remove obstacles.'},
+        {id:'A8', title:'Capacity for change', text:'We are able to translate changes into new behaviour and routines.'},
+        {id:'A9', title:'Learning & improvement', text:'We systematically learn from results, experiences and feedback.'},
+        {id:'A10',title:'Client & stakeholder focus', text:'We regularly check whether our work actually creates value for clients, users or stakeholders.'},
+      ]
+    },
+    B: {
+      label: 'Organisation elements',
+      sub: 'Structure, resources, processes and capacity (INK-based)',
+      items: [
+        {id:'B1', title:'Organisational structure', text:'Our organisational structure is logically set up for the work we must deliver.'},
+        {id:'B2', title:'Roles & responsibilities', text:'Tasks, roles and responsibilities are clearly documented.'},
+        {id:'B3', title:'Staffing capacity (numbers)', text:'We have sufficient people available for regular work and key priorities.'},
+        {id:'B4', title:'Staffing quality (skills)', text:'We have the right knowledge, experience and skills for our core tasks.'},
+        {id:'B5', title:'Work processes', text:'Our key work processes are clearly described, current and known to those involved.'},
+        {id:'B6', title:'Process control & quality', text:'We have clear standards, controls and methods to ensure quality and reliability.'},
+        {id:'B7', title:'ICT & digital support', text:'Our ICT systems are modern, reliable and support the work well.'},
+        {id:'B8', title:'Data & management information', text:'We have current and reliable data to track performance, capacity and quality.'},
+        {id:'B9', title:'Financial resources & budgets', text:"Budgets and financial resources are appropriate to the organisation's goals and tasks."},
+        {id:'B10',title:'Premises, facilities & tools', text:'Workspaces, facilities, materials and tools are suitable for doing the work well.'},
+      ]
+    }
+  }
+};
+
+/* DEMO_SCORES: 5 deelnemers, k=kracht (versneller), n=neutraal, a=aandachtspunt (remmer)
+   + custom V/R demo-toevoegingen */
+const DEMO_SCORES = [
+  {name:'Lisa',   scores:{A1:'k',A2:'k',A3:'n',A4:'k',A5:'n',A6:'k',A7:'k',A8:'a',A9:'n',A10:'k',B1:'k',B2:'k',B3:'a',B4:'k',B5:'n',B6:'n',B7:'a',B8:'a',B9:'n',B10:'k'},
+   customV:['Sterk lerend team'], customR:['Werkdruk piekt periodiek']},
+  {name:'Pieter', scores:{A1:'k',A2:'n',A3:'a',A4:'k',A5:'k',A6:'n',A7:'n',A8:'a',A9:'a',A10:'k',B1:'n',B2:'k',B3:'a',B4:'k',B5:'a',B6:'n',B7:'a',B8:'a',B9:'k',B10:'n'},
+   customV:[], customR:['Afhankelijkheid van enkele specialisten']},
+  {name:'Sara',   scores:{A1:'n',A2:'k',A3:'n',A4:'n',A5:'k',A6:'a',A7:'k',A8:'a',A9:'n',A10:'k',B1:'k',B2:'n',B3:'a',B4:'k',B5:'k',B6:'k',B7:'a',B8:'a',B9:'n',B10:'k'},
+   customV:['Goede klantrelaties'], customR:[]},
+  {name:'Tom',    scores:{A1:'k',A2:'k',A3:'a',A4:'k',A5:'n',A6:'a',A7:'n',A8:'a',A9:'k',A10:'n',B1:'k',B2:'k',B3:'n',B4:'n',B5:'a',B6:'a',B7:'a',B8:'n',B9:'k',B10:'n'},
+   customV:['Sterk lerend team'], customR:[]},
+  {name:'Aisha',  scores:{A1:'n',A2:'k',A3:'n',A4:'k',A5:'k',A6:'n',A7:'k',A8:'a',A9:'a',A10:'k',B1:'n',B2:'n',B3:'a',B4:'k',B5:'n',B6:'n',B7:'a',B8:'a',B9:'n',B10:'k'},
+   customV:['Goede klantrelaties'], customR:['Afhankelijkheid van enkele specialisten']},
+];
+
+/* ══════════════════════════════════════════
+   T-OBJECT (i18n NL + EN)
+══════════════════════════════════════════ */
+const T = {
+  nl: {
+    /* HEADER & GENERIC */
+    phasePill:'Fase 4 · Versnellers & remmers',
+    pvBtn:'Deelnemer-view →',
+    sessTitle:'Sessie-info',
+    sessOrg:'Organisatie', sessName:'Sessie', sessType:'Type', sessScale:'Schaal',
+    sessUrgency:'Urgentie', sessBudget:'Budget', sessHorizon:'Horizon', unnamedSession:'(naamloos)',
+    sessTypeLblFull:    {strategisch:'Strategisch plan', jaarplan:'Jaarplan', project:'Project', anders:'Anders'},
+    scaleLblFull:       {team:'Team', afdeling:'Afdeling', organisatie:'Organisatie', netwerk:'Netwerk'},
+    urgLblFull:         {laag:'Laag', medium:'Middel', hoog:'Hoog'},
+    budLblFull:         {beperkt:'Beperkt', voldoende:'Voldoende', ruim:'Ruim', onbekend:'Onbekend'},
+    horLblFull:         {'<1jr':'Minder dan 1 jaar', '1-3jr':'1 tot 3 jaar', '3-5jr':'3 tot 5 jaar', '5+jr':'Meer dan 5 jaar'},
+    sessTypeLbl:        {strategisch:'strategisch plan', jaarplan:'jaarplan', project:'project', anders:'sessie'},
+    scaleLbl:           {team:'teamniveau', afdeling:'afdelingsniveau', organisatie:'organisatieniveau', netwerk:'netwerkniveau'},
+    urgLbl:             {laag:'lage', medium:'middelhoge', hoog:'hoge'},
+    budLbl:             {beperkt:'beperkt', voldoende:'voldoende', ruim:'ruim', onbekend:'nog onduidelijk'},
+    horLbl:             {'<1jr':'minder dan 1 jaar', '1-3jr':'1 tot 3 jaar', '3-5jr':'3 tot 5 jaar', '5+jr':'meer dan 5 jaar'},
+    summaryTpl:         "Vandaag stellen we een {type} op, op {scale}, onder de naam '{name}'. Het is een plan met {urg} urgentie, waarvoor we {bud} budget hebben en met een tijdshorizon van {hor}.",
+    summaryTplNoName:   'Vandaag stellen we een {type} op, op {scale}. Het is een plan met {urg} urgentie, waarvoor we {bud} budget hebben en met een tijdshorizon van {hor}.',
+    pFacLabel:'Begeleid door:', pFacUnknown:'(facilitator nog niet ingevuld in fase 0)',
+    pYou:'Jij',
+
+    /* INTRO */
+    introTitle:'Fase 4 — Versnellers & remmers',
+    introSub:'Individueel scoren, eigen toevoegingen, gezamenlijke rangorde, input voor de roadmap',
+    visionLabel:'Onze stip op de horizon',
+    infoIntro:'Analyse van organisaties en verbeterplannen zijn vaak slechts gericht op het formuleren van de gewenste situatie. Organisatiewetenschap is het er echter over eens dat het daadwerkelijk behalen van doelstellingen, sterk samenhangt met de reeds aanwezige kwaliteiten en risico\'s binnen de organisatie. Zij ondersteunen of belemmeren doelrealisatie in de praktijk. Versnellers zijn kenmerken die jullie nu al sterker maken op weg naar de stip. Denk aan bestaande competenties, relaties, technologie of reputatie waarop je kan bouwen. Remmers zijn de reeds aanwezige risico\'s en obstakels die het bereiken van de visie moeilijker maken. Ze vragen expliciet aandacht in de roadmap. Denk hierbij aan belangen, gewoontes, beperkingen of afhankelijkheden. Door beide eerlijk te benoemen wordt de stip op de horizon ambitieus én geloofwaardig. Het doel is niet om de stip kleiner te maken, maar om de roadmap erop af te stemmen. De stellingen in deze fase zijn opgebouwd uit twee dimensies: executiekracht (gedrag, sturing, discipline) en organisatie-elementen (structuur, middelen, processen, capaciteit, in navolging van het INK-model). Eigen toevoegingen zijn welkom: alles wat je belangrijk vindt en niet in de stellingen staat.',
+    introWhatTitle:'Wat zijn versnellers en remmers?',
+    introWhatBody:'Versnellers en remmers samen geven een eerlijk beeld van de uitgangspositie. Versnellers wijzen op kracht die jullie kunnen benutten; remmers wijzen op risico\'s of obstakels die de uitvoering kunnen vertragen. Door beide expliciet te benoemen, wordt de roadmap in fase 5 zowel ambitieus als realistisch.',
+    versnellersTitle:'Versnellers',
+    versnellersBody:'Kenmerken van de organisatie die de uitvoering ondersteunen en versnellen. Factoren die er al zijn en die jullie kunnen benutten om de stip op de horizon makkelijker te bereiken.',
+    remmersTitle:'Remmers',
+    remmersBody:'Kenmerken die de realisatie belemmeren of vertragen. Obstakels die expliciet in de roadmap moeten worden geadresseerd om beweging mogelijk te maken.',
+    introHowTitle:'Hoe werken we deze fase?',
+    introHowBody:'Iedere deelnemer beoordeelt twintig stellingen (over executiekracht en organisatie-elementen) en mag eigen versnellers en remmers toevoegen. Daarna telt het systeem de stemmen en ontstaat een rangorde. Jullie bespreken samen welke items echt belangrijk zijn en stellen vervolgens een top 5 vast per lijst.',
+    themesLabel:"Strategische thema's uit fase 2",
+    introBotInfo:'Deelnemers zien het scoringformulier zodra je start',
+    introStart:'Fase 4 starten',
+    introItems: [
+      {icon:'1', title:'Deelnemers scoren',    sub:'20 stellingen individueel'},
+      {icon:'2', title:'Eigen toevoegingen',   sub:'Aanvullende versnellers/remmers'},
+      {icon:'3', title:'AI-rangorde',          sub:'Stemmen worden geteld en gerangschikt'},
+      {icon:'4', title:'Top 5 vastgesteld',    sub:'Samen bespreken, voor de roadmap'},
+    ],
+
+    /* WAIT */
+    waitTitle:'Deelnemers scoren versnellers en remmers',
+    waitSub:'Elke deelnemer beoordeelt de stellingen en kan eigen versnellers en remmers toevoegen',
+    deelLabel:'Deelnemers', scoreLabel:'Beoordelingen', customLabel2:'Eigen toevoegingen',
+    waitBot:"Klik op 'Analyse starten' zodra je voldoende input hebt",
+    analyseLabel:'Analyse starten',
+    anTitle:'Doorgaan met beschikbare input?',
+    anBody:'Niet alle deelnemers hebben input gegeven. Wil je doorgaan met de beschikbare input?',
+    anCancel:'Nog even wachten', anConfirm:'Doorgaan',
+
+    /* AI */
+    aiTitle:'Scores worden geanalyseerd…',
+    aiSub:'De stemmen worden geteld en de versnellers en remmers worden gerangschikt',
+
+    /* RANKING */
+    rankTitle:'Rangorde versnellers & remmers',
+    rankSub:'Sleep items omhoog of omlaag om de volgorde aan te passen na discussie · top 5 is prominent weergegeven',
+    infoRanking:'De rangorde geeft prioriteit aan versnellers en remmers. Items worden gerangschikt op basis van het totaal aantal stemmen. Je kunt items verslepen om de volgorde aan te passen. Items buiten de top 5 blijven bewaard en kunnen later weer omhoog worden gesleept. De top 5 versnellers en top 5 remmers worden meegenomen naar de roadmap in fase 5.',
+    rankBot:'Bespreek de rangorde en pas aan waar nodig. De top 5 van beide lijsten weegt mee in de roadmap.',
+    rankConfirm:'Top 5 bevestigen',
+    rankEmpty:'Nog geen input gescoord',
+    ringSource:{stmtA:'stelling A', stmtB:'stelling B', custom:'eigen toevoeging'},
+
+    /* FINAL */
+    finalBadge:'Fase 4 voltooid',
+    finalTitle:'Versnellers & remmers vastgesteld',
+    vtResults:'Uitkomsten', vtCanvas:'Visuele weergave',
+    vl1:'Onze stip op de horizon',
+    finalListV:'Top 5 versnellers',
+    finalListR:'Top 5 remmers',
+    outcomeTitle:'Wat doen deze uitkomsten?',
+    outcomeBodyV:'De versnellers zijn de bronnen van kracht waarop jullie kunnen bouwen. In fase 5 wegen ze mee bij het bepalen van haalbare en snelle acties.',
+    outcomeBodyR:'De remmers zijn de obstakels die expliciet aandacht vragen. In fase 5 worden ze meegenomen als aandachtspunten die de volgorde en haalbaarheid van de roadmap beïnvloeden.',
+    finalNote:'De top 5 versnellers en remmers worden meegenomen in de roadmap van fase 5.',
+    toPhase5:'Naar fase 5 →',
+    canvasTitle:'Visiekaart canvas — volledig beeld',
+    canvasSub:'Versnellers links · remmers rechts in het groene vlak',
+    canvasNote:'De roadmap met de top-5 acties wordt opgebouwd in fase 5.',
+    legendTitle:'Volledige top-5 lijsten',
+    legendVTitle:'Versnellers', legendRTitle:'Remmers',
+    legendThemesTitle:"Strategische thema's",
+
+    /* DEELNEMER pre-wait + form */
+    pPreWaitTitle:'Fase 4 — Versnellers & remmers',
+    pPreWaitSub:'Korte uitleg over wat we in deze fase doen. De stellingen verschijnen zodra de facilitator de fase start.',
+    summaryLabel:'Wat we vandaag doen',
+    pIntroWhatTitle:'Wat zijn versnellers en remmers?',
+    pIntroWhatBody:'Versnellers zijn kenmerken die jullie helpen om de stip op de horizon te bereiken. Remmers zijn obstakels die dat moeilijker maken. Door beide eerlijk te benoemen, wordt het vervolg realistisch én ambitieus.',
+    pIntroHowTitle:'Hoe werkt deze fase?',
+    pIntroHowBody:'Je beoordeelt twintig stellingen als versneller, remmer of neutraal, ten opzichte van onze stip op de horizon. Daarna kun je zelf nog versnellers en remmers toevoegen die voor jou belangrijk zijn. Klik onderaan op \"Definitief versturen\" zodra je klaar bent.',
+    pPreWaitWaiting:'Wachten op de facilitator…',
+    onderbouwingBtn:'Onderbouwing',
+    onderbouwingTitle:'Theoretische onderbouwing — fase 4',
+    onderbouwingBody:"Een goed plan staat of valt met de uitvoering. In deze fase identificeren jullie wat de realisatie van de stip op de horizon ondersteunt (versnellers) en wat haar belemmert (remmers). De stellingen zijn opgebouwd uit twee dimensies: executiekracht (gedrag, sturing, discipline) en organisatie-elementen (structuur, middelen, processen, capaciteit, ge\u00efnspireerd op het INK-model). Door beide eerlijk te benoemen wordt het plan ambitieus \u00e9n geloofwaardig. Het doel is niet de stip kleiner te maken, maar de roadmap erop af te stemmen: de top 5 versnellers worden bewust ingezet en de top 5 remmers worden expliciet geadresseerd in fase 5.",
+    onderbouwingClose:'Sluiten',
+    p4phase:'Fase 4 · Versnellers & remmers',
+    ofTotal:' van 20 beoordeeld',
+    pInstrTitle:'Hoe scoor je?',
+    pInstrBody:'Beoordeel elke stelling als versneller, remmer of neutraal, ten opzichte van onze stip op de horizon. Neutraal is een geldige keuze: je hoeft niet overal voor of tegen te kiezen. Je mag stellingen open laten als je geen mening hebt.',
+    infoPInstr:'Versneller: deze stelling klopt voor jullie en helpt op weg naar de stip. Remmer: deze stelling klopt minder, en kan beweging belemmeren. Neutraal: noch versneller, noch remmer. Bij twijfel: kies neutraal en voeg eventueel een eigen versneller of remmer toe.',
+    legendK:'Versneller', legendN:'Neutraal', legendA:'Remmer',
+    optK:'Versneller', optN:'Neutraal', optA:'Remmer',
+    customSecTitle:'Eigen toevoegingen (optioneel)',
+    customSecSub:'Mis je een belangrijke versneller of remmer? Voeg deze hieronder toe.',
+    customVTitle:'Eigen versnellers',
+    customVSub:'Factoren die jullie kunnen benutten om de stip op de horizon makkelijker te bereiken.',
+    customRTitle:'Eigen remmers',
+    customRSub:'Obstakels die jullie expliciet moeten adresseren in de roadmap.',
+    customVPh:'Bijv. sterke klantrelaties',
+    customRPh:'Bijv. afhankelijkheid van enkele specialisten',
+    addCustomVLabel:'Versneller toevoegen',
+    addCustomRLabel:'Remmer toevoegen',
+    pSubmit:'Definitief versturen',
+    incTitle:'Alles beoordeeld?',
+    incBody:'Je hebt nog niet alle stellingen beoordeeld. Wil je toch versturen met wat je hebt ingevuld?',
+    incCancel:'Terug naar invullen', incConfirm:'Toch versturen',
+    p4WaitTitle:'Scores verstuurd',
+    p4WaitSub:'De facilitator analyseert de resultaten. Even geduld…',
+    p4FinalTitle:'Versnellers & remmers bepaald',
+    p4FinalSub:'Dit zijn de gekozen top-5 versnellers en remmers',
+    p4Next:'Fase 5 (roadmap) start zodra de facilitator aangeeft',
+    pBack:'← Facilitator-view',
+
+    /* CONFIRMS */
+    resetConfirm:'Alle sessiedata wissen (stip op de horizon, thema\'s, acties, scores, roadmap)?\n\nDe demo-defaults worden hersteld bij de volgende pagina.',
+    resetDone:'Demo-data gewist. Pagina wordt herladen.',
+    goPhase3Confirm:'Terug naar fase 3?',
+    goPhase5Confirm:'Door naar fase 5 (roadmap)?',
+    // Cross-fase shared keys (v4)
+    tipClose:'Sluiten',
+    vkBackEdit:'Aanpassen',
+    pOnderbouwingBtnLabel:'Onderbouwing',
+    cumStipLabel:'Stip op de horizon',
+    cumThemesLabel:'Thema\'s',
+    cumVersnellersLabel:'Top 5 versnellers',
+    cumRemmersLabel:'Top 5 remmers',
+    cumActionsLabel:'Acties per thema',
+  },
+  en: {
+    phasePill:'Phase 4 · Accelerators & obstacles',
+    pvBtn:'Participant view →',
+    sessTitle:'Session info',
+    sessOrg:'Organisation', sessName:'Session', sessType:'Type', sessScale:'Scale',
+    sessUrgency:'Urgency', sessBudget:'Budget', sessHorizon:'Horizon', unnamedSession:'(unnamed)',
+    sessTypeLblFull:    {strategisch:'Strategic plan', jaarplan:'Annual plan', project:'Project', anders:'Other'},
+    scaleLblFull:       {team:'Team', afdeling:'Department', organisatie:'Organisation', netwerk:'Network'},
+    urgLblFull:         {laag:'Low', medium:'Medium', hoog:'High'},
+    budLblFull:         {beperkt:'Limited', voldoende:'Sufficient', ruim:'Ample', onbekend:'Unknown'},
+    horLblFull:         {'<1jr':'Less than 1 year', '1-3jr':'1 to 3 years', '3-5jr':'3 to 5 years', '5+jr':'More than 5 years'},
+    sessTypeLbl:        {strategisch:'strategic plan', jaarplan:'annual plan', project:'project', anders:'session'},
+    scaleLbl:           {team:'team level', afdeling:'department level', organisatie:'organisation level', netwerk:'network level'},
+    urgLbl:             {laag:'low', medium:'medium', hoog:'high'},
+    budLbl:             {beperkt:'limited', voldoende:'sufficient', ruim:'ample', onbekend:'still unclear'},
+    horLbl:             {'<1jr':'less than 1 year', '1-3jr':'1 to 3 years', '3-5jr':'3 to 5 years', '5+jr':'more than 5 years'},
+    summaryTpl:         "Today we are drafting a {type}, at {scale}, named '{name}'. It is a plan with {urg} urgency, for which we have {bud} budget and a time horizon of {hor}.",
+    summaryTplNoName:   'Today we are drafting a {type}, at {scale}. It is a plan with {urg} urgency, for which we have {bud} budget and a time horizon of {hor}.',
+    pFacLabel:'Facilitated by:', pFacUnknown:'(facilitator not yet filled in phase 0)',
+    pYou:'You',
+
+    introTitle:'Phase 4 — Accelerators & obstacles',
+    introSub:'Individual scoring, own additions, joint ranking, input for the roadmap',
+    visionLabel:'Our dot on the horizon',
+    infoIntro:'Analyses of organisations and improvement plans often focus only on formulating the desired situation. Organisational science agrees, however, that actually achieving objectives is strongly linked to the qualities and risks already present within the organisation. These either support or hinder goal realisation in practice. Accelerators are characteristics that already make you stronger on the way to the dot. Think of existing competencies, relationships, technology or reputation you can build on. Obstacles are the risks and barriers already present that make reaching the vision harder. They need explicit attention in the roadmap. Think of interests, habits, limitations or dependencies. By naming both honestly, the dot on the horizon becomes ambitious and credible. The goal is not to shrink the dot, but to align the roadmap to it. The statements in this phase are built on two dimensions: execution power (behaviour, steering, discipline) and organisational elements (structure, resources, processes, capacity, following the INK model). Your own additions are welcome: anything you consider important that is not in the statements.',
+    introWhatTitle:'What are accelerators and obstacles?',
+    introWhatBody:'Accelerators and obstacles together give an honest picture of the starting position. Accelerators point to strengths you can leverage; obstacles point to risks or barriers that can slow execution. By naming both explicitly, the phase-5 roadmap becomes both ambitious and realistic.',
+    versnellersTitle:'Accelerators',
+    versnellersBody:'Organisational characteristics that support and speed up execution. Factors that already exist and that you can leverage to reach the dot on the horizon more easily.',
+    remmersTitle:'Obstacles',
+    remmersBody:'Characteristics that hinder or slow realisation. Barriers that must be explicitly addressed in the roadmap to enable movement.',
+    introHowTitle:'How does this phase work?',
+    introHowBody:'Each participant rates twenty statements (on execution power and organisational elements) and can add their own accelerators and obstacles. The system then counts the votes and a ranking emerges. Together you discuss which items truly matter and lock in a top 5 per list.',
+    themesLabel:'Strategic themes from phase 2',
+    introBotInfo:'Participants see the scoring form as soon as you start',
+    introStart:'Start phase 4',
+    introItems: [
+      {icon:'1', title:'Participants score', sub:'20 statements individually'},
+      {icon:'2', title:'Own additions',      sub:'Additional accelerators/obstacles'},
+      {icon:'3', title:'AI ranking',         sub:'Votes are counted and ranked'},
+      {icon:'4', title:'Top 5 set',          sub:'Discuss together, for the roadmap'},
+    ],
+
+    waitTitle:'Participants are scoring accelerators and obstacles',
+    waitSub:'Each participant rates the statements and can add their own accelerators and obstacles',
+    deelLabel:'Participants', scoreLabel:'Ratings', customLabel2:'Own additions',
+    waitBot:"Click 'Start analysis' once you have enough input",
+    analyseLabel:'Start analysis',
+    anTitle:'Continue with available input?',
+    anBody:'Not all participants have given input. Do you want to continue with the available input?',
+    anCancel:'Wait a bit longer', anConfirm:'Continue',
+
+    aiTitle:'Scores are being analysed…',
+    aiSub:'The votes are counted and the accelerators and obstacles are ranked',
+
+    rankTitle:'Ranking accelerators & obstacles',
+    rankSub:'Drag items up or down to adjust the order · top 5 is prominently displayed',
+    infoRanking:'The ranking prioritises accelerators and obstacles. Items are ranked based on the total number of votes. You can drag items to adjust the order. Items outside the top 5 are kept and can be moved back up later. The top 5 accelerators and top 5 obstacles are taken into the roadmap in phase 5.',
+    rankBot:'Discuss the ranking and adjust where needed. The top 5 of both lists feeds into the roadmap.',
+    rankConfirm:'Confirm top 5',
+    rankEmpty:'No input scored yet',
+    ringSource:{stmtA:'statement A', stmtB:'statement B', custom:'own addition'},
+
+    finalBadge:'Phase 4 complete',
+    finalTitle:'Accelerators & obstacles determined',
+    vtResults:'Results', vtCanvas:'Visual view',
+    vl1:'Our dot on the horizon',
+    finalListV:'Top 5 accelerators',
+    finalListR:'Top 5 obstacles',
+    outcomeTitle:'What do these results do?',
+    outcomeBodyV:'The accelerators are the sources of strength you can build on. In phase 5 they help identify feasible and quick actions.',
+    outcomeBodyR:'The obstacles are the barriers that need explicit attention. In phase 5 they are taken into account as attention points that influence the order and feasibility of the roadmap.',
+    finalNote:'The top 5 accelerators and obstacles are taken along into the phase-5 roadmap.',
+    toPhase5:'To phase 5 →',
+    canvasTitle:'Visiekaart canvas — full picture',
+    canvasSub:'Accelerators left · obstacles right in the green band',
+    canvasNote:'The roadmap with the top 5 actions is built in phase 5.',
+    legendTitle:'Full top-5 lists',
+    legendVTitle:'Accelerators', legendRTitle:'Obstacles',
+    legendThemesTitle:'Strategic themes',
+
+    pPreWaitTitle:'Phase 4 — Accelerators & obstacles',
+    pPreWaitSub:'Short explanation of what we do in this phase. The statements appear once the facilitator starts.',
+    summaryLabel:'What we do today',
+    pIntroWhatTitle:'What are accelerators and obstacles?',
+    pIntroWhatBody:'Accelerators are characteristics that help you reach the dot on the horizon. Obstacles make that harder. Naming both honestly keeps what follows realistic and ambitious.',
+    pIntroHowTitle:'How does this phase work?',
+    pIntroHowBody:'You rate twenty statements as accelerator, obstacle or neutral, relative to our dot on the horizon. Then you can add your own accelerators and obstacles that matter to you. Click "Submit as final" at the bottom when you are done.',
+    pPreWaitWaiting:'Waiting for the facilitator…',
+    onderbouwingBtn:'Background',
+    onderbouwingTitle:'Theoretical background — phase 4',
+    onderbouwingBody:"A good plan stands or falls with execution. In this phase you identify what supports realising the dot on the horizon (accelerators) and what hinders it (obstacles). The statements are built on two dimensions: execution power (behaviour, steering, discipline) and organisational elements (structure, resources, processes, capacity, inspired by the INK model). Naming both honestly makes the plan ambitious and credible. The goal is not to shrink the dot but to align the roadmap to it: the top 5 accelerators are consciously deployed and the top 5 obstacles are explicitly addressed in phase 5.",
+    onderbouwingClose:'Close',
+    p4phase:'Phase 4 · Accelerators & obstacles',
+    ofTotal:' of 20 rated',
+    pInstrTitle:'How do you score?',
+    pInstrBody:'Rate each statement as accelerator, obstacle or neutral, relative to our dot on the horizon. Neutral is a valid choice: you do not have to pick a side everywhere. You may leave statements open if you have no opinion.',
+    infoPInstr:'Accelerator: this statement is true for us and helps us reach the dot. Obstacle: this statement is less true, and may hinder movement. Neutral: neither accelerator nor obstacle. When in doubt: choose neutral and optionally add an own accelerator or obstacle.',
+    legendK:'Accelerator', legendN:'Neutral', legendA:'Obstacle',
+    optK:'Accelerator', optN:'Neutral', optA:'Obstacle',
+    customSecTitle:'Own additions (optional)',
+    customSecSub:'Missing an important accelerator or obstacle? Add it below.',
+    customVTitle:'Own accelerators',
+    customVSub:'Factors you can leverage to reach the dot on the horizon more easily.',
+    customRTitle:'Own obstacles',
+    customRSub:'Barriers you must address explicitly in the roadmap.',
+    customVPh:'E.g. strong client relationships',
+    customRPh:'E.g. dependence on a few specialists',
+    addCustomVLabel:'Add accelerator',
+    addCustomRLabel:'Add obstacle',
+    pSubmit:'Submit as final',
+    incTitle:'All rated?',
+    incBody:'You have not rated all statements yet. Do you want to submit anyway with what you have filled in?',
+    incCancel:'Back to filling in', incConfirm:'Submit anyway',
+    p4WaitTitle:'Scores submitted',
+    p4WaitSub:'The facilitator is analysing the results. Please wait…',
+    p4FinalTitle:'Accelerators & obstacles determined',
+    p4FinalSub:'These are the chosen top-5 accelerators and obstacles',
+    p4Next:'Phase 5 (roadmap) starts when the facilitator indicates',
+    pBack:'← Facilitator view',
+
+    resetConfirm:'Clear all session data (dot on the horizon, themes, actions, scores, roadmap)?\n\nDefaults will reload on the next page.',
+    resetDone:'Demo data cleared. Page will reload.',
+    goPhase3Confirm:'Back to phase 3?',
+    goPhase5Confirm:'Continue to phase 5 (roadmap)?',
+    // Cross-fase shared keys (v4)
+    tipClose:'Close',
+    vkBackEdit:'Edit',
+    pOnderbouwingBtnLabel:'Theory',
+    cumStipLabel:'Dot on the horizon',
+    cumThemesLabel:'Themes',
+    cumVersnellersLabel:'Top 5 accelerators',
+    cumRemmersLabel:'Top 5 obstacles',
+    cumActionsLabel:'Actions per theme',
+  }
+};
+
+const DEFAULT_THEMES = {
+  nl: [
+    {name:'Klantgerichtheid'},{name:'Kwaliteit & processen'},{name:'Mensen & ontwikkeling'},
+    {name:'Digitalisering'},{name:'Samenwerking'}
+  ],
+  en: [
+    {name:'Client focus'},{name:'Quality & processes'},{name:'People & development'},
+    {name:'Digitalisation'},{name:'Collaboration'}
+  ]
+};
+/* ══════════════════════════════════════════
+   ESCAPE HTML
+══════════════════════════════════════════ */
+function escapeHtml(s){
+  return String(s||'').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ══════════════════════════════════════════
+   VK SHARED ENVIRONMENT DETECTION (v4)
+══════════════════════════════════════════ */
+function isProductionMode(){
+  const host = (window.location.hostname || '').toLowerCase();
+  const protocol = window.location.protocol;
+  if (protocol === 'file:') return false;
+  if (host === '' || host === 'localhost' || host === '127.0.0.1' || host === '::1') return false;
+  if (/^192\.168\./.test(host)) return false;
+  if (/^10\./.test(host)) return false;
+  if (/^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(host)) return false;
+  if (/\.local$/.test(host)) return false;
+  return true;
+}
+function vkApplyEnvironmentRules(){
+  if (!isProductionMode()) return;
+  document.querySelectorAll('[data-env="dev-only"]').forEach(el => { el.style.display = 'none'; });
+  window.__VK_PROD = true;
+}
+
+/* ══════════ VK LIVE-MODE SWITCH (Cluster A / B1) ══════════
+   VK_LIVE = echte data + AI; false = demo-simulatie. Eén bron-van-waarheid voor alle fasen.
+   Sessietoken voor de AI-proxy-poort wordt door de koppeling (stap 3) op window.__VK_TOKEN gezet;
+   tot die tijd leeg → proxy weigert in productie → tool valt terug op lokale berekening. */
+const VK_LIVE = isProductionMode();
+if (typeof window.__VK_TOKEN === 'undefined') window.__VK_TOKEN = '';
+
+/* ── Rol- en sessiedetectie (Blok 2) — identiek aan fase 1/2/3 ── */
+const VK_JOIN_CODE = (function(){
+  try {
+    // Fasebestanden worden uitsluitend bereikt met ?join={code} in de query
+    // (via join.html en fase-naar-fase-navigatie), nooit onder een /join/-pad.
+    // Code alleen uit de query lezen voorkomt dat de /join/{seg}-regex per
+    // ongeluk de bestandsnaam (bv. 'visiekaart_fase1') als sessiecode oppikt.
+    const q = new URLSearchParams(location.search);
+    return q.get('join') || q.get('code') || null;
+  } catch(e){ return null; }
+})();
+const VK_IS_PARTICIPANT = !!VK_JOIN_CODE;
+function vkLiveCode(){
+  if (VK_JOIN_CODE) return VK_JOIN_CODE;
+  try { return (JSON.parse(localStorage.getItem('vk_session')||'{}')).sessionCode || ''; } catch(e){ return ''; }
+}
+function vkParseStage(raw){
+  if (raw == null) return null;
+  if (typeof raw === 'object') return raw;
+  try { return JSON.parse(raw); } catch(e){ return { stage: String(raw) }; }
+}
+function vkTopList(key){ try { return JSON.parse(localStorage.getItem(key)||'[]'); } catch(e){ return []; } }
+
+/* ══════════════════════════════════════════
+   VK SHARED HELPERS (v4)
+══════════════════════════════════════════ */
+function vkEscape(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+function vkFillSentenceTemplate(template, vars){
+  let s = template;
+  for (const k in vars){
+    const v = (vars[k] == null) ? '' : String(vars[k]);
+    s = s.split('{' + k + '}').join(v);
+  }
+  s = s.replace(/\b(op|at)\s+(?=[,\.])/g, '');
+  s = s.replace(/,\s*,/g, ',');
+  s = s.replace(/\s+([,\.])/g, '$1');
+  s = s.replace(/[ \t]+/g, ' ');
+  s = s.replace(/\s*\u2018\s*\u2019\s*/g, ' ');
+  s = s.replace(/\s*''\s*/g, ' ');
+  return s.trim();
+}
+
+/* ══════════════════════════════════════════
+   VK SHARED TIP POPUP (v4)
+══════════════════════════════════════════ */
+function vkOpenTip(opts){
+  const popup    = document.getElementById('vkTipPopup');
+  const backdrop = document.getElementById('vkTipBackdrop');
+  const titleEl  = document.getElementById('vkTipTitle');
+  const subEl    = document.getElementById('vkTipSub');
+  const bodyEl   = document.getElementById('vkTipBody');
+  const closeBtn = document.getElementById('vkTipCloseBtn');
+  if (!popup) return;
+  const size = opts.size === 'sm' ? 'sm' : 'lg';
+  popup.setAttribute('data-size', size);
+  if (opts.title){ titleEl.textContent = opts.title; titleEl.style.display = ''; }
+  else           { titleEl.textContent = ''; titleEl.style.display = 'none'; }
+  if (opts.sub && size === 'lg'){ subEl.textContent = opts.sub; subEl.style.display = ''; }
+  else                          { subEl.textContent = ''; subEl.style.display = 'none'; }
+  const bodyArr = Array.isArray(opts.body) ? opts.body : [opts.body];
+  bodyEl.innerHTML = bodyArr.map(item => {
+    if (item == null) return '';
+    if (typeof item === 'string') return '<p>' + vkEscape(item) + '</p>';
+    if (typeof item === 'object'){
+      let html = '';
+      if (item.h) html += '<div class="vk-tip-h">' + vkEscape(item.h) + '</div>';
+      if (item.p) html += '<p>' + vkEscape(item.p) + '</p>';
+      return html;
+    }
+    return '';
+  }).join('');
+  if (closeBtn) closeBtn.textContent = opts.closeLabel || (T[lang] && T[lang].tipClose) || 'Sluiten';
+  if (size === 'lg'){
+    backdrop.classList.add('open');
+    popup.style.top = ''; popup.style.left = ''; popup.style.transform = '';
+  } else {
+    backdrop.classList.remove('open');
+    if (opts.anchor){
+      const r = opts.anchor.getBoundingClientRect();
+      const popW = 340;
+      let left = r.left;
+      if (left + popW > window.innerWidth - 16) left = window.innerWidth - popW - 16;
+      if (left < 16) left = 16;
+      popup.style.left = left + 'px';
+      popup.style.top  = (r.bottom + 12) + 'px';
+      popup.style.transform = '';
+    } else {
+      popup.style.left = '50%'; popup.style.top = '40%';
+      popup.style.transform = 'translate(-50%, -50%)';
+    }
+  }
+  popup.classList.add('open');
+  setTimeout(() => popup.querySelector('.vk-tip-close')?.focus(), 50);
+}
+function vkCloseTip(){
+  const popup    = document.getElementById('vkTipPopup');
+  const backdrop = document.getElementById('vkTipBackdrop');
+  if (popup)    popup.classList.remove('open');
+  if (backdrop) backdrop.classList.remove('open');
+}
+
+// ── INFO ICON WRAPPER (v4 BUG FIX) ────────────────────────────────────────
+// Inline onclick="..." kan T/lang (const/let) niet zien.
+// Daarom: 'i'-iconen roepen vkInfoOpen('infoXxx', this) aan.
+// Function declarations zijn wél global-bereikbaar én zien T/lang lexically.
+function vkInfoOpen(key, anchor){
+  if (typeof T === 'undefined' || !T[lang]) return;
+  const body = T[lang][key];
+  if (body == null) return;
+  vkOpenTip({ size: 'sm', body: body, anchor: anchor });
+}
+
+// Esc + klik buiten sm-popup
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') vkCloseTip();
+});
+document.addEventListener('click', e => {
+  const popup = document.getElementById('vkTipPopup');
+  if (!popup || !popup.classList.contains('open')) return;
+  if (popup.getAttribute('data-size') !== 'sm') return;
+  if (popup.contains(e.target)) return;
+  if (e.target.classList && e.target.classList.contains('info-icon')) return;
+  vkCloseTip();
+});
+
+/* ══════════════════════════════════════════
+   LANG + applyT (robuust met text-node-first)
+══════════════════════════════════════════ */
+function setLang(l, opts){
+  lang = l;
+  vkCloseTip();
+  document.documentElement.lang = l;
+  document.getElementById('lNL').classList.toggle('on', l==='nl');
+  document.getElementById('lEN').classList.toggle('on', l==='en');
+  applyT();
+  if (!opts || !opts.fromStorage) {
+    try { localStorage.setItem('vk_lang', l); } catch(e){}
+  }
+}
+
+function initLang(){
+  let init = null;
+  try {
+    const stored = localStorage.getItem('vk_lang');
+    if (stored === 'nl' || stored === 'en') init = stored;
+    if (!init) {
+      const ss = localStorage.getItem('vk_session_started');
+      if (ss) { const o = JSON.parse(ss); if (o && (o.lang==='nl'||o.lang==='en')) init = o.lang; }
+    }
+  } catch(e){}
+  if (init && init !== lang) setLang(init, {fromStorage:true});
+}
+
+function applyT(){
+  const t = T[lang];
+  Object.keys(t).forEach(k => {
+    if (typeof t[k] !== 'string') return;
+    const el = document.getElementById('t-' + k);
+    if (!el) return;
+    if (el.children.length > 0) {
+      let textNode = null;
+      for (const n of el.childNodes) {
+        if (n.nodeType === 3 && n.textContent.trim()) { textNode = n; break; }
+      }
+      if (textNode) textNode.textContent = t[k] + ' ';
+      else el.insertBefore(document.createTextNode(t[k] + ' '), el.firstChild);
+    } else {
+      el.textContent = t[k];
+    }
+  });
+  document.querySelectorAll('[data-t-placeholder]').forEach(el => {
+    const key = el.dataset.tPlaceholder;
+    if (t[key]) el.placeholder = t[key];
+  });
+  // Title
+  document.title = (lang==='nl')
+    ? 'Visiekaart v4 — Fase 4: Versnellers & remmers'
+    : 'Visiekaart v4 — Phase 4: Accelerators & obstacles';
+  // Vision in alle plekken
+  syncVision();
+  // Fase-specifieke renders
+  renderSessPanel();
+  buildIntroGrid();
+  buildIntroThemesList();
+  // Deelnemer-content opnieuw renderen voor nieuwe labels
+  if (document.getElementById('p4Form').style.display !== 'none') {
+    buildStatementsForm();
+    renderCustomFields('v');
+    renderCustomFields('r');
+  }
+  if (document.getElementById('sRanking').classList.contains('open')) renderRanking();
+  if (document.getElementById('sFinal').classList.contains('open')) { buildFinalScreen(); if (typeof drawCanvas==='function') { try{ drawCanvas(); }catch(e){} } }
+  if (document.getElementById('sWait').classList.contains('open')) renderWaitFeed();
+  if (document.getElementById('p4Final').style.display !== 'none') buildP4Final();
+  updatePSummary();
+}
+
+function syncVision(){
+  ['visionSentence','visionSentence2','visionSentence3','pVisionTextPre'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = visionSentence || '—';
+  });
+}
+
+/* ══════════════════════════════════════════
+   SESSIE-INFO PANEEL
+══════════════════════════════════════════ */
+function readSession(){
+  try { return JSON.parse(localStorage.getItem('vk_session') || 'null'); } catch(e){ return null; }
+}
+
+function renderSessPanel(){
+  const bar = document.getElementById('sessBar');
+  const grid = document.getElementById('sessGrid');
+  const mini = document.getElementById('sessMini');
+  if (!bar || !grid) return;
+  const sess = readSession();
+  if (!sess) { bar.style.display = 'none'; return; }
+  bar.style.display = 'block';
+  const t = T[lang];
+  const items = [
+    {k: t.sessOrg,     v: sess.org || '—'},
+    {k: t.sessName,    v: sess.sessionName || t.unnamedSession},
+    {k: t.sessType,    v: (t.sessTypeLblFull && t.sessTypeLblFull[sess.sessionType]) || sess.sessionType || '—'},
+    {k: t.sessScale,   v: (t.scaleLblFull && t.scaleLblFull[sess.scale]) || sess.scale || '—'},
+    {k: t.sessUrgency, v: (t.urgLblFull && t.urgLblFull[sess.urgency]) || sess.urgency || '—'},
+    {k: t.sessBudget,  v: (t.budLblFull && t.budLblFull[sess.budget]) || sess.budget || '—'},
+    {k: t.sessHorizon, v: (t.horLblFull && t.horLblFull[sess.horizon]) || sess.horizon || '—'},
+  ];
+  grid.innerHTML = items.map(i =>
+    `<div class="sess-item"><span class="sess-k">${escapeHtml(i.k)}</span><span class="sess-v" title="${escapeHtml(i.v)}">${escapeHtml(i.v)}</span></div>`
+  ).join('');
+  if (mini) {
+    const org = (sess.org || '').trim();
+    const nm  = (sess.sessionName || '').trim();
+    const parts = [];
+    if (org) parts.push(org);
+    if (nm)  parts.push(nm);
+    mini.textContent = parts.length ? (' · ' + parts.join(' · ')) : '';
+  }
+}
+
+function toggleSessPanel(){
+  const panel = document.getElementById('sessPanel');
+  const tgl = document.getElementById('sessToggle');
+  const open = !panel.classList.contains('open');
+  panel.classList.toggle('open', open);
+  tgl.classList.toggle('open', open);
+  tgl.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+
+/* ══════════════════════════════════════════
+   ONDERBOUWING (v4: via vkOpenTip) + BACK-EDIT + CUMULATIVE RESULTS
+══════════════════════════════════════════ */
+function openOnderbouwing(){
+  const t = T[lang];
+  vkOpenTip({
+    size: 'lg',
+    title: t.onderbouwingTitle,
+    body: t.onderbouwingBody,
+    closeLabel: t.tipClose || t.onderbouwingClose
+  });
+}
+
+function vkBackToEdit(){
+  try{ localStorage.setItem('vk_phase4_state', 'editing'); }catch(e){}
+  // Terug naar ranking-stap (waar bevestiging laatst plaatsvond)
+  goStep('ranking');
+}
+
+function vkRenderCumulativeF4(){
+  const wrap = document.getElementById('vkCumWrap');
+  if (!wrap) return;
+  const t = T[lang];
+  let stip = '';
+  let themes = [];
+  let actionsByTheme = {};
+  let versnellers = [];
+  let remmers = [];
+  try {
+    stip = localStorage.getItem('vk_vision_sentence') || '';
+    const rawThemes = localStorage.getItem('vk_selected_themes');
+    if (rawThemes) themes = JSON.parse(rawThemes) || [];
+    const rawActs = localStorage.getItem('vk_confirmed_actions');
+    if (rawActs) actionsByTheme = JSON.parse(rawActs) || {};
+    const rawV = localStorage.getItem('vk_versnellers');
+    if (rawV) versnellers = JSON.parse(rawV) || [];
+    const rawR = localStorage.getItem('vk_remmers');
+    if (rawR) remmers = JSON.parse(rawR) || [];
+  } catch(e){}
+
+  if (!stip && (!themes || !themes.length)) {
+    wrap.style.display = 'none';
+    return;
+  }
+  wrap.style.display = '';
+
+  const themeColors = ['#70A2D7','#BDD24D','#E8423F','#9666AA','#2A9791'];
+  let html = '';
+
+  // 1. Stip
+  if (stip) {
+    html += `<div class="vk-cum-section">
+      <div class="vk-cum-label">${vkEscape(t.cumStipLabel || 'Stip op de horizon')}</div>
+      <div class="vk-cum-stip">${vkEscape(stip)}</div>
+    </div>`;
+  }
+
+  // 2. Thema's
+  if (themes && themes.length) {
+    html += `<div class="vk-cum-section">
+      <div class="vk-cum-label">${vkEscape(t.cumThemesLabel || "Thema's")}</div>
+      <div class="vk-cum-themes">
+        ${themes.map((th, i) => {
+          const name = (th && typeof th === 'object') ? (th.name || '') : String(th || '');
+          const c = themeColors[i % themeColors.length];
+          return `<span class="vk-cum-theme-pill" style="background:${c}">${vkEscape(name)}</span>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
+
+  // 3. Versnellers + remmers (top 5)
+  const vTop = (versnellers || []).slice(0, 5);
+  const rTop = (remmers || []).slice(0, 5);
+  if (vTop.length || rTop.length) {
+    const extractText = it => (it && typeof it === 'object') ? (it.text || it.label || '') : String(it || '');
+    html += `<div class="vk-cum-section">
+      <div class="vk-cum-vr-grid">
+        <div class="vk-cum-vr-block v">
+          <div class="vk-cum-vr-label">${vkEscape(t.cumVersnellersLabel || 'Top 5 versnellers')}</div>
+          <ul class="vk-cum-vr-list">
+            ${vTop.map(v => `<li>${vkEscape(extractText(v))}</li>`).join('') || '<li style="list-style:none;color:var(--t3);font-style:italic">—</li>'}
+          </ul>
+        </div>
+        <div class="vk-cum-vr-block r">
+          <div class="vk-cum-vr-label">${vkEscape(t.cumRemmersLabel || 'Top 5 remmers')}</div>
+          <ul class="vk-cum-vr-list">
+            ${rTop.map(r => `<li>${vkEscape(extractText(r))}</li>`).join('') || '<li style="list-style:none;color:var(--t3);font-style:italic">—</li>'}
+          </ul>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // 4. Acties per thema (uit fase 3)
+  const actionKeys = Object.keys(actionsByTheme || {});
+  if (actionKeys.length) {
+    let actionsHtml = '';
+    themes.forEach((th, i) => {
+      const name = (th && typeof th === 'object') ? (th.name || '') : String(th || '');
+      const c = themeColors[i % themeColors.length];
+      const acts = actionsByTheme[i] || actionsByTheme[String(i)] || actionsByTheme[name];
+      if (!acts || !acts.length) return;
+      actionsHtml += `<div class="vk-cum-actions-block" style="border-left-color:${c}">
+        <div class="vk-cum-actions-theme">${vkEscape(name)}</div>
+        <ul class="vk-cum-actions-list">
+          ${acts.map(a => `<li>${vkEscape(typeof a === 'string' ? a : (a && a.text) || '')}</li>`).join('')}
+        </ul>
+      </div>`;
+    });
+    if (actionsHtml) {
+      html += `<div class="vk-cum-section">
+        <div class="vk-cum-label">${vkEscape(t.cumActionsLabel || 'Acties per thema')}</div>
+        ${actionsHtml}
+      </div>`;
+    }
+  }
+
+  wrap.innerHTML = html;
+}
+
+/* ESC voor F4-specifieke popups (Tip-popup heeft eigen Esc-listener uit v4-blok) */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    const ic = document.getElementById('incompleteConfirm');
+    if (ic && ic.classList.contains('open')) { closeIncompleteConfirm(); return; }
+    const an = document.getElementById('analyseConfirm');
+    if (an && an.classList.contains('open')) { closeAnalyseConfirm(); return; }
+  }
+});
+
+/* ══════════════════════════════════════════
+   CROSS-TAB STAGE-SYNC
+══════════════════════════════════════════ */
+let _vkRestoring = false;   // niveau 1: onderdrukt (her)publicatie van de stage tijdens facilitator-herstel
+function publishStage(stage, payload){
+  if (_vkRestoring) return;   // herstel na verversing → niet (her)publiceren; deelnemers ongemoeid
+  try {
+    const obj = {stage, at: Date.now()};
+    if (payload) Object.assign(obj, payload);
+    localStorage.setItem('vk_phase4_stage', JSON.stringify(obj));
+  } catch(e){}
+  if (VK_LIVE && window.vkFb){
+    try {
+      const g = Object.assign({ phase: 4, stage: stage, at: Date.now() }, payload || {});
+      vkFb.stageSet(vkLiveCode(), JSON.stringify(g));
+    } catch(e){}
+  }
+}
+function readStage(){
+  try { return JSON.parse(localStorage.getItem('vk_phase4_stage') || 'null'); } catch(e){ return null; }
+}
+
+function vkRestoreFacilitatorView(){
+  // Niveau 1: facilitator na verversing op het live werkscherm (publicatie onderdrukt).
+  if (VK_IS_PARTICIPANT) return false;
+  const st = readStage();
+  const s = st && st.stage;
+  if (s==='wait' || s==='ai' || s==='ranking'){
+    _vkRestoring = true;
+    try { goStep('wait'); }
+    catch(e){ _vkRestoring = false; return false; }
+    _vkRestoring = false;
+    return true;
+  }
+  return false;
+}
+function applyStageToPView(stObj){
+  if (facView) return;
+  let st = stObj || readStage();
+  if (!st) st = { stage: 'preWait' };
+  // Cross-device: facilitator naar latere fase → deelnemer volgt mee.
+  if (Number(st.phase) > 4){
+    window.location.href = 'visiekaart_fase' + Number(st.phase) + '.html?join=' + encodeURIComponent(vkLiveCode());
+    return;
+  }
+  // Eindscherm: spiegel de top-5 zodat buildP4Final ze toont op het deelnemer-apparaat.
+  if (st.stage === 'final' || st.stage === 'done'){
+    if (Array.isArray(st.versnellers)) { try { localStorage.setItem('vk_versnellers', JSON.stringify(st.versnellers)); } catch(e){} }
+    if (Array.isArray(st.remmers))     { try { localStorage.setItem('vk_remmers',    JSON.stringify(st.remmers));     } catch(e){} }
+  }
+  const stage = st && st.stage ? st.stage : 'preWait';
+  if (stage === 'preWait') showPStage('preWait');
+  else if (stage === 'wait' || stage === 'form' || stage === 'input') showPStage('form');
+  else if (stage === 'ai' || stage === 'ranking') {
+    // Tijdens facilitator-analyse: deelnemer ziet wachtscherm tenzij nog niet ingestuurd
+    if (pSubmitted) showPStage('wait'); else showPStage('form');
+  }
+  else if (stage === 'final' || stage === 'done') showPStage('final');
+  else showPStage('preWait');
+}
+
+/* ══════════════════════════════════════════
+   INTRO GRID + THEMES LIST
+══════════════════════════════════════════ */
+function buildIntroGrid(){
+  const grid = document.getElementById('introGrid');
+  if (!grid) return;
+  const items = T[lang].introItems;
+  grid.innerHTML = items.map(it => {
+    return `<div class="intro-item"><div class="intro-icon">${escapeHtml(it.icon)}</div><div><div class="intro-item-title">${escapeHtml(it.title)}</div><div class="intro-item-sub">${escapeHtml(it.sub)}</div></div></div>`;
+  }).join('');
+}
+
+function buildIntroThemesList(){
+  const el = document.getElementById('introThemesList');
+  if (!el) return;
+  if (!selectedThemes.length) { el.innerHTML = ''; return; }
+  el.innerHTML = selectedThemes.map((th, i) => {
+    const color = THEME_COLORS_CANVAS[i] || '#7B8E1E';
+    return `<span class="intro-theme-chip" style="background:${color}22;color:${color};border:1px solid ${color}55"><span style="width:8px;height:8px;border-radius:50%;background:${color};display:inline-block"></span>${escapeHtml(th.name)}</span>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   STEPS BAR
+══════════════════════════════════════════ */
+function buildQSteps(){
+  const bar = document.getElementById('qStepsBar');
+  if (!bar) return;
+  bar.innerHTML = STEPS.map(() => '<span class="q-step"></span>').join('');
+  updateQSteps();
+}
+function updateQSteps(){
+  const bar = document.getElementById('qStepsBar');
+  if (!bar) return;
+  // 'ai' telt visueel als 'ranking'-fase niet — laat het bij 'wait' staan
+  let s = step === 'ai' ? 'wait' : step;
+  const curIdx = STEPS.indexOf(s);
+  bar.querySelectorAll('.q-step').forEach((el, i) => {
+    el.classList.remove('done','active');
+    if (i < curIdx) el.classList.add('done');
+    else if (i === curIdx) el.classList.add('active');
+  });
+}
+
+/* ══════════════════════════════════════════
+   SCREEN NAVIGATION
+══════════════════════════════════════════ */
+function showScreen(id){
+  ['sIntro','sWait','sAILoad','sRanking','sFinal'].forEach(s => {
+    document.getElementById(s).classList.toggle('open', s === id);
+  });
+}
+function goStep(s){
+  step = s;
+  if (s === 'intro')   showScreen('sIntro');
+  if (s === 'wait')    { showScreen('sWait'); publishStage('wait'); if(!VK_LIVE) startDemoSubmissions(); renderWaitFeed(); }
+  if (s === 'ai')      { showScreen('sAILoad'); publishStage('ai'); }
+  if (s === 'ranking') { showScreen('sRanking'); publishStage('ranking'); renderRanking(); }
+  if (s === 'final')   { showScreen('sFinal'); publishStage('final', {versnellers: vkTopList('vk_versnellers'), remmers: vkTopList('vk_remmers')}); buildFinalScreen(); buildP4Final(); }
+  updateQSteps();
+}
+
+/* ══════════════════════════════════════════
+   DEMO SUBMISSIONS (facilitator-zicht voor sWait)
+══════════════════════════════════════════ */
+let demoSubmissionTimer = null;
+let demoBatchIdx = 0;
+
+function startDemoSubmissions(){
+  allScores = [];
+  demoBatchIdx = 0;
+  if (demoSubmissionTimer) clearTimeout(demoSubmissionTimer);
+  scheduleNextDemoBatch();
+}
+
+function scheduleNextDemoBatch(){
+  if (demoBatchIdx >= DEMO_SCORES.length) return;
+  demoSubmissionTimer = setTimeout(() => {
+    const src = DEMO_SCORES[demoBatchIdx];
+    // Map shortcodes 'k/n/a' → volledige interne values
+    const scores = {};
+    Object.keys(src.scores).forEach(k => {
+      const v = src.scores[k];
+      scores[k] = (v === 'k') ? 'kracht' : (v === 'a') ? 'aandachtspunt' : 'neutraal';
+    });
+    allScores.push({
+      name: src.name,
+      scores,
+      customV: (src.customV || []).slice(),
+      customR: (src.customR || []).slice(),
+      at: Date.now()
+    });
+    demoBatchIdx++;
+    renderWaitFeed();
+    scheduleNextDemoBatch();
+  }, 1100 + Math.random()*900);
+}
+
+function renderWaitFeed(){
+  const feed = document.getElementById('waitFeed');
+  if (!feed) return;
+  const t = T[lang];
+  document.getElementById('deelCount').textContent = allScores.length;
+  let scoreTotal = 0, customTotal = 0;
+  allScores.forEach(s => {
+    scoreTotal += Object.values(s.scores || {}).filter(v => v).length;
+    customTotal += (s.customV || []).length + (s.customR || []).length;
+  });
+  document.getElementById('scoreCount').textContent = scoreTotal;
+  document.getElementById('customCount').textContent = customTotal;
+  if (!allScores.length) {
+    feed.innerHTML = `<div style="font-size:12px;color:var(--t3);font-style:italic;padding:8px 0">${escapeHtml(lang==='nl'?'Nog geen inzendingen binnen…':'No submissions yet…')}</div>`;
+    return;
+  }
+  feed.innerHTML = allScores.slice().reverse().map(s => {
+    const counts = {kracht:0, neutraal:0, aandachtspunt:0};
+    Object.values(s.scores || {}).forEach(v => { if (counts[v] !== undefined) counts[v]++; });
+    const cv = (s.customV || []).length;
+    const cr = (s.customR || []).length;
+    const customChip = (cv + cr > 0)
+      ? ` · <span style="color:var(--gd);font-weight:600">+${cv+cr} ${escapeHtml(lang==='nl'?'eigen':'own')}</span>`
+      : '';
+    return `<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:var(--bg);border-radius:var(--rsm);font-size:12.5px;line-height:1.45">
+      <span style="font-size:14px;line-height:1">✓</span>
+      <span style="flex:1;word-break:break-word">
+        <strong>${escapeHtml(s.name)}</strong> · 
+        <span style="color:var(--gd);font-weight:600">${counts.kracht} ${escapeHtml(t.legendK.toLowerCase())}</span>, 
+        <span style="color:var(--t2)">${counts.neutraal} ${escapeHtml(t.legendN.toLowerCase())}</span>, 
+        <span style="color:var(--cd);font-weight:600">${counts.aandachtspunt} ${escapeHtml(t.legendA.toLowerCase())}</span>${customChip}
+      </span>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   ANALYSE (facilitator)
+══════════════════════════════════════════ */
+function onClickAnalyse(){
+  // Verwacht aantal deelnemers = DEMO_SCORES.length (5) als referentie
+  const expected = DEMO_SCORES.length;
+  if (allScores.length < expected) {
+    document.getElementById('analyseConfirm').classList.add('open');
+    return;
+  }
+  confirmAnalyse();
+}
+function closeAnalyseConfirm(){ document.getElementById('analyseConfirm').classList.remove('open'); }
+function confirmAnalyse(){
+  closeAnalyseConfirm();
+  goStep('ai');
+  setTimeout(() => {
+    computeRankings();
+    goStep('ranking');
+  }, 1800);
+}
+
+/* ══════════════════════════════════════════
+   COMPUTE RANKINGS
+══════════════════════════════════════════ */
+function computeRankings(){
+  // Verzamel alle A+B stellingen
+  const sNL = STATEMENTS.nl;
+  const sCur = STATEMENTS[lang] || sNL;
+  const titleMap = {}; // id → {title:{nl,en}, source}
+  ['A','B'].forEach(sec => {
+    STATEMENTS.nl[sec].items.forEach((it, idx) => {
+      const enIt = (STATEMENTS.en[sec].items[idx]) || it;
+      titleMap[it.id] = {
+        titleNl: it.title, titleEn: enIt.title,
+        source: 'stmt-' + sec
+      };
+    });
+  });
+
+  // Tel stemmen
+  const vCounts = {}; // statementId → count kracht
+  const rCounts = {}; // statementId → count aandachtspunt
+  const customVMap = {}; // text (lowercase) → {title, count}
+  const customRMap = {};
+
+  allScores.forEach(sub => {
+    Object.entries(sub.scores || {}).forEach(([sid, val]) => {
+      if (val === 'kracht')         vCounts[sid] = (vCounts[sid] || 0) + 1;
+      else if (val === 'aandachtspunt') rCounts[sid] = (rCounts[sid] || 0) + 1;
+    });
+    (sub.customV || []).forEach(txt => {
+      const key = String(txt).trim().toLowerCase();
+      if (!key) return;
+      if (!customVMap[key]) customVMap[key] = {title: String(txt).trim(), count: 0};
+      customVMap[key].count++;
+    });
+    (sub.customR || []).forEach(txt => {
+      const key = String(txt).trim().toLowerCase();
+      if (!key) return;
+      if (!customRMap[key]) customRMap[key] = {title: String(txt).trim(), count: 0};
+      customRMap[key].count++;
+    });
+  });
+
+  // Bouw versnellers-array
+  const vArr = [];
+  Object.entries(vCounts).forEach(([sid, count]) => {
+    const info = titleMap[sid];
+    vArr.push({
+      id: sid, title: (lang==='en' ? info.titleEn : info.titleNl),
+      titleNl: info.titleNl, titleEn: info.titleEn,
+      count, source: info.source
+    });
+  });
+  Object.entries(customVMap).forEach(([key, obj], idx) => {
+    vArr.push({
+      id: 'custV-' + key, title: obj.title, titleNl: obj.title, titleEn: obj.title,
+      count: obj.count, source: 'custom'
+    });
+  });
+
+  // Bouw remmers-array
+  const rArr = [];
+  Object.entries(rCounts).forEach(([sid, count]) => {
+    const info = titleMap[sid];
+    rArr.push({
+      id: sid, title: (lang==='en' ? info.titleEn : info.titleNl),
+      titleNl: info.titleNl, titleEn: info.titleEn,
+      count, source: info.source
+    });
+  });
+  Object.entries(customRMap).forEach(([key, obj]) => {
+    rArr.push({
+      id: 'custR-' + key, title: obj.title, titleNl: obj.title, titleEn: obj.title,
+      count: obj.count, source: 'custom'
+    });
+  });
+
+  // Sorteer descending
+  vArr.sort((a, b) => b.count - a.count || a.title.localeCompare(b.title));
+  rArr.sort((a, b) => b.count - a.count || a.title.localeCompare(b.title));
+
+  versnellersRanked = vArr;
+  remmersRanked = rArr;
+}
+
+/* ══════════════════════════════════════════
+   RANKING UI — robuuste drag-and-drop
+   Top-5 visueel prominent maar één geordende array
+══════════════════════════════════════════ */
+function renderRanking(){
+  const cols = document.getElementById('rankCols');
+  if (!cols) return;
+  const t = T[lang];
+  cols.innerHTML = `
+    <div class="rank-panel vp">
+      <div class="rank-panel-head">
+        <div class="rph-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 11V4M3.5 7.5L7 4l3.5 3.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div><div class="rph-title">${escapeHtml(t.legendVTitle)}</div><div class="rph-sub" id="ph-vSub">${escapeHtml(lang==='nl'?'Top 5 in volle kleur · rest blijft bewaard':'Top 5 in full colour · rest is kept')}</div></div>
+      </div>
+      <div class="rank-list" id="rankListV"></div>
+    </div>
+    <div class="rank-panel rp">
+      <div class="rank-panel-head">
+        <div class="rph-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 3v7M3.5 6.5L7 10l3.5-3.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div><div class="rph-title">${escapeHtml(t.legendRTitle)}</div><div class="rph-sub" id="ph-rSub">${escapeHtml(lang==='nl'?'Top 5 in volle kleur · rest blijft bewaard':'Top 5 in full colour · rest is kept')}</div></div>
+      </div>
+      <div class="rank-list" id="rankListR"></div>
+    </div>
+  `;
+  renderList('V', versnellersRanked);
+  renderList('R', remmersRanked);
+}
+
+function renderList(side, items){
+  const containerId = side === 'V' ? 'rankListV' : 'rankListR';
+  const wrap = document.getElementById(containerId);
+  if (!wrap) return;
+  const t = T[lang];
+  if (!items || !items.length) {
+    wrap.innerHTML = `<div class="rank-empty">${escapeHtml(t.rankEmpty)}</div>`;
+    return;
+  }
+  // Bouw HTML voor alle items, met visuele markering top5/below5 en een divider tussen pos 5 en 6
+  let html = '';
+  items.forEach((it, i) => {
+    const cls = (i < 5) ? 'top5' : 'below5';
+    const maxCount = Math.max(...items.map(x => x.count || 0), 1);
+    const pct = Math.round(((it.count || 0) / maxCount) * 100);
+    const srcLabel = (it.source === 'custom') ? t.ringSource.custom
+                   : (it.source === 'stmt-A') ? t.ringSource.stmtA
+                   : t.ringSource.stmtB;
+    const sideLetter = side === 'V' ? 'v' : 'r';
+    html += `<div class="rank-item ${cls}" draggable="true" data-side="${side}" data-idx="${i}">
+      <div class="ri-rank ri-rank-${sideLetter}">${i+1}</div>
+      <div class="ri-body">
+        <div class="ri-title">${escapeHtml(it.title)}</div>
+        <div class="ri-meta">
+          <div class="ri-bar"><div class="ri-bar-fill ri-bar-fill-${sideLetter}" style="width:${pct}%"></div></div>
+          <span class="ri-count" style="color:${side==='V'?'var(--gd)':'var(--cd)'}">${it.count}×</span>
+          <span class="ri-src">${escapeHtml(srcLabel)}</span>
+        </div>
+      </div>
+      <span class="ri-drag" aria-hidden="true">⋮⋮</span>
+    </div>`;
+    if (i === 4 && items.length > 5) {
+      html += `<div class="top5-divider top5-divider-${sideLetter}" aria-hidden="true"></div>`;
+    }
+  });
+  wrap.innerHTML = html;
+
+  // Bind event-listeners op ALLE items (geen early return bij i===4)
+  wrap.querySelectorAll('.rank-item').forEach(el => {
+    el.addEventListener('dragstart', onRankDragStart);
+    el.addEventListener('dragend',   onRankDragEnd);
+    el.addEventListener('dragover',  onRankDragOver);
+    el.addEventListener('dragleave', onRankDragLeave);
+    el.addEventListener('drop',      onRankDrop);
+  });
+}
+
+function onRankDragStart(e){
+  const el = e.currentTarget;
+  draggedItemIdx = parseInt(el.getAttribute('data-idx'), 10);
+  draggedList = el.getAttribute('data-side');
+  el.classList.add('dragging');
+  try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(draggedItemIdx)); } catch(err){}
+}
+function onRankDragEnd(e){
+  e.currentTarget.classList.remove('dragging');
+  // Cleanup drag-over markers
+  document.querySelectorAll('.rank-item.drag-over').forEach(el => el.classList.remove('drag-over'));
+}
+function onRankDragOver(e){
+  if (!draggedList) return;
+  if (e.currentTarget.getAttribute('data-side') !== draggedList) return;
+  e.preventDefault();
+  e.currentTarget.classList.add('drag-over');
+  try { e.dataTransfer.dropEffect = 'move'; } catch(err){}
+}
+function onRankDragLeave(e){
+  e.currentTarget.classList.remove('drag-over');
+}
+function onRankDrop(e){
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if (draggedList === null || draggedItemIdx === null) return;
+  if (e.currentTarget.getAttribute('data-side') !== draggedList) return;
+  const targetIdx = parseInt(e.currentTarget.getAttribute('data-idx'), 10);
+  const list = draggedList === 'V' ? versnellersRanked : remmersRanked;
+  if (draggedItemIdx === targetIdx) return;
+  if (draggedItemIdx < 0 || draggedItemIdx >= list.length) return;
+  // Splice-move: haal item uit oude positie, voeg in op targetIdx
+  const [moved] = list.splice(draggedItemIdx, 1);
+  list.splice(targetIdx, 0, moved);
+  renderList(draggedList, list);
+  draggedItemIdx = null;
+  draggedList = null;
+}
+
+/* ══════════════════════════════════════════
+   CONFIRM RANKING — schrijf alle storage keys
+══════════════════════════════════════════ */
+function confirmRanking(){
+  // Top-5 als arrays van strings (NL of EN — actuele taal, want fase 5/rapport lezen string)
+  const topV = versnellersRanked.slice(0, 5).map(x => x.title);
+  const topR = remmersRanked.slice(0, 5).map(x => x.title);
+  try {
+    localStorage.setItem('vk_versnellers', JSON.stringify(topV));
+    localStorage.setItem('vk_remmers',    JSON.stringify(topR));
+  } catch(e){}
+
+  // Uitgebreid scores-object met volledige rankings, allScores, eigen toevoegingen, handmatige rangorde
+  const scoresPayload = {
+    versnellersRanked: versnellersRanked.map((x, i) => ({...x, rank: i+1})),
+    remmersRanked:    remmersRanked.map((x, i) => ({...x, rank: i+1})),
+    allScores: allScores.map(s => ({...s})),
+    confirmedAt: Date.now(),
+    lang
+  };
+  try { localStorage.setItem('vk_phase4_scores', JSON.stringify(scoresPayload)); } catch(e){}
+
+  // Ruwe inzendingen voor rapportage
+  try {
+    localStorage.setItem('vk_phase4_submissions', JSON.stringify(allScores.map(s => ({
+      name: s.name, scores: s.scores, customV: s.customV, customR: s.customR, at: s.at
+    }))));
+  } catch(e){}
+
+  goStep('final');
+}
+
+/* ══════════════════════════════════════════
+   FINAL SCREEN — uitkomsten + canvas + legend
+══════════════════════════════════════════ */
+function buildFinalScreen(){
+  const wrap = document.getElementById('finalContent');
+  if (!wrap) return;
+  const t = T[lang];
+  const topV = versnellersRanked.slice(0, 5);
+  const topR = remmersRanked.slice(0, 5);
+  const srcLbl = (it) => (it.source === 'custom') ? t.ringSource.custom
+                       : (it.source === 'stmt-A') ? t.ringSource.stmtA
+                       : t.ringSource.stmtB;
+  const renderList = (items, side) => items.length
+    ? items.map((it, i) => `
+        <div class="final-list-item">
+          <span class="fli-num ${side}">${i+1}.</span>
+          <span style="flex:1;word-break:break-word">${escapeHtml(it.title)}</span>
+          <span class="fli-src">${escapeHtml(srcLbl(it))}</span>
+        </div>`).join('')
+    : `<div style="font-size:12px;color:var(--t3);font-style:italic;padding:6px 0">${escapeHtml(t.rankEmpty)}</div>`;
+  wrap.innerHTML = `
+    <div class="final-list-block">
+      <div class="flb-head v">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 11V4M3.5 7.5L7 4l3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        ${escapeHtml(t.finalListV)}
+      </div>
+      ${renderList(topV, 'v')}
+    </div>
+    <div class="final-list-block">
+      <div class="flb-head r">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 3v7M3.5 6.5L7 10l3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        ${escapeHtml(t.finalListR)}
+      </div>
+      ${renderList(topR, 'r')}
+    </div>
+  `;
+  // Outcome-block
+  const ob = document.getElementById('outcomeBlock');
+  if (ob) {
+    ob.innerHTML = `
+      <strong>${escapeHtml(t.outcomeTitle)}</strong><br>
+      <span style="color:var(--gd);font-weight:600">${escapeHtml(t.legendVTitle)}</span> — ${escapeHtml(t.outcomeBodyV)}<br>
+      <span style="color:var(--cd);font-weight:600">${escapeHtml(t.legendRTitle)}</span> — ${escapeHtml(t.outcomeBodyR)}
+    `;
+  }
+  // Indien canvas-view actief: render
+  if (document.getElementById('fvCanvas').style.display !== 'none') drawCanvas();
+  // v4: cumulative results
+  vkRenderCumulativeF4();
+  // v4: markeer fase 4 als bevestigd voor back-edit flow
+  try { localStorage.setItem('vk_phase4_state', 'confirmed'); } catch(e){}
+}
+
+function buildCanvasLegend(){
+  const t = T[lang];
+  const topV = versnellersRanked.slice(0, 5);
+  const topR = remmersRanked.slice(0, 5);
+  const elV = document.getElementById('legendVList');
+  const elR = document.getElementById('legendRList');
+  if (elV) {
+    elV.innerHTML = topV.length
+      ? topV.map((it, i) => `<div class="cl-list-item"><span class="cl-list-num v">${i+1}.</span><span>${escapeHtml(it.title)}</span></div>`).join('')
+      : `<div style="font-size:12px;color:var(--t3);font-style:italic">${escapeHtml(t.rankEmpty)}</div>`;
+  }
+  if (elR) {
+    elR.innerHTML = topR.length
+      ? topR.map((it, i) => `<div class="cl-list-item"><span class="cl-list-num r">${i+1}.</span><span>${escapeHtml(it.title)}</span></div>`).join('')
+      : `<div style="font-size:12px;color:var(--t3);font-style:italic">${escapeHtml(t.rankEmpty)}</div>`;
+  }
+  const elTh = document.getElementById('legendThemes');
+  if (elTh) {
+    if (!selectedThemes.length) elTh.innerHTML = '';
+    else elTh.innerHTML = `
+      <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">${escapeHtml(t.legendThemesTitle)}</div>
+      ${selectedThemes.map((th, i) => {
+        const color = THEME_COLORS_CANVAS[i] || '#7B8E1E';
+        return `<div class="cl-theme-row"><span class="cl-theme-bullet" style="background:${color}">${i+1}</span><span class="cl-theme-name">${escapeHtml(th.name)}</span></div>`;
+      }).join('')}
+    `;
+  }
+}
+
+function drawCanvas(){
+  const svgEl = document.getElementById('vkCanvas');
+  if (!svgEl) return;
+  // Acties per thema uit vk_confirmed_actions (fase 3)
+  let conf = {};
+  try { conf = JSON.parse(localStorage.getItem('vk_confirmed_actions') || '{}'); } catch(e){}
+  const themeActions = selectedThemes.map((_, i) => (conf[i] || []).map(text => ({text})));
+  const topV = versnellersRanked.slice(0, 5).map(x => x.title);
+  const topR = remmersRanked.slice(0, 5).map(x => x.title);
+  vkRenderInto(svgEl, {
+    visionSentence,
+    themeNames: selectedThemes.map(t => t.name),
+    themeActions,
+    versnellers: topV,
+    remmers: topR,
+    roadmapTop5: [],
+    lang
+  });
+  buildCanvasLegend();
+}
+
+function switchView(v){
+  const r = document.getElementById('vt-results');
+  const c = document.getElementById('vt-canvas');
+  const fvR = document.getElementById('fvResults');
+  const fvC = document.getElementById('fvCanvas');
+  if (v === 'results') {
+    r.classList.add('on'); c.classList.remove('on');
+    fvR.style.display = ''; fvC.style.display = 'none';
+  } else {
+    r.classList.remove('on'); c.classList.add('on');
+    fvR.style.display = 'none'; fvC.style.display = '';
+    drawCanvas();
+  }
+}
+
+/* ══════════════════════════════════════════
+   PARTICIPANT VIEW
+══════════════════════════════════════════ */
+function showPView(){
+  facView = false;
+  document.getElementById('facView').style.display = 'none';
+  document.getElementById('pView').classList.add('open');
+  renderPView();
+  applyStageToPView();
+}
+function hidePView(){
+  facView = true;
+  document.getElementById('facView').style.display = '';
+  document.getElementById('pView').classList.remove('open');
+}
+function showPStage(stage){
+  ['p4PreWait','p4Form','p4Wait','p4Final'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+  if (stage === 'preWait') document.getElementById('p4PreWait').style.display = '';
+  else if (stage === 'form')  { document.getElementById('p4Form').style.display = ''; buildStatementsForm(); renderCustomFields('v'); renderCustomFields('r'); updateProgress(); }
+  else if (stage === 'wait')  document.getElementById('p4Wait').style.display = '';
+  else if (stage === 'final') { document.getElementById('p4Final').style.display = ''; buildP4Final(); }
+}
+function renderPView(){
+  syncVision();
+  updatePSummary();
+}
+function updatePSummary(){
+  const block = document.getElementById('pSummaryBlock');
+  const text  = document.getElementById('pSummaryText');
+  const sess  = readSession();
+  const facBlock = document.getElementById('pFacilitatorBlock');
+  const facName  = document.getElementById('pFacilitatorName');
+  if (!block || !text) return;
+  if (!sess) { block.style.display = 'none'; return; }
+  const t = T[lang];
+  const typeLbl  = (t.sessTypeLbl && t.sessTypeLbl[sess.sessionType]) || sess.sessionType || '';
+  const scaleLbl = (t.scaleLbl    && t.scaleLbl   [sess.scale])       || sess.scale       || '';
+  const urgLbl   = (t.urgLbl      && t.urgLbl     [sess.urgency])     || sess.urgency     || '';
+  const budLbl   = (t.budLbl      && t.budLbl     [sess.budget])      || sess.budget      || '';
+  const horLbl   = (t.horLbl      && t.horLbl     [sess.horizon])     || sess.horizon     || '';
+  const name     = (sess.sessionName || '').trim();
+  const tpl      = name ? t.summaryTpl : t.summaryTplNoName;
+  text.textContent = tpl
+    .replace('{type}',  typeLbl).replace('{scale}', scaleLbl).replace('{name}', name)
+    .replace('{urg}',   urgLbl) .replace('{bud}',   budLbl)  .replace('{hor}',  horLbl);
+  block.style.display = 'block';
+  if (facBlock && facName) {
+    const facStr = (sess.facilitator || '').trim();
+    if (facStr) { facName.textContent = facStr; facBlock.style.display = 'block'; }
+    else        { facName.textContent = T[lang].pFacUnknown; facBlock.style.display = 'block'; }
+  }
+}
+
+/* ══════════════════════════════════════════
+   STATEMENTS FORM (deelnemer)
+══════════════════════════════════════════ */
+function buildStatementsForm(){
+  const container = document.getElementById('statementsContainer');
+  if (!container) return;
+  const t = T[lang];
+  const stmts = STATEMENTS[lang];
+  let html = '';
+  ['A','B'].forEach(sec => {
+    const block = stmts[sec];
+    html += `<div class="section-head sec-${sec}">
+      <div class="sh-letter">${sec}</div>
+      <div><div class="sh-title">${escapeHtml(block.label)}</div><div class="sh-sub">${escapeHtml(block.sub)}</div></div>
+    </div>`;
+    block.items.forEach((it, i) => {
+      const cur = pScores[it.id]; // 'kracht'|'neutraal'|'aandachtspunt' of undefined
+      const ansClass = cur ? `answered-${cur}` : '';
+      const selK = cur === 'kracht'        ? 'selected-k' : '';
+      const selN = cur === 'neutraal'      ? 'selected-n' : '';
+      const selA = cur === 'aandachtspunt' ? 'selected-a' : '';
+      html += `<div class="statement-card ${ansClass}" id="sc-${it.id}">
+        <div class="sc-num">${sec}${i+1}</div>
+        <div class="sc-title">${escapeHtml(it.title)}</div>
+        <div class="sc-text">${escapeHtml(it.text)}</div>
+        <div class="sc-options" role="radiogroup" aria-label="${escapeHtml(it.title)}">
+          <button class="sc-opt ${selK}" type="button" data-sid="${escapeHtml(it.id)}" data-val="kracht"        onclick="scoreStatement('${escapeHtml(it.id)}','kracht',this)"        role="radio" aria-checked="${cur==='kracht'}">${escapeHtml(t.optK)}</button>
+          <button class="sc-opt ${selN}" type="button" data-sid="${escapeHtml(it.id)}" data-val="neutraal"      onclick="scoreStatement('${escapeHtml(it.id)}','neutraal',this)"      role="radio" aria-checked="${cur==='neutraal'}">${escapeHtml(t.optN)}</button>
+          <button class="sc-opt ${selA}" type="button" data-sid="${escapeHtml(it.id)}" data-val="aandachtspunt" onclick="scoreStatement('${escapeHtml(it.id)}','aandachtspunt',this)" role="radio" aria-checked="${cur==='aandachtspunt'}">${escapeHtml(t.optA)}</button>
+        </div>
+      </div>`;
+    });
+  });
+  container.innerHTML = html;
+}
+
+function scoreStatement(sid, val, btn){
+  pScores[sid] = val;
+  const card = document.getElementById('sc-' + sid);
+  if (card) {
+    card.classList.remove('answered-kracht','answered-neutraal','answered-aandachtspunt');
+    card.classList.add('answered-' + val);
+    card.querySelectorAll('.sc-opt').forEach(b => {
+      b.classList.remove('selected-k','selected-n','selected-a');
+      const v = b.getAttribute('data-val');
+      if (v === val) {
+        b.classList.add(val === 'kracht' ? 'selected-k' : val === 'neutraal' ? 'selected-n' : 'selected-a');
+      }
+      b.setAttribute('aria-checked', String(v === val));
+    });
+  }
+  updateProgress();
+}
+
+/* ══════════════════════════════════════════
+   CUSTOM FIELDS (eigen versnellers + remmers)
+══════════════════════════════════════════ */
+function preservePCustomValues(side){
+  const wrap = document.getElementById(side === 'v' ? 'customFieldsV' : 'customFieldsR');
+  if (!wrap) return;
+  const inputs = wrap.querySelectorAll('.custom-input');
+  const arr = Array.from(inputs).map(i => i.value || '');
+  if (side === 'v') pCustomV = arr.length ? arr : [''];
+  else              pCustomR = arr.length ? arr : [''];
+}
+
+function renderCustomFields(side){
+  const wrap = document.getElementById(side === 'v' ? 'customFieldsV' : 'customFieldsR');
+  if (!wrap) return;
+  const t = T[lang];
+  const arr = side === 'v' ? pCustomV : pCustomR;
+  if (!arr.length) {
+    if (side === 'v') pCustomV = [''];
+    else              pCustomR = [''];
+  }
+  const list = side === 'v' ? pCustomV : pCustomR;
+  const ph = side === 'v' ? t.customVPh : t.customRPh;
+  wrap.innerHTML = list.map((val, idx) => `
+    <div class="custom-field">
+      <div class="custom-num ${side}">${idx+1}</div>
+      <input class="custom-input" type="text" id="pCustom-${side}-${idx}" value="${escapeHtml(val)}" placeholder="${escapeHtml(ph)}" onkeydown="pCustomKeydown(event,'${side}',${idx})" oninput="pCustomInput('${side}',${idx})" aria-label="${escapeHtml(side==='v'?t.customVTitle:t.customRTitle)} ${idx+1}">
+      ${list.length > 1 ? `<button class="custom-remove" type="button" onclick="pRemoveCustom('${side}',${idx})" aria-label="${escapeHtml(lang==='nl'?'Verwijder veld':'Remove field')}" title="${escapeHtml(lang==='nl'?'Verwijderen':'Remove')}">×</button>` : ''}
+    </div>
+  `).join('');
+}
+
+function pCustomInput(side, idx){
+  const inp = document.getElementById('pCustom-' + side + '-' + idx);
+  if (!inp) return;
+  if (side === 'v') pCustomV[idx] = inp.value || '';
+  else              pCustomR[idx] = inp.value || '';
+  updateProgress();
+}
+
+function pAddCustom(side){
+  preservePCustomValues(side);
+  if (side === 'v') pCustomV.push('');
+  else              pCustomR.push('');
+  renderCustomFields(side);
+  // Focus nieuw veld
+  setTimeout(() => {
+    const arr = side === 'v' ? pCustomV : pCustomR;
+    const el = document.getElementById('pCustom-' + side + '-' + (arr.length - 1));
+    if (el) el.focus();
+  }, 50);
+}
+
+function pRemoveCustom(side, idx){
+  preservePCustomValues(side);
+  const arr = side === 'v' ? pCustomV : pCustomR;
+  if (arr.length <= 1) {
+    // Laatste veld: clear in plaats van verwijderen
+    if (side === 'v') pCustomV = [''];
+    else              pCustomR = [''];
+  } else {
+    arr.splice(idx, 1);
+  }
+  renderCustomFields(side);
+  updateProgress();
+}
+
+function pCustomKeydown(ev, side, idx){
+  if (ev.key === 'Enter') {
+    ev.preventDefault();
+    preservePCustomValues(side);
+    const arr = side === 'v' ? pCustomV : pCustomR;
+    const nextEl = document.getElementById('pCustom-' + side + '-' + (idx + 1));
+    if (nextEl) nextEl.focus();
+    else if ((arr[idx] || '').trim()) pAddCustom(side);
+  }
+  // TAB doet de browser-default focusverplaatsing; oninput houdt waarden in sync.
+}
+
+function updateProgress(){
+  const answered = Object.values(pScores).filter(v => !!v).length;
+  const total = 20;
+  const pct = Math.round((answered / total) * 100);
+  const fill = document.getElementById('progFill');
+  const cnt  = document.getElementById('answeredCount');
+  if (fill) fill.style.width = pct + '%';
+  if (cnt)  cnt.textContent = answered;
+}
+
+/* ══════════════════════════════════════════
+   SUBMIT SCORES (deelnemer)
+══════════════════════════════════════════ */
+function submitScores(){
+  preservePCustomValues('v');
+  preservePCustomValues('r');
+  const answered = Object.values(pScores).filter(v => !!v).length;
+  if (answered < 20) {
+    document.getElementById('incompleteConfirm').classList.add('open');
+    return;
+  }
+  doSubmitScores();
+}
+function closeIncompleteConfirm(){ document.getElementById('incompleteConfirm').classList.remove('open'); }
+function confirmIncompleteSubmit(){
+  closeIncompleteConfirm();
+  doSubmitScores();
+}
+function doSubmitScores(){
+  let myName = T[lang].pYou;
+  try{ const j=JSON.parse(localStorage.getItem('vk_joined')||'null'); if(j && j.name) myName=j.name; }catch(e){}
+  const entry = {
+    name: myName,
+    at: Date.now(),
+    scores: {...pScores},
+    customV: pCustomV.filter(v => v && v.trim()).map(v => v.trim()),
+    customR: pCustomR.filter(v => v && v.trim()).map(v => v.trim())
+  };
+  if (VK_LIVE && window.vkFb){
+    try{ vkFb.push(vkLiveCode(),'phase4/scores', entry); }catch(e){}   // facilitator-leeskant telt mee
+  } else {
+    // Demo/lokaal: schrijf naar live-foundation
+    try {
+      const cur = JSON.parse(localStorage.getItem('vk_phase4_live_subs') || '[]');
+      cur.push(entry);
+      localStorage.setItem('vk_phase4_live_subs', JSON.stringify(cur));
+    } catch(e){}
+  }
+  pSubmitted = true;
+  showPStage('wait');
+}
+
+/* ══════════════════════════════════════════
+   PARTICIPANT FINAL
+══════════════════════════════════════════ */
+function buildP4Final(){
+  const wrap = document.getElementById('p4FinalContent');
+  if (!wrap) return;
+  const t = T[lang];
+  let topV = [], topR = [];
+  try { topV = JSON.parse(localStorage.getItem('vk_versnellers') || '[]'); } catch(e){}
+  try { topR = JSON.parse(localStorage.getItem('vk_remmers')     || '[]'); } catch(e){}
+  const renderL = (arr, side) => arr.length
+    ? arr.map((s, i) => `<div class="final-list-item"><span class="fli-num ${side}">${i+1}.</span><span style="flex:1;word-break:break-word">${escapeHtml(s)}</span></div>`).join('')
+    : `<div style="font-size:12px;color:var(--t3);font-style:italic;padding:6px 0">${escapeHtml(t.rankEmpty)}</div>`;
+  wrap.innerHTML = `
+    <div class="final-list-block" style="margin-bottom:12px">
+      <div class="flb-head v">${escapeHtml(t.finalListV)}</div>
+      ${renderL(topV, 'v')}
+    </div>
+    <div class="final-list-block">
+      <div class="flb-head r">${escapeHtml(t.finalListR)}</div>
+      ${renderL(topR, 'r')}
+    </div>
+  `;
+}
+
+/* ══════════════════════════════════════════
+   RESET & NAVIGATIE
+══════════════════════════════════════════ */
+function resetDemoData(){
+  if (window.__VK_PROD) return;
+  if (!confirm(T[lang].resetConfirm)) return;
+  const keys = [
+    'vk_session','vk_session_started',
+    'vk_vision_sentence','vk_vision_keywords',
+    'vk_phase1_answers','vk_phase1_stage','vk_phase1_live_answers',
+    'vk_selected_themes','vk_phase2_submissions','vk_phase2_stage','vk_phase2_live_subs',
+    'vk_confirmed_actions','vk_phase3_submissions','vk_phase3_stage','vk_phase3_live_subs',
+    'vk_versnellers','vk_remmers','vk_phase4_scores','vk_phase4_submissions','vk_phase4_stage','vk_phase4_live_subs',
+    'vk_roadmap_actions'
+  ];
+  // vk_lang BEHOUDEN — UI-voorkeur
+  keys.forEach(k => { try { localStorage.removeItem(k); } catch(e){} });
+  alert(T[lang].resetDone);
+  location.reload();
+}
+
+function goPhase3(){
+  window.location.href = 'visiekaart_fase3.html';
+}
+function goPhase5(){
+  publishStage('done');
+  // Cross-device: zet globale stage naar fase 5 zodat deelnemer-apparaten meegaan.
+  if (VK_LIVE && window.vkFb){
+    try{ vkFb.stageSet(vkLiveCode(), JSON.stringify({phase:5, stage:'preWait', at:Date.now()})); }catch(e){}
+  }
+  window.location.href = 'visiekaart_fase5.html';
+}
+
+/* ══════════════════════════════════════════
+   STORAGE-EVENT LISTENER
+══════════════════════════════════════════ */
+window.addEventListener('storage', e => {
+  if (e.key === 'vk_lang' && e.newValue && e.newValue !== lang) {
+    setLang(e.newValue, {fromStorage:true});
+  }
+  if (e.key === 'vk_phase4_stage' || e.key === 'vk_vision_sentence' || e.key === 'vk_selected_themes') {
+    if (!facView) {
+      loadVisionAndThemes();
+      renderPView();
+      applyStageToPView();
+    }
+  }
+  if (e.key === 'vk_session') { renderSessPanel(); if (!facView) updatePSummary(); }
+});
+
+/* ══════════════════════════════════════════
+   LOAD DATA
+══════════════════════════════════════════ */
+function loadVisionAndThemes(){
+  // Vision sentence
+  try {
+    const st = localStorage.getItem('vk_vision_sentence');
+    visionSentence = st || '';
+  } catch(e){ visionSentence = ''; }
+  if (!visionSentence) {
+    visionSentence = (lang==='nl')
+      ? 'Omdat ouderen langer thuis willen wonen, richten wij ons op toegankelijke zorg dichtbij, zodat zij waardig en zelfstandig kunnen blijven leven.'
+      : 'Because older adults want to live at home longer, we focus on accessible care nearby so they can keep living with dignity and independence.';
+  }
+  // Selected themes
+  try {
+    const st = localStorage.getItem('vk_selected_themes');
+    if (st) {
+      const arr = JSON.parse(st);
+      if (Array.isArray(arr) && arr.length) {
+        selectedThemes = arr.map((t,i) => ({...t, color: THEME_COLORS_CANVAS[i]}));
+      } else {
+        selectedThemes = DEFAULT_THEMES[lang].map((t,i) => ({...t, color: THEME_COLORS_CANVAS[i]}));
+      }
+    } else {
+      selectedThemes = DEFAULT_THEMES[lang].map((t,i) => ({...t, color: THEME_COLORS_CANVAS[i]}));
+    }
+  } catch(e){
+    selectedThemes = DEFAULT_THEMES[lang].map((t,i) => ({...t, color: THEME_COLORS_CANVAS[i]}));
+  }
+  syncVision();
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+/* Deelnemer-rol: forceer pView en volg de globale stage uit RTDB. */
+function vkRoleInit(){
+  if(!VK_IS_PARTICIPANT) return;
+  showPView();
+  if(!(VK_LIVE && window.vkFb)) return;
+  try{
+    vkFb.stageListen(vkLiveCode(), function(raw){ applyStageToPView(vkParseStage(raw)); });
+  }catch(e){}
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  vkApplyEnvironmentRules();
+  buildQSteps();
+  initLang();
+  loadVisionAndThemes();
+  buildIntroGrid();
+  buildIntroThemesList();
+  renderSessPanel();
+  applyT();
+  if (!vkRestoreFacilitatorView()){ step = 'intro'; showScreen('sIntro'); }
+  updateQSteps();
+  vkRoleInit();
+  // Cluster B (Blok 1): platform-context herstellen uit sessionStorage (geen poort;
+  // de betaalmuur ligt uitsluitend op fase 5 — VK_BETAAL_VANAF_FASE, bevroren door CINAB).
+  if (VK_LIVE && window.VK_CINAB && !VK_IS_PARTICIPANT){ try { VK_CINAB.restore(); } catch(e){} }
+});
+
+</script>
+
+<!-- ═══════════════ PLATFORM / FIREBASE / CINAB (Blok 1, identiek in fase 0-5 + rapport) ═══════════════ -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script type="module">
+  // De ONGEWIJZIGDE module-client; we bridgen alleen zijn publieke API naar window.
+  import { startCinabSession, createCinabClient, CinabError } from './cinab-tool-client.js';
+  window.__cinabLib = { startCinabSession, createCinabClient, CinabError };
+  window.dispatchEvent(new Event('cinab-lib-ready'));
+</script>
+<script>
+/* ── ingebouwde vk-firebase.js ── */
+/* ══════════════════════════════════════════════════════════════════════════
+   vk-firebase.js — Cluster B / Firebase-integratie (niveau B)
+   Wordt straks INGEBOUWD per fase (zelf-bevattend), net als vk-ai.js.
+
+   Levert:
+   - omgevings-config (staging vs productie; NOOIT databaseURL hardcoden in code)
+   - anonieme auth
+   - server-side sessie-state in RTDB  (/sessions/{code}/state)   — vervangt localStorage op B
+   - stage-sync                        (/sessions/{code}/stage)
+   - live-listeners + append           (/sessions/{code}/phaseN/...)
+   - session/clear                     (wist de RTDB-tak; stateless-at-rest)
+
+   ALLES degradeert netjes: ontbreekt de SDK/config of faalt het netwerk, dan
+   rejecten de helpers en de fase valt terug op de bestaande localStorage/demo-flow.
+   De beveiliging zit in database.rules.json, niet in deze config (geen secret).
+   ══════════════════════════════════════════════════════════════════════════ */
+(function (global) {
+  'use strict';
+
+  /* ── Omgevings-config (per omgeving inlezen; productie schoon omwisselbaar) ── */
+  var VK_FB_STAGING = {
+    apiKey: "AIzaSyCer_6Y7f-jUXygHnBF_UdtpTxPTEIvaoA",
+    authDomain: "visiekaart.firebaseapp.com",
+    databaseURL: "https://visiekaart-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "visiekaart",
+    storageBucket: "visiekaart.firebasestorage.app",
+    messagingSenderId: "757784606494",
+    appId: "1:757784606494:web:6f47e48fc85f15f6257b0f"
+  };
+  // Vul in zodra het schone productieproject (europe-west1, CINAB-account) staat:
+  var VK_FB_PROD = null; // bv. { apiKey:"…", databaseURL:"https://…-prod-….europe-west1.firebasedatabase.app", … }
+
+  function vkFbEnv() {
+    var h = (global.location && global.location.hostname) || '';
+    var staging = (h === 'localhost' || h.indexOf('127.') === 0 || h.indexOf('192.168.') === 0 ||
+                   h.indexOf('.local') !== -1 || h.indexOf('.web.app') !== -1 ||
+                   h.indexOf('.firebaseapp.com') !== -1 || h.indexOf('staging.') === 0);
+    return staging ? 'staging' : 'production';
+  }
+  function vkFbConfig() { return vkFbEnv() === 'production' ? VK_FB_PROD : VK_FB_STAGING; }
+
+  /* ── Init + anonieme auth ── */
+  var _readyPromise = null;
+  function vkFbInit() {
+    if (_readyPromise) return _readyPromise;
+    _readyPromise = new Promise(function (resolve, reject) {
+      try {
+        if (typeof global.firebase === 'undefined' || !global.firebase.initializeApp) {
+          return reject(new Error('firebase_sdk_missing'));
+        }
+        var cfg = vkFbConfig();
+        if (!cfg || !cfg.databaseURL) return reject(new Error('firebase_config_missing'));
+        if (!global.firebase.apps || !global.firebase.apps.length) global.firebase.initializeApp(cfg);
+        global.firebase.auth().signInAnonymously()
+          .then(function () { resolve(global.firebase); })
+          .catch(reject);
+      } catch (e) { reject(e); }
+    });
+    return _readyPromise;
+  }
+
+  function db() { return global.firebase.database(); }
+  function sessRef(code, sub) { return db().ref('sessions/' + code + (sub ? '/' + sub : '')); }
+  function nowUTC() { return Date.now(); }
+
+  /* ── Sessie-state (server-side; vervangt localStorage op niveau B) ── */
+  // payload = opaak object (volledige tool-state). WordPress leest dit nooit (data_ref).
+  function stateSave(code, payload) {
+    return vkFbInit().then(function () {
+      return sessRef(code, 'state').set({ updatedAt: nowUTC(), payload: payload });
+    });
+  }
+  function stateLoad(code) {
+    return vkFbInit().then(function () {
+      return sessRef(code, 'state').once('value').then(function (s) {
+        var v = s.val(); return v ? v.payload : null;
+      });
+    });
+  }
+  function stateClear(code) {
+    return vkFbInit().then(function () { return sessRef(code, 'state').remove(); });
+  }
+
+  /* ── Stage-sync (facilitator schrijft, deelnemer leest) ── */
+  function stageSet(code, stage) {
+    return vkFbInit().then(function () { return sessRef(code, 'stage').set(String(stage)); });
+  }
+  function stageListen(code, cb) {
+    return vkFbInit().then(function () {
+      var ref = sessRef(code, 'stage');
+      ref.on('value', function (s) { cb(s.val()); });
+      return function off() { ref.off(); };
+    });
+  }
+
+  /* ── Live inzendingen: listener (facilitator) + append (deelnemer) ── */
+  // sub bv. 'phase4/scores'. cb krijgt een array van waarden (chronologisch).
+  function liveListen(code, sub, cb) {
+    return vkFbInit().then(function () {
+      var ref = sessRef(code, sub);
+      ref.on('value', function (snap) {
+        var arr = []; snap.forEach(function (ch) { var v = ch.val(); if (v) arr.push(v); });
+        cb(arr);
+      });
+      return function off() { ref.off(); };
+    });
+  }
+  function push(code, sub, obj) {
+    return vkFbInit().then(function () {
+      obj = obj || {}; if (typeof obj.at === 'undefined') obj.at = nowUTC();
+      return sessRef(code, sub).push(obj);
+    });
+  }
+
+  /* ── Facilitator: sessie aanmaken / content publiceren / hele tak wissen ── */
+  function ensureSession(code, lang) {
+    return vkFbInit().then(function (fb) {
+      var uid = fb.auth().currentUser.uid;
+      return sessRef(code, 'meta').transaction(function (cur) {
+        if (cur) return cur; // bestaat al → niet overschrijven
+        return { createdAt: nowUTC(), lang: lang || 'nl', facilitatorUid: uid };
+      }).then(function () { return uid; });
+    });
+  }
+  function contentSet(code, content) {
+    return vkFbInit().then(function () { return sessRef(code, 'content').set(content); });
+  }
+  function contentListen(code, cb) {
+    return vkFbInit().then(function () {
+      var ref = sessRef(code, 'content');
+      ref.on('value', function (s) { cb(s.val()); });
+      return function off() { ref.off(); };
+    });
+  }
+  function sessionClear(code) {
+    return vkFbInit().then(function () { return sessRef(code).remove(); });
+  }
+
+  global.vkFb = {
+    env: vkFbEnv, config: vkFbConfig, init: vkFbInit,
+    stateSave: stateSave, stateLoad: stateLoad, stateClear: stateClear,
+    stageSet: stageSet, stageListen: stageListen,
+    liveListen: liveListen, push: push,
+    ensureSession: ensureSession, contentSet: contentSet, contentListen: contentListen,
+    sessionClear: sessionClear
+  };
+})(window);
+
+</script>
+<script>
+/* ── ingebouwde vk-cinab.js ── */
+/* ══════════════════════════════════════════════════════════════════════════
+   vk-cinab.js — Cluster B / Blok 1: koppeling, betaalmuur, rapport-opslaan
+   Glue tussen de ONGEWIJZIGDE module-client (cinab-tool-client.js) en de
+   inline fase-scripts. De client wordt NIET herschreven; deze laag roept
+   alleen zijn publieke API aan en bridget naar window.VK_CINAB.
+
+   Vereist (per fase, in deze volgorde geladen):
+     <script type="module">
+       import { startCinabSession, createCinabClient, CinabError }
+         from './cinab-tool-client.js';
+       window.__cinabLib = { startCinabSession, createCinabClient, CinabError };
+       window.dispatchEvent(new Event('cinab-lib-ready'));
+     <\/script>
+   Optioneel (voor RTDB-state t.b.v. pay-resume): vk-firebase.js (window.vkFb).
+
+   Alles draait ALLEEN in VK_LIVE; ontbreekt platform/lib, dan geeft elke functie
+   netjes null/false terug en draait de tool zelfstandig verder (demo/lokaal).
+   ══════════════════════════════════════════════════════════════════════════ */
+(function (global) {
+  'use strict';
+
+  var SS_KEY = 'vk_cinab';   // sessionStorage: token (capability) + poortconfig — NIET in URL/localStorage-at-rest
+
+  function libReady() {
+    return new Promise(function (resolve) {
+      if (global.__cinabLib) return resolve(global.__cinabLib);
+      var done = false;
+      global.addEventListener('cinab-lib-ready', function () { if (!done) { done = true; resolve(global.__cinabLib); } }, { once: true });
+      setTimeout(function () { if (!done) { done = true; resolve(global.__cinabLib || null); } }, 8000);
+    });
+  }
+
+  function saveCtx(ctx) { try { sessionStorage.setItem(SS_KEY, JSON.stringify(ctx)); } catch (e) {} }
+  function loadCtx()    { try { return JSON.parse(sessionStorage.getItem(SS_KEY) || 'null'); } catch (e) { return null; } }
+  function clearCtx()   { try { sessionStorage.removeItem(SS_KEY); } catch (e) {} }
+  function urlParam(n)  { try { return new URLSearchParams(global.location.search).get(n); } catch (e) { return null; } }
+
+  /* ── Fase 0: verse start (launch→token) of resume → client + context bewaren ── */
+  async function bootstrap() {
+    var lib = await libReady();
+    if (!lib) return null;
+    try {
+      var client = await lib.startCinabSession();           // leest ?launch/?token/?cinab/?action; wist ze uit de URL
+      saveCtx({
+        apiBase: client.apiBase, token: client.token,
+        betaalVanafFase: client.betaalVanafFase, credits: client.credits,
+        parentRapportId: client.parentRapportId || null
+      });
+      try { client.notifyLoaded(); } catch (e) {}
+      return client;
+    } catch (e) { return null; }                            // geen platform-context → tool draait zelfstandig
+  }
+
+  /* ── Andere fasen: client herstellen uit sessionStorage (token reist niet in de URL) ── */
+  async function restore() {
+    var lib = await libReady(); if (!lib) return null;
+    var ctx = loadCtx(); if (!ctx || !ctx.token || !ctx.apiBase) return null;
+    try {
+      return lib.createCinabClient({
+        apiBase: ctx.apiBase, token: ctx.token,
+        betaalVanafFase: ctx.betaalVanafFase, credits: ctx.credits,
+        parentRapportId: ctx.parentRapportId, action: urlParam('action')
+      });
+    } catch (e) { return null; }
+  }
+
+  /* ── Betaalpoort op de start van faseNr (werkboek §5.2). ──
+     resolve(true) = door; resolve(false) = stop/navigeert weg (koop of afbreken). */
+  async function gate(client, faseNr, opts) {
+    opts = opts || {};
+    if (!client || client.betaalVanafFase == null || faseNr < client.betaalVanafFase) return true;
+
+    // Terugkeer na betaling: idempotente retry (al betaald → no-op → door)
+    if (client.isResume) {
+      try { await client.settleSession(); return true; } catch (e) { /* val door naar de poort */ }
+    }
+
+    try { await client.getSaldo(); } catch (e) {}           // advisory, alleen UX
+
+    var credits = (client.credits != null) ? client.credits : null;
+    var vraag = opts.confirmText ||
+      ('Verder naar deze fase? ' + (credits != null ? ('Er worden ' + credits + ' credits afgeschreven.') : 'Er wordt saldo afgeschreven.'));
+    if (!global.confirm(vraag)) return false;               // gebruiker stopt → niets afgeschreven, sessie blijft (TTL)
+
+    try {
+      await client.settleSession();                         // bindend: atomisch + idempotent
+      return true;
+    } catch (e) {
+      if (e && e.isPaymentRequired) {
+        if (opts.beforePay) { try { await opts.beforePay(); } catch (_) {} }   // state persistent zetten vóór de redirect
+        try { global.VK_CINAB.__paying = true; } catch (_) {}                   // signaal voor de poort-UI (redirect ≠ annuleren)
+        client.goToPayment(e, { returnUrl: opts.returnUrl || global.location.href });
+        return false;                                       // navigeert weg naar de shop (window.top.location)
+      }
+      throw e;
+    }
+  }
+
+  /* ── Rapport opslaan (consumeert het token) + WordPress laten doorschakelen ── */
+  async function saveReport(client, wrapper) {
+    var out = await client.saveReport(wrapper);             // → { rapport_id, rapport_url }
+    if (out && out.rapport_url) { try { client.notifyCompleted(out.rapport_url); } catch (e) {} }
+    return out;
+  }
+
+  /* ── Wrapper bouwen uit de tool-state: 20 INK-dimensies + data_ref naar RTDB ── */
+  var INK_IDS = ['A1','A2','A3','A4','A5','A6','A7','A8','A9','A10','B1','B2','B3','B4','B5','B6','B7','B8','B9','B10'];
+
+  function buildWrapper(opts) {
+    opts = opts || {};
+    var p4 = {}; try { p4 = JSON.parse(localStorage.getItem('vk_phase4_scores') || '{}'); } catch (e) {}
+    var all = (p4 && p4.allScores && typeof p4.allScores === 'object') ? p4.allScores : {};
+    var scores = {};
+    INK_IDS.forEach(function (id) {
+      var r = all[id] || {}; var k = +r.k || 0, n = +r.n || 0, a = +r.a || 0; var tot = k + n + a;
+      scores[id.toLowerCase()] = tot ? Math.round((k * 100 + n * 50 + a * 0) / tot) : 50;  // geen stemmen → neutraal 50
+    });
+
+    var sess = {}; try { sess = JSON.parse(localStorage.getItem('vk_session') || '{}'); } catch (e) {}
+    var deelnemers = Array.isArray(sess.participants) ? sess.participants.length : (opts.deelnemers || 0);
+    var meta = {
+      organisatie: sess.org || sess.organisatie || '',
+      datum: new Date().toISOString().slice(0, 10),          // UTC ISO YYYY-MM-DD
+      deelnemers: deelnemers,
+      facilitator: sess.facilitator || sess.facilitatorName || sess.sessionName || ''
+    };
+    if (sess.sector) meta.sector = sess.sector;              // e-mailvrij: geen e-mail in meta
+
+    var code = sess.sessionCode || opts.sessionCode || '';
+    var data = { data_ref: { store: 'firebase-rtdb', path: '/sessions/' + code } };
+    if (opts.includeExport) data.export = collectExport();   // opaak; platform leest dit niet
+
+    return {
+      template_id: 'visiekaart',
+      schema_version: '1.0',
+      scores: scores,
+      meta: meta,
+      data: data,
+      parent_rapport_id: null                                // _cinab_is_vergelijkbaar = false
+    };
+  }
+
+  function collectExport() {
+    var keys = ['vk_session','vk_vision_sentence','vk_vision_keywords','vk_selected_themes',
+      'vk_confirmed_actions','vk_versnellers','vk_remmers','vk_phase4_scores','vk_roadmap_actions'];
+    var out = {};
+    keys.forEach(function (k) {
+      try {
+        var v = localStorage.getItem(k);
+        if (v == null) return;
+        try { out[k] = JSON.parse(v); } catch(e){ out[k] = v; }   // niet-JSON (bv. de visiezin) als ruwe string bewaren, niet droppen
+      } catch (e) {}
+    });
+    return out;
+  }
+
+  global.VK_CINAB = {
+    libReady: libReady, bootstrap: bootstrap, restore: restore, gate: gate,
+    saveReport: saveReport, buildWrapper: buildWrapper, collectExport: collectExport,
+    loadCtx: loadCtx, clearCtx: clearCtx
+  };
+})(window);
+
+</script>
+<script>
+/* ── Blok 2 leeskant: live INK-scores 20 dimensies (fase 4) ── */
+(function(){
+  if (!VK_LIVE) return;
+  if (typeof VK_IS_PARTICIPANT !== 'undefined' && VK_IS_PARTICIPANT) return;  // alleen facilitator leest
+  function code(){ try { return (JSON.parse(localStorage.getItem('vk_session')||'{}')).sessionCode||''; } catch(e){ return ''; } }
+  function mp(v){ return (v==='k'||v==='kracht')?'kracht':(v==='a'||v==='aandachtspunt')?'aandachtspunt':'neutraal'; }
+  function start(){
+    if (!window.vkFb) return;
+    var c=code(); if(!c) return;
+    vkFb.ensureSession(c,(typeof lang!=='undefined'?lang:'nl'))
+      .then(function(){ return vkFb.liveListen(c,'phase4/scores',function(arr){
+        allScores=(arr||[]).map(function(s){
+          var sc={},raw=(s&&s.scores)||{};
+          Object.keys(raw).forEach(function(k){ sc[k]=mp(raw[k]); });
+          return {name:(s&&s.name)||'',scores:sc,customV:((s&&s.customV)||[]).slice(),customR:((s&&s.customR)||[]).slice(),at:(s&&s.at)||0};
+        });
+        try{ renderWaitFeed(); }catch(e){}
+      }); })
+      .catch(function(){});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
+})();
+</script>
+
+</body>
+</html>

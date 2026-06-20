@@ -1,0 +1,78 @@
+{
+  "rules": {
+    "sessions": {
+      ".read": false,
+      ".write": false,
+      "$code": {
+        "meta": {
+          ".read": "auth != null",
+          ".write": "auth != null && (!data.exists() || data.child('facilitatorUid').val() === auth.uid)",
+          ".validate": "newData.hasChildren(['createdAt','facilitatorUid']) && newData.child('facilitatorUid').val() === auth.uid"
+        },
+        "stage": {
+          ".read": "auth != null",
+          ".write": "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid",
+          ".validate": "newData.isString() && newData.val().length <= 50000"
+        },
+        "content": {
+          ".read": "auth != null",
+          ".write": "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid"
+        },
+        "state": {
+          ".read": "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid",
+          ".write": "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid"
+        },
+        "phase1": {
+          "answers": {
+            ".read": "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid",
+            "$pushId": {
+              ".write": "auth != null && !data.exists()",
+              ".validate": "newData.hasChildren(['text','at']) && newData.child('text').isString() && newData.child('text').val().length <= 1000 && (!newData.hasChild('name') || newData.child('name').val().length <= 120)"
+            }
+          }
+        },
+        "phase2": {
+          "submissions": {
+            ".read": "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid",
+            "$pushId": {
+              ".write": "auth != null && !data.exists()",
+              ".validate": "newData.hasChildren(['themes','at']) && (!newData.hasChild('name') || newData.child('name').val().length <= 120)"
+            }
+          },
+          "votes": {
+            ".read": "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid",
+            "$pushId": {
+              ".write": "auth != null && !data.exists()",
+              ".validate": "newData.hasChildren(['votes','at']) && (!newData.hasChild('name') || newData.child('name').val().length <= 120)"
+            }
+          }
+        },
+        "phase3": {
+          "submissions": {
+            ".read": "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid",
+            "$pushId": {
+              ".write": "auth != null && !data.exists()",
+              ".validate": "newData.hasChildren(['text','at']) && newData.child('text').isString() && newData.child('text').val().length <= 600 && (!newData.hasChild('author') || newData.child('author').val().length <= 120)"
+            }
+          }
+        },
+        "phase4": {
+          "scores": {
+            ".read": "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid",
+            "$pushId": {
+              ".write": "auth != null && !data.exists()",
+              ".validate": "newData.hasChildren(['scores','at']) && (!newData.hasChild('name') || newData.child('name').val().length <= 120)"
+            }
+          }
+        },
+        "participants": {
+          ".read": "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid",
+          "$pushId": {
+            ".write": "auth != null && !data.exists()",
+            ".validate": "newData.hasChildren(['name','at']) && newData.child('name').isString() && newData.child('name').val().length <= 120 && (!newData.hasChild('email') || (newData.child('email').isString() && newData.child('email').val().length <= 200))"
+          }
+        }
+      }
+    }
+  }
+}

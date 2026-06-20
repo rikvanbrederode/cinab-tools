@@ -1,0 +1,1929 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visiekaart v4 — Rapportage</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display:ital@0;1&display=swap');
+
+/* ── SCREEN VARS ── */
+:root{
+  --orange:#FAA833;--oh:#D8901E;--ol:rgba(250,168,51,0.12);--ob:rgba(250,168,51,0.28);
+  --green:#BDD24D;--gl:rgba(189,210,77,0.20);--gd:#7B8E1E;
+  --coral:#F05736;--red:#E8423F;--cll:rgba(240,87,54,0.10);--cd:#B53A20;
+  --purple:#9666AA;--pl:rgba(150,102,170,0.14);
+  --teal:#2A9791;--tl:rgba(42,151,145,0.14);
+  --blue:#70A2D7;--bl:rgba(112,162,215,0.15);
+  --amber:#D8901E;
+  --bg:#F9F8F5;--surface:#FFF;
+  --b0:rgba(0,0,0,.07);--b1:rgba(0,0,0,.11);--b2:rgba(0,0,0,.18);
+  --text:#262A36;--t2:#5A5956;--t3:#9A9894;
+  --r:8px;--sh:0 1px 3px rgba(0,0,0,.07),0 4px 12px rgba(0,0,0,.05);
+  --THEME0:#70A2D7;--THEME1:#BDD24D;--THEME2:#E8423F;--THEME3:#9666AA;--THEME4:#2A9791;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.6}
+.serif{font-family:'DM Serif Display',serif}
+
+/* ── PRINT BAR (screen only) ── */
+.print-bar{position:fixed;top:0;left:0;right:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--b1);padding:10px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:999;box-shadow:var(--sh)}
+.pb-logo{display:flex;align-items:center;gap:8px;font-family:'DM Serif Display',serif;font-size:17px}
+.pb-actions{display:flex;gap:8px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border-radius:6px;border:1px solid var(--b2);background:var(--surface);color:var(--t2);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .13s}
+.btn:hover{background:var(--bg);color:var(--text)}
+.btn-orange{background:var(--orange);border-color:var(--oh);color:#fff}
+.btn-orange:hover{background:var(--oh)}
+.lang-toggle{display:flex;border:1px solid var(--b2);border-radius:6px;overflow:hidden}
+.lang-btn{padding:5px 10px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;border:none;background:transparent;cursor:pointer;color:var(--t3)}
+.lang-btn.on{background:var(--orange);color:#fff}
+
+/* ── REPORT WRAPPER ── */
+.report{margin:72px auto 40px;max-width:800px;padding:0 20px}
+
+/* ── PAGE ── */
+.rpage{background:var(--surface);border:1px solid var(--b0);border-radius:12px;margin-bottom:20px;overflow:hidden;box-shadow:var(--sh);page-break-inside:avoid}
+.rpage.full-break{page-break-before:always}
+
+/* ── COVER PAGE ── */
+.cover{background:linear-gradient(145deg,#FAA833 0%,#D8901E 100%);min-height:520px;padding:60px 52px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.cover-deco1{position:absolute;right:-40px;top:-40px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.08)}
+.cover-deco2{position:absolute;right:60px;bottom:-50px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.05)}
+.cover-deco3{position:absolute;left:30%;bottom:60px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.04)}
+.cover-brand{display:flex;align-items:center;gap:10px;color:#fff;font-family:'DM Serif Display',serif;font-size:22px;position:relative;z-index:1}
+.cover-sun{width:42px;height:42px;background:rgba(255,255,255,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(255,255,255,.4)}
+.cover-main{position:relative;z-index:1}
+.cover-type{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.7);margin-bottom:14px}
+.cover-org{font-family:'DM Serif Display',serif;font-size:36px;color:#fff;line-height:1.2;margin-bottom:8px}
+.cover-session{font-size:16px;color:rgba(255,255,255,.85);margin-bottom:20px}
+.cover-meta{display:flex;gap:20px;flex-wrap:wrap}
+.cover-meta-item{font-size:12px;color:rgba(255,255,255,.75);display:flex;flex-direction:column;gap:2px}
+.cover-meta-item strong{color:#fff;font-weight:600}
+.cover-vision{position:relative;z-index:1;background:rgba(255,255,255,.12);border-radius:10px;padding:18px 22px;border:1px solid rgba(255,255,255,.2)}
+.cv-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.65);margin-bottom:6px}
+.cv-text{font-family:'DM Serif Display',serif;font-size:15px;color:#fff;line-height:1.5}
+
+/* ── SECTION HEADERS ── */
+.section-head{padding:18px 24px;border-bottom:1px solid var(--b0);display:flex;align-items:center;gap:12px;background:var(--surface)}
+.sh-badge{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+.sh-title{font-family:'DM Serif Display',serif;font-size:18px;color:var(--text)}
+.sh-sub{font-size:12px;color:var(--t3);margin-top:2px}
+
+/* ── BODY PADDING ── */
+.page-body{padding:20px 24px}
+
+/* ── CANVAS PAGE ── */
+.canvas-page{padding:0}
+.canvas-inner svg{width:100%;display:block}
+.canvas-caption{padding:12px 20px;background:var(--bg);border-top:1px solid var(--b0);font-size:11px;color:var(--t3);text-align:center}
+
+/* ── SUMMARY GRID ── */
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.sg-card{border-radius:var(--r);padding:14px 16px;border:1px solid transparent}
+
+/* ── THEME LIST ── */
+.theme-list{display:flex;flex-direction:column;gap:10px}
+.theme-entry{border-radius:var(--r);overflow:hidden;border:1px solid transparent}
+.te-head{padding:10px 14px;display:flex;align-items:center;gap:10px}
+.te-bubble{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.te-name{font-size:13px;font-weight:700}
+.te-actions{padding:8px 14px 10px 52px;display:flex;flex-direction:column;gap:5px}
+.ta-item{display:flex;align-items:flex-start;gap:8px;font-size:12px}
+.ta-num{font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px}
+.ta-text{flex:1}
+.ta-badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:2px}
+.badge{padding:1px 7px;border-radius:10px;font-size:10px;font-weight:600;display:inline-block}
+
+/* ── ROADMAP TABLE ── */
+.rm-table{width:100%;border-collapse:collapse;font-size:11px}
+.rm-table th{text-align:left;padding:7px 10px;background:var(--bg);border-bottom:2px solid var(--b1);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--t3)}
+.rm-table td{padding:7px 10px;border-bottom:1px solid var(--b0);vertical-align:top}
+.rm-table tr:hover td{background:var(--bg)}
+
+/* Mini-Gantt cel in roadmap-tabel: tonen welk deel van de totale tijdlijn een actie beslaat. */
+.mg-cell{min-width:90px}
+.mg-track{position:relative;height:8px;background:var(--b0);border-radius:4px;overflow:hidden}
+.mg-bar{position:absolute;top:0;bottom:0;border-radius:4px;opacity:.85}
+.mg-tick{position:absolute;top:-1px;bottom:-1px;width:1px;background:rgba(0,0,0,.06)}
+
+/* ── BOLD STEPS BLOCK (exec summary) ── */
+.bs-wrap{margin:14px 0 18px;border:1px solid var(--ob);background:linear-gradient(135deg,rgba(250,168,51,.06),rgba(250,168,51,.02));border-radius:var(--r);padding:14px 16px}
+.bs-title{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--oh);margin-bottom:10px}
+.bs-list{display:flex;flex-direction:column;gap:7px}
+.bs-item{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;background:var(--surface);border:1px solid var(--b0);border-radius:6px}
+.bs-num{width:22px;height:22px;border-radius:50%;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.bs-text{font-size:12.5px;font-weight:600;line-height:1.45;flex:1;min-width:0}
+.bs-period{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;margin-top:2px}
+
+/* ── VR TABLE (versnellers/remmers) ── */
+.vr-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.vr-panel{border-radius:var(--r);padding:14px 16px;border:1px solid transparent}
+.vr-head{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.vr-item{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px}
+.vr-rank{width:18px;height:18px;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.vr-bar{flex:1;height:5px;background:var(--b0);border-radius:3px;overflow:hidden;margin-top:5px}
+.vr-fill{height:100%;border-radius:3px}
+.vr-label{font-size:12px;font-weight:600;line-height:1.3}
+.vr-count{font-size:10px;font-weight:700;flex-shrink:0;margin-top:2px}
+
+/* ── APPENDIX TABLES ── */
+.app-table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:14px}
+.app-table th{padding:6px 9px;background:var(--bg);border-bottom:2px solid var(--b1);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--t3);text-align:left}
+.app-table td{padding:6px 9px;border-bottom:1px solid var(--b0);vertical-align:top}
+.app-table tr:nth-child(even) td{background:rgba(0,0,0,.015)}
+.score-k{background:var(--gl);color:var(--gd)}
+.score-n{background:var(--bg);color:var(--t3)}
+.score-a{background:var(--cll);color:var(--cd)}
+.heat-bar{height:5px;border-radius:3px;margin-top:3px;overflow:hidden;background:var(--b0);width:60px}
+
+/* ── STATEMENT HEATMAP ── */
+.stmt-table{width:100%;border-collapse:collapse;font-size:11px}
+.stmt-table th{padding:5px 8px;text-align:center;font-size:10px;font-weight:700;color:var(--t3);background:var(--bg);border-bottom:2px solid var(--b1)}
+.stmt-table th.left{text-align:left}
+.stmt-table td{padding:5px 8px;border-bottom:1px solid var(--b0)}
+.stmt-table td.label{font-weight:600;font-size:11px}
+.stmt-table td.section{background:var(--bg);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);padding:4px 8px}
+.dot-k{width:28px;height:18px;border-radius:9px;background:var(--green);color:#fff;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.dot-n{width:28px;height:18px;border-radius:9px;background:var(--b1);color:var(--text);font-size:10px;font-weight:600;display:inline-flex;align-items:center;justify-content:center}
+.dot-a{width:28px;height:18px;border-radius:9px;background:var(--coral);color:#fff;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+
+/* ── ORDER PAGE ── */
+.order-page{background:var(--surface)}
+.order-inner{padding:32px 40px;display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center}
+.order-text h2{font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:8px;color:var(--text)}
+.order-text p{font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:12px}
+.order-link{display:inline-flex;align-items:center;gap:6px;background:var(--orange);color:#fff;padding:9px 18px;border-radius:7px;font-weight:600;font-size:13px;text-decoration:none;margin-right:8px;margin-bottom:8px}
+.order-link:hover{background:var(--oh)}
+.order-link.outline{background:transparent;border:1.5px solid var(--orange);color:var(--oh)}
+.order-img{background:linear-gradient(135deg,#FAA833,#D8901E);border-radius:12px;padding:24px;text-align:center}
+.order-board-preview{background:rgba(255,255,255,.15);border-radius:8px;padding:16px;margin-bottom:12px}
+
+/* ── DIVIDERS ── */
+.divider{height:1px;background:var(--b0);margin:14px 0}
+.phase-divider{background:var(--bg);padding:8px 24px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);border-bottom:1px solid var(--b0)}
+
+/* ── UTILITY ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.meta-pill{background:var(--bg);border:1px solid var(--b1);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;color:var(--t2);display:inline-block}
+.page-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:8px}
+.small-text{font-size:11px;color:var(--t2);line-height:1.6}
+
+/* ══════════════════════════════
+   PRINT STYLES
+══════════════════════════════ */
+@media print {
+  @page{size:A4;margin:14mm 16mm 14mm 16mm}
+  @page:first{margin:0}
+
+  body{background:white;font-size:11px}
+  .print-bar{display:none!important}
+  .report{margin:0;max-width:100%;padding:0}
+  .rpage{border:none;border-radius:0;box-shadow:none;margin-bottom:0;page-break-inside:avoid}
+  .rpage.full-break{page-break-before:always}
+  .cover{min-height:auto;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .summary-grid{grid-template-columns:1fr 1fr}
+  .vr-cols{grid-template-columns:1fr 1fr}
+  .two-col{grid-template-columns:1fr 1fr}
+  .three-col{grid-template-columns:1fr 1fr 1fr}
+  .order-inner{grid-template-columns:1fr 1fr}
+  .action-bar-print{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  a{text-decoration:none!important;color:var(--orange)!important}
+  canvas{max-width:100%!important}
+}
+
+/* ── CINAB LOGO ── */
+.logo-img{height:32px;width:auto;display:block}
+/* ═══ VK SHARED LOGO STYLES ═══ */
+.logo-img .fil-logo-main   { fill:#2A9791; }
+.logo-img .fil-logo-shadow { fill:#2A9791; filter:brightness(0.5); }
+.logo-img .fil-logo-line   { fill:none; stroke:#F7A710; stroke-width:300; stroke-miterlimit:22.9256; }
+.logo-img .fil-logo-bar    { fill:#F7A710; }
+/* ═══ END VK SHARED LOGO STYLES ═══ */
+.cover-brand .logo-img{height:40px;width:auto}
+
+.pb-logo{padding-left:6px}
+
+
+/* ═══ VK FASE-EXPRESSIE VARS (fase-specifiek) ═══ */
+:root{ --fase-accent:#262A36; --fase-accent-text:#FFFFFF; --fase-nummer:"R"; }
+
+/* ═══ VK SHARED EXPRESSIE (v1) — byte-identiek in alle fasebestanden, in één keer wijzigen ═══
+   Expressielaag conform CINAB-EXPRESSIE-STIJL: uitsluitend tokens, geen gradients,
+   geen alpha-kleurtinten, betekenis nooit alleen via kleur, reduced-motion gerespecteerd.
+   Methodiek-DNA Visiekaart: de oranje stip op de horizon + vijf vaste themakleuren. */
+:root{
+  --vk-ex-stip:#FAA833;   /* signatuurkleur: de stip op de horizon (zon) */
+  --vk-ex-line:#E5E3DB;   /* tone-on-tone watermerk- en rasterkleur */
+  --vk-ex-card:#FFFFFF;
+  --vk-ex-t1:#70A2D7;     /* thema 1 · Klantgerichtheid */
+  --vk-ex-t2:#BDD24D;     /* thema 2 · Kwaliteit & processen */
+  --vk-ex-t3:#F05736;     /* thema 3 · Medewerkers & ontwikkeling */
+  --vk-ex-t4:#9666AA;     /* thema 4 · Digitalisering */
+  --vk-ex-t5:#2A9791;     /* thema 5 · Samenwerking */
+  --vk-ex-inset:inset 0 0 0 1px rgba(0,0,0,.12); /* goedgekeurde speelstuk-schaduw */
+}
+
+/* ── E1 · fase-accent ── */
+.hdr,.header,.phdr,.print-bar{border-bottom:3px solid var(--fase-accent)}
+.phase-pill{background:var(--fase-accent);color:var(--fase-accent-text);border:1px solid var(--fase-accent)}
+.phase-num,.step-num,.phase-icon,.q-num{background:var(--fase-accent);color:var(--fase-accent-text);box-shadow:var(--vk-ex-inset)}
+
+/* ── E2 · methodiek-DNA in micro-vormen ── */
+.card,.pcard{border-left:6px solid var(--fase-accent)}
+.card-title::before{content:'';display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--vk-ex-stip);box-shadow:var(--vk-ex-inset);margin-right:7px;vertical-align:1px}
+.card-head,.q-meta{position:relative;border-bottom:2px dotted var(--vk-ex-line);padding-bottom:16px;margin-bottom:22px}
+
+/* ── F2 · themaladder als ornament op de bordlijn ── */
+.card-head::before,.q-meta::before{content:'';position:absolute;left:0;bottom:-5px;width:8px;height:8px;border-radius:50%;background:var(--vk-ex-t1);box-shadow:14px 0 0 var(--vk-ex-t2),28px 0 0 var(--vk-ex-t3),42px 0 0 var(--vk-ex-t4),56px 0 0 var(--vk-ex-t5)}
+
+/* ── E3 + F1 · watermerk en accentstreep (DM Serif Display, afsprakenblad leidend) ── */
+.phase-header{position:relative}
+/* Groot fasecijfer (Optie 1): uitsluitend op de startpagina van elke fase.
+   Fase 1-5 = introscherm (#sIntro); fase 0 = .phase-header (eigen startpagina).
+   Geen wisselende tekens (?, 123, vinkje) meer en niet meer op werkschermen,
+   dus geen overlap met fase-gegevens. */
+#sIntro .card:first-of-type{position:relative}
+#sIntro .card:first-of-type::after,.phase-header::after{content:var(--fase-nummer);position:absolute;font-family:'DM Serif Display',serif;font-weight:600;font-size:84px;line-height:1;letter-spacing:-.025em;color:var(--vk-ex-line);pointer-events:none;user-select:none;z-index:0}
+.phase-header::after{right:0;top:-10px}
+#sIntro .card:first-of-type::after{right:22px;top:16px}
+.card:first-of-type .card-head .card-title::after,.card:first-of-type .q-text::after,.phase-title::after{content:'';display:block;width:56px;height:5px;border-radius:3px;background:var(--fase-accent);margin-top:8px}
+@media(max-width:900px){#sIntro .card:first-of-type::after,.phase-header::after{display:none!important}}
+
+/* ── E4 + F3 · beweging en voortgang ── */
+.card,.pcard{transition:transform .15s ease,box-shadow .15s ease}
+.card:hover,.pcard:hover{transform:translateY(-2px);box-shadow:0 2px 5px rgba(0,0,0,.08),0 8px 22px rgba(0,0,0,.09)}
+.btn:hover:not(:disabled){transform:translateY(-1px)}
+.q-steps{align-items:center}
+.q-step{flex:0 0 11px;height:11px;border-radius:50%;background:var(--vk-ex-line);box-shadow:var(--vk-ex-inset)}
+.q-step.done{background:var(--vk-ex-stip)}
+.q-step.active{background:var(--fase-accent);box-shadow:var(--vk-ex-inset),0 0 0 2px var(--vk-ex-card),0 0 0 3px var(--fase-accent)}
+
+/* ── F4 · wachtschermen: trio speelstukken (zon + twee themacirkels) ── */
+@keyframes vkExPulse{0%,100%{opacity:1}50%{opacity:.45}}
+.wait-screen .spinner{width:16px;height:16px;border:none;border-radius:50%;background:var(--vk-ex-stip);box-shadow:var(--vk-ex-inset),12px 0 0 var(--vk-ex-t1),24px 0 0 var(--vk-ex-t2);position:relative;left:-12px;margin:0 auto 16px;animation:vkExPulse 1.6s ease-in-out infinite}
+
+/* ── F5 · rasterwatermerk + R-watermerk (alleen rapport; klassen bestaan alleen daar) ── */
+.section-head{position:relative;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Cpath d='M14 0H0v14' fill='none' stroke='%23E5E3DB' stroke-width='1'/%3E%3C/svg%3E")}
+.section-head::after{content:var(--fase-nummer);position:absolute;right:16px;top:50%;transform:translateY(-50%);font-family:'DM Serif Display',serif;font-weight:600;font-size:44px;line-height:1;color:var(--vk-ex-line);pointer-events:none;user-select:none;z-index:0}
+@media(max-width:900px){.section-head::after{display:none!important}}
+
+/* ── A11y · reduced motion ── */
+@media (prefers-reduced-motion:reduce){
+  .card,.pcard,.btn,.q-step{transition:none!important}
+  .card:hover,.pcard:hover,.btn:hover:not(:disabled){transform:none!important}
+  .wait-screen .spinner{animation:none!important}
+}
+/* ═══ END VK SHARED EXPRESSIE (v1) ═══ */
+</style>
+</head>
+<body>
+
+<!-- ═══════ PRINT BAR (screen only) ═══════ -->
+<div class="print-bar">
+  <div class="pb-logo">
+    <svg class="logo-img" xmlns="http://www.w3.org/2000/svg" viewBox="6392 11502 7040 7040" aria-hidden="true" focusable="false">
+      <rect class="fil-logo-shadow" x="6542.13" y="11652.68" width="6840.47" height="6840.47" rx="625.64" ry="625.64"/>
+      <rect class="fil-logo-main"   x="6492.13" y="11602.68" width="6840.47" height="6840.47" rx="625.64" ry="625.64"/>
+      <path class="fil-logo-line" d="M8459.51 11340.66l6.77 2886.05c0.53,225.18 44.93,223.19 131.76,299.11 64.53,56.42 712.98,613.44 1067.73,922.39m279.67 498.36c-3.85,335.14 -17.51,1600.45 -22.09,2025.82m-1460.38 -5160.51l785.98 4.94m3662.81 274.39l-6.72 591.26 -710.88 10.16 0 978.81m-1557.05 3300.95c-5.59,-19.68 -10.23,-41.55 -13.66,-65.97 -40.62,-289.42 -55.5,-1603.06 -55.5,-1603.06m0 0l-12.4 -1458.25c0,0 -44.42,-161.55 137.32,-169.63 181.74,-8.08 658.3,-4.04 658.3,-4.04l-3.77 -1608.68m459.06 3230.04l-615.21 -562.61m1311.37 -167.26l-1179.41 -4.13m-1388.18 1333.84l1210.17 -1126.72c0,0 173.66,-113.07 201.93,-286.74 28.27,-173.67 4.04,-807.74 4.04,-807.74l1579.11 0c0,0 10.18,8.09 137.31,-44.42 53.21,-21.98 127.68,-100.56 196.29,-184.51m-4091.56 3529.88c18.68,-34.96 33.6,-74 38.36,-114.44 16.15,-137.31 24.23,-1514.5 24.23,-1514.5 0,0 -4.03,-137.32 -72.69,-185.78 -68.66,-48.46 -665.89,-556.18 -665.89,-556.18m-467.07 653.4l469.73 -451.59c0,0 69.04,-77 -2.66,-201.81m-1213.8 -2.13l1213.8 2.13 -29.21 -897.55 -563.22 -1.72m-1022.85 -1671.85l3.28 541.68c0,0 -10.23,140.69 117.67,140.69 127.9,0 600.9,26.88 600.9,26.88l-1 659.21m-302.89 299.12l-178.2 -1.97c0,0 -220.41,18.58 -300.07,-21.25 -41.28,-20.64 -175.23,-151.79 -294.75,-273.38m1035.23 -2176.98l5.68 516.43 895.89 -2.1m2.16 920.01l2255.42 21.86m-1471.05 -1258.2l-0.37 394.45 -2.13 2268.51m2268.36 -3395.11c-121.47,117.05 -302.96,241.2 -548.07,278.79m-1062.71 -1009.16l-14.83 1611m313.94 307.52l452.12 4 9.35 -663.77m8.52 -604.84l5.09 -361.34m1408.26 1081.76l-2065.77 2035.4c-50.75,50 -106.04,79.05 -108.71,151.99 -1.64,44.93 10.93,491.27 20.85,827.53m-1774.69 2623.29l879.79 0 134 0 720.63 0 30.4 0 713.76 0 217.25 0 802.66 0 0 323.39 -3498.49 0 0 -323.39z"/>
+      <rect class="fil-logo-bar" x="8158.53" y="17972.39" width="3395.02" height="332.88"/>
+    </svg>
+    <span style="font-size:13px;font-weight:400;color:var(--t3);font-family:'DM Sans',sans-serif;margin-left:6px">· Rapportage</span>
+  </div>
+  <div class="pb-actions">
+    <button class="btn btn-ghost" data-env="dev-only" onclick="window.location.href='visiekaart_fase5.html'" id="t-backBtn" aria-label="Terug naar fase 5" style="font-size:12px;padding:6px 10px">← Fase 5</button>
+    <button class="btn btn-ghost" data-env="dev-only" onclick="resetDemoData()" id="t-resetBtn" aria-label="Reset demo-data" style="padding:6px 10px"><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M2 7a5 5 0 0 1 8.5-3.5L12 5M12 2v3h-3M12 7a5 5 0 0 1-8.5 3.5L2 9M2 12V9h3"/></svg></button>
+    <div class="lang-toggle" role="group" aria-label="Taalkeuze">
+      <button class="lang-btn on" id="lNL" onclick="setLang('nl')" aria-label="Nederlands">NL</button>
+      <button class="lang-btn" id="lEN" onclick="setLang('en')" aria-label="English">EN</button>
+    </div>
+    <button class="btn" onclick="exportJSON()" aria-label="Data als JSON exporteren">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M7 1v8M4 6l3 3 3-3M2 11h10"/></svg>
+      <span id="t-exportBtn">Data exporteren</span>
+    </button>
+    <button class="btn btn-orange" onclick="window.print()" aria-label="Rapport afdrukken of als PDF opslaan">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><rect x="2" y="5" width="10" height="7" rx="1"/><path d="M4 5V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M4 9h6M4 11h3"/></svg>
+      <span id="t-printBtn">PDF afdrukken / opslaan</span>
+    </button>
+  </div>
+</div>
+
+<div class="report" id="report">
+
+<!-- ═══════ PAGE 1: COVER ═══════ -->
+<div class="rpage">
+  <div class="cover">
+    <div class="cover-deco1"></div><div class="cover-deco2"></div><div class="cover-deco3"></div>
+    <div class="cover-brand">
+      <svg class="logo-img" xmlns="http://www.w3.org/2000/svg" viewBox="6392 11502 36200 7040" aria-hidden="true" focusable="false">
+      <rect class="fil-logo-shadow" x="6542.13" y="11652.68" width="6840.47" height="6840.47" rx="625.64" ry="625.64"/>
+      <rect class="fil-logo-main"   x="6492.13" y="11602.68" width="6840.47" height="6840.47" rx="625.64" ry="625.64"/>
+      <path class="fil-logo-main" d="M15313.74 17479.39l1493.97 0c114.15,0 213.19,40.29 297.12,120.86 83.93,80.57 125.89,177.93 125.89,292.08 0,114.15 -41.96,211.51 -125.89,292.08 -83.93,80.57 -182.97,120.86 -297.12,120.86l-1546.01 0c-198.07,0 -401.19,-62.11 -611.01,-186.33 -209.83,-124.21 -355.87,-263.54 -438.12,-417.97l-950.1 -1844.8c-127.58,-265.23 -191.36,-537.16 -191.36,-815.81 0,-308.87 60.43,-575.77 181.29,-802.38l960.17 -1824.66c92.32,-171.22 235,-320.62 428.04,-449.87 194.72,-129.25 381.05,-194.72 562.34,-194.72l1634.98 0c114.14,0 211.5,40.29 292.08,122.54 80.57,82.25 120.86,179.61 120.86,290.4 0,114.15 -40.29,213.18 -120.86,297.12 -80.58,83.93 -179.62,125.89 -293.76,125.89l-1582.94 0c-130.93,-3.36 -238.36,72.18 -318.94,228.29l-908.13 1715.55c-70.5,134.29 -107.43,293.76 -109.11,475.05 5.04,191.36 47,362.58 124.22,510.3l869.52 1685.33c82.25,174.58 216.54,260.19 402.87,260.19zm2800.55 -5710.66l3343.81 0c107.43,0 203.11,40.29 287.04,122.54 83.94,82.25 125.9,179.61 125.9,290.4 0,114.15 -41.96,213.18 -124.22,297.12 -82.25,83.93 -179.61,125.89 -290.4,125.89l-1257.28 0 0 4874.71 1257.28 0c114.15,0 213.19,40.29 293.76,120.86 80.57,80.57 120.86,177.93 120.86,292.08 0,114.15 -40.29,211.51 -122.54,292.08 -82.25,80.57 -179.61,120.86 -290.4,120.86l-3343.81 0c-114.14,0 -211.5,-40.29 -292.08,-120.86 -80.57,-80.57 -120.86,-177.93 -120.86,-292.08 0,-114.15 40.29,-211.51 119.18,-292.08 80.58,-80.57 177.94,-120.86 292.08,-120.86l1260.65 0 0 -4874.71 -1260.65 0c-114.14,0 -211.5,-40.28 -292.08,-122.54 -78.89,-82.25 -119.18,-179.61 -119.18,-290.4 0,-117.5 40.29,-218.22 120.86,-300.47 80.58,-82.25 177.94,-122.54 292.08,-122.54zm8397.07 423.01l0 6113.53 -1106.21 0 -2237.6 -5076.14 0 4663.2c0,114.15 -40.29,211.51 -120.86,292.08 -80.57,80.57 -177.93,120.86 -292.08,120.86 -114.14,0 -211.5,-40.29 -292.08,-120.86 -80.57,-80.57 -120.86,-177.93 -120.86,-292.08l0 -6123.6 1101.17 0 2232.57 5066.07 0 -4643.06c0,-114.14 41.96,-213.18 125.89,-297.11 83.93,-83.93 182.97,-125.9 297.12,-125.9 114.14,0 211.5,40.29 292.08,122.54 80.57,82.25 120.86,182.97 120.86,300.47zm505.88 5537.76l1676.94 -5650.23c65.47,-206.47 201.43,-310.54 407.9,-310.54 201.44,0 327.33,87.29 379.37,263.54l1660.16 5737.52c13.42,41.97 20.14,82.25 20.14,122.54 0,114.15 -38.61,211.51 -117.5,292.08 -78.9,80.57 -169.54,120.86 -270.26,120.86 -216.54,0 -354.19,-100.72 -412.94,-300.47l-327.33 -1119.64 -1900.2 0 -360.9 1200.21c-8.39,52.04 -50.36,100.72 -122.54,149.4 -72.18,47 -152.75,70.5 -238.36,70.5 -120.86,0 -221.58,-40.29 -300.48,-122.54 -78.89,-82.25 -119.18,-182.97 -119.18,-300.47 0,-48.68 8.39,-100.72 25.18,-152.76zm2079.81 -4047.14l-711.74 2366.85 1403.33 0 -691.59 -2366.85zm6715.09 2598.5l0 362.58c0,456.58 -161.15,846.02 -485.12,1173.35 -322.3,325.65 -711.74,488.48 -1166.64,488.48l-2528 0 0 -6536.54 2528 0c454.9,0 844.34,162.83 1166.64,486.8 323.97,325.65 485.12,716.77 485.12,1176.71l0 349.15c0,488.48 -188.01,906.46 -565.7,1250.57 377.69,350.84 565.7,767.13 565.7,1248.9zm-846.02 -2509.54l0 -339.08c0,-229.97 -80.58,-428.05 -241.73,-590.87 -162.82,-164.51 -355.86,-246.76 -580.8,-246.76l-1675.26 0 0 2004.27 1675.26 0c221.58,0 414.62,-80.57 577.45,-243.4 162.82,-162.82 245.08,-357.54 245.08,-584.16zm0 2872.12l0 -342.44c0,-229.97 -80.58,-426.37 -243.4,-590.87 -162.83,-162.83 -355.87,-245.08 -582.48,-245.08l-1671.91 0 0 2004.27 1671.91 0c223.25,0 416.29,-80.58 580.8,-243.4 162.82,-161.15 245.08,-355.87 245.08,-582.48z"/>
+      <path class="fil-logo-line" d="M8459.51 11340.66l6.77 2886.05c0.53,225.18 44.93,223.19 131.76,299.11 64.53,56.42 712.98,613.44 1067.73,922.39m279.67 498.36c-3.85,335.14 -17.51,1600.45 -22.09,2025.82m-1460.38 -5160.51l785.98 4.94m3662.81 274.39l-6.72 591.26 -710.88 10.16 0 978.81m-1557.05 3300.95c-5.59,-19.68 -10.23,-41.55 -13.66,-65.97 -40.62,-289.42 -55.5,-1603.06 -55.5,-1603.06m0 0l-12.4 -1458.25c0,0 -44.42,-161.55 137.32,-169.63 181.74,-8.08 658.3,-4.04 658.3,-4.04l-3.77 -1608.68m459.06 3230.04l-615.21 -562.61m1311.37 -167.26l-1179.41 -4.13m-1388.18 1333.84l1210.17 -1126.72c0,0 173.66,-113.07 201.93,-286.74 28.27,-173.67 4.04,-807.74 4.04,-807.74l1579.11 0c0,0 10.18,8.09 137.31,-44.42 53.21,-21.98 127.68,-100.56 196.29,-184.51m-4091.56 3529.88c18.68,-34.96 33.6,-74 38.36,-114.44 16.15,-137.31 24.23,-1514.5 24.23,-1514.5 0,0 -4.03,-137.32 -72.69,-185.78 -68.66,-48.46 -665.89,-556.18 -665.89,-556.18m-467.07 653.4l469.73 -451.59c0,0 69.04,-77 -2.66,-201.81m-1213.8 -2.13l1213.8 2.13 -29.21 -897.55 -563.22 -1.72m-1022.85 -1671.85l3.28 541.68c0,0 -10.23,140.69 117.67,140.69 127.9,0 600.9,26.88 600.9,26.88l-1 659.21m-302.89 299.12l-178.2 -1.97c0,0 -220.41,18.58 -300.07,-21.25 -41.28,-20.64 -175.23,-151.79 -294.75,-273.38m1035.23 -2176.98l5.68 516.43 895.89 -2.1m2.16 920.01l2255.42 21.86m-1471.05 -1258.2l-0.37 394.45 -2.13 2268.51m2268.36 -3395.11c-121.47,117.05 -302.96,241.2 -548.07,278.79m-1062.71 -1009.16l-14.83 1611m313.94 307.52l452.12 4 9.35 -663.77m8.52 -604.84l5.09 -361.34m1408.26 1081.76l-2065.77 2035.4c-50.75,50 -106.04,79.05 -108.71,151.99 -1.64,44.93 10.93,491.27 20.85,827.53m-1774.69 2623.29l879.79 0 134 0 720.63 0 30.4 0 713.76 0 217.25 0 802.66 0 0 323.39 -3498.49 0 0 -323.39z"/>
+      <rect class="fil-logo-bar" x="8158.53" y="17972.39" width="3395.02" height="332.88"/>
+    </svg>
+    </div>
+    <div class="cover-main">
+      <div class="cover-type" id="coverType">Strategische Rapportage</div>
+      <div class="cover-org" id="coverOrg">—</div>
+      <div class="cover-session" id="coverSession">—</div>
+      <div class="cover-meta" id="coverMeta"></div>
+    </div>
+    <div class="cover-vision">
+      <div class="cv-label" id="t-cvLabel">Stip op de horizon</div>
+      <div class="cv-text" id="coverVision">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ PAGE 2: VISUAL CANVAS ═══════ -->
+<div class="rpage full-break canvas-page">
+  <div class="section-head">
+    <div class="sh-badge" style="background:var(--orange)">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="white" stroke-width="1.5"/><circle cx="8" cy="8" r="2.5" fill="white"/></svg>
+    </div>
+    <div><div class="sh-title" id="t-canvasTitle">Visiekaart — volledig ingevuld</div><div class="sh-sub" id="t-canvasSub">Visuele samenvatting van visie, thema's, acties, versnellers en remmers</div></div>
+  </div>
+  <div class="canvas-inner">
+    <svg id="mainCanvas" viewBox="0 0 800 460" width="100%" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+  <div class="canvas-caption" id="t-canvasCaption">Visiekaart · adviesborden.nl · Alle rechten voorbehouden</div>
+</div>
+
+<!-- ═══════ PAGE 3: EXECUTIVE SUMMARY ═══════ -->
+<div class="rpage full-break">
+  <div class="section-head">
+    <div class="sh-badge" style="background:var(--purple)">1</div>
+    <div><div class="sh-title" id="t-execTitle">Samenvatting</div><div class="sh-sub" id="t-execSub">Visie, thema's en kernacties op één pagina</div></div>
+  </div>
+  <div class="page-body">
+    <div style="background:linear-gradient(135deg,#FAA833,#D8901E);border-radius:10px;padding:18px 22px;margin-bottom:18px">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.7);margin-bottom:6px" id="t-visionLabel">Stip op de horizon</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:16px;color:#fff;line-height:1.5" id="execVision">—</div>
+    </div>
+    <!-- Bold Steps: top-5 chronologisch, het hart van de roadmap -->
+    <div class="bs-wrap" id="boldStepsWrap" style="display:none">
+      <div class="bs-title">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 11l3.5-8 3.5 8M5 8h3"/></svg>
+        <span id="t-bsTitle">Top 5 strategische acties — chronologisch</span>
+      </div>
+      <div class="bs-list" id="boldStepsList"></div>
+    </div>
+    <div class="theme-list" id="execThemes"></div>
+  </div>
+</div>
+
+<!-- ═══════ PAGE 4: ROADMAP OVERVIEW ═══════ -->
+<div class="rpage full-break">
+  <div class="section-head">
+    <div class="sh-badge" style="background:var(--orange)">2</div>
+    <div><div class="sh-title" id="t-roadmapTitle">Strategische Roadmap</div><div class="sh-sub" id="roadmapSubTitle">—</div></div>
+  </div>
+  <div class="page-body">
+    <div id="roadmapContextBadges" style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px"></div>
+    <table class="rm-table">
+      <thead>
+        <tr>
+          <th id="t-rmPrio">#</th>
+          <th id="t-rmAction">Actie</th>
+          <th id="t-rmTheme">Thema</th>
+          <th id="t-rmVision">Visie</th>
+          <th id="t-rmPeriod">Periode</th>
+          <th id="t-rmGantt">Tijdlijn</th>
+          <th id="t-rmOwner">Eigenaar</th>
+          <th id="t-rmRisk">Risico</th>
+          <th id="t-rmScore">Score</th>
+        </tr>
+      </thead>
+      <tbody id="roadmapTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════ PAGE 5: VERSNELLERS & REMMERS SUMMARY ═══════ -->
+<div class="rpage full-break">
+  <div class="section-head">
+    <div class="sh-badge" style="background:var(--green)">3</div>
+    <div><div class="sh-title" id="t-vrTitle">Versnellers & Remmers</div><div class="sh-sub" id="t-vrSub">Top 5 organisatiekenmerken die de strategie versnellen of remmen</div></div>
+  </div>
+  <div class="page-body">
+    <div class="vr-cols" id="vrContent"></div>
+  </div>
+</div>
+
+<!-- ═══════ APPENDIX A: FASE 0 ═══════ -->
+<div class="rpage full-break">
+  <div class="phase-divider" id="t-app0label">Bijlage A — Fase 0: Sessie-opzet</div>
+  <div class="page-body">
+    <div class="two-col" id="app0Content"></div>
+  </div>
+</div>
+
+<!-- ═══════ APPENDIX B: FASE 1 ═══════ -->
+<div class="rpage full-break">
+  <div class="phase-divider" id="t-app1label">Bijlage B — Fase 1: Visie & doelstelling</div>
+  <div class="page-body">
+    <div id="app1Content"></div>
+  </div>
+</div>
+
+<!-- ═══════ APPENDIX C: FASE 2 ═══════ -->
+<div class="rpage full-break">
+  <div class="phase-divider" id="t-app2label">Bijlage C — Fase 2: Thema's bepalen</div>
+  <div class="page-body">
+    <div id="app2Content"></div>
+  </div>
+</div>
+
+<!-- ═══════ APPENDIX D: FASE 3 ═══════ -->
+<div class="rpage full-break">
+  <div class="phase-divider" id="t-app3label">Bijlage D — Fase 3: Thema's concretiseren</div>
+  <div class="page-body">
+    <div id="app3Content"></div>
+  </div>
+</div>
+
+<!-- ═══════ APPENDIX E: FASE 4 (STATEMENTS) ═══════ -->
+<div class="rpage full-break">
+  <div class="phase-divider" id="t-app4label">Bijlage E — Fase 4: Versnellers & Remmers — scores</div>
+  <div class="page-body">
+    <div id="app4Content"></div>
+  </div>
+</div>
+
+<!-- ═══════ ORDER PAGE ═══════ -->
+<div class="rpage full-break order-page">
+  <div class="order-inner">
+    <div class="order-text">
+      <h2 id="t-orderTitle">Van digitaal naar tastbaar</h2>
+      <p id="t-orderBody1">De uitkomsten van uw strategiesessie zijn nu digitaal vastgelegd. Maar een strategie komt pas echt tot leven als ze zichtbaar aanwezig is — op kantoor, in de vergaderzaal, op de werkvloer.</p>
+      <p id="t-orderBody2">Adviesborden.nl maakt op maat gedrukte, professionele Visiekaart-borden waarop uw visie, thema's, acties en roadmap permanent zichtbaar zijn. Zo blijft de strategie niet in een document, maar wordt ze dagelijks zichtbaar en bespreekbaar.</p>
+      <a class="order-link" href="https://adviesborden.nl/contact/" target="_blank" id="t-orderBtn">Bestellen / informatie</a>
+      <a class="order-link outline" href="https://adviesborden.nl/contact/" target="_blank" id="t-sessionBtn">Begeleide heisessie</a>
+      <p style="font-size:11px;color:var(--t3);margin-top:12px">adviesborden.nl/contact</p>
+    </div>
+    <div class="order-img">
+      <div class="order-board-preview">
+        <svg viewBox="0 0 240 140" width="100%" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="0" width="240" height="140" rx="8" fill="white" opacity="0.2"/>
+          <circle cx="120" cy="80" r="40" fill="#FCC429" opacity="0.85"/>
+          <circle cx="60" cy="65" r="24" fill="#70A2D7" opacity="0.7"/>
+          <circle cx="88" cy="34" r="22" fill="#BDD24D" opacity="0.7"/>
+          <circle cx="152" cy="34" r="22" fill="#E8423F" opacity="0.7"/>
+          <circle cx="180" cy="65" r="24" fill="#9666AA" opacity="0.7"/>
+          <rect x="0" y="108" width="240" height="32" rx="4" fill="#C5D93D" opacity="0.6"/>
+          <text x="120" y="80" text-anchor="middle" dominant-baseline="central" font-family="DM Serif Display,serif" font-size="9" fill="white">stip</text>
+        </svg>
+      </div>
+      <div style="color:rgba(255,255,255,.9);font-family:'DM Serif Display',serif;font-size:16px;margin-bottom:4px">Visiekaart op maat</div>
+      <div style="color:rgba(255,255,255,.7);font-size:12px">Professioneel gedrukt · Uw eigen inhoud</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end .report -->
+
+<script>
+/* ═══ VK SHARED CANVAS BUILDER (injected) ═══ */
+/* ══════════════════════════════════════════════════════════════════════
+   VISIEKAART CANVAS — shared blueprint (used in fase 1 t/m 5 + rapport)
+   ──────────────────────────────────────────────────────────────────────
+   Geometry is faithful to bijlage_-_visiekaart_v2.svg.
+   ViewBox: 0 0 67733 38100 (CorelDRAW mm × 100).
+   Colors are mapped to standaard kleurcodes (Option B).
+   Font: DM Sans throughout.
+   ══════════════════════════════════════════════════════════════════════ */
+
+const VK_THEME_COLORS = ['#70A2D7','#BDD24D','#E8423F','#9666AA','#2A9791'];
+const VK_SUN = '#FCC429';
+const VK_BAND = '#BDD24D';
+const VK_DOTS = '#C5D93D';
+const VK_DARK = '#262A36';
+const VK_WHITE = '#FFFFFF';
+
+const VK_GEOM = {
+  sun: { cx: 33748, cy: 17537, r: 10421 },
+  band: { x: 2464, y: 17751, w: 62569, h: 19058, r: 886 },
+  themes: [
+    { cx: 20071, cy: 14057 },
+    { cx: 24285, cy:  7294 },
+    { cx: 33748, cy:  3625 },
+    { cx: 43161, cy:  7294 },
+    { cx: 47403, cy: 14057 }
+  ],
+  themeR: 3312,
+  triangle: 'M11768 35254 L33477 17752 L55186 35254 Z',
+  triApex: { x: 33477, y: 17751 },
+  triLeft: { x: 11768, y: 35254 },
+  triRight: { x: 55186, y: 35254 },
+  numbers: [
+    { x: 15205, y: 33897 },
+    { x: 18205, y: 31295 },
+    { x: 21439, y: 28632 },
+    { x: 24286, y: 25980 },
+    { x: 27496, y: 23474 }
+  ],
+  dots: [
+    { cx: 16229, cy: 14135 },
+    { cx: 64191, cy: 14135 },
+    { cx: 21013, cy:  9466 }
+  ]
+};
+
+function vkEscape(s){
+  return String(s||'').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function vkWrap(text, maxChars){
+  const words = String(text||'').split(/\s+/).filter(Boolean);
+  const out = [];
+  let line = '';
+  for (const w of words) {
+    const cand = line ? line + ' ' + w : w;
+    if (cand.length > maxChars && line) { out.push(line); line = w; }
+    else line = cand;
+  }
+  if (line) out.push(line);
+  return out;
+}
+
+function vkTruncate(text, maxChars){
+  text = String(text||'');
+  if (text.length <= maxChars) return text;
+  return text.substring(0, maxChars - 1).trimEnd() + '…';
+}
+
+/* Right edge of triangle at a given y */
+function vkTriRightX(y){
+  const apex = VK_GEOM.triApex, br = VK_GEOM.triRight;
+  if (y <= apex.y) return apex.x;
+  if (y >= br.y) return br.x;
+  return apex.x + (y - apex.y) / (br.y - apex.y) * (br.x - apex.x);
+}
+
+/*
+  data = {
+    visionSentence:  string | '',
+    themeNames:      array[5] of string | [],
+    themeActions:    array[5] of array[5] of string | [],
+    versnellers:     array of string,
+    remmers:         array of string,
+    roadmapTop5:     array of {text, themeIdx} | [],
+    lang:            'nl' | 'en',
+    stickyMode:      'numbers'  // show numbered chips in phase 3+
+  }
+*/
+function vkBuildCanvas(data){
+  const d = Object.assign({
+    visionSentence: '', themeNames: [], themeActions: [],
+    versnellers: [], remmers: [], roadmapTop5: [],
+    lang: 'nl', stickyMode: 'numbers'
+  }, data || {});
+  const isEN = d.lang === 'en';
+
+  const stoereLine1 = isEN ? 'bold steps' : 'stoere stappen';
+  const stoereLine2 = isEN ? 'to our dot' : 'naar onze stip';
+  const versnLabel = isEN ? 'accelerators' : 'versnellers';
+  const remmLabel  = isEN ? 'obstacles'    : 'remmers';
+  const placeholderPrefix = isEN ? 'theme' : 'thema';
+  const visionPlaceholder = isEN ? ['our dot on','the horizon'] : ['onze stip op','de horizon'];
+
+  let svg = '';
+
+  svg += `<rect x="0" y="0" width="67733" height="38100" fill="${VK_WHITE}"/>`;
+
+  const sun = VK_GEOM.sun;
+  svg += `<circle cx="${sun.cx}" cy="${sun.cy}" r="${sun.r}" fill="${VK_SUN}"/>`;
+
+  {
+    const visTop = sun.cy - sun.r;
+    const bandTop = VK_GEOM.band.y;
+    const visCenterY = (visTop + bandTop) / 2;
+    const sentence = d.visionSentence ? d.visionSentence : visionPlaceholder.join(' ');
+    let lines = vkWrap(sentence, 24).slice(0, 5);
+    if (!lines.length) lines = visionPlaceholder;
+    const fontSize = lines.length > 3 ? 900 : 1050;
+    const lineH = fontSize * 1.2;
+    const totalH = lines.length * lineH;
+    const startY = visCenterY - totalH/2 + lineH/2;
+    svg += lines.map((ln, i) =>
+      `<text x="${sun.cx}" y="${startY + i*lineH}" text-anchor="middle" dominant-baseline="central" font-size="${fontSize}" fill="${VK_WHITE}" font-weight="500">${vkEscape(ln)}</text>`
+    ).join('');
+  }
+
+  const b = VK_GEOM.band;
+  svg += `<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="${b.r}" ry="${b.r}" fill="${VK_BAND}"/>`;
+
+  VK_GEOM.dots.forEach(p => {
+    svg += `<circle cx="${p.cx}" cy="${p.cy}" r="80" fill="${VK_DOTS}"/>`;
+  });
+
+  VK_GEOM.themes.forEach((p, i) => {
+    const color = VK_THEME_COLORS[i];
+    const name = d.themeNames[i];
+    const isPlaceholder = !name;
+    const opacity = isPlaceholder ? 0.35 : 1;
+    svg += `<circle cx="${p.cx}" cy="${p.cy}" r="${VK_GEOM.themeR}" fill="${color}" opacity="${opacity}"/>`;
+    const numberLabel = String(i+1);
+    const display = name || `${placeholderPrefix} ${i+1}`;
+    const wrapped = vkWrap(display, 10).slice(0, 3).map(ln => vkTruncate(ln, 12));
+    const lineH = wrapped.length > 2 ? 560 : 680;
+    const blockH = wrapped.length * lineH;
+    const numberH = 1100;
+    const totalH = numberH + 200 + blockH;
+    const startY = p.cy - totalH/2 + numberH/2;
+    svg += `<text x="${p.cx}" y="${startY}" text-anchor="middle" dominant-baseline="central" font-size="${numberH}" fill="${VK_WHITE}" font-weight="700">${numberLabel}</text>`;
+    const nameTop = startY + numberH/2 + 200 + lineH/2;
+    svg += wrapped.map((ln, li) =>
+      `<text x="${p.cx}" y="${nameTop + li*lineH}" text-anchor="middle" dominant-baseline="central" font-size="${lineH}" fill="${VK_WHITE}" font-weight="600">${vkEscape(ln)}</text>`
+    ).join('');
+  });
+
+  VK_GEOM.themes.forEach((p, i) => {
+    const actions = d.themeActions[i];
+    if (!actions || !actions.length) return;
+    const n = Math.min(actions.length, 5);
+    const color = VK_THEME_COLORS[i];
+    // v4b: stickies vergroot en naar de buitenzijde van elke themabol gespreid
+    // (conform referentie 'visiekaart actiebeeld' B). Links-thema's → rij links,
+    // rechts-thema's → rij rechts, top-thema (2) → links/rechts geflankeerd.
+    const w = 1300, h = 1100, gap = 200, rx = 150, numFont = 620, strokeW = 80;
+    const R = VK_GEOM.themeR;
+    const drawSticky = (x, y, label) => {
+      svg += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" ry="${rx}" fill="${color}" stroke="${VK_WHITE}" stroke-width="${strokeW}"/>`
+           + `<text x="${x + w/2}" y="${y + h/2}" text-anchor="middle" dominant-baseline="central" font-size="${numFont}" fill="${VK_WHITE}" font-weight="700">${label}</text>`;
+    };
+    const rowLeftOf = (rightEdge, cy, count, start) => {
+      let x = rightEdge - (count * w + (count - 1) * gap);
+      const y = cy - h / 2;
+      for (let s = 0; s < count; s++){ drawSticky(x, y, start + s); x += w + gap; }
+    };
+    const rowRightOf = (leftEdge, cy, count, start) => {
+      let x = leftEdge;
+      const y = cy - h / 2;
+      for (let s = 0; s < count; s++){ drawSticky(x, y, start + s); x += w + gap; }
+    };
+    if (i === 0 || i === 1){
+      rowLeftOf(p.cx - R - 250, p.cy, n, 1);
+    } else if (i === 3 || i === 4){
+      rowRightOf(p.cx + R + 250, p.cy, n, 1);
+    } else {
+      const leftN = Math.ceil(n / 2), rightN = n - leftN;
+      const fy = p.cy - 260;
+      if (leftN)  rowLeftOf(p.cx - R - 250, fy, leftN, 1);
+      if (rightN) rowRightOf(p.cx + R + 250, fy, rightN, leftN + 1);
+    }
+  });
+
+  svg += `<path d="${VK_GEOM.triangle}" fill="${VK_WHITE}"/>`;
+
+  {
+    const apex = VK_GEOM.triApex;
+    const headY = apex.y + 1850;
+    svg += `<text x="${apex.x}" y="${headY}" text-anchor="middle" font-size="900" fill="${VK_DARK}" font-weight="600">${stoereLine1}</text>
+      <text x="${apex.x}" y="${headY + 1100}" text-anchor="middle" font-size="900" fill="${VK_DARK}" font-weight="400">${stoereLine2}</text>`;
+  }
+
+  VK_GEOM.numbers.forEach((p, i) => {
+    svg += `<text x="${p.x}" y="${p.y}" font-size="900" fill="${VK_DARK}" font-weight="600">${i+1}</text>`;
+    const action = d.roadmapTop5[i];
+    if (!action) return;
+    const themeIdx = (typeof action.themeIdx === 'number' ? action.themeIdx : 0);
+    const themeColor = VK_THEME_COLORS[themeIdx] || VK_DARK;
+    const bx = p.x + 1200;
+    const by = p.y - 280;
+    const br = 380;
+    svg += `<circle cx="${bx}" cy="${by}" r="${br}" fill="${themeColor}"/>
+      <text x="${bx}" y="${by}" text-anchor="middle" dominant-baseline="central" font-size="500" fill="${VK_WHITE}" font-weight="700">${themeIdx+1}</text>`;
+    const tx = bx + br + 200;
+    const xRight = vkTriRightX(p.y);
+    const maxW = xRight - tx - 500;
+    const charBudget = Math.max(8, Math.floor(maxW / 340));
+    const text = vkTruncate(action.text || '', charBudget);
+    svg += `<text x="${tx}" y="${p.y}" font-size="600" fill="${VK_DARK}" font-weight="400">${vkEscape(text)}</text>`;
+  });
+
+  {
+    const headX = 3360;
+    const headY = 18950;
+    svg += `<text x="${headX}" y="${headY}" font-size="1100" fill="${VK_DARK}" font-weight="700">${versnLabel}</text>`;
+    d.versnellers.slice(0, 5).forEach((v, i) => {
+      const t = typeof v === 'string' ? v : (v && (v.title || v.name) || '');
+      svg += `<text x="${headX}" y="${headY + 1700 + i*1500}" font-size="700" fill="${VK_DARK}" font-weight="400">${i+1}. ${vkEscape(vkTruncate(t, 28))}</text>`;
+    });
+  }
+
+  {
+    const headX = 64374;
+    const headY = 18950;
+    svg += `<text x="${headX}" y="${headY}" text-anchor="end" font-size="1100" fill="${VK_DARK}" font-weight="700">${remmLabel}</text>`;
+    d.remmers.slice(0, 5).forEach((r, i) => {
+      const t = typeof r === 'string' ? r : (r && (r.title || r.name) || '');
+      svg += `<text x="${headX}" y="${headY + 1700 + i*1500}" text-anchor="end" font-size="700" fill="${VK_DARK}" font-weight="400">${i+1}. ${vkEscape(vkTruncate(t, 28))}</text>`;
+    });
+  }
+
+  return svg;
+}
+
+/* Apply to an <svg> element: sets viewBox + innerHTML */
+function vkRenderInto(svgEl, data){
+  if (!svgEl) return;
+  svgEl.setAttribute('viewBox', '0 0 67733 38100');
+  svgEl.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+  svgEl.style.fontFamily = "'DM Sans', sans-serif";
+  svgEl.innerHTML = vkBuildCanvas(data);
+}
+
+/* ═══ END VK SHARED CANVAS BUILDER ═══ */
+
+/* ══════ STATE ══════ */
+let lang = 'nl';
+let D = {}; // all session data
+
+const THEME_COLORS=['#70A2D7','#BDD24D','#E8423F','#9666AA','#2A9791'];
+const THEME_LIGHT=['rgba(112,162,215,.12)','rgba(189,210,77,.12)','rgba(240,87,54,.09)','rgba(150,102,170,.1)','rgba(42,151,145,.12)'];
+
+/* ══════ TRANSLATIONS ══════ */
+const T={
+  nl:{
+    backBtn:'← Fase 5',
+    exportBtn:'Data exporteren',printBtn:'PDF afdrukken / opslaan',
+    cvLabel:'Stip op de horizon',
+    canvasTitle:'Visiekaart — volledig ingevuld',
+    canvasSub:'Visuele samenvatting van visie, thema\'s, acties, versnellers en remmers',
+    canvasCaption:'Visiekaart · adviesborden.nl · Alle rechten voorbehouden',
+    execTitle:'Samenvatting',execSub:'Visie, thema\'s en kernacties op één pagina',
+    visionLabel:'Stip op de horizon',
+    bsTitle:'Top 5 strategische acties — chronologisch',
+    roadmapTitle:'Strategische Roadmap',
+    vrTitle:'Versnellers & Remmers',vrSub:'Top 5 organisatiekenmerken die de strategie versnellen of remmen',
+    rmPrio:'#',rmAction:'Actie',rmTheme:'Thema',rmVision:'Visie',rmPeriod:'Periode',rmGantt:'Tijdlijn',rmOwner:'Eigenaar',rmRisk:'Risico',rmScore:'Score',
+    app0label:'Bijlage A — Fase 0: Sessie-opzet',
+    app1label:'Bijlage B — Fase 1: Stip op de horizon',
+    app2label:'Bijlage C — Fase 2: Thema\'s bepalen',
+    app3label:'Bijlage D — Fase 3: Thema\'s concretiseren',
+    app4label:'Bijlage E — Fase 4: Versnellers en Remmers — scores',
+    orderTitle:'Van digitaal naar tastbaar',
+    orderBody1:'De uitkomsten van uw strategiesessie zijn nu digitaal vastgelegd. Maar een strategie komt pas echt tot leven als ze zichtbaar aanwezig is op kantoor, in de vergaderzaal en op de werkvloer.',
+    orderBody2:'Adviesborden.nl maakt op maat gedrukte, professionele Visiekaart-borden waarop uw visie, thema\'s, acties en roadmap permanent zichtbaar zijn. Zo blijft de strategie niet in een document, maar wordt ze dagelijks zichtbaar en bespreekbaar.',
+    orderBtn:'Bestellen of informatie',sessionBtn:'Begeleide heisessie aanvragen',
+    visionComps:['Bestaansreden','Doelgroep','Behoefte','Ambitie','Focus'],
+    kracht:'Kracht',neutraal:'Neutraal',aandacht:'Aandachtspunt',
+    versnellers:'Versnellers',remmers:'Remmers',
+    appendixInvoer:'Ingevulde waarden',appendixSelectie:'Definitieve keuze',
+    phase:'Fase',question:'Vraag',keywords:'Kernwoorden',keywordsConfirmed:'Kernwoorden (bevestigd)',
+    visiezin:'Definitieve stip op de horizon',
+    themas:'Thema\'s',acties:'Acties',deelnemers:'Deelnemers',
+    score:'Score',periode:'Periode',eigenaar:'Eigenaar',
+    sectionA:'A — Executiekracht',sectionB:'B — Organisatie-elementen (INK)',
+    stmtHeaders:['Stelling','Kracht','Neutraal','Aandacht'],
+    heatmapNote:'Aggregaat van alle deelnemerscores. Groen = kracht, rood = aandachtspunt.',
+    heatmapDemoNote:'Aggregaat (demo-data). Echte stemmen verschijnen hier zodra fase 4 in een sessie is afgerond.',
+    horizonContext:{'<1jr':'< 1 jaar','1-3jr':'1-3 jaar','3-5jr':'3-5 jaar','5+jr':'5+ jaar'},
+    urgencyContext:{laag:'Laag',medium:'Medium',hoog:'Hoog'},
+    budgetContext:{beperkt:'Beperkt',voldoende:'Voldoende',ruim:'Ruim',onbekend:'Onbekend'},
+    sectorLabels:{overheid:'Overheid, onderwijs en cultuur',zorg:'Zorg en welzijn',zakelijk:'Zakelijke dienstverlening',industrie:'Industrie en bouw',handel:'Handel, transport en horeca',landbouw:'Landbouw, bosbouw en visserij'},
+    sessionTypeLabels:{strategisch:'Strategisch plan',jaarplan:'Jaarplan',project:'Project',anders:'Anders'},
+    app0Labels:{org:'Organisatie',sector:'Sector',sessionName:'Sessienaam',date:'Datum',facilitator:'Facilitator',sessionType:'Type sessie',horizon:'Tijdshorizon',scale:'Schaalniveau',urgency:'Urgentie',budget:'Budget',participants:'Deelnemers'},
+    resetConfirm:'Alle sessiedata wissen (stip op de horizon, thema\'s, acties, scores, roadmap)?\n\nDe demo-defaults worden hersteld bij de volgende pagina.',
+    resetDone:'Demo-data gewist. Pagina wordt herladen.',
+    docTitle:'Visiekaart v4 — Rapportage',
+  },
+  en:{
+    backBtn:'← Phase 5',
+    exportBtn:'Export data',printBtn:'Print / Save as PDF',
+    cvLabel:'Dot on the horizon',
+    canvasTitle:'Visiekaart — fully completed',
+    canvasSub:'Visual summary of vision, themes, actions, accelerators and obstacles',
+    canvasCaption:'Visiekaart · adviesborden.nl · All rights reserved',
+    execTitle:'Summary',execSub:'Vision, themes and key actions on one page',
+    visionLabel:'Dot on the horizon',
+    bsTitle:'Top 5 strategic actions — chronological',
+    roadmapTitle:'Strategic Roadmap',
+    vrTitle:'Accelerators & Obstacles',vrSub:'Top 5 organisational characteristics that accelerate or hinder the strategy',
+    rmPrio:'#',rmAction:'Action',rmTheme:'Theme',rmVision:'Vision',rmPeriod:'Period',rmGantt:'Timeline',rmOwner:'Owner',rmRisk:'Risk',rmScore:'Score',
+    app0label:'Appendix A — Phase 0: Session setup',
+    app1label:'Appendix B — Phase 1: Dot on the horizon',
+    app2label:'Appendix C — Phase 2: Determining themes',
+    app3label:'Appendix D — Phase 3: Concretising themes',
+    app4label:'Appendix E — Phase 4: Accelerators and Obstacles — scores',
+    orderTitle:'From digital to tangible',
+    orderBody1:'The outcomes of your strategy session are now digitally recorded. But a strategy truly comes to life when it is visibly present in the office, the meeting room and the workplace.',
+    orderBody2:'Adviesborden.nl creates custom-printed, professional Visiekaart boards showing your vision, themes, actions and roadmap permanently. This keeps the strategy visible and discussable every day.',
+    orderBtn:'Order or information',sessionBtn:'Request guided session',
+    visionComps:['Reason','Audience','Need','Ambition','Focus'],
+    kracht:'Strength',neutraal:'Neutral',aandacht:'Attention point',
+    versnellers:'Accelerators',remmers:'Obstacles',
+    appendixInvoer:'Submitted values',appendixSelectie:'Final choice',
+    phase:'Phase',question:'Question',keywords:'Keywords',keywordsConfirmed:'Keywords (confirmed)',
+    visiezin:'Final dot on the horizon',
+    themas:'Themes',acties:'Actions',deelnemers:'Participants',
+    score:'Score',periode:'Period',eigenaar:'Owner',
+    sectionA:'A — Execution power',sectionB:'B — Organisation elements (INK)',
+    stmtHeaders:['Statement','Strength','Neutral','Attention'],
+    heatmapNote:'Aggregate of all participant scores. Green = strength, red = attention point.',
+    heatmapDemoNote:'Aggregate (demo data). Real votes will appear here once phase 4 has been completed in a session.',
+    horizonContext:{'<1jr':'< 1 year','1-3jr':'1-3 years','3-5jr':'3-5 years','5+jr':'5+ years'},
+    urgencyContext:{laag:'Low',medium:'Medium',hoog:'High'},
+    budgetContext:{beperkt:'Limited',voldoende:'Sufficient',ruim:'Ample',onbekend:'Unknown'},
+    sectorLabels:{overheid:'Government & education',zorg:'Healthcare & welfare',zakelijk:'Business services',industrie:'Industry & construction',handel:'Trade & hospitality',landbouw:'Agriculture'},
+    sessionTypeLabels:{strategisch:'Strategic plan',jaarplan:'Annual plan',project:'Project',anders:'Other'},
+    app0Labels:{org:'Organisation',sector:'Sector',sessionName:'Session name',date:'Date',facilitator:'Facilitator',sessionType:'Session type',horizon:'Time horizon',scale:'Scale level',urgency:'Urgency',budget:'Budget',participants:'Participants'},
+    resetConfirm:'Clear all session data (dot on the horizon, themes, actions, scores, roadmap)?\n\nDefaults will reload on the next page.',
+    resetDone:'Demo data cleared. Page will reload.',
+    docTitle:'Visiekaart v4 — Report',
+  }
+};
+
+
+/* ══════════════════════════════════════════
+   VK SHARED ENVIRONMENT DETECTION (v4)
+══════════════════════════════════════════ */
+function isProductionMode(){
+  const host = (window.location.hostname || '').toLowerCase();
+  const protocol = window.location.protocol;
+  if (protocol === 'file:') return false;
+  if (host === '' || host === 'localhost' || host === '127.0.0.1' || host === '::1') return false;
+  if (/^192\.168\./.test(host)) return false;
+  if (/^10\./.test(host)) return false;
+  if (/^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(host)) return false;
+  if (/\.local$/.test(host)) return false;
+  return true;
+}
+function vkApplyEnvironmentRules(){
+  if (!isProductionMode()) return;
+  document.querySelectorAll('[data-env="dev-only"]').forEach(el => { el.style.display = 'none'; });
+  window.__VK_PROD = true;
+}
+
+/* ══════════ VK LIVE-MODE SWITCH (Cluster A / B1) ══════════
+   VK_LIVE = echte data + AI; false = demo-simulatie. Eén bron-van-waarheid voor alle fasen.
+   Sessietoken voor de AI-proxy-poort wordt door de koppeling (stap 3) op window.__VK_TOKEN gezet;
+   tot die tijd leeg → proxy weigert in productie → tool valt terug op lokale berekening. */
+const VK_LIVE = isProductionMode();
+if (typeof window.__VK_TOKEN === 'undefined') window.__VK_TOKEN = '';
+
+/* ══════════ RESET DEMO DATA ══════════ */
+function resetDemoData(){
+  if (window.__VK_PROD) return;
+  const msg = (T[lang] && T[lang].resetConfirm) || 'Alle sessiedata wissen?';
+  if(!confirm(msg)) return;
+  const keys = [
+    // fase 0 sessie
+    'vk_session','vk_session_started',
+    // fase 1
+    'vk_vision_sentence','vk_vision_keywords','vk_phase1_answers','vk_phase1_stage','vk_phase1_live_answers',
+    // fase 2
+    'vk_selected_themes','vk_phase2_submissions','vk_phase2_stage','vk_phase2_live_subs',
+    // fase 3
+    'vk_confirmed_actions','vk_phase3_submissions','vk_phase3_stage','vk_phase3_live_subs',
+    // fase 4
+    'vk_versnellers','vk_remmers','vk_phase4_scores','vk_phase4_submissions','vk_phase4_stage','vk_phase4_live_subs',
+    // fase 5
+    'vk_roadmap_actions','vk_phase5_stage',
+    // v4: fase-state markers voor back-edit flow
+    'vk_phase1_state','vk_phase2_state','vk_phase3_state','vk_phase4_state','vk_phase5_state',
+  ];
+  // vk_lang blijft expliciet behouden (UI-voorkeur)
+  keys.forEach(k=>localStorage.removeItem(k));
+  alert((T[lang] && T[lang].resetDone) || 'Demo-data gewist.');
+  location.reload();
+}
+
+/* ══════ LOAD DATA ══════ */
+/* Bron voor het rapport. Standaard localStorage (facilitator-apparaat direct na fase 5).
+   Bij RECALL vanaf het platform injecteert het platform de opgeslagen export
+   (zelfde vorm als VK_CINAB.collectExport) op window.__VK_REPORT_DATA of in
+   sessionStorage['vk_report_data']; die krijgt dan voorrang zodat het opgeslagen
+   rapport correct hydrateert in plaats van demo-standaarden te tonen. */
+/* Platform-endpoint voor de deellink-route (s22).
+   Het CINAB-platform laadt deze pagina in een iframe met alleen ?rapport_id=
+   in de URL. We halen de OPGESLAGEN wrapper op bij het platform en gebruiken
+   de opake tool-payload (json.data) als bron — dat is exact de collectExport-
+   vorm (de vk_*-keys) die loadData() verwacht.
+
+   NB: json.data bevat ook data_ref naar de RTDB-sessie. Dat is een verwijzing,
+   GEEN leesopdracht — de sessie is na afronden gewist (stateless-at-rest/AVG).
+   Alle benodigde gegevens staan al als snapshot náást data_ref in json.data.
+   We lezen dus NOOIT de live RTDB voor de render.
+
+   Host-afleiding: standaard de origin waar de iframe-parent op draait is niet
+   leesbaar (cross-origin); we leiden de API-host af uit een data-attribuut of
+   vallen terug op staging. Productie zet later VK_RAPPORT_API_BASE. */
+function vkRapportApiBase(){
+  // 1. expliciet meegegeven (productie/staging override) via <html data-cinab-api="https://cinab.nl">
+  try {
+    var attr = document.documentElement.getAttribute('data-cinab-api');
+    if (attr) return attr.replace(/\/+$/, '');
+  } catch(e){}
+  // 2. fallback: staging
+  return 'https://staging2.cinab.nl';
+}
+
+async function vkReportSource(){
+  // 1. Deellink-route: rapport_id uit de URL → platform-endpoint (de PRIMAIRE
+  //    bron zodra de pagina via /rapport/{uuid} in het iframe geladen wordt).
+  try {
+    var rid = new URLSearchParams(location.search).get('rapport_id');
+    if (rid) {
+      var url = vkRapportApiBase() + '/wp-json/cinab/v1/rapport-data/' + encodeURIComponent(rid);
+      var res = await fetch(url, { method: 'GET', credentials: 'omit' });
+      if (res.ok) {
+        var json = await res.json();
+        if (json && json.data && typeof json.data === 'object') {
+          // export-snapshot zit in json.data (collectExport-vorm: vk_*-keys).
+          // Sommige builds nesten 'm onder data.export — beide afvangen.
+          if (json.data.export && typeof json.data.export === 'object') return json.data.export;
+          return json.data;
+        }
+      }
+    }
+  } catch(e){}
+  // 2. Lokale recall (facilitator-apparaat direct na fase 5) — ongewijzigd.
+  try {
+    if (window.__VK_REPORT_DATA && typeof window.__VK_REPORT_DATA === 'object') return window.__VK_REPORT_DATA;
+    const ss = sessionStorage.getItem('vk_report_data');
+    if (ss) { const o = JSON.parse(ss); if (o && typeof o === 'object') return o; }
+  } catch(e){}
+  return null;
+}
+
+async function loadData(){
+  const SRC = await vkReportSource();   // endpoint (deellink) → recall → null (→ localStorage)
+  const rd = (k) => {
+    if (SRC) return (k in SRC) ? (typeof SRC[k] === 'string' ? SRC[k] : JSON.stringify(SRC[k])) : null;
+    try { return localStorage.getItem(k); } catch(e){ return null; }
+  };
+  const keys=['vk_vision_sentence','vk_vision_keywords','vk_selected_themes','vk_confirmed_actions',
+    'vk_versnellers','vk_remmers','vk_session','vk_roadmap_actions','vk_phase1_answers','vk_phase2_submissions','vk_phase3_submissions','vk_phase4_scores'];
+  D={};
+  keys.forEach(k=>{
+    try{ const v=rd(k); if(v) D[k.replace('vk_','')]=JSON.parse(v); } catch(e){}
+  });
+
+  // Vision sentence (string, not JSON)
+  try{ const vs=rd('vk_vision_sentence'); if(vs&&vs[0]!=='{') D.vision_sentence=vs; } catch(e){}
+  D.__recall = !!SRC;   // markeer recall-modus (bv. voor toekomstige appendix-afhandeling)
+
+  // ── Fase 4: normaliseer versnellers/remmers ──
+  // Datacontract §4: vk_versnellers en vk_remmers zijn arrays-of-strings.
+  // vk_phase4_scores bevat ranked-lijsten met count en allScores per stelling.
+  // Voorkeur: gebruik vk_phase4_scores als die er is; anders array-of-strings naar
+  // objects {title,count,source} normaliseren zodat renderVRSummary geen undefined ziet.
+  const ph4 = D.phase4_scores;
+  if (ph4 && Array.isArray(ph4.versnellersRanked) && ph4.versnellersRanked.length) {
+    D.versnellers = ph4.versnellersRanked.slice(0,5).map(v=>({
+      title:v.title||v.titleNl||v.titleEn||'', count:typeof v.count==='number'?v.count:0, source:v.source||''
+    }));
+  } else if (Array.isArray(D.versnellers)) {
+    D.versnellers = D.versnellers.map((v,i)=> typeof v==='string'
+      ? {title:v,count:5-i,source:''}
+      : {title:v.title||v.name||'', count:typeof v.count==='number'?v.count:(5-i), source:v.source||''});
+  }
+  if (ph4 && Array.isArray(ph4.remmersRanked) && ph4.remmersRanked.length) {
+    D.remmers = ph4.remmersRanked.slice(0,5).map(r=>({
+      title:r.title||r.titleNl||r.titleEn||'', count:typeof r.count==='number'?r.count:0, source:r.source||''
+    }));
+  } else if (Array.isArray(D.remmers)) {
+    D.remmers = D.remmers.map((r,i)=> typeof r==='string'
+      ? {title:r,count:5-i,source:''}
+      : {title:r.title||r.name||'', count:typeof r.count==='number'?r.count:(5-i), source:r.source||''});
+  }
+  // Bewaar allScores apart voor de heatmap (Bijlage E)
+  D.allScores = (ph4 && ph4.allScores) ? ph4.allScores : null;
+
+  applyDefaults();
+}
+
+function applyDefaults(){
+  const l=lang;
+  if(!D.vision_sentence) D.vision_sentence = l==='nl'
+    ?'Omdat er te weinig toegankelijke zorg is, richten wij ons op ouderen die zelfstandig willen wonen, die behoefte hebben aan een vertrouwd gezicht. Wij willen bereiken dat mensen hun eigen leven kunnen leiden. Daarom ligt onze focus de komende periode op het moderniseren van onze werkprocessen.'
+    :'Because accessible care is insufficient, we focus on elderly people who need a familiar face. We want to achieve that people can lead their own lives. Therefore our focus is on modernising our work processes.';
+
+  if(!D.selected_themes) D.selected_themes=(l==='nl'
+    ?['Klantgerichtheid','Kwaliteit en processen','Medewerkers en ontwikkeling','Digitalisering','Samenwerking']
+    :['Customer focus','Quality and processes','Staff and development','Digitalisation','Collaboration']
+  ).map((name,i)=>({name,score:3+i*0.3,color:THEME_COLORS[i]}));
+
+  if(!D.confirmed_actions){
+    const da=l==='nl'
+      ?[['Interview tien klanten','Maak klantpersona\'s','Breng klantreis in kaart','Ontwikkel tevredenheidsmeting','Klantpanels organiseren'],
+        ['Breng kernprocessen in kaart','Implementeer PDCA-cyclus','Stel kwaliteitsnormen vast','Voer maandelijks audit uit','Train team op procesdenken'],
+        ['Voer ontwikkelgesprekken','Persoonlijk ontwikkelplan','Kennisdelingsoverleg','Opleidingskalender','Mentorprogramma'],
+        ['Inventariseer digitale tools','Maak digitale roadmap','Implementeer cliëntvolgsysteem','Train op systemen','Automatiseer administratie'],
+        ['Breng partners in kaart','Sluit overeenkomsten','Kwartaaloverleg','Communicatieplan','Evalueer jaarlijks']]
+      :[['Interview ten clients','Create client personas','Map client journey','Develop satisfaction measurement','Organise client panels'],
+        ['Map core processes','Implement PDCA cycle','Set quality standards','Conduct monthly audit','Train on process thinking'],
+        ['Conduct development talks','Personal development plans','Knowledge sharing','Training calendar','Mentoring programme'],
+        ['Inventory digital tools','Create digital roadmap','Implement client tracker','Train on systems','Automate administration'],
+        ['Map partners','Sign agreements','Quarterly meetings','Communication plan','Annual evaluation']];
+    D.confirmed_actions={};
+    da.forEach((a,i)=>D.confirmed_actions[i]=a);
+  }
+
+  if(!D.versnellers || !D.versnellers.length) D.versnellers=(l==='nl'
+    ?['Eigenaarschap en accountability','Klant- en stakeholdergerichtheid','Prioritering en focus','Kwalitatieve personele bezetting','Financiële middelen en budgetten']
+    :['Ownership and accountability','Client and stakeholder focus','Prioritisation and focus','Qualitative staffing','Financial resources and budgets']
+  ).map((title,i)=>({title,count:5-i,source:''}));
+
+  if(!D.remmers || !D.remmers.length) D.remmers=(l==='nl'
+    ?['ICT en digitale ondersteuning','Verandervermogen','Data en managementinformatie','Leren en verbeteren','Kwantitatieve personele capaciteit']
+    :['ICT and digital support','Capacity for change','Data and management information','Learning and improvement','Quantitative staffing capacity']
+  ).map((title,i)=>({title,count:5-i,source:''}));
+
+  if(!D.session) D.session={org:'Zorgorganisatie Noord',sector:'zorg',sessionName:'Strategie 2025-2028',sessionType:'strategisch',horizon:'3-5jr',scale:'organisatie',urgency:'hoog',budget:'voldoende',facilitator:'Lisa',participants:[{name:'Lisa',email:''},{name:'Pieter',email:''},{name:'Sara',email:''},{name:'Tom',email:''},{name:'Aisha',email:''}],date:new Date().toLocaleDateString('nl-NL')};
+
+  // Build roadmap actions if not stored
+  if(!D.roadmap_actions) D.roadmap_actions=buildDefaultRoadmapActions();
+}
+
+function buildDefaultRoadmapActions(){
+  const vComps=[1,2,3,4,0,2,3,4,1,0,3,2,4,1,2,0,3,4,1,2,3,0,4,1,2];
+  const actions=[];
+  Object.entries(D.confirmed_actions).forEach(([ti,acts])=>{
+    (acts||[]).forEach((text,ai)=>{
+      const i=parseInt(ti)*5+ai;
+      actions.push({
+        id:`T${ti}_A${ai}`,text,themeIdx:parseInt(ti),
+        themeName:D.selected_themes[parseInt(ti)]?.name||`Thema ${parseInt(ti)+1}`,
+        themeColor:THEME_COLORS[parseInt(ti)],
+        visComp:vComps[i%vComps.length],
+        priorityScore:80-i*2+Math.random()*8,
+        feasibility:6+Math.random()*3,impact:5+Math.random()*4,
+        riskScore:20+Math.random()*50,
+        startPeriod:Math.floor(i/3),duration:2,
+        owner:'',rank:i+1
+      });
+    });
+  });
+  return actions.sort((a,b)=>b.priorityScore-a.priorityScore);
+}
+
+/* ══════ RENDER ALL ══════ */
+function renderAll(){
+  const t=T[lang];
+  renderCover();
+  renderCanvas();
+  renderExecSummary();
+  renderRoadmapTable();
+  renderVRSummary();
+  renderApp0();
+  renderApp1();
+  renderApp2();
+  renderApp3();
+  renderApp4();
+}
+
+/* ══════ COVER ══════ */
+function renderCover(){
+  const t=T[lang];
+  const s=D.session||{};
+  const sectorLabel=t.sectorLabels[s.sector]||s.sector||'';
+  const typeLabel=s.sessionType?(t.sessionTypeLabels[s.sessionType]||s.sessionType):'';
+  const partList=(s.participants||[]).map(p=>typeof p==='string'?p:(p&&p.name)||'').filter(Boolean).join(', ');
+
+  document.getElementById('coverType').textContent=t.sectorLabels[s.sector]?`${t.roadmapTitle} · ${sectorLabel}`:`${t.roadmapTitle}`;
+  document.getElementById('coverOrg').textContent=s.org||'Organisatie';
+  document.getElementById('coverSession').textContent=s.sessionName||'Strategiesessie';
+  document.getElementById('coverVision').textContent=D.vision_sentence||'—';
+
+  const meta=document.getElementById('coverMeta');
+  meta.innerHTML=[
+    {label:lang==='nl'?'Datum':'Date',val:s.date||new Date().toLocaleDateString()},
+    {label:lang==='nl'?'Facilitator':'Facilitator',val:s.facilitator||'—'},
+    {label:lang==='nl'?'Type':'Type',val:typeLabel||'—'},
+    {label:lang==='nl'?'Tijdshorizon':'Time horizon',val:t.horizonContext[s.horizon]||s.horizon||'—'},
+    {label:lang==='nl'?'Deelnemers':'Participants',val:partList||'—'},
+  ].map(m=>`<div class="cover-meta-item"><strong>${escapeHtml(m.val)}</strong><span>${escapeHtml(m.label)}</span></div>`).join('');
+}
+
+/* ══════ CANVAS SVG ══════ */
+function renderCanvas(){
+  const themesArr = D.selected_themes || [];
+  const allActions = D.roadmap_actions || [];
+  const names = themesArr.map(t => (t && t.name) || '');
+  const themeActs = themesArr.map((_, i) =>
+    allActions.filter(a => a.themeIdx === i)
+              .sort((a,b) => (a.rank||0) - (b.rank||0))
+              .slice(0,5)
+              .map(a => a.text || '')
+  );
+  const v = (D.versnellers || []).map(x => typeof x === 'string' ? x : (x && (x.title || x.name)) || '');
+  const r = (D.remmers     || []).map(x => typeof x === 'string' ? x : (x && (x.title || x.name)) || '');
+  const top5 = allActions.slice().sort((a,b) =>
+    (b.priorityScore||b.score||0) - (a.priorityScore||a.score||0)
+  ).slice(0,5).map(a => ({text: a.text || '', themeIdx: a.themeIdx || 0}));
+  vkRenderInto(document.getElementById('mainCanvas'), {
+    visionSentence: D.vision_sentence || '',
+    themeNames: names,
+    themeActions: themeActs,
+    versnellers: v,
+    remmers: r,
+    roadmapTop5: top5,
+    lang: lang
+  });
+}
+
+/* ══════ EXEC SUMMARY ══════ */
+function renderExecSummary(){
+  const t=T[lang];
+  document.getElementById('execVision').textContent=D.vision_sentence||'—';
+  const themes=D.selected_themes||[];
+  const actions=D.roadmap_actions||[];
+
+  // ── Bold Steps: top-5 op priorityScore, daarna chronologisch op startPeriod
+  // (Sibbet stap 6: orden de bold steps logisch in de tijd) ──
+  const top5priority = actions.slice().sort((a,b)=>(b.priorityScore||b.score||0)-(a.priorityScore||a.score||0)).slice(0,5);
+  const top5chrono = top5priority.slice().sort((a,b)=>{
+    const da=(a.startPeriod||0)-(b.startPeriod||0);
+    if(da!==0) return da;
+    return (b.priorityScore||0)-(a.priorityScore||0);
+  });
+  const bsWrap = document.getElementById('boldStepsWrap');
+  const bsList = document.getElementById('boldStepsList');
+  if (top5chrono.length && bsWrap && bsList) {
+    bsWrap.style.display = 'block';
+    // Periodlabel via horizon
+    const h=(D.session&&D.session.horizon)||'3-5jr';
+    const yr=new Date().getFullYear();
+    function periodLabel(i){
+      if(h==='<1jr') return (lang==='nl'?['Jan','Feb','Mrt','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec']:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'])[i%12];
+      if(h==='1-3jr') return `Q${(i%4)+1} '${String(yr+Math.floor(i/4)).slice(2)}`;
+      if(h==='3-5jr') return `H${(i%2)+1} '${String(yr+Math.floor(i/2)).slice(2)}`;
+      return String(yr+i);
+    }
+    bsList.innerHTML = top5chrono.map((a,i)=>{
+      const c = a.themeColor || THEME_COLORS[a.themeIdx||0];
+      return `<div class="bs-item">
+        <div class="bs-num" style="background:${c}">${i+1}</div>
+        <div class="bs-text">${escapeHtml(a.text||'')}</div>
+        <div class="bs-period">${escapeHtml(periodLabel(a.startPeriod||0))}</div>
+      </div>`;
+    }).join('');
+  } else if (bsWrap) {
+    bsWrap.style.display = 'none';
+  }
+
+  // ── Thema-overzicht per thema (alle acties, gesorteerd op rank) ──
+  const el=document.getElementById('execThemes');
+  el.innerHTML=themes.map((th,ti)=>{
+    const c=th.color||THEME_COLORS[ti];
+    const acts=actions.filter(a=>a.themeIdx===ti).sort((a,b)=>(a.rank||0)-(b.rank||0)).slice(0,5);
+    return `<div class="theme-entry" style="border-color:${c}25;background:${c}05">
+      <div class="te-head" style="background:${c}10">
+        <div class="te-bubble" style="background:${c}">${ti+1}</div>
+        <div class="te-name" style="color:${c}">${escapeHtml(th.name||'')}</div>
+        <div style="margin-left:auto;font-size:11px;font-weight:600;color:${c}">${(th.score||3).toFixed(1)}/5</div>
+      </div>
+      <div class="te-actions">
+        ${acts.map((a,ai)=>`<div class="ta-item">
+          <span class="ta-num" style="color:${c}">${ai+1}.</span>
+          <div>
+            <div class="ta-text">${escapeHtml(a.text||'')}</div>
+            <div class="ta-badges">
+              <span class="badge" style="background:${c}12;color:${c}">${escapeHtml(t.visionComps[a.visComp]||'')}</span>
+              ${a.owner?`<span class="badge" style="background:var(--gl);color:var(--gd)">👤 ${escapeHtml(a.owner)}</span>`:''}
+              ${a.riskScore>60?`<span class="badge" style="background:var(--cll);color:var(--cd)">⚠ ${escapeHtml(t.aandacht)}</span>`:''}
+            </div>
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════ ROADMAP TABLE ══════ */
+function renderRoadmapTable(){
+  const t=T[lang];
+  const s=D.session||{};
+  const h=s.horizon||'3-5jr';
+  const yr=new Date().getFullYear();
+  function periodLabel(i){
+    if(h==='<1jr') return ['Jan','Feb','Mrt','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec'][i%12];
+    if(h==='1-3jr') return `Q${(i%4)+1} '${String(yr+Math.floor(i/4)).slice(2)}`;
+    if(h==='3-5jr') return `H${(i%2)+1} '${String(yr+Math.floor(i/2)).slice(2)}`;
+    return String(yr+i);
+  }
+
+  document.getElementById('roadmapSubTitle').textContent=`${s.org||''} · ${s.sessionName||''} · ${t.horizonContext[s.horizon]||''}`;
+
+  const cb=document.getElementById('roadmapContextBadges');
+  cb.innerHTML=[
+    t.urgencyContext[s.urgency],t.budgetContext[s.budget],t.horizonContext[s.horizon]
+  ].filter(Boolean).map(v=>`<span class="meta-pill">${escapeHtml(v)}</span>`).join('');
+
+  // ── Bepaal totaal aantal perioden voor het mini-Gantt-spoor ──
+  // Match de horizonconfig die fase 5 hanteert.
+  const totalPeriods = (h==='<1jr') ? 12 : (h==='1-3jr') ? 12 : (h==='3-5jr') ? 10 : 7;
+  const actions=D.roadmap_actions||[];
+  const tbody=document.getElementById('roadmapTableBody');
+  tbody.innerHTML=actions.map((a,i)=>{
+    const c=a.themeColor||THEME_COLORS[a.themeIdx||0];
+    const riskColor=a.riskScore>60?'var(--cd)':a.riskScore>35?'var(--amber)':'var(--gd)';
+    const txt=a.text||'';
+    const shortTxt=txt.length>40?txt.slice(0,38)+'…':txt;
+    const startP=Math.max(0,Math.min(totalPeriods-1, a.startPeriod||0));
+    const dur=Math.max(1,Math.min(totalPeriods-startP, a.duration||2));
+    const leftPct=(startP/totalPeriods)*100;
+    const widthPct=(dur/totalPeriods)*100;
+    // tickmarks elke periode (subtiel) — vermijdt voor erg lange tijdlijnen overload
+    const tickEvery = totalPeriods>10 ? 2 : 1;
+    let ticks='';
+    for(let k=1;k<totalPeriods;k+=tickEvery){
+      ticks+=`<div class="mg-tick" style="left:${(k/totalPeriods)*100}%"></div>`;
+    }
+    return `<tr>
+      <td style="font-weight:700;color:${c}">${i+1}</td>
+      <td style="font-weight:600;max-width:180px" title="${escapeHtml(txt)}">${escapeHtml(shortTxt)}</td>
+      <td><span style="display:inline-flex;align-items:center;gap:4px"><span style="width:7px;height:7px;border-radius:50%;background:${c};display:inline-block"></span>${escapeHtml(a.themeName||'')}</span></td>
+      <td><span style="background:${c}12;color:${c};padding:1px 6px;border-radius:9px;font-size:10px;font-weight:600">${escapeHtml(t.visionComps[a.visComp]||'')}</span></td>
+      <td style="white-space:nowrap"><span style="background:var(--ol);color:var(--oh);padding:1px 6px;border-radius:9px;font-size:10px;font-weight:600">${escapeHtml(periodLabel(startP))}</span></td>
+      <td class="mg-cell"><div class="mg-track">${ticks}<div class="mg-bar" style="left:${leftPct.toFixed(2)}%;width:${widthPct.toFixed(2)}%;background:${c}"></div></div></td>
+      <td style="color:var(--t2)">${escapeHtml(a.owner||'—')}</td>
+      <td><div style="display:flex;align-items:center;gap:4px"><div style="width:36px;height:4px;background:var(--b0);border-radius:2px;overflow:hidden"><div style="height:100%;background:${riskColor};width:${(a.riskScore||0).toFixed(0)}%"></div></div><span style="font-size:10px;font-weight:600;color:${riskColor}">${(a.riskScore||0).toFixed(0)}%</span></div></td>
+      <td style="font-weight:700;color:${c}">${(a.priorityScore||0).toFixed(0)}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ══════ VR SUMMARY ══════ */
+function renderVRSummary(){
+  const t=T[lang];
+  const vs = (D.versnellers||[]).map(v => ({title: v.title||v.name||'', count: typeof v.count==='number'?v.count:0}));
+  const rs = (D.remmers||[]).map(r => ({title: r.title||r.name||'', count: typeof r.count==='number'?r.count:0}));
+  const maxV = Math.max(1, ...vs.map(v=>v.count));
+  const maxR = Math.max(1, ...rs.map(r=>r.count));
+  const el=document.getElementById('vrContent');
+  el.innerHTML=`
+    <div class="vr-panel" style="background:var(--gl);border-color:rgba(189,210,77,.2)">
+      <div class="vr-head" style="color:var(--gd)">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 10V3M3 6l3-3 3 3"/></svg>
+        ${escapeHtml(t.versnellers)}
+      </div>
+      ${vs.map((v,i)=>`<div class="vr-item">
+        <div class="vr-rank" style="${i<5?'background:var(--green);color:#fff':'background:var(--gl);color:var(--gd)'}">${i+1}</div>
+        <div style="flex:1">
+          <div class="vr-label">${escapeHtml(v.title)}</div>
+          <div class="vr-bar"><div class="vr-fill" style="background:var(--green);width:${(v.count/maxV)*100}%"></div></div>
+        </div>
+        <div class="vr-count" style="color:var(--gd)">${v.count}×</div>
+      </div>`).join('')}
+    </div>
+    <div class="vr-panel" style="background:var(--cll);border-color:rgba(240,87,54,.15)">
+      <div class="vr-head" style="color:var(--cd)">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 2v7M3 6l3 3 3-3"/></svg>
+        ${escapeHtml(t.remmers)}
+      </div>
+      ${rs.map((r,i)=>`<div class="vr-item">
+        <div class="vr-rank" style="${i<5?'background:var(--coral);color:#fff':'background:var(--cll);color:var(--cd)'}">${i+1}</div>
+        <div style="flex:1">
+          <div class="vr-label">${escapeHtml(r.title)}</div>
+          <div class="vr-bar"><div class="vr-fill" style="background:var(--coral);width:${(r.count/maxR)*100}%"></div></div>
+        </div>
+        <div class="vr-count" style="color:var(--cd)">${r.count}×</div>
+      </div>`).join('')}
+    </div>`;
+}
+
+/* ══════ APPENDIX A — SESSION ══════ */
+function renderApp0(){
+  const t=T[lang];
+  const s=D.session||{};
+  const el=document.getElementById('app0Content');
+  const L=t.app0Labels||{};
+  const items=[
+    {label:L.org,val:s.org||'—'},
+    {label:L.sector,val:t.sectorLabels[s.sector]||s.sector||'—'},
+    {label:L.sessionName,val:s.sessionName||'—'},
+    {label:L.date,val:s.date||'—'},
+    {label:L.facilitator,val:s.facilitator||'—'},
+    {label:L.sessionType,val:s.sessionType?(t.sessionTypeLabels[s.sessionType]||s.sessionType):'—'},
+    {label:L.horizon,val:t.horizonContext[s.horizon]||s.horizon||'—'},
+    {label:L.scale,val:s.scale||'—'},
+    {label:L.urgency,val:t.urgencyContext[s.urgency]||s.urgency||'—'},
+    {label:L.budget,val:t.budgetContext[s.budget]||s.budget||'—'},
+    {label:L.participants,val:(s.participants||[]).map(p=>typeof p==='string'?p:(p&&p.name)||'').filter(Boolean).join(', ')||'—'},
+  ];
+  el.innerHTML=items.map(item=>`<div style="background:var(--bg);border:1px solid var(--b1);border-radius:var(--r);padding:10px 13px">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);margin-bottom:3px">${escapeHtml(item.label||'')}</div>
+    <div style="font-size:13px;font-weight:600">${escapeHtml(item.val)}</div>
+  </div>`).join('');
+}
+
+/* ══════ APPENDIX B — FASE 1 ══════ */
+function renderApp1(){
+  const t=T[lang];
+  const QUESTIONS_NL=[
+    {q:'Welk belangrijk probleem of welke kans maakt dat onze organisatie of dit project nodig is?',slot:'Bestaansreden'},
+    {q:'Voor welke doelgroep doen we dit, en waarom juist voor hen?',slot:'Doelgroep'},
+    {q:'Welke belangrijkste behoefte, frustratie of ambitie heeft deze doelgroep?',slot:'Behoefte'},
+    {q:'Welke concrete verandering willen wij bereiken?',slot:'Ambitie'},
+    {q:'Wat is de ene opgave die wij de komende periode als eerste moeten aanpakken?',slot:'Focus'},
+  ];
+  const QUESTIONS_EN=[
+    {q:'What important problem or opportunity makes our organisation or this project necessary?',slot:'Reason'},
+    {q:'Which target group are we doing this for, and why specifically for them?',slot:'Audience'},
+    {q:'What is the most important need, frustration or ambition of this target group?',slot:'Need'},
+    {q:'What concrete change do we want to achieve?',slot:'Ambition'},
+    {q:'What is the one priority we must tackle first in the coming period?',slot:'Focus'},
+  ];
+  const questions=lang==='nl'?QUESTIONS_NL:QUESTIONS_EN;
+  const kws=D.vision_keywords||{};
+  const el=document.getElementById('app1Content');
+
+  let html=`<table class="app-table">
+    <thead><tr>
+      <th style="width:30px">#</th>
+      <th>${escapeHtml(t.question||'Vraag')}</th>
+      <th>${escapeHtml(t.keywordsConfirmed||'Kernwoorden')}</th>
+    </tr></thead><tbody>`;
+  questions.forEach((q,i)=>{
+    const kw=(kws[i]||[]).map(k=>String(k||'').trim()).filter(Boolean).join(', ')||'—';
+    html+=`<tr><td style="font-weight:700;color:var(--orange)">${i+1}</td>
+      <td><div style="font-weight:600;font-size:11px;margin-bottom:2px">${escapeHtml(q.slot)}</div><div style="font-size:11px;color:var(--t2)">${escapeHtml(q.q)}</div></td>
+      <td><span style="background:var(--ol);color:var(--oh);padding:2px 8px;border-radius:10px;font-size:11px">${escapeHtml(kw)}</span></td>
+    </tr>`;
+  });
+  html+=`</tbody></table>
+    <div style="background:linear-gradient(135deg,#FAA833,#D8901E);border-radius:var(--r);padding:14px 18px">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.7);margin-bottom:6px">${escapeHtml(t.visiezin)}</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:14px;color:#fff;line-height:1.5">${escapeHtml(D.vision_sentence||'—')}</div>
+    </div>`;
+  el.innerHTML=html;
+}
+
+/* ══════ APPENDIX C — FASE 2 ══════ */
+function renderApp2(){
+  const t=T[lang];
+  const themes=D.selected_themes||[];
+  const el=document.getElementById('app2Content');
+
+  let html=`<table class="app-table">
+    <thead><tr>
+      <th style="width:30px">#</th>
+      <th>${lang==='nl'?'Thema':'Theme'}</th>
+      <th>${lang==='nl'?'Score stemronde':'Voting score'}</th>
+      <th>${lang==='nl'?'Geselecteerd':'Selected'}</th>
+    </tr></thead><tbody>`;
+  themes.forEach((th,i)=>{
+    const c=th.color||THEME_COLORS[i];
+    const score=(th.score||3).toFixed(1);
+    html+=`<tr>
+      <td style="font-weight:700;color:${c}">${i+1}</td>
+      <td><span style="font-weight:700;color:${c}">${escapeHtml(th.name||'')}</span></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="width:60px;height:5px;background:var(--b0);border-radius:3px;overflow:hidden">
+            <div style="height:100%;background:${c};width:${((th.score||3)/5)*100}%"></div>
+          </div>
+          <span style="font-size:11px;font-weight:700;color:${c}">${score}/5</span>
+        </div>
+      </td>
+      <td><span style="background:var(--gl);color:var(--gd);padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700">✓ ${lang==='nl'?'Opgenomen':'Included'}</span></td>
+    </tr>`;
+  });
+  html+='</tbody></table>';
+  el.innerHTML=html;
+}
+
+/* ══════ APPENDIX D — FASE 3 ══════ */
+function renderApp3(){
+  const t=T[lang];
+  const themes=D.selected_themes||[];
+  const actions=D.roadmap_actions||[];
+  const el=document.getElementById('app3Content');
+
+  let html='';
+  themes.forEach((th,ti)=>{
+    const c=th.color||THEME_COLORS[ti];
+    const acts=actions.filter(a=>a.themeIdx===ti).sort((a,b)=>(a.rank||0)-(b.rank||0));
+    html+=`<div style="margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <div style="width:22px;height:22px;border-radius:50%;background:${c};color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">${ti+1}</div>
+        <span style="font-size:13px;font-weight:700;color:${c}">${escapeHtml(th.name||'')}</span>
+      </div>
+      <table class="app-table">
+        <thead><tr>
+          <th style="width:20px">#</th><th>${lang==='nl'?'Actie':'Action'}</th>
+          <th style="width:70px">${escapeHtml(t.rmVision)}</th><th style="width:70px">${escapeHtml(t.rmScore)}</th>
+        </tr></thead><tbody>
+        ${acts.map((a,ai)=>`<tr>
+          <td style="font-weight:700;color:${c}">${ai+1}</td>
+          <td style="font-size:12px">${escapeHtml(a.text||'')}</td>
+          <td><span style="background:${c}12;color:${c};padding:1px 6px;border-radius:8px;font-size:10px;font-weight:600">${escapeHtml(t.visionComps[a.visComp]||'')}</span></td>
+          <td style="font-weight:700;color:${c}">${(a.priorityScore||0).toFixed(0)}</td>
+        </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+
+/* ══════ APPENDIX E — FASE 4 ══════ */
+function renderApp4(){
+  const t=T[lang];
+  const el=document.getElementById('app4Content');
+  const STATEMENTS_NL=[
+    {sec:'A',id:'A1',title:'Richting & strategische scherpte'},{id:'A2',sec:'A',title:'Prioritering & focus'},
+    {id:'A3',sec:'A',title:'Besluitvorming & mandaat'},{id:'A4',sec:'A',title:'Eigenaarschap & accountability'},
+    {id:'A5',sec:'A',title:'Voortgangssturing & ritme'},{id:'A6',sec:'A',title:'Samenwerking over grenzen'},
+    {id:'A7',sec:'A',title:'Leiderschap & voorbeeldgedrag'},{id:'A8',sec:'A',title:'Verandervermogen'},
+    {id:'A9',sec:'A',title:'Leren & verbeteren'},{id:'A10',sec:'A',title:'Klant- en stakeholdergerichtheid'},
+    {sec:'B',id:'B1',title:'Organisatiestructuur'},{id:'B2',sec:'B',title:'Rollen & verantwoordelijkheden'},
+    {id:'B3',sec:'B',title:'Kwantitatieve personele capaciteit'},{id:'B4',sec:'B',title:'Kwalitatieve personele bezetting'},
+    {id:'B5',sec:'B',title:'Werkprocessen'},{id:'B6',sec:'B',title:'Procesbeheersing & kwaliteit'},
+    {id:'B7',sec:'B',title:'ICT & digitale ondersteuning'},{id:'B8',sec:'B',title:'Data & managementinformatie'},
+    {id:'B9',sec:'B',title:'Financiële middelen & budgetten'},{id:'B10',sec:'B',title:'Huisvesting & faciliteiten'},
+  ];
+  const STATEMENTS_EN=[
+    {sec:'A',id:'A1',title:'Direction & strategic clarity'},{id:'A2',sec:'A',title:'Prioritisation & focus'},
+    {id:'A3',sec:'A',title:'Decision-making & mandate'},{id:'A4',sec:'A',title:'Ownership & accountability'},
+    {id:'A5',sec:'A',title:'Progress management & rhythm'},{id:'A6',sec:'A',title:'Cross-boundary collaboration'},
+    {id:'A7',sec:'A',title:'Leadership & role modelling'},{id:'A8',sec:'A',title:'Capacity for change'},
+    {id:'A9',sec:'A',title:'Learning & improvement'},{id:'A10',sec:'A',title:'Client & stakeholder focus'},
+    {sec:'B',id:'B1',title:'Organisational structure'},{id:'B2',sec:'B',title:'Roles & responsibilities'},
+    {id:'B3',sec:'B',title:'Quantitative staffing capacity'},{id:'B4',sec:'B',title:'Qualitative staffing'},
+    {id:'B5',sec:'B',title:'Work processes'},{id:'B6',sec:'B',title:'Process control & quality'},
+    {id:'B7',sec:'B',title:'ICT & digital support'},{id:'B8',sec:'B',title:'Data & management information'},
+    {id:'B9',sec:'B',title:'Financial resources & budgets'},{id:'B10',sec:'B',title:'Premises & facilities'},
+  ];
+  const stmts=lang==='nl'?STATEMENTS_NL:STATEMENTS_EN;
+
+  // ── Heatmap-bron: bij voorkeur echte stemmen uit vk_phase4_scores.allScores ──
+  // Fallback: demo-aggregaat zodat het rapport altijd zinvol oogt.
+  const realScores = D.allScores && typeof D.allScores === 'object' ? D.allScores : null;
+  const aggregate = {};
+  if (realScores) {
+    stmts.forEach(s=>{
+      const r = realScores[s.id] || {};
+      aggregate[s.id] = {
+        k: typeof r.k==='number' ? r.k : 0,
+        n: typeof r.n==='number' ? r.n : 0,
+        a: typeof r.a==='number' ? r.a : 0,
+      };
+    });
+  } else {
+    const demo_kracht=['A1','A2','A4','A5','A7','A10','B1','B2','B4','B9'];
+    const demo_aandacht=['A3','A8','A9','B3','B7','B8'];
+    stmts.forEach(s=>{
+      aggregate[s.id]={
+        k:demo_kracht.includes(s.id)?4:1,
+        n:demo_aandacht.includes(s.id)?1:2,
+        a:demo_aandacht.includes(s.id)?4:1
+      };
+    });
+  }
+
+  const noteText = realScores ? (t.heatmapNote||'') : (t.heatmapDemoNote||'');
+  let html=`<div style="margin-bottom:8px;font-size:11px;color:var(--t2)">${escapeHtml(noteText)}</div>
+    <table class="stmt-table">
+      <thead><tr>
+        <th class="left">${escapeHtml(t.stmtHeaders[0])}</th>
+        <th style="color:var(--gd)">${escapeHtml(t.stmtHeaders[1])}</th>
+        <th>${escapeHtml(t.stmtHeaders[2])}</th>
+        <th style="color:var(--cd)">${escapeHtml(t.stmtHeaders[3])}</th>
+      </tr></thead><tbody>`;
+
+  let curSec='';
+  stmts.forEach(s=>{
+    if(s.sec!==curSec){
+      curSec=s.sec;
+      html+=`<tr><td class="section" colspan="4">${escapeHtml(s.sec==='A'?t.sectionA:t.sectionB)}</td></tr>`;
+    }
+    const sc=aggregate[s.id]||{k:0,n:0,a:0};
+    html+=`<tr>
+      <td class="label">${escapeHtml(s.id+'. '+s.title)}</td>
+      <td style="text-align:center"><span class="dot-k">${sc.k}</span></td>
+      <td style="text-align:center"><span class="dot-n">${sc.n}</span></td>
+      <td style="text-align:center"><span class="dot-a">${sc.a}</span></td>
+    </tr>`;
+  });
+  html+='</tbody></table>';
+  el.innerHTML=html;
+}
+
+/* ══════ LANG ══════ */
+function setLang(l, opts){
+  lang=l;
+  document.documentElement.lang=l;
+  document.title = (T[lang] && T[lang].docTitle) || document.title;
+  document.getElementById('lNL').classList.toggle('on',l==='nl');
+  document.getElementById('lEN').classList.toggle('on',l==='en');
+  applyT();
+  applyDefaults();
+  renderAll();
+  if (!opts || !opts.fromStorage) {
+    try { localStorage.setItem('vk_lang', l); } catch(e){}
+  }
+}
+function initLang(){
+  let init = null;
+  try {
+    const stored = localStorage.getItem('vk_lang');
+    if (stored === 'nl' || stored === 'en') init = stored;
+    if (!init) {
+      const ss = localStorage.getItem('vk_session_started');
+      if (ss) { const o = JSON.parse(ss); if (o && (o.lang === 'nl' || o.lang === 'en')) init = o.lang; }
+    }
+  } catch(e){}
+  if (init && init !== lang) setLang(init, {fromStorage:true});
+}
+
+function applyT(){
+  const t=T[lang];
+  if (!t) return;
+  Object.keys(t).forEach(k=>{
+    if (typeof t[k] !== 'string') return;
+    const el = document.getElementById('t-'+k);
+    if (!el) return;
+    if (el.children.length > 0) {
+      let textNode = null;
+      for (const n of el.childNodes) {
+        if (n.nodeType === 3 && n.textContent.trim()) { textNode = n; break; }
+      }
+      if (textNode) textNode.textContent = t[k] + ' ';
+      else el.insertBefore(document.createTextNode(t[k] + ' '), el.firstChild);
+    } else {
+      el.textContent = t[k];
+    }
+  });
+}
+
+/* Cross-tab language sync */
+window.addEventListener('storage', e => {
+  if (e.key === 'vk_lang' && e.newValue && e.newValue !== lang) {
+    setLang(e.newValue, {fromStorage:true});
+  }
+});
+
+/* ══════ ESCAPE HELPER ══════ */
+function escapeHtml(s){
+  return String(s||'').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ══════ EXPORT JSON ══════ */
+function exportJSON(){
+  const data={
+    exportDate:new Date().toISOString(),
+    session:D.session,
+    visionSentence:D.vision_sentence,
+    themes:D.selected_themes,
+    confirmedActions:D.confirmed_actions,
+    roadmapActions:D.roadmap_actions,
+    versnellers:D.versnellers,
+    remmers:D.remmers,
+  };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`visiekaart_${(D.session?.org||'export').replace(/\s+/g,'-')}_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();URL.revokeObjectURL(url);
+}
+
+/* ══════ INIT ══════ */
+document.addEventListener('DOMContentLoaded', async ()=>{
+  vkApplyEnvironmentRules();
+  // Cluster B (Blok 1): platform-context herstellen uit sessionStorage (geen poort;
+  // de betaalmuur ligt uitsluitend op fase 5 — opslaan gebeurt in fase 5 via VK_CINAB.saveReport).
+  if (VK_LIVE && window.VK_CINAB){ try { VK_CINAB.restore(); } catch(e){} }
+  await loadData();   // s22: wacht op de bron (deellink-route haalt async op bij het platform-endpoint)
+  initLang();
+  applyT();
+  document.title = (T[lang] && T[lang].docTitle) || document.title;
+  renderAll();
+});
+</script>
+
+<!-- ═══════════════ PLATFORM / FIREBASE / CINAB (Blok 1, identiek in fase 0-5 + rapport) ═══════════════ -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script type="module">
+  // De ONGEWIJZIGDE module-client; we bridgen alleen zijn publieke API naar window.
+  import { startCinabSession, createCinabClient, CinabError } from './cinab-tool-client.js';
+  window.__cinabLib = { startCinabSession, createCinabClient, CinabError };
+  window.dispatchEvent(new Event('cinab-lib-ready'));
+</script>
+<script>
+/* ── ingebouwde vk-firebase.js ── */
+/* ══════════════════════════════════════════════════════════════════════════
+   vk-firebase.js — Cluster B / Firebase-integratie (niveau B)
+   Wordt straks INGEBOUWD per fase (zelf-bevattend), net als vk-ai.js.
+
+   Levert:
+   - omgevings-config (staging vs productie; NOOIT databaseURL hardcoden in code)
+   - anonieme auth
+   - server-side sessie-state in RTDB  (/sessions/{code}/state)   — vervangt localStorage op B
+   - stage-sync                        (/sessions/{code}/stage)
+   - live-listeners + append           (/sessions/{code}/phaseN/...)
+   - session/clear                     (wist de RTDB-tak; stateless-at-rest)
+
+   ALLES degradeert netjes: ontbreekt de SDK/config of faalt het netwerk, dan
+   rejecten de helpers en de fase valt terug op de bestaande localStorage/demo-flow.
+   De beveiliging zit in database.rules.json, niet in deze config (geen secret).
+   ══════════════════════════════════════════════════════════════════════════ */
+(function (global) {
+  'use strict';
+
+  /* ── Omgevings-config (per omgeving inlezen; productie schoon omwisselbaar) ── */
+  var VK_FB_STAGING = {
+    apiKey: "AIzaSyCer_6Y7f-jUXygHnBF_UdtpTxPTEIvaoA",
+    authDomain: "visiekaart.firebaseapp.com",
+    databaseURL: "https://visiekaart-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "visiekaart",
+    storageBucket: "visiekaart.firebasestorage.app",
+    messagingSenderId: "757784606494",
+    appId: "1:757784606494:web:6f47e48fc85f15f6257b0f"
+  };
+  // Vul in zodra het schone productieproject (europe-west1, CINAB-account) staat:
+  var VK_FB_PROD = null; // bv. { apiKey:"…", databaseURL:"https://…-prod-….europe-west1.firebasedatabase.app", … }
+
+  function vkFbEnv() {
+    var h = (global.location && global.location.hostname) || '';
+    var staging = (h === 'localhost' || h.indexOf('127.') === 0 || h.indexOf('192.168.') === 0 ||
+                   h.indexOf('.local') !== -1 || h.indexOf('.web.app') !== -1 ||
+                   h.indexOf('.firebaseapp.com') !== -1 || h.indexOf('staging.') === 0);
+    return staging ? 'staging' : 'production';
+  }
+  function vkFbConfig() { return vkFbEnv() === 'production' ? VK_FB_PROD : VK_FB_STAGING; }
+
+  /* ── Init + anonieme auth ── */
+  var _readyPromise = null;
+  function vkFbInit() {
+    if (_readyPromise) return _readyPromise;
+    _readyPromise = new Promise(function (resolve, reject) {
+      try {
+        if (typeof global.firebase === 'undefined' || !global.firebase.initializeApp) {
+          return reject(new Error('firebase_sdk_missing'));
+        }
+        var cfg = vkFbConfig();
+        if (!cfg || !cfg.databaseURL) return reject(new Error('firebase_config_missing'));
+        if (!global.firebase.apps || !global.firebase.apps.length) global.firebase.initializeApp(cfg);
+        global.firebase.auth().signInAnonymously()
+          .then(function () { resolve(global.firebase); })
+          .catch(reject);
+      } catch (e) { reject(e); }
+    });
+    return _readyPromise;
+  }
+
+  function db() { return global.firebase.database(); }
+  function sessRef(code, sub) { return db().ref('sessions/' + code + (sub ? '/' + sub : '')); }
+  function nowUTC() { return Date.now(); }
+
+  /* ── Sessie-state (server-side; vervangt localStorage op niveau B) ── */
+  // payload = opaak object (volledige tool-state). WordPress leest dit nooit (data_ref).
+  function stateSave(code, payload) {
+    return vkFbInit().then(function () {
+      return sessRef(code, 'state').set({ updatedAt: nowUTC(), payload: payload });
+    });
+  }
+  function stateLoad(code) {
+    return vkFbInit().then(function () {
+      return sessRef(code, 'state').once('value').then(function (s) {
+        var v = s.val(); return v ? v.payload : null;
+      });
+    });
+  }
+  function stateClear(code) {
+    return vkFbInit().then(function () { return sessRef(code, 'state').remove(); });
+  }
+
+  /* ── Stage-sync (facilitator schrijft, deelnemer leest) ── */
+  function stageSet(code, stage) {
+    return vkFbInit().then(function () { return sessRef(code, 'stage').set(String(stage)); });
+  }
+  function stageListen(code, cb) {
+    return vkFbInit().then(function () {
+      var ref = sessRef(code, 'stage');
+      ref.on('value', function (s) { cb(s.val()); });
+      return function off() { ref.off(); };
+    });
+  }
+
+  /* ── Live inzendingen: listener (facilitator) + append (deelnemer) ── */
+  // sub bv. 'phase4/scores'. cb krijgt een array van waarden (chronologisch).
+  function liveListen(code, sub, cb) {
+    return vkFbInit().then(function () {
+      var ref = sessRef(code, sub);
+      ref.on('value', function (snap) {
+        var arr = []; snap.forEach(function (ch) { var v = ch.val(); if (v) arr.push(v); });
+        cb(arr);
+      });
+      return function off() { ref.off(); };
+    });
+  }
+  function push(code, sub, obj) {
+    return vkFbInit().then(function () {
+      obj = obj || {}; if (typeof obj.at === 'undefined') obj.at = nowUTC();
+      return sessRef(code, sub).push(obj);
+    });
+  }
+
+  /* ── Facilitator: sessie aanmaken / content publiceren / hele tak wissen ── */
+  function ensureSession(code, lang) {
+    return vkFbInit().then(function (fb) {
+      var uid = fb.auth().currentUser.uid;
+      return sessRef(code, 'meta').transaction(function (cur) {
+        if (cur) return cur; // bestaat al → niet overschrijven
+        return { createdAt: nowUTC(), lang: lang || 'nl', facilitatorUid: uid };
+      }).then(function () { return uid; });
+    });
+  }
+  function contentSet(code, content) {
+    return vkFbInit().then(function () { return sessRef(code, 'content').set(content); });
+  }
+  function contentListen(code, cb) {
+    return vkFbInit().then(function () {
+      var ref = sessRef(code, 'content');
+      ref.on('value', function (s) { cb(s.val()); });
+      return function off() { ref.off(); };
+    });
+  }
+  function sessionClear(code) {
+    return vkFbInit().then(function () { return sessRef(code).remove(); });
+  }
+
+  global.vkFb = {
+    env: vkFbEnv, config: vkFbConfig, init: vkFbInit,
+    stateSave: stateSave, stateLoad: stateLoad, stateClear: stateClear,
+    stageSet: stageSet, stageListen: stageListen,
+    liveListen: liveListen, push: push,
+    ensureSession: ensureSession, contentSet: contentSet, contentListen: contentListen,
+    sessionClear: sessionClear
+  };
+})(window);
+
+</script>
+<script>
+/* ── ingebouwde vk-cinab.js ── */
+/* ══════════════════════════════════════════════════════════════════════════
+   vk-cinab.js — Cluster B / Blok 1: koppeling, betaalmuur, rapport-opslaan
+   Glue tussen de ONGEWIJZIGDE module-client (cinab-tool-client.js) en de
+   inline fase-scripts. De client wordt NIET herschreven; deze laag roept
+   alleen zijn publieke API aan en bridget naar window.VK_CINAB.
+
+   Vereist (per fase, in deze volgorde geladen):
+     <script type="module">
+       import { startCinabSession, createCinabClient, CinabError }
+         from './cinab-tool-client.js';
+       window.__cinabLib = { startCinabSession, createCinabClient, CinabError };
+       window.dispatchEvent(new Event('cinab-lib-ready'));
+     <\/script>
+   Optioneel (voor RTDB-state t.b.v. pay-resume): vk-firebase.js (window.vkFb).
+
+   Alles draait ALLEEN in VK_LIVE; ontbreekt platform/lib, dan geeft elke functie
+   netjes null/false terug en draait de tool zelfstandig verder (demo/lokaal).
+   ══════════════════════════════════════════════════════════════════════════ */
+(function (global) {
+  'use strict';
+
+  var SS_KEY = 'vk_cinab';   // sessionStorage: token (capability) + poortconfig — NIET in URL/localStorage-at-rest
+
+  function libReady() {
+    return new Promise(function (resolve) {
+      if (global.__cinabLib) return resolve(global.__cinabLib);
+      var done = false;
+      global.addEventListener('cinab-lib-ready', function () { if (!done) { done = true; resolve(global.__cinabLib); } }, { once: true });
+      setTimeout(function () { if (!done) { done = true; resolve(global.__cinabLib || null); } }, 8000);
+    });
+  }
+
+  function saveCtx(ctx) { try { sessionStorage.setItem(SS_KEY, JSON.stringify(ctx)); } catch (e) {} }
+  function loadCtx()    { try { return JSON.parse(sessionStorage.getItem(SS_KEY) || 'null'); } catch (e) { return null; } }
+  function clearCtx()   { try { sessionStorage.removeItem(SS_KEY); } catch (e) {} }
+  function urlParam(n)  { try { return new URLSearchParams(global.location.search).get(n); } catch (e) { return null; } }
+
+  /* ── Fase 0: verse start (launch→token) of resume → client + context bewaren ── */
+  async function bootstrap() {
+    var lib = await libReady();
+    if (!lib) return null;
+    try {
+      var client = await lib.startCinabSession();           // leest ?launch/?token/?cinab/?action; wist ze uit de URL
+      saveCtx({
+        apiBase: client.apiBase, token: client.token,
+        betaalVanafFase: client.betaalVanafFase, credits: client.credits,
+        parentRapportId: client.parentRapportId || null
+      });
+      try { client.notifyLoaded(); } catch (e) {}
+      return client;
+    } catch (e) { return null; }                            // geen platform-context → tool draait zelfstandig
+  }
+
+  /* ── Andere fasen: client herstellen uit sessionStorage (token reist niet in de URL) ── */
+  async function restore() {
+    var lib = await libReady(); if (!lib) return null;
+    var ctx = loadCtx(); if (!ctx || !ctx.token || !ctx.apiBase) return null;
+    try {
+      return lib.createCinabClient({
+        apiBase: ctx.apiBase, token: ctx.token,
+        betaalVanafFase: ctx.betaalVanafFase, credits: ctx.credits,
+        parentRapportId: ctx.parentRapportId, action: urlParam('action')
+      });
+    } catch (e) { return null; }
+  }
+
+  /* ── Betaalpoort op de start van faseNr (werkboek §5.2). ──
+     resolve(true) = door; resolve(false) = stop/navigeert weg (koop of afbreken). */
+  async function gate(client, faseNr, opts) {
+    opts = opts || {};
+    if (!client || client.betaalVanafFase == null || faseNr < client.betaalVanafFase) return true;
+
+    // Terugkeer na betaling: idempotente retry (al betaald → no-op → door)
+    if (client.isResume) {
+      try { await client.settleSession(); return true; } catch (e) { /* val door naar de poort */ }
+    }
+
+    try { await client.getSaldo(); } catch (e) {}           // advisory, alleen UX
+
+    var credits = (client.credits != null) ? client.credits : null;
+    var vraag = opts.confirmText ||
+      ('Verder naar deze fase? ' + (credits != null ? ('Er worden ' + credits + ' credits afgeschreven.') : 'Er wordt saldo afgeschreven.'));
+    if (!global.confirm(vraag)) return false;               // gebruiker stopt → niets afgeschreven, sessie blijft (TTL)
+
+    try {
+      await client.settleSession();                         // bindend: atomisch + idempotent
+      return true;
+    } catch (e) {
+      if (e && e.isPaymentRequired) {
+        if (opts.beforePay) { try { await opts.beforePay(); } catch (_) {} }   // state persistent zetten vóór de redirect
+        try { global.VK_CINAB.__paying = true; } catch (_) {}                   // signaal voor de poort-UI (redirect ≠ annuleren)
+        client.goToPayment(e, { returnUrl: opts.returnUrl || global.location.href });
+        return false;                                       // navigeert weg naar de shop (window.top.location)
+      }
+      throw e;
+    }
+  }
+
+  /* ── Rapport opslaan (consumeert het token) + WordPress laten doorschakelen ── */
+  async function saveReport(client, wrapper) {
+    var out = await client.saveReport(wrapper);             // → { rapport_id, rapport_url }
+    if (out && out.rapport_url) { try { client.notifyCompleted(out.rapport_url); } catch (e) {} }
+    return out;
+  }
+
+  /* ── Wrapper bouwen uit de tool-state: 20 INK-dimensies + data_ref naar RTDB ── */
+  var INK_IDS = ['A1','A2','A3','A4','A5','A6','A7','A8','A9','A10','B1','B2','B3','B4','B5','B6','B7','B8','B9','B10'];
+
+  function buildWrapper(opts) {
+    opts = opts || {};
+    var p4 = {}; try { p4 = JSON.parse(localStorage.getItem('vk_phase4_scores') || '{}'); } catch (e) {}
+    var all = (p4 && p4.allScores && typeof p4.allScores === 'object') ? p4.allScores : {};
+    var scores = {};
+    INK_IDS.forEach(function (id) {
+      var r = all[id] || {}; var k = +r.k || 0, n = +r.n || 0, a = +r.a || 0; var tot = k + n + a;
+      scores[id.toLowerCase()] = tot ? Math.round((k * 100 + n * 50 + a * 0) / tot) : 50;  // geen stemmen → neutraal 50
+    });
+
+    var sess = {}; try { sess = JSON.parse(localStorage.getItem('vk_session') || '{}'); } catch (e) {}
+    var deelnemers = Array.isArray(sess.participants) ? sess.participants.length : (opts.deelnemers || 0);
+    var meta = {
+      organisatie: sess.org || sess.organisatie || '',
+      datum: new Date().toISOString().slice(0, 10),          // UTC ISO YYYY-MM-DD
+      deelnemers: deelnemers,
+      facilitator: sess.facilitator || sess.facilitatorName || sess.sessionName || ''
+    };
+    if (sess.sector) meta.sector = sess.sector;              // e-mailvrij: geen e-mail in meta
+
+    var code = sess.sessionCode || opts.sessionCode || '';
+    var data = { data_ref: { store: 'firebase-rtdb', path: '/sessions/' + code } };
+    if (opts.includeExport) data.export = collectExport();   // opaak; platform leest dit niet
+
+    return {
+      template_id: 'visiekaart',
+      schema_version: '1.0',
+      scores: scores,
+      meta: meta,
+      data: data,
+      parent_rapport_id: null                                // _cinab_is_vergelijkbaar = false
+    };
+  }
+
+  function collectExport() {
+    var keys = ['vk_session','vk_vision_sentence','vk_vision_keywords','vk_selected_themes',
+      'vk_confirmed_actions','vk_versnellers','vk_remmers','vk_phase4_scores','vk_roadmap_actions'];
+    var out = {};
+    keys.forEach(function (k) {
+      try {
+        var v = localStorage.getItem(k);
+        if (v == null) return;
+        try { out[k] = JSON.parse(v); } catch(e){ out[k] = v; }   // niet-JSON (bv. de visiezin) als ruwe string bewaren, niet droppen
+      } catch (e) {}
+    });
+    return out;
+  }
+
+  global.VK_CINAB = {
+    libReady: libReady, bootstrap: bootstrap, restore: restore, gate: gate,
+    saveReport: saveReport, buildWrapper: buildWrapper, collectExport: collectExport,
+    loadCtx: loadCtx, clearCtx: clearCtx
+  };
+})(window);
+
+</script>
+
+</body>
+</html>

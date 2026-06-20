@@ -1,0 +1,3284 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visiekaart v4 — Fase 2: Thema's bepalen</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display:ital@0;1&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --orange:#FAA833;--oh:#D8901E;--ol:rgba(250,168,51,0.12);--ob:rgba(250,168,51,.28);
+  --green:#BDD24D;--gl:rgba(189,210,77,0.20);--gd:#7B8E1E;
+  --purple:#9666AA;--pl:rgba(150,102,170,0.14);
+  --coral:#F05736;--red:#E8423F;--cll:rgba(240,87,54,0.10);
+  --teal:#2A9791;--tl:rgba(42,151,145,0.14);--tb:rgba(42,151,145,.28);--td:#1F6E6A;
+  --blue:#70A2D7;--bl:rgba(112,162,215,0.15);
+  --amber:#FAA833;--al:rgba(250,168,51,0.12);
+  --bg:#F9F8F5;--surface:#FFF;
+  --b0:rgba(0,0,0,.07);--b1:rgba(0,0,0,.11);--b2:rgba(0,0,0,.18);
+  --text:#262A36;--t2:#5A5956;--t3:#9A9894;
+  --r:10px;--rsm:6px;--rlg:16px;--rxl:22px;
+  --sh:0 1px 3px rgba(0,0,0,.07),0 4px 14px rgba(0,0,0,.05);
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.55}
+.serif{font-family:'DM Serif Display',serif}
+
+/* ── HEADER ── */
+.hdr{background:var(--surface);border-bottom:1px solid var(--b0);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;cursor:pointer;padding-left:6px}
+.logo-img{height:32px;width:auto;display:block}
+/* ═══ VK SHARED LOGO STYLES ═══ */
+.logo-img .fil-logo-main   { fill:#2A9791; }
+.logo-img .fil-logo-shadow { fill:#2A9791; filter:brightness(0.5); }
+.logo-img .fil-logo-line   { fill:none; stroke:#F7A710; stroke-width:300; stroke-miterlimit:22.9256; }
+.logo-img .fil-logo-bar    { fill:#F7A710; }
+/* ═══ END VK SHARED LOGO STYLES ═══ */
+.hdr-mid{display:flex;align-items:center;gap:12px}
+.phase-pill{background:var(--tl);color:var(--teal);font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;border:1px solid var(--tb);letter-spacing:.06em;text-transform:uppercase}
+.q-steps{display:flex;gap:5px;width:180px}
+.q-step{flex:1;height:6px;border-radius:3px;background:var(--b0);transition:background .3s}
+.q-step.done{background:var(--teal)}
+.q-step.active{background:var(--teal)}
+.hdr-r{display:flex;align-items:center;gap:8px}
+.lang-toggle{display:flex;border:1px solid var(--b2);border-radius:var(--rsm);overflow:hidden}
+.lang-btn{padding:5px 11px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;border:none;background:transparent;cursor:pointer;color:var(--t3);letter-spacing:.04em;transition:all .13s}
+.lang-btn.on{background:var(--teal);color:#fff}
+
+/* ── SESSIE-INFO PANEEL (opvouwbaar) ── */
+.sess-bar{background:var(--surface);border-bottom:1px solid var(--b0);padding:0 28px}
+.sess-toggle{display:flex;align-items:center;gap:8px;padding:8px 0;font-size:12px;font-weight:600;color:var(--t2);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:.02em}
+.sess-toggle:hover{color:var(--text)}
+.sess-toggle .chev{transition:transform .2s ease}
+.sess-toggle.open .chev{transform:rotate(180deg)}
+.sess-toggle .sess-mini{color:var(--t3);font-weight:500;margin-left:6px}
+.sess-panel{max-height:0;overflow:hidden;transition:max-height .25s ease,padding .25s ease;padding:0 0;border-top:0 solid transparent}
+.sess-panel.open{max-height:240px;padding:14px 0 16px;border-top:1px solid var(--b0)}
+.sess-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 18px}
+.sess-item{display:flex;flex-direction:column;gap:2px;min-width:0}
+.sess-k{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3)}
+.sess-v{font-size:13px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border-radius:var(--rsm);border:1px solid var(--b2);background:var(--surface);color:var(--t2);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .13s}
+.btn:hover{background:var(--bg);color:var(--text)}
+.btn-teal{background:var(--teal);border-color:var(--td);color:#fff}
+.btn-teal:hover{background:var(--td);color:#fff}
+.btn-orange{background:var(--orange);border-color:var(--oh);color:#fff}
+.btn-orange:hover{background:var(--oh);color:#fff}
+.btn-green{background:var(--green);border-color:var(--gd);color:#fff}
+.btn-green:hover{background:var(--gd);color:#fff}
+.btn-ghost{background:transparent;border-color:var(--b1);color:var(--t3);font-size:12px}
+.btn-ghost:hover{border-color:var(--b2);color:var(--t2);background:var(--bg)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important}
+.btn-lg{padding:12px 28px;font-size:15px;font-weight:600;border-radius:var(--r);box-shadow:0 2px 8px rgba(42,151,145,.25)}
+.btn-lg:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 14px rgba(42,151,145,.35)}
+
+/* ── LAYOUT ── */
+.wrap{max-width:900px;margin:0 auto;padding:30px 24px 100px}
+.card{background:var(--surface);border:1px solid var(--b0);border-radius:var(--rxl);padding:26px 28px;margin-bottom:16px;box-shadow:var(--sh)}
+.card-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid var(--b0)}
+.phase-num{width:38px;height:38px;border-radius:50%;background:var(--teal);color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.card-title{font-size:16px;font-weight:600;color:var(--text)}
+.card-sub{font-size:13px;color:var(--t2);margin-top:2px}
+.divider{height:1px;background:var(--b0);margin:18px 0}
+
+/* ── INFO ICON + POPOVER ── */
+.info-icon{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--surface);border:1.5px solid var(--b2);color:var(--t2);font-size:11px;font-weight:700;font-style:italic;font-family:Georgia,serif;cursor:pointer;transition:all .13s;user-select:none;line-height:1;flex-shrink:0}
+.info-icon:hover{background:var(--tl);border-color:var(--tb);color:var(--teal)}
+.info-icon.on{background:var(--teal);border-color:var(--td);color:#fff}
+.info-popover{display:none;margin-top:10px;padding:12px 14px;background:var(--tl);border:1px solid var(--tb);border-radius:var(--rsm);font-size:12.5px;line-height:1.55;color:var(--text)}
+.info-popover.open{display:block;animation:fadeUp .22s ease forwards}
+
+/* ── VISION BOX (gewenste doelstelling / stip op de horizon) ── */
+.vision-box{background:var(--ol);border:1px solid var(--ob);border-radius:var(--r);padding:14px 18px;margin-bottom:18px;display:flex;align-items:flex-start;gap:10px}
+.vision-icon{width:26px;height:26px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.vision-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--oh);margin-bottom:4px}
+.vision-text{font-size:14px;font-weight:500;color:var(--text);line-height:1.5}
+
+/* ── INTRO BLOK: "Wat" + "Hoe" ── */
+.intro-block{padding:14px 16px;background:var(--bg);border:1px solid var(--b1);border-radius:var(--r);margin-bottom:14px}
+.intro-block-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.intro-block-title .dot{width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0}
+.intro-block p{font-size:13px;color:var(--t2);line-height:1.6}
+
+/* ── INTRO GRID (4 tegels) ── */
+.intro-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:18px 0}
+.intro-item{padding:14px 16px;background:var(--bg);border:1px solid var(--b1);border-radius:var(--r);display:flex;gap:10px;align-items:flex-start}
+.intro-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;font-weight:700;background:var(--tl);color:var(--teal)}
+.intro-icon svg{width:18px;height:18px}
+.intro-item-title{font-size:13px;font-weight:600;margin-bottom:2px}
+.intro-item-sub{font-size:12px;color:var(--t2)}
+
+/* ── THEME INPUT FIELDS (deelnemer) ── */
+.theme-fields{display:flex;flex-direction:column;gap:10px;margin:16px 0}
+.theme-field{display:flex;align-items:center;gap:10px}
+.theme-num{width:24px;height:24px;border-radius:50%;background:var(--tl);color:var(--teal);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.theme-input{flex:1;padding:10px 14px;border:1.5px solid var(--b2);border-radius:var(--r);font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--surface);transition:border-color .13s,box-shadow .13s}
+.theme-input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(42,151,145,.12)}
+.theme-input.warn{border-color:var(--amber);box-shadow:0 0 0 3px rgba(250,168,51,.12)}
+.add-theme-field-btn{margin-top:4px;border:1.5px dashed var(--b2);background:transparent;border-radius:var(--r);padding:9px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;color:var(--t3);cursor:pointer;transition:all .13s;font-family:'DM Sans',sans-serif}
+.add-theme-field-btn:hover{border-color:var(--teal);color:var(--teal);background:var(--tl)}
+
+/* ── INSTRUCTIE BOX (deelnemer thema-uitleg) ── */
+.instruction-box{background:var(--bl);border:1px solid rgba(112,162,215,.2);border-radius:var(--r);padding:18px 20px;margin-bottom:18px}
+.instruction-title{font-size:13px;font-weight:700;color:var(--blue);margin-bottom:8px;display:flex;align-items:center;gap:7px}
+.instruction-text{font-size:13px;color:var(--t2);line-height:1.7}
+.examples{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.ex-tag{background:var(--surface);border:1px solid var(--b2);border-radius:20px;padding:3px 10px;font-size:12px;color:var(--t2)}
+.ex-tag.neg{background:var(--cll);border-color:rgba(240,87,54,.25);color:var(--coral);text-decoration:line-through}
+
+/* ── CLUSTER / KANDIDAAT-THEMA EDITOR ── */
+.cluster-edit-hint{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;background:var(--tl);border:1px solid var(--tb);border-radius:var(--rsm);font-size:12.5px;color:var(--text);margin-bottom:14px;line-height:1.5}
+.cluster-edit-hint svg{flex-shrink:0;margin-top:1px;color:var(--teal)}
+.cluster-grid{display:flex;flex-direction:column;gap:12px}
+.cluster-block{border:1px solid var(--b1);border-radius:var(--r);overflow:visible;transition:box-shadow .15s}
+.cluster-block.drag-over{box-shadow:0 0 0 2px var(--teal);border-color:var(--teal)}
+.cluster-hd{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--b0)}
+.cluster-color{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.cluster-name-input{border:none;background:transparent;border-bottom:1px dashed transparent;font-size:13px;font-weight:700;color:var(--text);font-family:'DM Sans',sans-serif;flex:1;padding:2px 4px;cursor:text;text-transform:uppercase;letter-spacing:.04em}
+.cluster-name-input:hover{border-bottom-color:currentColor}
+.cluster-name-input:focus{outline:none;border-bottom-color:currentColor;background:rgba(255,255,255,.55)}
+.cluster-edit-pencil{flex-shrink:0;color:var(--t3);opacity:.7}
+.cluster-count{font-size:11px;color:var(--t3);margin-left:auto;white-space:nowrap}
+.cluster-remove{background:none;border:none;cursor:pointer;color:var(--t3);padding:2px 4px;font-size:13px;line-height:1;border-radius:var(--rsm)}
+.cluster-remove:hover{color:var(--coral);background:var(--cll)}
+.cluster-body{padding:10px 12px;min-height:48px;display:flex;flex-wrap:wrap;gap:7px}
+.cluster-body.empty{border:2px dashed var(--b1);border-radius:var(--rsm);background:var(--bg);align-items:center;justify-content:center;color:var(--t3);font-size:12px;min-height:60px}
+
+.answer-chip{padding:6px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:grab;border:1px solid transparent;transition:all .15s;user-select:none;display:flex;align-items:center;gap:6px;word-break:break-word;max-width:100%}
+.answer-chip:hover{transform:scale(1.03);box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.answer-chip.dragging{opacity:.4;transform:scale(.95)}
+.chip-author{font-size:10px;opacity:.6;font-weight:400}
+
+/* cluster color themes */
+.cl-teal .cluster-hd{background:var(--tl)}
+.cl-teal .cluster-color{background:var(--teal)}
+.cl-teal .answer-chip{background:var(--tl);border-color:rgba(42,151,145,.2);color:var(--teal)}
+.cl-purple .cluster-hd{background:var(--pl)}
+.cl-purple .cluster-color{background:var(--purple)}
+.cl-purple .answer-chip{background:var(--pl);border-color:rgba(150,102,170,.2);color:var(--purple)}
+.cl-amber .cluster-hd{background:var(--al)}
+.cl-amber .cluster-color{background:var(--amber)}
+.cl-amber .answer-chip{background:var(--al);border-color:rgba(250,168,51,.2);color:var(--amber)}
+.cl-blue .cluster-hd{background:var(--bl)}
+.cl-blue .cluster-color{background:var(--blue)}
+.cl-blue .answer-chip{background:var(--bl);border-color:rgba(112,162,215,.2);color:var(--blue)}
+.cl-coral .cluster-hd{background:var(--cll)}
+.cl-coral .cluster-color{background:var(--coral)}
+.cl-coral .answer-chip{background:var(--cll);border-color:rgba(240,87,54,.2);color:var(--coral)}
+.cl-green .cluster-hd{background:var(--gl)}
+.cl-green .cluster-color{background:var(--green)}
+.cl-green .answer-chip{background:var(--gl);border-color:rgba(189,210,77,.2);color:var(--gd)}
+
+.add-cluster-btn{border:1.5px dashed var(--b2);background:transparent;border-radius:var(--r);padding:10px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;color:var(--t3);cursor:pointer;transition:all .13s;font-family:'DM Sans',sans-serif}
+.add-cluster-btn:hover{border-color:var(--teal);color:var(--teal);background:var(--tl)}
+
+/* ── LIVE COUNT / PULSE ── */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--teal);animation:pulse 2s ease-in-out infinite;display:inline-block}
+.count-chip{background:var(--tl);color:var(--teal);border:1px solid var(--tb);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:700}
+
+/* ── VOTING ── */
+.vote-explain{background:var(--tl);border:1px solid var(--tb);border-radius:var(--r);padding:14px 16px;margin-bottom:16px}
+.vote-explain-title{font-size:13px;font-weight:700;color:var(--teal);margin-bottom:6px;display:flex;align-items:center;gap:7px}
+.vote-explain-body{font-size:13px;color:var(--text);line-height:1.6}
+.vote-grid{display:flex;flex-direction:column;gap:10px}
+.vote-card{background:var(--surface);border:1.5px solid var(--b1);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:10px;transition:border-color .13s}
+.vote-card-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.vote-card.has-vote{border-color:var(--teal);background:var(--tl)}
+.vc-info{flex:1;min-width:140px}
+.vc-name{font-size:14px;font-weight:600;word-break:break-word}
+.vc-count{font-size:12px;color:var(--t3);margin-top:2px}
+.vc-pts{display:flex;gap:5px;flex-shrink:0}
+.pt-btn{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--b2);background:var(--surface);font-size:13px;font-weight:700;cursor:pointer;transition:all .13s;color:var(--t2);display:flex;align-items:center;justify-content:center}
+.pt-btn:hover:not(.used):not(.selected){border-color:var(--teal);color:var(--teal)}
+.pt-btn.selected{background:var(--teal);border-color:var(--teal);color:#fff}
+.pt-btn.used{opacity:.3;cursor:not-allowed}
+
+.vc-expand-btn{align-self:flex-start;background:none;border:none;color:var(--teal);font-size:12px;font-weight:600;cursor:pointer;padding:4px 0;display:inline-flex;align-items:center;gap:4px;font-family:'DM Sans',sans-serif}
+.vc-expand-btn:hover{text-decoration:underline}
+.vc-expand-btn .chev{transition:transform .2s ease}
+.vc-expand-btn.open .chev{transform:rotate(180deg)}
+.vc-source{display:none;padding-top:8px;border-top:1px dashed var(--b1)}
+.vc-source.open{display:block;animation:fadeUp .2s ease forwards}
+.vc-source-list{display:flex;flex-wrap:wrap;gap:6px}
+
+/* ── SCORE BARS ── */
+.score-card{background:var(--surface);border:1.5px solid var(--b1);border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .15s;margin-bottom:8px;flex-wrap:wrap}
+.score-card:hover{border-color:var(--teal)}
+.score-card.selected{border-color:var(--teal);background:var(--tl);box-shadow:0 0 0 2px rgba(42,151,145,.2)}
+.score-card.max-reached:not(.selected){opacity:.55;cursor:not-allowed}
+.sc-rank{width:28px;height:28px;border-radius:50%;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--bg);color:var(--t3)}
+.score-card.selected .sc-rank{background:var(--teal);color:#fff}
+.sc-body{flex:1;min-width:200px}
+.sc-name{font-size:14px;font-weight:600;word-break:break-word}
+.sc-bar-wrap{height:6px;background:var(--b0);border-radius:3px;margin-top:6px;overflow:hidden}
+.sc-bar{height:100%;border-radius:3px;background:var(--teal);transition:width .6s ease}
+.sc-score{font-size:18px;font-weight:700;color:var(--teal);flex-shrink:0;white-space:nowrap}
+.score-card.selected .sc-score{color:var(--gd)}
+.tie-badge{background:var(--al);color:var(--amber);border:1px solid rgba(250,168,51,.25);border-radius:20px;padding:2px 8px;font-size:11px;font-weight:600}
+
+/* ── FINAL CANVAS / TOGGLE ── */
+.view-toggle{display:flex;background:var(--bg);border:1px solid var(--b2);border-radius:var(--r);padding:3px;gap:2px;width:fit-content}
+.vt-btn{padding:7px 18px;border-radius:var(--rsm);font-size:13px;font-weight:500;border:none;background:transparent;cursor:pointer;color:var(--t2);transition:all .13s}
+.vt-btn.on{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.final-themes-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:20px 0}
+.theme-bubble-card{border-radius:var(--rlg);padding:14px 12px;text-align:center;border:1px solid transparent;display:flex;flex-direction:column;align-items:center;gap:4px}
+.tbc-num{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.tbc-name{font-size:13px;font-weight:700;line-height:1.3;word-break:break-word}
+.tbc-score{font-size:11px;opacity:.7}
+
+/* ── CANVAS SVG ── */
+.canvas-wrap{background:var(--surface);border-radius:var(--rxl);border:1px solid var(--b0);box-shadow:var(--sh);overflow:hidden}
+.canvas-note{padding:12px 20px;background:var(--bg);border-top:1px solid var(--b0);font-size:12px;color:var(--t3);text-align:center}
+
+/* ── CANVAS THEME-LEGEND (genummerde lijst onder canvas) ── */
+.canvas-legend{padding:16px 22px;border-top:1px solid var(--b0);background:var(--surface)}
+.canvas-legend-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:10px}
+.canvas-legend-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px 16px}
+.canvas-legend-item{display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.45}
+.cl-num{width:22px;height:22px;border-radius:50%;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.cl-text{font-weight:600;color:var(--text);word-break:break-word}
+
+/* ── BOTTOM BAR ── */
+.bot-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.93);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--b0);padding:12px 28px;display:flex;justify-content:space-between;align-items:center;z-index:100;gap:12px;flex-wrap:wrap}
+.bot-info{font-size:13px;color:var(--t2)}
+.bot-warn{font-size:12px;color:var(--oh);margin-top:2px}
+
+/* ── SCREENS ── */
+.screen{display:none}.screen.open{display:block}
+/* ═══ VK SHARED SCROLL WRAPPER (v4b) ═══ */
+/* Lost de schermafkapping op: de inhoud van het actieve scherm scrollt nu
+   onafhankelijk binnen het zichtbare gebied, bóven de vaste bot-bar. Hierdoor
+   valt geen tekst meer weg — robuust in zowel test/preview-iframe als live. */
+.screen.open{max-height:calc(100vh - 168px);overflow-y:auto;overflow-x:hidden;padding-right:6px;scrollbar-width:thin;scrollbar-color:var(--b1) transparent}
+.screen.open::-webkit-scrollbar{width:8px}
+.screen.open::-webkit-scrollbar-track{background:transparent}
+.screen.open::-webkit-scrollbar-thumb{background:var(--b1);border-radius:4px}
+.screen.open::-webkit-scrollbar-thumb:hover{background:var(--t3)}
+body.sess-open .screen.open{max-height:calc(100vh - 250px)}
+@media(max-width:640px){.screen.open{max-height:calc(100vh - 190px)}}
+/* ═══ END VK SHARED SCROLL WRAPPER (v4b) ═══ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes reveal{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+.anim{animation:fadeUp .3s ease forwards}
+/* v4b-fix: schermen faden zónder transform — een transform-animatie maakt het
+   scherm tot containing-block, waardoor de vaste .bot-bar in het scrollgebied
+   gevangen raakt en inhoud bedekt. Alleen schermen krijgen deze fade; de
+   slide-animatie (fadeUp) blijft voor alle overige .anim-elementen behouden. */
+@keyframes vkScreenFade{from{opacity:0}to{opacity:1}}
+.screen.anim{animation:vkScreenFade .3s ease forwards}
+.anim-reveal{animation:reveal .35s ease forwards}
+
+/* ── POPUP / MODAL ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400;align-items:center;justify-content:center;padding:24px}
+.overlay.open{display:flex}
+.popup{background:var(--surface);border-radius:var(--rxl);max-width:460px;width:100%;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.18);animation:reveal .22s ease}
+.popup-icon{width:44px;height:44px;background:var(--al);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:14px;font-size:20px}
+.popup-title{font-family:'DM Serif Display',serif;font-size:19px;margin-bottom:8px}
+.popup-body{font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:16px}
+.criteria-list{list-style:none;margin:10px 0}
+.criteria-list li{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--t2);margin-bottom:8px;line-height:1.5}
+.cr-num{width:20px;height:20px;border-radius:50%;background:var(--al);color:var(--amber);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+
+/* ── MODAL (verb-popup gebruikt nog .modal/.modal-card; onderbouwing gaat via vkTipPopup) ── */
+.modal{display:none;position:fixed;inset:0;background:rgba(38,42,54,.55);z-index:1000;align-items:flex-start;justify-content:center;padding:5vh 20px;overflow-y:auto}
+.modal.open{display:flex}
+.modal-card{background:var(--surface);border-radius:var(--rxl);max-width:640px;width:100%;padding:28px 30px;box-shadow:0 8px 32px rgba(0,0,0,.18)}
+.modal-card h3{font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:14px;color:var(--text)}
+.modal-card p{font-size:14px;color:var(--t2);line-height:1.7;margin-bottom:14px}
+.modal-actions{display:flex;justify-content:flex-end;margin-top:10px}
+
+/* ═══ VK SHARED TIP POPUP (verenigde stijl, accent: teal voor F2) ═══ */
+.vk-tip-backdrop{display:none;position:fixed;inset:0;background:rgba(38,42,54,.55);z-index:999}
+.vk-tip-backdrop.open{display:block}
+.vk-tip-popup{display:none;position:fixed;background:var(--surface);border-radius:var(--rxl);box-shadow:0 12px 40px rgba(0,0,0,.22);z-index:1000;font-family:'DM Sans',sans-serif;animation:vkTipIn .18s ease}
+@keyframes vkTipIn{from{opacity:0;transform:translateY(6px) scale(.985)}to{opacity:1;transform:none}}
+.vk-tip-popup.open{display:flex;flex-direction:column}
+.vk-tip-popup[data-size="lg"]{top:5vh;left:50%;transform:translateX(-50%);max-width:640px;width:calc(100% - 40px);max-height:90vh;padding:32px 36px 28px}
+.vk-tip-popup[data-size="lg"].open{transform:translateX(-50%)}
+.vk-tip-popup[data-size="sm"]{max-width:340px;padding:14px 16px 12px}
+.vk-tip-popup .vk-tip-close{position:absolute;top:10px;right:12px;width:30px;height:30px;background:var(--surface);border:1px solid var(--b1);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--t2);padding:0;line-height:1;transition:all .13s}
+.vk-tip-popup .vk-tip-close:hover{background:var(--bg);color:var(--text)}
+.vk-tip-popup[data-size="sm"] .vk-tip-close{width:22px;height:22px;font-size:14px;top:6px;right:6px;border-color:var(--b0)}
+.vk-tip-popup .vk-tip-title{font-family:'DM Serif Display',serif;color:var(--text);margin:0 36px 4px 0;letter-spacing:-0.01em}
+.vk-tip-popup[data-size="lg"] .vk-tip-title{font-size:22px}
+.vk-tip-popup[data-size="sm"] .vk-tip-title{font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;margin-right:28px}
+.vk-tip-popup .vk-tip-sub{font-size:13px;color:var(--t2);margin-bottom:22px}
+.vk-tip-popup[data-size="sm"] .vk-tip-sub{display:none}
+.vk-tip-popup .vk-tip-body{color:var(--t2);line-height:1.7;overflow-y:auto}
+.vk-tip-popup[data-size="lg"] .vk-tip-body{font-size:13.5px;max-height:calc(90vh - 140px)}
+.vk-tip-popup[data-size="sm"] .vk-tip-body{font-size:12.5px;line-height:1.55}
+.vk-tip-popup .vk-tip-body p{margin:0 0 10px}
+.vk-tip-popup .vk-tip-body p:last-child{margin-bottom:0}
+.vk-tip-popup .vk-tip-h{font-size:14px;font-weight:700;color:var(--teal);margin:16px 0 5px;display:flex;align-items:center;gap:7px}
+.vk-tip-popup .vk-tip-h:first-child{margin-top:0}
+.vk-tip-popup .vk-tip-h::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0}
+.vk-tip-popup .vk-tip-actions{display:flex;justify-content:flex-end;margin-top:18px}
+.vk-tip-popup[data-size="sm"] .vk-tip-actions{display:none}
+@media(max-width:520px){
+  .vk-tip-popup[data-size="sm"]{left:20px !important;right:20px !important;max-width:none;width:auto}
+  .vk-tip-popup[data-size="lg"]{padding:24px 22px 20px}
+}
+/* ═══ END VK SHARED TIP POPUP ═══ */
+
+/* ═══ VK SHARED CUMULATIVE RESULTS STYLES (klaar voor F2-F5) ═══ */
+.vk-cum-wrap{margin-top:18px;padding-top:18px;border-top:1px solid var(--b0)}
+.vk-cum-section{margin-bottom:18px}
+.vk-cum-section:last-child{margin-bottom:0}
+.vk-cum-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:8px}
+.vk-cum-stip{font-size:14.5px;line-height:1.55;color:var(--text);padding:10px 14px;background:rgba(252,196,41,.12);border-left:3px solid #FCC429;border-radius:6px}
+.vk-cum-themes{display:flex;flex-wrap:wrap;gap:6px}
+.vk-cum-theme-pill{padding:4px 10px;border-radius:14px;font-size:12px;font-weight:600;color:#fff}
+/* ═══ END VK SHARED CUMULATIVE RESULTS STYLES ═══ */
+
+/* ═══ VK SHARED FINAL ACTIONS STYLES (eindscherm met aanpassen-knop) ═══ */
+.vk-final-actions{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.vk-back-edit-btn{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;color:var(--t2)}
+.vk-back-edit-btn:hover{color:var(--text);background:var(--bg)}
+.vk-back-edit-btn svg{color:var(--t3)}
+.vk-back-edit-btn:hover svg{color:var(--text)}
+/* ═══ END VK SHARED FINAL ACTIONS STYLES ═══ */
+
+/* ── DEELNEMER VIEW ── */
+.pview{display:none;min-height:100vh;background:var(--bg);padding:28px 20px}
+.pview.open{display:block}
+.pcard{background:var(--surface);border-radius:var(--rxl);border:1px solid var(--b0);box-shadow:var(--sh);padding:28px;max-width:540px;margin:0 auto}
+.pcard-wide{max-width:640px}
+.wait-screen{text-align:center;padding:36px 20px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:24px;height:24px;border:2.5px solid var(--b1);border-top-color:var(--teal);border-radius:50%;animation:spin .9s linear infinite;margin:0 auto 14px}
+.p-back{display:block;text-align:right;max-width:640px;margin:0 auto 14px}
+
+/* ── DEELNEMER SESSIE-SAMENVATTING ── */
+.p-summary{padding:14px 16px;background:var(--tl);border:1px solid var(--tb);border-radius:var(--r);margin-bottom:16px}
+.p-summary-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--teal);margin-bottom:6px}
+.p-summary-text{font-size:13.5px;color:var(--text);line-height:1.55}
+.p-facilitator{font-size:12px;color:var(--t2);margin-top:8px}
+.p-facilitator strong{color:var(--text);font-weight:600}
+
+/* ── AFTER-CONFIRM (na bevestigen thema's) ── */
+.after-confirm{margin-top:18px;padding:20px 22px;background:var(--bg);border:1px solid var(--b1);border-radius:var(--r)}
+.after-confirm-head{font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.after-confirm-head svg{width:16px;height:16px;color:var(--teal)}
+.after-confirm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.after-confirm-item{padding:12px 14px;background:var(--surface);border:1px solid var(--b0);border-radius:var(--rsm)}
+.after-confirm-item h4{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.after-confirm-item p{font-size:12.5px;color:var(--t2);line-height:1.55}
+
+/* ── AI LOADING ── */
+.ai-load{text-align:center;padding:44px 20px}
+.ai-dots{display:flex;gap:8px;justify-content:center;margin-bottom:18px}
+.ai-dot{width:10px;height:10px;border-radius:50%;background:var(--teal)}
+.ai-dot:nth-child(1){animation:pulse .9s ease-in-out infinite}
+.ai-dot:nth-child(2){animation:pulse .9s .2s ease-in-out infinite}
+.ai-dot:nth-child(3){animation:pulse .9s .4s ease-in-out infinite}
+
+@media(max-width:640px){
+  .final-themes-grid{grid-template-columns:repeat(2,1fr)}
+  .hdr{padding:0 14px}.wrap{padding:20px 14px 90px}.sess-bar{padding:0 14px}
+  .card{padding:18px}.bot-bar{padding:10px 14px}
+  .intro-grid{grid-template-columns:1fr}
+}
+
+/* ═══ VK FASE-EXPRESSIE VARS (fase-specifiek) ═══ */
+:root{ --fase-accent:#70A2D7; --fase-accent-text:#262A36; --fase-nummer:"2"; }
+
+/* ═══ VK SHARED EXPRESSIE (v1) — byte-identiek in alle fasebestanden, in één keer wijzigen ═══
+   Expressielaag conform CINAB-EXPRESSIE-STIJL: uitsluitend tokens, geen gradients,
+   geen alpha-kleurtinten, betekenis nooit alleen via kleur, reduced-motion gerespecteerd.
+   Methodiek-DNA Visiekaart: de oranje stip op de horizon + vijf vaste themakleuren. */
+:root{
+  --vk-ex-stip:#FAA833;   /* signatuurkleur: de stip op de horizon (zon) */
+  --vk-ex-line:#E5E3DB;   /* tone-on-tone watermerk- en rasterkleur */
+  --vk-ex-card:#FFFFFF;
+  --vk-ex-t1:#70A2D7;     /* thema 1 · Klantgerichtheid */
+  --vk-ex-t2:#BDD24D;     /* thema 2 · Kwaliteit & processen */
+  --vk-ex-t3:#F05736;     /* thema 3 · Medewerkers & ontwikkeling */
+  --vk-ex-t4:#9666AA;     /* thema 4 · Digitalisering */
+  --vk-ex-t5:#2A9791;     /* thema 5 · Samenwerking */
+  --vk-ex-inset:inset 0 0 0 1px rgba(0,0,0,.12); /* goedgekeurde speelstuk-schaduw */
+}
+
+/* ── E1 · fase-accent ── */
+.hdr,.header,.phdr,.print-bar{border-bottom:3px solid var(--fase-accent)}
+.phase-pill{background:var(--fase-accent);color:var(--fase-accent-text);border:1px solid var(--fase-accent)}
+.phase-num,.step-num,.phase-icon,.q-num{background:var(--fase-accent);color:var(--fase-accent-text);box-shadow:var(--vk-ex-inset)}
+
+/* ── E2 · methodiek-DNA in micro-vormen ── */
+.card,.pcard{border-left:6px solid var(--fase-accent)}
+.card-title::before{content:'';display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--vk-ex-stip);box-shadow:var(--vk-ex-inset);margin-right:7px;vertical-align:1px}
+.card-head,.q-meta{position:relative;border-bottom:2px dotted var(--vk-ex-line);padding-bottom:16px;margin-bottom:22px}
+
+/* ── F2 · themaladder als ornament op de bordlijn ── */
+.card-head::before,.q-meta::before{content:'';position:absolute;left:0;bottom:-5px;width:8px;height:8px;border-radius:50%;background:var(--vk-ex-t1);box-shadow:14px 0 0 var(--vk-ex-t2),28px 0 0 var(--vk-ex-t3),42px 0 0 var(--vk-ex-t4),56px 0 0 var(--vk-ex-t5)}
+
+/* ── E3 + F1 · watermerk en accentstreep (DM Serif Display, afsprakenblad leidend) ── */
+.phase-header{position:relative}
+/* Twee-staps-start (zoals fase 0/1): na de bevestig-popup wordt de startknop 'armed'. */
+#introStartBtn.armed{background:var(--green);border-color:var(--green);color:var(--text);box-shadow:0 2px 8px rgba(189,210,77,.45)}
+#introStartBtn.armed:hover:not(:disabled){background:var(--green);filter:brightness(.96);box-shadow:0 4px 14px rgba(189,210,77,.55)}
+#introStartBtn.armed svg{stroke:var(--text)}
+/* Groot fasecijfer (Optie 1): uitsluitend op de startpagina van elke fase.
+   Fase 1-5 = introscherm (#sIntro); fase 0 = .phase-header (eigen startpagina).
+   Geen wisselende tekens (?, 123, vinkje) meer en niet meer op werkschermen,
+   dus geen overlap met fase-gegevens. */
+#sIntro .card:first-of-type{position:relative}
+#sIntro .card:first-of-type::after,.phase-header::after{content:var(--fase-nummer);position:absolute;font-family:'DM Serif Display',serif;font-weight:600;font-size:84px;line-height:1;letter-spacing:-.025em;color:var(--vk-ex-line);pointer-events:none;user-select:none;z-index:0}
+.phase-header::after{right:0;top:-10px}
+#sIntro .card:first-of-type::after{right:22px;top:16px}
+.card:first-of-type .card-head .card-title::after,.card:first-of-type .q-text::after,.phase-title::after{content:'';display:block;width:56px;height:5px;border-radius:3px;background:var(--fase-accent);margin-top:8px}
+@media(max-width:900px){#sIntro .card:first-of-type::after,.phase-header::after{display:none!important}}
+
+/* ── E4 + F3 · beweging en voortgang ── */
+.card,.pcard{transition:transform .15s ease,box-shadow .15s ease}
+.card:hover,.pcard:hover{transform:translateY(-2px);box-shadow:0 2px 5px rgba(0,0,0,.08),0 8px 22px rgba(0,0,0,.09)}
+.btn:hover:not(:disabled){transform:translateY(-1px)}
+.q-steps{align-items:center}
+.q-step{flex:0 0 11px;height:11px;border-radius:50%;background:var(--vk-ex-line);box-shadow:var(--vk-ex-inset)}
+.q-step.done{background:var(--vk-ex-stip)}
+.q-step.active{background:var(--fase-accent);box-shadow:var(--vk-ex-inset),0 0 0 2px var(--vk-ex-card),0 0 0 3px var(--fase-accent)}
+
+/* ── F4 · wachtschermen: trio speelstukken (zon + twee themacirkels) ── */
+@keyframes vkExPulse{0%,100%{opacity:1}50%{opacity:.45}}
+.wait-screen .spinner{width:16px;height:16px;border:none;border-radius:50%;background:var(--vk-ex-stip);box-shadow:var(--vk-ex-inset),12px 0 0 var(--vk-ex-t1),24px 0 0 var(--vk-ex-t2);position:relative;left:-12px;margin:0 auto 16px;animation:vkExPulse 1.6s ease-in-out infinite}
+
+/* ── F5 · rasterwatermerk + R-watermerk (alleen rapport; klassen bestaan alleen daar) ── */
+.section-head{position:relative;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Cpath d='M14 0H0v14' fill='none' stroke='%23E5E3DB' stroke-width='1'/%3E%3C/svg%3E")}
+.section-head::after{content:var(--fase-nummer);position:absolute;right:16px;top:50%;transform:translateY(-50%);font-family:'DM Serif Display',serif;font-weight:600;font-size:44px;line-height:1;color:var(--vk-ex-line);pointer-events:none;user-select:none;z-index:0}
+@media(max-width:900px){.section-head::after{display:none!important}}
+
+/* ── A11y · reduced motion ── */
+@media (prefers-reduced-motion:reduce){
+  .card,.pcard,.btn,.q-step{transition:none!important}
+  .card:hover,.pcard:hover,.btn:hover:not(:disabled){transform:none!important}
+  .wait-screen .spinner{animation:none!important}
+}
+/* ═══ END VK SHARED EXPRESSIE (v1) ═══ */
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ FACILITATOR VIEW ═══════════════ -->
+<div id="facView">
+  <header class="hdr">
+    <div class="logo" onclick="goPhase1()" role="button" tabindex="0" aria-label="Terug naar fase 1">
+      <svg class="logo-img" xmlns="http://www.w3.org/2000/svg" viewBox="6392 11502 7040 7040" aria-hidden="true" focusable="false">
+        <rect class="fil-logo-shadow" x="6542.13" y="11652.68" width="6840.47" height="6840.47" rx="625.64" ry="625.64"/>
+        <rect class="fil-logo-main"   x="6492.13" y="11602.68" width="6840.47" height="6840.47" rx="625.64" ry="625.64"/>
+        <path class="fil-logo-line" d="M8459.51 11340.66l6.77 2886.05c0.53,225.18 44.93,223.19 131.76,299.11 64.53,56.42 712.98,613.44 1067.73,922.39m279.67 498.36c-3.85,335.14 -17.51,1600.45 -22.09,2025.82m-1460.38 -5160.51l785.98 4.94m3662.81 274.39l-6.72 591.26 -710.88 10.16 0 978.81m-1557.05 3300.95c-5.59,-19.68 -10.23,-41.55 -13.66,-65.97 -40.62,-289.42 -55.5,-1603.06 -55.5,-1603.06m0 0l-12.4 -1458.25c0,0 -44.42,-161.55 137.32,-169.63 181.74,-8.08 658.3,-4.04 658.3,-4.04l-3.77 -1608.68m459.06 3230.04l-615.21 -562.61m1311.37 -167.26l-1179.41 -4.13m-1388.18 1333.84l1210.17 -1126.72c0,0 173.66,-113.07 201.93,-286.74 28.27,-173.67 4.04,-807.74 4.04,-807.74l1579.11 0c0,0 10.18,8.09 137.31,-44.42 53.21,-21.98 127.68,-100.56 196.29,-184.51m-4091.56 3529.88c18.68,-34.96 33.6,-74 38.36,-114.44 16.15,-137.31 24.23,-1514.5 24.23,-1514.5 0,0 -4.03,-137.32 -72.69,-185.78 -68.66,-48.46 -665.89,-556.18 -665.89,-556.18m-467.07 653.4l469.73 -451.59c0,0 69.04,-77 -2.66,-201.81m-1213.8 -2.13l1213.8 2.13 -29.21 -897.55 -563.22 -1.72m-1022.85 -1671.85l3.28 541.68c0,0 -10.23,140.69 117.67,140.69 127.9,0 600.9,26.88 600.9,26.88l-1 659.21m-302.89 299.12l-178.2 -1.97c0,0 -220.41,18.58 -300.07,-21.25 -41.28,-20.64 -175.23,-151.79 -294.75,-273.38m1035.23 -2176.98l5.68 516.43 895.89 -2.1m2.16 920.01l2255.42 21.86m-1471.05 -1258.2l-0.37 394.45 -2.13 2268.51m2268.36 -3395.11c-121.47,117.05 -302.96,241.2 -548.07,278.79m-1062.71 -1009.16l-14.83 1611m313.94 307.52l452.12 4 9.35 -663.77m8.52 -604.84l5.09 -361.34m1408.26 1081.76l-2065.77 2035.4c-50.75,50 -106.04,79.05 -108.71,151.99 -1.64,44.93 10.93,491.27 20.85,827.53m-1774.69 2623.29l879.79 0 134 0 720.63 0 30.4 0 713.76 0 217.25 0 802.66 0 0 323.39 -3498.49 0 0 -323.39z"/>
+        <rect class="fil-logo-bar" x="8158.53" y="17972.39" width="3395.02" height="332.88"/>
+      </svg>
+    </div>
+    <div class="hdr-mid">
+      <div class="q-steps" id="qStepsBar"></div>
+      <span class="phase-pill" id="t-phasePill">Fase 2 · Thema's</span>
+    </div>
+    <div class="hdr-r">
+      <button class="btn btn-ghost" data-env="dev-only" onclick="showPView()" id="t-pvBtn" aria-label="Open deelnemer-view">Deelnemer-view →</button>
+      <button class="btn btn-ghost" data-env="dev-only" onclick="resetDemoData()" aria-label="Reset demo-data" title="Reset demo-data" style="padding:6px 10px">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M2 7a5 5 0 0 1 8.5-3.5L12 5M12 2v3h-3M12 7a5 5 0 0 1-8.5 3.5L2 9M2 12V9h3"/></svg>
+      </button>
+      <div class="lang-toggle" role="group" aria-label="Taalkeuze">
+        <button class="lang-btn on" id="lNL" onclick="setLang('nl')" aria-label="Nederlands">NL</button>
+        <button class="lang-btn" id="lEN" onclick="setLang('en')" aria-label="English">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ──────── SESSIE-INFO PANEEL ──────── -->
+  <div class="sess-bar" id="sessBar" style="display:none">
+    <button class="sess-toggle" id="sessToggle" onclick="toggleSessPanel()" aria-expanded="false" aria-controls="sessPanel">
+      <svg class="chev" width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 4.5L6 7.5L9 4.5"/></svg>
+      <span id="t-sessTitle">Sessie-info</span>
+      <span class="sess-mini" id="sessMini"></span>
+    </button>
+    <div class="sess-panel" id="sessPanel" role="region" aria-label="Sessiecontext">
+      <div class="sess-grid" id="sessGrid"></div>
+    </div>
+  </div>
+
+  <main class="wrap">
+
+    <!-- ──── INTRO ──── -->
+    <div id="sIntro" class="screen open anim">
+      <div class="card">
+        <div class="card-head">
+          <div class="phase-num">2</div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="card-title serif" style="font-size:22px" id="t-introTitle">Fase 2 — Thema's bepalen</div>
+              <span class="info-icon" onclick="event.stopPropagation();vkInfoOpen('infoIntro',this)" role="button" tabindex="0" aria-label="Uitleg over deze fase">i</span>
+            </div>
+            <div class="card-sub" id="t-introSub">Maximaal 5 strategische thema's, co-creatief, AI-geclusterd, dot-voting</div>
+          </div>
+        </div>
+
+        <div class="vision-box">
+          <div class="vision-icon">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="5" stroke="white" stroke-width="1.3"/><circle cx="6" cy="6" r="2" fill="white"/></svg>
+          </div>
+          <div>
+            <div class="vision-label" id="t-visionLabel">Onze stip op de horizon</div>
+            <div class="vision-text" id="visionSentence">Laden…</div>
+          </div>
+        </div>
+
+        <!-- Wat-blok -->
+        <div class="intro-block">
+          <div class="intro-block-title"><span class="dot"></span><span id="t-introWhatTitle">Wat is een thema?</span></div>
+          <p id="t-introWhatBody"></p>
+        </div>
+
+        <!-- Hoe-blok -->
+        <div class="intro-block">
+          <div class="intro-block-title"><span class="dot"></span><span id="t-introHowTitle">Hoe komen we tot de thema's?</span></div>
+          <p id="t-introHowBody"></p>
+        </div>
+
+        <div class="intro-grid" id="introGrid"></div>
+      </div>
+      <div class="bot-bar">
+        <div class="bot-info" id="t-introBotInfo">Deelnemers ontvangen instructies zodra je start</div>
+        <button class="btn btn-teal btn-lg" id="introStartBtn" onclick="vkF2StartGated()">
+          <span id="t-introStart">Fase 2 starten</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3.5 8h9M9 4l4 4-4 4"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ──── WAIT FOR INPUT ──── -->
+    <div id="sWait" class="screen anim">
+      <div class="card">
+        <div class="card-head">
+          <div class="phase-num">2</div>
+          <div>
+            <div class="card-title" id="t-waitTitle">Wachten op thema-inzendingen</div>
+            <div class="card-sub" id="t-waitSub">Deelnemers vullen nu hun thema's in op hun eigen apparaat</div>
+          </div>
+        </div>
+        <div class="vision-box">
+          <div class="vision-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="5" stroke="white" stroke-width="1.3"/><circle cx="6" cy="6" r="2" fill="white"/></svg></div>
+          <div><div class="vision-label" id="t-visionLabel2">Onze stip op de horizon</div><div class="vision-text" id="visionSentence2">—</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+          <span class="live-dot"></span>
+          <span style="font-size:13px;color:var(--t2)" id="t-liveLabel">Live antwoorden binnengekomen</span>
+          <span class="count-chip" id="submittedCount">0</span>
+        </div>
+        <div id="incomingList" style="display:flex;flex-wrap:wrap;gap:7px;min-height:48px"></div>
+      </div>
+      <div class="bot-bar">
+        <div>
+          <div class="bot-info" id="t-waitBot">Klik om te clusteren zodra je genoeg input hebt</div>
+          <div class="bot-warn" id="t-waitWarn" style="display:none"></div>
+        </div>
+        <button class="btn btn-teal btn-lg" onclick="startClustering()" id="t-clusterBtn">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="4" cy="7" r="2"/><circle cx="11" cy="4" r="2"/><circle cx="11" cy="10" r="2"/><path d="M6 6.5L9 4.5M6 7.5L9 9.5"/></svg>
+          <span id="t-clusterBtnLabel">AI-clustering starten</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ──── AI LOADING ──── -->
+    <div id="sAILoad" class="screen anim">
+      <div class="card">
+        <div class="ai-load">
+          <div class="ai-dots"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>
+          <p class="serif" style="font-size:22px;margin-bottom:8px" id="t-aiTitle">Thema's worden geclusterd…</p>
+          <p style="font-size:13px;color:var(--t2)" id="t-aiSub">AI groepeert inhoudelijk verwante antwoorden tot kandidaat-thema's.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──── CLUSTER (KANDIDAAT-THEMA) EDITOR ──── -->
+    <div id="sCluster" class="screen anim">
+      <div class="card">
+        <div class="card-head">
+          <div class="phase-num">2</div>
+          <div>
+            <div class="card-title" id="t-clTitle">Kandidaat-thema's controleren en aanpassen</div>
+            <div class="card-sub" id="t-clSub">Sleep antwoorden naar een ander kandidaat-thema, hernoem namen, voeg toe of verwijder leeg</div>
+          </div>
+        </div>
+        <div class="cluster-edit-hint">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M9.5 2L12 4.5L4.5 12H2V9.5L9.5 2Z"/></svg>
+          <span id="t-clEditHint">Klik op een naam om te hernoemen. Sleep antwoorden tussen kandidaat-thema's. Meer dan vijf kandidaat-thema's is prima, na de stemronde kiezen we maximaal vijf definitieve thema's.</span>
+        </div>
+        <div class="cluster-grid" id="clusterGrid"></div>
+        <div style="margin-top:12px">
+          <button class="add-cluster-btn" onclick="addCluster()" aria-label="Nieuw kandidaat-thema toevoegen">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 2v10M2 7h10"/></svg>
+            <span id="t-addCluster">Nieuw kandidaat-thema toevoegen</span>
+          </button>
+        </div>
+      </div>
+      <div class="bot-bar">
+        <div class="bot-info" id="t-clBot">Pas aan tot de groepering klopt</div>
+        <button class="btn btn-teal btn-lg" onclick="confirmClustering()">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2.5 8l4 4L12.5 3.5"/></svg>
+          <span id="t-clConfirm">Bevestigen & stemmen openen</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ──── VOTE OPEN (facilitator) ──── -->
+    <div id="sVoteOpen" class="screen anim">
+      <div class="card">
+        <div class="card-head">
+          <div class="phase-num">2</div>
+          <div>
+            <div class="card-title" id="t-voTitle">Dot-voting is open</div>
+            <div class="card-sub" id="t-voSub">Deelnemers kennen punten toe aan kandidaat-thema's (5-4-3-2-1)</div>
+          </div>
+        </div>
+        <div class="vote-explain">
+          <div class="vote-explain-title">
+            <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="5.5"/><path d="M7 9.5V7M7 4.5h.01"/></svg>
+            <span id="t-voExplainTitle">Hoe werkt dot-voting?</span>
+          </div>
+          <div class="vote-explain-body" id="t-voExplainBody"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+          <span class="live-dot"></span>
+          <span style="font-size:13px;color:var(--t2)" id="t-votesIn">Stemmen binnengekomen</span>
+          <span class="count-chip" id="voteCount">0</span>
+        </div>
+        <div id="voteProgressList"></div>
+      </div>
+      <div class="bot-bar">
+        <div class="bot-info" id="t-voBot">Sluit de stemronde zodra het klaar is</div>
+        <button class="btn btn-teal btn-lg" onclick="showResults()">
+          <span id="t-voResults">Resultaten tonen</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3.5 8h9M9 4l4 4-4 4"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ──── RESULTS + SELECT ──── -->
+    <div id="sResults" class="screen anim">
+      <div class="card">
+        <div class="card-head">
+          <div class="phase-num">2</div>
+          <div>
+            <div class="card-title" id="t-resTitle">Selecteer maximaal 5 thema's</div>
+            <div class="card-sub" id="t-resSub">Gerangschikt op gemiddelde score, klik om te selecteren of deselecteren</div>
+          </div>
+        </div>
+        <div id="scoreList"></div>
+        <div id="tieNotice" style="display:none;background:var(--al);border:1px solid rgba(250,168,51,.25);border-radius:var(--r);padding:12px 16px;font-size:13px;color:var(--amber);margin-top:12px"></div>
+      </div>
+      <div class="bot-bar">
+        <div class="bot-info"><span id="selectedCount" style="font-weight:700;color:var(--teal)">0</span> <span id="t-resBot">van max. 5 thema's geselecteerd</span></div>
+        <button class="btn btn-green btn-lg" onclick="confirmThemes()" id="confirmThemesBtn" disabled>
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2.5 8l4 4L12.5 3.5"/></svg>
+          <span id="t-resConfirm">Thema's bevestigen</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ──── FINAL ──── -->
+    <div id="sFinal" class="screen anim">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <div>
+          <div class="phase-pill" style="margin-bottom:6px;display:inline-flex" id="t-finalBadge">Fase 2 voltooid</div>
+          <h2 class="serif" style="font-size:26px;letter-spacing:-.01em" id="t-finalTitle">Thema's bepaald</h2>
+        </div>
+        <div class="view-toggle" role="group" aria-label="Weergave-keuze">
+          <button class="vt-btn on" onclick="switchView('results')" id="t-vtResults">Uitkomsten</button>
+          <button class="vt-btn" onclick="switchView('canvas')" id="t-vtCanvas">Visuele weergave</button>
+        </div>
+      </div>
+
+      <div id="fvResults" class="anim-reveal">
+        <div class="card">
+          <div class="vision-box">
+            <div class="vision-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="5" stroke="white" stroke-width="1.3"/><circle cx="6" cy="6" r="2" fill="white"/></svg></div>
+            <div><div class="vision-label" id="t-vl3">Onze stip op de horizon</div><div class="vision-text" id="visionSentence3"></div></div>
+          </div>
+          <div class="final-themes-grid" id="finalThemesGrid"></div>
+          <div class="after-confirm">
+            <div class="after-confirm-head">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 1.5"/></svg>
+              <span id="t-afterConfirmTitle">Wat doen deze thema's?</span>
+            </div>
+            <div class="after-confirm-grid" id="afterConfirmGrid"></div>
+          </div>
+          <div style="padding-top:18px;margin-top:6px;border-top:1px solid var(--b0)">
+            <div class="vk-final-actions">
+              <button class="btn btn-ghost vk-back-edit-btn" onclick="vkBackToEdit()" type="button" id="vkBackEditBtn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                <span id="t-vkBackEdit">Aanpassen</span>
+              </button>
+              <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+                <p style="font-size:13px;color:var(--t2);margin:0" id="t-finalNote">Deze thema's vormen de structurele pijlers voor fase 3 en verder.</p>
+                <button class="btn btn-teal btn-lg" onclick="goPhase3()" id="t-toPhase3">Naar fase 3 →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="fvCanvas" style="display:none" class="anim-reveal">
+        <div class="canvas-wrap">
+          <div style="padding:16px 22px;border-bottom:1px solid var(--b0);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+            <span class="serif" style="font-size:15px" id="t-canvasTitle">Visiekaart canvas — fase 1 & 2</span>
+            <span style="font-size:12px;color:var(--t3)" id="t-canvasSub">Thema's zijn nu zichtbaar in de bollen</span>
+          </div>
+          <svg id="vkCanvas" viewBox="0 0 800 440" width="100%" xmlns="http://www.w3.org/2000/svg" aria-label="Visiekaart canvas"></svg>
+          <div class="canvas-legend">
+            <div class="canvas-legend-title" id="t-canvasLegendTitle">Volledige themanamen</div>
+            <div class="canvas-legend-list" id="canvasLegendList"></div>
+          </div>
+          <div class="canvas-note" id="t-canvasNote">Versnellers & remmers verschijnen in fase 4 · Roadmap in fase 5</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══════════════ PARTICIPANT VIEW ═══════════════ -->
+<div id="pView" class="pview">
+  <div class="p-back" data-env="dev-only"><button class="btn btn-ghost" onclick="hidePView()" id="t-pBack">← Facilitator-view</button></div>
+
+  <!-- Pre-wait: voordat facilitator de fase start -->
+  <div id="p2PreWait" class="pcard pcard-wide">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--b0)">
+      <div style="width:40px;height:40px;background:var(--teal);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-weight:700">2</div>
+      <div style="flex:1;min-width:0">
+        <div class="serif" style="font-size:20px;letter-spacing:-.01em" id="t-pPreWaitTitle">Fase 2 — Thema's bepalen</div>
+        <p style="font-size:12.5px;color:var(--t2)" id="t-pPreWaitSub">Korte uitleg over wat we in deze fase doen. De invoer verschijnt zodra de facilitator de fase start.</p>
+      </div>
+    </div>
+
+    <div class="p-summary" id="pSummaryBlock" style="display:none">
+      <div class="p-summary-label" id="t-summaryLabel">Wat we vandaag doen</div>
+      <div class="p-summary-text" id="pSummaryText"></div>
+      <div class="p-facilitator" id="pFacilitatorBlock" style="display:none"><span id="t-pFacLabel">Begeleid door:</span> <strong id="pFacilitatorName"></strong></div>
+    </div>
+
+    <div class="vision-box">
+      <div class="vision-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="5" stroke="white" stroke-width="1.3"/><circle cx="6" cy="6" r="2" fill="white"/></svg></div>
+      <div><div class="vision-label" id="t-pvl">Onze stip op de horizon</div><div class="vision-text" id="pVisionTextPre">—</div></div>
+    </div>
+
+    <div class="intro-block">
+      <div class="intro-block-title"><span class="dot"></span><span id="t-pIntroWhatTitle">Wat is een thema?</span></div>
+      <p id="t-pIntroWhatBody"></p>
+    </div>
+
+    <div class="intro-block">
+      <div class="intro-block-title"><span class="dot"></span><span id="t-pIntroHowTitle">Hoe komen we tot de thema's?</span></div>
+      <p id="t-pIntroHowBody"></p>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:12px;border-top:1px solid var(--b0)">
+      <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--t2)">
+        <span class="live-dot"></span>
+        <span id="t-pPreWaitWaiting">Wachten op de facilitator…</span>
+      </div>
+      <button class="btn" onclick="openOnderbouwing()" id="pOnderbouwingBtn1" aria-label="Open onderbouwing">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="5.5"/><path d="M7 9.5V7M7 4.5h.01"/></svg>
+        <span id="t-pOnderbouwingBtnLabel">Onderbouwing</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Instruction + input -->
+  <div id="p2Input" class="pcard" style="display:none">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+      <div style="width:28px;height:28px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0">2</div>
+      <span style="font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.05em" id="t-p2phase">Fase 2 · Thema's</span>
+    </div>
+
+    <div class="instruction-box">
+      <div class="instruction-title">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="5.5"/><path d="M7 9.5V7M7 4.5h.01"/></svg>
+        <span id="t-instrTitle">Wat is een thema?</span>
+        <span class="info-icon" onclick="event.stopPropagation();vkInfoOpen('infoThemeInput',this)" role="button" tabindex="0" aria-label="Meer uitleg over thema's" style="margin-left:auto">i</span>
+      </div>
+      <div class="instruction-text" id="t-instrText"></div>
+      <div style="font-size:12px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-top:14px;margin-bottom:6px" id="t-examplesPos">Voorbeelden van thema's</div>
+      <div class="examples" id="examplesRow"></div>
+      <div style="font-size:12px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-top:10px;margin-bottom:6px" id="t-examplesNeg">Géén thema's (dit zijn acties, die komen pas in fase 3)</div>
+      <div class="examples" id="examplesNegRow"></div>
+    </div>
+
+    <div class="vision-box">
+      <div class="vision-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="5" stroke="white" stroke-width="1.3"/><circle cx="6" cy="6" r="2" fill="white"/></svg></div>
+      <div><div class="vision-label" id="t-pvl2">Onze stip op de horizon</div><div class="vision-text" id="pVisionText">—</div></div>
+    </div>
+
+    <div style="font-size:14px;font-weight:600;margin-bottom:12px;line-height:1.5" id="t-pQuestion">Om deze stip op de horizon waar te maken, moeten we structureel sterker worden in…</div>
+
+    <div class="theme-fields" id="pThemeFields"></div>
+    <button type="button" class="add-theme-field-btn" onclick="addThemeField()" id="t-addThemeField">
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 2v10M2 7h10"/></svg>
+      <span>Veld toevoegen</span>
+    </button>
+
+    <div style="margin-top:16px;text-align:right">
+      <button class="btn btn-teal btn-lg" onclick="submitThemes()" id="t-pSubmit">Thema's insturen</button>
+    </div>
+  </div>
+
+  <!-- Wait after submit -->
+  <div id="p2Wait" class="pcard" style="display:none">
+    <div class="wait-screen">
+      <div class="spinner"></div>
+      <div style="font-size:17px;font-weight:700;margin-bottom:6px" id="t-p2WaitTitle">Thema's verstuurd</div>
+      <div style="font-size:13px;color:var(--t2)" id="t-p2WaitSub">De facilitator verwerkt de antwoorden en stelt kandidaat-thema's op. Even geduld…</div>
+    </div>
+  </div>
+
+  <!-- Vote screen -->
+  <div id="p2Vote" class="pcard pcard-wide" style="display:none">
+    <div style="margin-bottom:14px">
+      <div style="font-size:17px;font-weight:700;margin-bottom:4px;font-family:'DM Serif Display',serif" id="t-p2VoteTitle">Stem op de kandidaat-thema's</div>
+      <div style="font-size:13px;color:var(--t2)" id="t-p2VoteSub">Geef punten aan maximaal vijf kandidaat-thema's (5, 4, 3, 2 en 1). Elk puntenaantal mag je maar één keer gebruiken.</div>
+    </div>
+    <div class="vote-explain">
+      <div class="vote-explain-title">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="5.5"/><path d="M7 9.5V7M7 4.5h.01"/></svg>
+        <span id="t-pVoExplainTitle">Hoe werkt dot-voting?</span>
+      </div>
+      <div class="vote-explain-body" id="t-pVoExplainBody"></div>
+    </div>
+    <div class="vote-grid" id="pVoteGrid"></div>
+    <div style="margin-top:16px;text-align:right">
+      <button class="btn btn-teal btn-lg" onclick="submitVotes()" id="t-pVoteSubmit">Stem versturen</button>
+    </div>
+  </div>
+
+  <!-- Wait for results -->
+  <div id="p2WaitResults" class="pcard" style="display:none">
+    <div class="wait-screen">
+      <div class="spinner"></div>
+      <div style="font-size:17px;font-weight:700;margin-bottom:6px" id="t-p2WRTitle">Stem ontvangen</div>
+      <div style="font-size:13px;color:var(--t2)" id="t-p2WRSub">De facilitator selecteert nu de definitieve thema's…</div>
+    </div>
+  </div>
+
+  <!-- Final themes for participant -->
+  <div id="p2Final" class="pcard" style="display:none">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="width:52px;height:52px;background:var(--teal);border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M4 13l5 5L20 6"/></svg>
+      </div>
+      <div class="serif" style="font-size:20px;margin-bottom:4px" id="t-p2FinalTitle">Thema's bepaald</div>
+      <div style="font-size:13px;color:var(--t2)" id="t-p2FinalSub">Dit zijn de strategische pijlers</div>
+    </div>
+    <div id="p2FinalThemes"></div>
+    <div style="margin-top:14px;text-align:center;font-size:12px;color:var(--t3)" id="t-p2Next">Fase 3 start zodra de facilitator aangeeft</div>
+  </div>
+</div>
+
+<!-- ═══════════════ VERB WARNING POPUP ═══════════════ -->
+<div class="overlay" id="verbPopup" role="dialog" aria-modal="true" aria-labelledby="t-verbTitle" onclick="if(event.target===this)closeVerbPopup()">
+  <div class="popup">
+    <div class="popup-icon" aria-hidden="true">!</div>
+    <h3 class="popup-title" id="t-verbTitle">Weet je zeker dat dit een thema is?</h3>
+    <p class="popup-body" id="t-verbBody">Het lijkt of je een actie of werkwoord hebt ingevuld. Een thema begint vaak met een zelfstandig naamwoord. Controleer aan de hand van deze drie criteria:</p>
+    <ul class="criteria-list">
+      <li><div class="cr-num">1</div><span id="t-cr1">Is wat je hebt ingevuld <strong>structureel belangrijk</strong> voor het realiseren van de stip op de horizon?</span></li>
+      <li><div class="cr-num">2</div><span id="t-cr2">Is dit <strong>breder dan één actie</strong>?</span></li>
+      <li><div class="cr-num">3</div><span id="t-cr3">Kunnen er <strong>meerdere acties of initiatieven</strong> onder vallen?</span></li>
+    </ul>
+    <p style="font-size:12px;color:var(--t3);margin-bottom:16px" id="t-verbConclusion">Drie keer "ja"? Dan is het een thema. Anders, pas je antwoord aan.</p>
+    <div style="display:flex;justify-content:flex-end;gap:8px">
+      <button class="btn btn-teal" onclick="closeVerbPopup()" id="t-verbClose">Sluiten</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ VK SHARED TIP POPUP (DOM) ═══════════════ -->
+<div id="vkTipBackdrop" class="vk-tip-backdrop" onclick="vkCloseTip()"></div>
+<div id="vkTipPopup" class="vk-tip-popup" role="dialog" aria-modal="true" aria-labelledby="vkTipTitle">
+  <button class="vk-tip-close" onclick="vkCloseTip()" aria-label="Sluiten" type="button">×</button>
+  <h3 class="vk-tip-title" id="vkTipTitle"></h3>
+  <p class="vk-tip-sub" id="vkTipSub"></p>
+  <div class="vk-tip-body" id="vkTipBody"></div>
+  <div class="vk-tip-actions" id="vkTipActions">
+    <button class="btn btn-teal" onclick="vkCloseTip()" id="vkTipCloseBtn" type="button">Sluiten</button>
+  </div>
+</div>
+<script>
+/* ═══ VK SHARED CANVAS BUILDER (injected) ═══ */
+/* ══════════════════════════════════════════════════════════════════════
+   VISIEKAART CANVAS — shared blueprint (used in fase 1 t/m 5 + rapport)
+   ──────────────────────────────────────────────────────────────────────
+   Geometry is faithful to bijlage_-_visiekaart_v2.svg.
+   ViewBox: 0 0 67733 38100 (CorelDRAW mm × 100).
+   Colors are mapped to standaard kleurcodes (Option B).
+   Font: DM Sans throughout.
+   ══════════════════════════════════════════════════════════════════════ */
+
+const VK_THEME_COLORS = ['#70A2D7','#BDD24D','#E8423F','#9666AA','#2A9791'];
+const VK_SUN = '#FCC429';
+const VK_BAND = '#BDD24D';
+const VK_DOTS = '#C5D93D';
+const VK_DARK = '#262A36';
+const VK_WHITE = '#FFFFFF';
+
+const VK_GEOM = {
+  sun: { cx: 33748, cy: 17537, r: 10421 },
+  band: { x: 2464, y: 17751, w: 62569, h: 19058, r: 886 },
+  themes: [
+    { cx: 20071, cy: 14057 },
+    { cx: 24285, cy:  7294 },
+    { cx: 33748, cy:  3625 },
+    { cx: 43161, cy:  7294 },
+    { cx: 47403, cy: 14057 }
+  ],
+  themeR: 3312,
+  triangle: 'M11768 35254 L33477 17752 L55186 35254 Z',
+  triApex: { x: 33477, y: 17751 },
+  triLeft: { x: 11768, y: 35254 },
+  triRight: { x: 55186, y: 35254 },
+  numbers: [
+    { x: 15205, y: 33897 },
+    { x: 18205, y: 31295 },
+    { x: 21439, y: 28632 },
+    { x: 24286, y: 25980 },
+    { x: 27496, y: 23474 }
+  ],
+  dots: [
+    { cx: 16229, cy: 14135 },
+    { cx: 64191, cy: 14135 },
+    { cx: 21013, cy:  9466 }
+  ]
+};
+
+function vkEscape(s){
+  return String(s||'').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function vkWrap(text, maxChars){
+  const words = String(text||'').split(/\s+/).filter(Boolean);
+  const out = [];
+  let line = '';
+  for (const w of words) {
+    const cand = line ? line + ' ' + w : w;
+    if (cand.length > maxChars && line) { out.push(line); line = w; }
+    else line = cand;
+  }
+  if (line) out.push(line);
+  return out;
+}
+
+function vkTruncate(text, maxChars){
+  text = String(text||'');
+  if (text.length <= maxChars) return text;
+  return text.substring(0, maxChars - 1).trimEnd() + '…';
+}
+
+/* Right edge of triangle at a given y */
+function vkTriRightX(y){
+  const apex = VK_GEOM.triApex, br = VK_GEOM.triRight;
+  if (y <= apex.y) return apex.x;
+  if (y >= br.y) return br.x;
+  return apex.x + (y - apex.y) / (br.y - apex.y) * (br.x - apex.x);
+}
+
+/*
+  data = {
+    visionSentence:  string | '',
+    themeNames:      array[5] of string | [],
+    themeActions:    array[5] of array[5] of string | [],
+    versnellers:     array of string,
+    remmers:         array of string,
+    roadmapTop5:     array of {text, themeIdx} | [],
+    lang:            'nl' | 'en',
+    stickyMode:      'numbers'
+  }
+*/
+function vkBuildCanvas(data){
+  const d = Object.assign({
+    visionSentence: '', themeNames: [], themeActions: [],
+    versnellers: [], remmers: [], roadmapTop5: [],
+    lang: 'nl', stickyMode: 'numbers'
+  }, data || {});
+  const isEN = d.lang === 'en';
+
+  const stoereLine1 = isEN ? 'bold steps' : 'stoere stappen';
+  const stoereLine2 = isEN ? 'to our dot' : 'naar onze stip';
+  const versnLabel = isEN ? 'accelerators' : 'versnellers';
+  const remmLabel  = isEN ? 'obstacles'    : 'remmers';
+  const placeholderPrefix = isEN ? 'theme' : 'thema';
+  const visionPlaceholder = isEN ? ['our dot on','the horizon'] : ['onze stip op','de horizon'];
+
+  let svg = '';
+
+  svg += `<rect x="0" y="0" width="67733" height="38100" fill="${VK_WHITE}"/>`;
+
+  const sun = VK_GEOM.sun;
+  svg += `<circle cx="${sun.cx}" cy="${sun.cy}" r="${sun.r}" fill="${VK_SUN}"/>`;
+
+  {
+    const visTop = sun.cy - sun.r;
+    const bandTop = VK_GEOM.band.y;
+    const visCenterY = (visTop + bandTop) / 2;
+    const sentence = d.visionSentence ? d.visionSentence : visionPlaceholder.join(' ');
+    let lines = vkWrap(sentence, 24).slice(0, 5);
+    if (!lines.length) lines = visionPlaceholder;
+    const fontSize = lines.length > 3 ? 900 : 1050;
+    const lineH = fontSize * 1.2;
+    const totalH = lines.length * lineH;
+    const startY = visCenterY - totalH/2 + lineH/2;
+    svg += lines.map((ln, i) =>
+      `<text x="${sun.cx}" y="${startY + i*lineH}" text-anchor="middle" dominant-baseline="central" font-size="${fontSize}" fill="${VK_WHITE}" font-weight="500">${vkEscape(ln)}</text>`
+    ).join('');
+  }
+
+  const b = VK_GEOM.band;
+  svg += `<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="${b.r}" ry="${b.r}" fill="${VK_BAND}"/>`;
+
+  VK_GEOM.dots.forEach(p => {
+    svg += `<circle cx="${p.cx}" cy="${p.cy}" r="80" fill="${VK_DOTS}"/>`;
+  });
+
+  VK_GEOM.themes.forEach((p, i) => {
+    const color = VK_THEME_COLORS[i];
+    const name = d.themeNames[i];
+    const isPlaceholder = !name;
+    const opacity = isPlaceholder ? 0.35 : 1;
+    svg += `<circle cx="${p.cx}" cy="${p.cy}" r="${VK_GEOM.themeR}" fill="${color}" opacity="${opacity}"/>`;
+    const numberLabel = String(i+1);
+    const display = name || `${placeholderPrefix} ${i+1}`;
+    const wrapped = vkWrap(display, 10).slice(0, 3).map(ln => vkTruncate(ln, 12));
+    const lineH = wrapped.length > 2 ? 560 : 680;
+    const blockH = wrapped.length * lineH;
+    const numberH = 1100;
+    const totalH = numberH + 200 + blockH;
+    const startY = p.cy - totalH/2 + numberH/2;
+    svg += `<text x="${p.cx}" y="${startY}" text-anchor="middle" dominant-baseline="central" font-size="${numberH}" fill="${VK_WHITE}" font-weight="700">${numberLabel}</text>`;
+    const nameTop = startY + numberH/2 + 200 + lineH/2;
+    svg += wrapped.map((ln, li) =>
+      `<text x="${p.cx}" y="${nameTop + li*lineH}" text-anchor="middle" dominant-baseline="central" font-size="${lineH}" fill="${VK_WHITE}" font-weight="600">${vkEscape(ln)}</text>`
+    ).join('');
+  });
+
+  VK_GEOM.themes.forEach((p, i) => {
+    const actions = d.themeActions[i];
+    if (!actions || !actions.length) return;
+    const n = Math.min(actions.length, 5);
+    const color = VK_THEME_COLORS[i];
+    // v4b: stickies vergroot en naar de buitenzijde van elke themabol gespreid
+    // (conform referentie 'visiekaart actiebeeld' B). Links-thema's → rij links,
+    // rechts-thema's → rij rechts, top-thema (2) → links/rechts geflankeerd.
+    const w = 1300, h = 1100, gap = 200, rx = 150, numFont = 620, strokeW = 80;
+    const R = VK_GEOM.themeR;
+    const drawSticky = (x, y, label) => {
+      svg += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" ry="${rx}" fill="${color}" stroke="${VK_WHITE}" stroke-width="${strokeW}"/>`
+           + `<text x="${x + w/2}" y="${y + h/2}" text-anchor="middle" dominant-baseline="central" font-size="${numFont}" fill="${VK_WHITE}" font-weight="700">${label}</text>`;
+    };
+    const rowLeftOf = (rightEdge, cy, count, start) => {
+      let x = rightEdge - (count * w + (count - 1) * gap);
+      const y = cy - h / 2;
+      for (let s = 0; s < count; s++){ drawSticky(x, y, start + s); x += w + gap; }
+    };
+    const rowRightOf = (leftEdge, cy, count, start) => {
+      let x = leftEdge;
+      const y = cy - h / 2;
+      for (let s = 0; s < count; s++){ drawSticky(x, y, start + s); x += w + gap; }
+    };
+    if (i === 0 || i === 1){
+      rowLeftOf(p.cx - R - 250, p.cy, n, 1);
+    } else if (i === 3 || i === 4){
+      rowRightOf(p.cx + R + 250, p.cy, n, 1);
+    } else {
+      const leftN = Math.ceil(n / 2), rightN = n - leftN;
+      const fy = p.cy - 260;
+      if (leftN)  rowLeftOf(p.cx - R - 250, fy, leftN, 1);
+      if (rightN) rowRightOf(p.cx + R + 250, fy, rightN, leftN + 1);
+    }
+  });
+
+  svg += `<path d="${VK_GEOM.triangle}" fill="${VK_WHITE}"/>`;
+
+  {
+    const apex = VK_GEOM.triApex;
+    const headY = apex.y + 1850;
+    svg += `<text x="${apex.x}" y="${headY}" text-anchor="middle" font-size="900" fill="${VK_DARK}" font-weight="600">${stoereLine1}</text>
+      <text x="${apex.x}" y="${headY + 1100}" text-anchor="middle" font-size="900" fill="${VK_DARK}" font-weight="400">${stoereLine2}</text>`;
+  }
+
+  VK_GEOM.numbers.forEach((p, i) => {
+    svg += `<text x="${p.x}" y="${p.y}" font-size="900" fill="${VK_DARK}" font-weight="600">${i+1}</text>`;
+    const action = d.roadmapTop5[i];
+    if (!action) return;
+    const themeIdx = (typeof action.themeIdx === 'number' ? action.themeIdx : 0);
+    const themeColor = VK_THEME_COLORS[themeIdx] || VK_DARK;
+    const bx = p.x + 1200;
+    const by = p.y - 280;
+    const br = 380;
+    svg += `<circle cx="${bx}" cy="${by}" r="${br}" fill="${themeColor}"/>
+      <text x="${bx}" y="${by}" text-anchor="middle" dominant-baseline="central" font-size="500" fill="${VK_WHITE}" font-weight="700">${themeIdx+1}</text>`;
+    const tx = bx + br + 200;
+    const xRight = vkTriRightX(p.y);
+    const maxW = xRight - tx - 500;
+    const charBudget = Math.max(8, Math.floor(maxW / 340));
+    const text = vkTruncate(action.text || '', charBudget);
+    svg += `<text x="${tx}" y="${p.y}" font-size="600" fill="${VK_DARK}" font-weight="400">${vkEscape(text)}</text>`;
+  });
+
+  {
+    const headX = 3360;
+    const headY = 18950;
+    svg += `<text x="${headX}" y="${headY}" font-size="1100" fill="${VK_DARK}" font-weight="700">${versnLabel}</text>`;
+    d.versnellers.slice(0, 5).forEach((v, i) => {
+      const t = typeof v === 'string' ? v : (v && (v.title || v.name) || '');
+      svg += `<text x="${headX}" y="${headY + 1700 + i*1500}" font-size="700" fill="${VK_DARK}" font-weight="400">${i+1}. ${vkEscape(vkTruncate(t, 28))}</text>`;
+    });
+  }
+
+  {
+    const headX = 64374;
+    const headY = 18950;
+    svg += `<text x="${headX}" y="${headY}" text-anchor="end" font-size="1100" fill="${VK_DARK}" font-weight="700">${remmLabel}</text>`;
+    d.remmers.slice(0, 5).forEach((r, i) => {
+      const t = typeof r === 'string' ? r : (r && (r.title || r.name) || '');
+      svg += `<text x="${headX}" y="${headY + 1700 + i*1500}" text-anchor="end" font-size="700" fill="${VK_DARK}" font-weight="400">${i+1}. ${vkEscape(vkTruncate(t, 28))}</text>`;
+    });
+  }
+
+  return svg;
+}
+
+/* Apply to an <svg> element: sets viewBox + innerHTML */
+function vkRenderInto(svgEl, data){
+  if (!svgEl) return;
+  svgEl.setAttribute('viewBox', '0 0 67733 38100');
+  svgEl.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+  svgEl.style.fontFamily = "'DM Sans', sans-serif";
+  svgEl.innerHTML = vkBuildCanvas(data);
+}
+
+/* ═══ END VK SHARED CANVAS BUILDER ═══ */
+
+
+/* ══════════════════════════════════════════
+   STATE
+══════════════════════════════════════════ */
+let lang = 'nl';
+let step = 'intro'; // intro → wait → cluster → voteopen → results → final
+let visionSentence = '';
+let facView = true;
+
+// All participant submissions: [{name, themes:[...]}]
+let submissions = [];
+// Clusters: [{id, name, colorCls, answers:[{text,author}]}]
+let clusters = [];
+// Votes per participant: [{name, votes:{clusterId:pts}}]
+let votes = [];
+// Selected themes (after results)
+let selectedThemes = [];
+
+// Drag-drop state
+let draggedChip = null;
+let draggedFromCluster = null;
+let clusterIdCounter = 0;
+
+const CLUSTER_COLORS = ['cl-teal','cl-purple','cl-amber','cl-blue','cl-coral','cl-green'];
+const THEME_COLORS_CANVAS = ['#70A2D7','#BDD24D','#E8423F','#9666AA','#2A9791'];
+const THEME_COLORS_CSS = ['var(--blue)','var(--green)','var(--red)','var(--purple)','var(--teal)'];
+const THEME_BG_CSS = ['var(--bl)','var(--gl)','var(--cll)','var(--pl)','var(--tl)'];
+
+// Value-based werkwoord-detectie state
+// Per-field laatste-gewaarschuwde waarde. Als de huidige waarde gelijk is
+// aan de laatst-gewaarschuwde, niet opnieuw waarschuwen. Wijzigt de waarde,
+// dan wordt opnieuw gecontroleerd. Werkt voor blur, ENTER, TAB en submit.
+let lastWarnedValueByField = {};
+let currentVerbField = null;
+
+// Dutch verb detection
+const VERB_PREFIXES = ['ver','ont','be','her','op','af','in','uit','aan','samen','door','over','onder','bij','mee','na'];
+const VERB_SUFFIXES = ['iseren','aliseren','ificeren','iviseren'];
+const COMMON_VERBS = ['maken','werken','bouwen','groeien','leren','bieden','sturen','leiden','dragen','halen','zetten','geven','krijgen','stellen','delen','brengen','nemen','vinden','helpen','voeren','doen','zijn','hebben','kunnen','willen','mogen','moeten'];
+const VERB_PREFIXES_EN = ['re','de','un','dis','pre','en','em','mis','over','under'];
+const COMMON_VERBS_EN = ['make','build','grow','learn','offer','lead','reach','set','give','share','take','find','help','do','be','have','can','will','should','must','improve','optimize','optimise','develop'];
+
+function looksLikeVerb(text) {
+  const t = String(text||'').trim().toLowerCase();
+  if (!t || t.length < 4) return false;
+  const firstWord = t.split(/[\s,-]+/)[0];
+  if (firstWord.length < 4) return false;
+  if (lang === 'en') {
+    // Engelse heuristiek: gerund (-ing), infinitief (to X), of bekende werkwoordsvorm
+    if (firstWord.endsWith('ing') && firstWord.length > 5) return true;
+    if (t.startsWith('to ')) return true;
+    if (VERB_PREFIXES_EN.some(p => firstWord.startsWith(p) && firstWord.length > p.length + 2)
+        && (firstWord.endsWith('e') || firstWord.endsWith('ed') || firstWord.endsWith('ize') || firstWord.endsWith('ise'))) return true;
+    if (COMMON_VERBS_EN.includes(firstWord)) return true;
+    return false;
+  }
+  // Nederlandse heuristiek (zoals voorheen)
+  if (!firstWord.endsWith('en')) return false;
+  if (VERB_SUFFIXES.some(s => firstWord.endsWith(s))) return true;
+  if (VERB_PREFIXES.some(p => firstWord.startsWith(p) && firstWord.length > p.length + 2)) return true;
+  if (COMMON_VERBS.some(v => firstWord === v || firstWord.endsWith(v))) return true;
+  return false;
+}
+
+function escapeHtml(s){
+  return String(s||'').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ══════════════════════════════════════════
+   TRANSLATIONS  (T-object, fase 1 patroon §5.1)
+══════════════════════════════════════════ */
+const T = {
+  nl:{
+    phasePill:'Fase 2 · Thema\'s',
+    pvBtn:'Deelnemer-view →',
+    introTitle:'Fase 2 — Thema\'s bepalen',
+    introSub:'Maximaal 5 strategische thema\'s, co-creatief, AI-geclusterd, dot-voting',
+    visionLabel:'Onze stip op de horizon',visionLabel2:'Onze stip op de horizon',vl3:'Onze stip op de horizon',
+    introWhatTitle:'Wat is een thema?',
+    introWhatBody:'Een thema is een structureel aandachts- of ontwikkelgebied dat nodig is om de stip op de horizon te realiseren. Thema\'s zijn brede pijlers, geen acties: ze beschrijven wáár we in moeten groeien, niet wat we precies gaan doen. Een thema bevat doorgaans meerdere onderliggende acties of initiatieven (die volgen in fase 3).',
+    introHowTitle:'Hoe komen we tot de thema\'s?',
+    introHowBody:'Iedere deelnemer formuleert eerst maximaal vijf thema\'s op zijn eigen device. AI groepeert vergelijkbare antwoorden tot kandidaat-thema\'s. Het team controleert de groepering en bewerkt namen indien nodig. Vervolgens stemt iedereen via dot-voting (5-4-3-2-1) op de kandidaten. De facilitator kiest op basis van de scores maximaal vijf definitieve thema\'s.',
+    introBotInfo:'Deelnemers ontvangen instructies zodra je start',
+    introStart:'Fase 2 starten',
+    startConfirmTitle:'Hebben alle deelnemers de toelichting gelezen en is de vervolgaanpak voor iedereen duidelijk?',
+    startConfirmBody:'Klik deze melding weg als dat zo is. De knop wordt dan groen; klik daarna nogmaals op \"Fase 2 starten\" om te beginnen.',
+    startConfirmBtn:'Akkoord',
+    introItems:[
+      {icon:'5',title:'Maximaal vijf thema\'s',sub:'Elk thema is een brede pijler onder de stip op de horizon'},
+      {icon:'people-svg',title:'Iedereen doet mee',sub:'Deelnemers formuleren elk maximaal vijf thema\'s op eigen device'},
+      {icon:'AI',title:'AI clustert',sub:'Verwante thema\'s worden automatisch tot kandidaat-thema\'s gegroepeerd'},
+      {icon:'✓',title:'Samen kiezen',sub:'Dot-voting bepaalt prioriteit, facilitator bevestigt maximaal vijf thema\'s'},
+    ],
+    waitTitle:'Wachten op thema-inzendingen',
+    waitSub:'Deelnemers vullen nu hun thema\'s in op hun eigen apparaat',
+    liveLabel:'Live antwoorden binnengekomen',
+    waitBot:'Klik om te clusteren zodra je genoeg input hebt',
+    waitWarnLow:'Nog weinig inzendingen, je kunt alvast clusteren met wat beschikbaar is.',
+    clusterBtnLabel:'AI-clustering starten',
+    aiTitle:'Thema\'s worden geclusterd…',
+    aiSub:'AI groepeert inhoudelijk verwante antwoorden tot kandidaat-thema\'s.',
+    clTitle:'Kandidaat-thema\'s controleren en aanpassen',
+    clSub:'Sleep antwoorden naar een ander kandidaat-thema, hernoem namen, voeg toe of verwijder leeg',
+    clEditHint:'Klik op een naam om te hernoemen. Sleep antwoorden tussen kandidaat-thema\'s. Meer dan vijf kandidaat-thema\'s is prima, na de stemronde kiezen we maximaal vijf definitieve thema\'s.',
+    addCluster:'Nieuw kandidaat-thema toevoegen',
+    clBot:'Pas aan tot de groepering klopt',
+    clConfirm:'Bevestigen & stemmen openen',
+    voTitle:'Dot-voting is open',
+    voSub:'Deelnemers kennen punten toe aan kandidaat-thema\'s (5-4-3-2-1)',
+    voExplainTitle:'Hoe werkt dot-voting?',
+    voExplainBody:'Iedere deelnemer geeft punten aan maximaal vijf kandidaat-thema\'s: 5 punten voor het belangrijkste, daarna 4, 3, 2 en 1. Elk puntenaantal mag maar één keer worden gegeven. De gemiddelde score per kandidaat-thema bepaalt de volgorde in de resultaten.',
+    votesIn:'Stemmen binnengekomen',
+    voBot:'Sluit de stemronde zodra het klaar is',
+    voResults:'Resultaten tonen',
+    resTitle:'Selecteer maximaal 5 thema\'s',
+    resSub:'Gerangschikt op gemiddelde score, klik om te selecteren of deselecteren',
+    resBot:'van max. 5 thema\'s geselecteerd',
+    resConfirm:'Thema\'s bevestigen',
+    finalBadge:'Fase 2 voltooid',
+    finalTitle:'Thema\'s bepaald',
+    finalNote:'Deze thema\'s vormen de structurele pijlers voor fase 3 en verder.',
+    afterConfirmTitle:'Wat doen deze thema\'s?',
+    afterConfirmItems:[
+      {h:'Strategische pijlers',b:'De gekozen thema\'s vormen het kader waarbinnen alle latere acties en prioriteiten passen.'},
+      {h:'Toetssteen voor acties',b:'In fase 3 worden acties geformuleerd onder de thema\'s; thema\'s die geen acties dragen, horen niet bij de stip.'},
+      {h:'Lijn naar de roadmap',b:'De thema\'s bepalen mede hoe versnellers, remmers en de uiteindelijke roadmap worden geprioriteerd.'},
+    ],
+    toPhase3:'Naar fase 3 →',
+    vtResults:'Uitkomsten',vtCanvas:'Visuele weergave',
+    canvasTitle:'Visiekaart canvas — fase 1 & 2',
+    canvasSub:'Thema\'s zijn nu zichtbaar in de bollen',
+    canvasNote:'Versnellers & remmers verschijnen in fase 4 · Roadmap in fase 5',
+    canvasLegendTitle:'Volledige themanamen',
+    pBack:'← Facilitator-view',
+    p2phase:'Fase 2 · Thema\'s',
+    pPreWaitTitle:'Fase 2 — Thema\'s bepalen',
+    pPreWaitSub:'Korte uitleg over wat we in deze fase doen. De invoer verschijnt zodra de facilitator de fase start.',
+    pPreWaitWaiting:'Wachten op de facilitator…',
+    pvl:'Onze stip op de horizon',pvl2:'Onze stip op de horizon',
+    pIntroWhatTitle:'Wat is een thema?',
+    pIntroWhatBody:'Een thema is een structureel aandachts- of ontwikkelgebied. Het is breder dan een actie en bevat meerdere onderliggende activiteiten. Thema\'s helpen ons om gefocust te bouwen aan de stip op de horizon.',
+    pIntroHowTitle:'Hoe komen we tot de thema\'s?',
+    pIntroHowBody:'Jij vult straks zelf maximaal vijf thema\'s in. AI groepeert vergelijkbare antwoorden, jullie bespreken samen de kandidaat-thema\'s en stemmen via dot-voting. Op basis van de score selecteert de facilitator maximaal vijf definitieve thema\'s.',
+    instrTitle:'Wat is een thema?',
+    instrText:'Een thema is een structureel aandachts- of ontwikkelgebied dat nodig is om de stip op de horizon te realiseren. Je formuleert het als zelfstandig naamwoord. Het is breder dan één actie en bevat meerdere onderliggende activiteiten.',
+    examplesPos:'Voorbeelden van thema\'s',
+    examplesNeg:'Géén thema\'s (dit zijn acties, die komen pas in fase 3)',
+    examples:['klantinzicht','kennisdeling','procesverbetering','kwaliteitsborging','digitale ondersteuning'],
+    examplesNegList:['interviewen van klanten','dashboard bouwen','medewerkers trainen','procedures opstellen'],
+    pQuestion:'Om deze stip op de horizon waar te maken, moeten we structureel sterker worden in…',
+    addThemeField:'Veld toevoegen',
+    pSubmit:'Thema\'s insturen',
+    p2WaitTitle:'Thema\'s verstuurd',
+    p2WaitSub:'De facilitator verwerkt de antwoorden en stelt kandidaat-thema\'s op. Even geduld…',
+    p2VoteTitle:'Stem op de kandidaat-thema\'s',
+    p2VoteSub:'Geef punten aan maximaal vijf kandidaat-thema\'s (5, 4, 3, 2 en 1). Elk puntenaantal mag je maar één keer gebruiken.',
+    pVoExplainTitle:'Hoe werkt dot-voting?',
+    pVoExplainBody:'Geef punten aan maximaal vijf kandidaat-thema\'s: 5 punten voor het belangrijkste, daarna 4, 3, 2 en 1. Open "Onderliggende input" als je wilt zien welke antwoorden onder een kandidaat-thema vallen.',
+    pVoteSubmit:'Stem versturen',
+    pSourceOpen:'Onderliggende input bekijken',
+    pSourceClose:'Onderliggende input verbergen',
+    p2WRTitle:'Stem ontvangen',
+    p2WRSub:'De facilitator selecteert nu de definitieve thema\'s…',
+    p2FinalTitle:'Thema\'s bepaald',
+    p2FinalSub:'Dit zijn de strategische pijlers',
+    p2Next:'Fase 3 start zodra de facilitator aangeeft',
+    verbTitle:'Weet je zeker dat dit een thema is?',
+    verbBody:'Het lijkt of je een actie of werkwoord hebt ingevuld. Een thema begint vaak met een zelfstandig naamwoord. Controleer aan de hand van deze drie criteria:',
+    cr1:'Is wat je hebt ingevuld <strong>structureel belangrijk</strong> voor het realiseren van de stip op de horizon?',
+    cr2:'Is dit <strong>breder dan één actie</strong>?',
+    cr3:'Kunnen er <strong>meerdere acties of initiatieven</strong> onder vallen?',
+    verbConclusion:'Drie keer "ja"? Dan is het een thema. Anders, pas je antwoord aan.',
+    verbClose:'Sluiten',
+    onderbouwingBtn:'Onderbouwing',
+    onderbouwingTitle:'Theoretische onderbouwing — fase 2',
+    onderbouwingBody:'Een visie geeft richting, maar wordt pas concreet als jullie weten op welke gebieden het werk vooruit moet. Thema\'s zijn die strategische pijlers: brede aandachtsgebieden waar acties uit voortvloeien. In deze fase brengen deelnemers ieder hun eigen perspectief in: welke gebieden moeten structureel sterker worden om de stip op de horizon te realiseren? AI groepeert vergelijkbare antwoorden tot kandidaat-thema\'s, het team bespreekt en past de groepering aan, en via dot-voting kiest de groep maximaal vijf definitieve thema\'s. Deze thema\'s vormen het skelet voor fase 3 (activiteiten), fase 4 (versnellers/remmers) en fase 5 (roadmap).',
+    onderbouwingClose:'Sluiten',
+    // Cross-fase shared keys (v4)
+    tipClose:'Sluiten',
+    vkBackEdit:'Aanpassen',
+    pOnderbouwingBtnLabel:'Onderbouwing',
+    summaryLabel:'Wat we vandaag doen',
+    pFacLabel:'Begeleid door:',
+    pFacUnknown:'(facilitator nog niet ingevuld in fase 0)',
+    summaryTpl:'Vandaag stellen we een {type} op, op {scale}, onder de naam \'{name}\'. Het is een plan met {urg} urgentie, waarvoor we {bud} budget hebben en met een tijdshorizon van {hor}.',
+    summaryTplNoName:'Vandaag stellen we een {type} op, op {scale}. Het is een plan met {urg} urgentie, waarvoor we {bud} budget hebben en met een tijdshorizon van {hor}.',
+    summaryFallback:'De facilitator heeft de sessie gestart.',
+    answers:'antwoorden',
+    avg:'gem.',
+    thema:'Thema',
+    newClusterName:'Nieuw kandidaat-thema',
+    sourceLabel:'Onderliggende input',
+    tieText:'Gelijke score gedetecteerd. Bespreek met de deelnemers welke thema\'s worden opgenomen.',
+    pYou:'Jij',
+    // Sessie-info paneel
+    sessTitle:'Sessie-info',
+    sessOrg:'Organisatie',
+    sessName:'Sessienaam',
+    sessType:'Type sessie',
+    sessScale:'Schaal',
+    sessUrgency:'Urgentie',
+    sessBudget:'Budget',
+    sessHorizon:'Tijdshorizon',
+    sessNoData:'Geen sessiedata, open fase 0 om een sessie aan te maken.',
+    sessMiniTpl:'{org} · {name}',
+    sessTypeLbl:{strategisch:'strategisch plan',jaarplan:'jaarplan',project:'project',anders:'sessie'},
+    sessTypeLblFull:{strategisch:'Strategisch plan',jaarplan:'Jaarplan',project:'Project',anders:'Anders'},
+    scaleLbl:{team:'teamniveau',afdeling:'afdelingsniveau',organisatie:'organisatieniveau',netwerk:'netwerk- of ketenniveau'},
+    scaleLblFull:{team:'Team',afdeling:'Afdeling',organisatie:'Organisatie',netwerk:'Netwerk / keten'},
+    urgLbl:{laag:'lage',medium:'gemiddelde',hoog:'hoge'},
+    urgLblFull:{laag:'Laag',medium:'Medium',hoog:'Hoog'},
+    budLbl:{beperkt:'beperkt',voldoende:'voldoende',ruim:'ruim',onbekend:'nog onbekend'},
+    budLblFull:{beperkt:'Beperkt',voldoende:'Voldoende',ruim:'Ruim',onbekend:'Onbekend'},
+    horLbl:{'<1jr':'minder dan 1 jaar','1-3jr':'1 tot 3 jaar','3-5jr':'3 tot 5 jaar','5+jr':'5 jaar of meer'},
+    horLblFull:{'<1jr':'< 1 jaar','1-3jr':'1 tot 3 jaar','3-5jr':'3 tot 5 jaar','5+jr':'5 jaar of meer'},
+    unnamedSession:'Naamloze sessie',
+    // Alerts en confirms
+    resetConfirm:'Alle sessiedata wissen (stip-zin, thema\'s, acties, scores, roadmap)?\n\nDe demo-defaults worden hersteld bij de volgende pagina.',
+    resetDone:'Demo-data gewist. Pagina wordt herladen.',
+    goPhase1Confirm:'Terug naar fase 1? Sessie-data blijft bewaard.',
+    goPhase3Confirm:'Naar fase 3 gaan? Sessie-data blijft bewaard.',
+    // Info-popover teksten
+    infoIntro:'Een thema is een structureel aandachts- of ontwikkelgebied dat nodig is om de stip op de horizon te realiseren. Ieder formuleert maximaal vijf thema\'s op eigen device; AI groepeert verwante antwoorden tot kandidaat-thema\'s; het team controleert de groepering, stemt met dot-voting (5-4-3-2-1) en de facilitator selecteert maximaal vijf definitieve thema\'s.',
+    infoThemeInput:'Goede thema\'s zijn brede pijlers (zelfstandige naamwoorden of begrippen) die meerdere acties of initiatieven dragen. Niet doen: één-op-één acties of werkwoorden invullen (die komen pas in fase 3).',
+    pFacilitatorLabel:'Begeleid door',
+  },
+  en:{
+    phasePill:'Phase 2 · Themes',
+    pvBtn:'Participant view →',
+    introTitle:'Phase 2 — Determine themes',
+    introSub:'Up to 5 strategic themes, co-creative, AI-clustered, dot-voting',
+    visionLabel:'Our dot on the horizon',visionLabel2:'Our dot on the horizon',vl3:'Our dot on the horizon',
+    introWhatTitle:'What is a theme?',
+    introWhatBody:'A theme is a structural focus or development area needed to realise the dot on the horizon. Themes are broad pillars, not actions: they describe where we need to grow, not exactly what we will do. A theme typically contains multiple underlying actions or initiatives (which follow in phase 3).',
+    introHowTitle:'How do we get to the themes?',
+    introHowBody:'Each participant first formulates up to five themes on their own device. AI groups similar answers into candidate themes. The team checks the grouping and renames where needed. Then everyone votes through dot-voting (5-4-3-2-1) on the candidates. Based on the scores, the facilitator selects up to five definitive themes.',
+    introBotInfo:'Participants get instructions as soon as you start',
+    introStart:'Start phase 2',
+    startConfirmTitle:'Have all participants read the explanation and is the next approach clear to everyone?',
+    startConfirmBody:'Dismiss this message if so. The button then turns green; click \"Start phase 2\" again to begin.',
+    startConfirmBtn:'Agreed',
+    introItems:[
+      {icon:'5',title:'Up to five themes',sub:'Each theme is a broad pillar under the dot on the horizon'},
+      {icon:'people-svg',title:'Everyone participates',sub:'Each participant formulates up to five themes on their own device'},
+      {icon:'AI',title:'AI clusters',sub:'Related themes are automatically grouped into candidate themes'},
+      {icon:'✓',title:'Choose together',sub:'Dot-voting sets priority, facilitator confirms up to five themes'},
+    ],
+    waitTitle:'Waiting for theme submissions',
+    waitSub:'Participants are now filling in their themes on their own device',
+    liveLabel:'Live answers received',
+    waitBot:'Click to start clustering once you have enough input',
+    waitWarnLow:'Few submissions so far, you can start clustering with what is available.',
+    clusterBtnLabel:'Start AI clustering',
+    aiTitle:'Themes are being clustered…',
+    aiSub:'AI groups thematically related answers into candidate themes.',
+    clTitle:'Review and adjust candidate themes',
+    clSub:'Drag answers to another candidate theme, rename, add new, or remove empty ones',
+    clEditHint:'Click a name to rename. Drag answers between candidate themes. More than five candidate themes is fine, after the voting round we pick up to five definitive themes.',
+    addCluster:'Add new candidate theme',
+    clBot:'Adjust until the grouping is right',
+    clConfirm:'Confirm & open voting',
+    voTitle:'Dot-voting is open',
+    voSub:'Participants assign points to candidate themes (5-4-3-2-1)',
+    voExplainTitle:'How does dot-voting work?',
+    voExplainBody:'Each participant gives points to up to five candidate themes: 5 points for the most important, then 4, 3, 2 and 1. Each value can be used only once. The average score per candidate theme determines the ranking in the results.',
+    votesIn:'Votes received',
+    voBot:'Close the voting round once it is finished',
+    voResults:'Show results',
+    resTitle:'Select up to 5 themes',
+    resSub:'Ranked by average score, click to select or deselect',
+    resBot:'of max. 5 themes selected',
+    resConfirm:'Confirm themes',
+    finalBadge:'Phase 2 complete',
+    finalTitle:'Themes determined',
+    finalNote:'These themes form the structural pillars for phase 3 and beyond.',
+    afterConfirmTitle:'What do these themes do?',
+    afterConfirmItems:[
+      {h:'Strategic pillars',b:'The chosen themes form the frame within which all later actions and priorities fit.'},
+      {h:'Touchstone for actions',b:'In phase 3 we formulate actions under the themes; themes that carry no actions do not really belong to the dot.'},
+      {h:'Line to the roadmap',b:'The themes co-determine how accelerators, obstacles and the final roadmap are prioritised.'},
+    ],
+    toPhase3:'To phase 3 →',
+    vtResults:'Results',vtCanvas:'Visual view',
+    canvasTitle:'Visiekaart canvas — phase 1 & 2',
+    canvasSub:'Themes are now visible in the bubbles',
+    canvasNote:'Accelerators & obstacles appear in phase 4 · Roadmap in phase 5',
+    canvasLegendTitle:'Full theme names',
+    pBack:'← Facilitator view',
+    p2phase:'Phase 2 · Themes',
+    pPreWaitTitle:'Phase 2 — Determine themes',
+    pPreWaitSub:'A brief explanation of what we do in this phase. Input appears once the facilitator starts the phase.',
+    pPreWaitWaiting:'Waiting for the facilitator…',
+    pvl:'Our dot on the horizon',pvl2:'Our dot on the horizon',
+    pIntroWhatTitle:'What is a theme?',
+    pIntroWhatBody:'A theme is a structural focus or development area. It is broader than an action and contains multiple underlying activities. Themes help us to build towards the dot on the horizon in a focused way.',
+    pIntroHowTitle:'How do we get to the themes?',
+    pIntroHowBody:'You will fill in up to five themes yourself. AI groups similar answers, you discuss the candidate themes together and vote through dot-voting. Based on the score, the facilitator selects up to five definitive themes.',
+    instrTitle:'What is a theme?',
+    instrText:'A theme is a structural focus or development area needed to realise the dot on the horizon. Formulate it as a noun. It is broader than one action and contains multiple underlying activities.',
+    examplesPos:'Examples of themes',
+    examplesNeg:'Not themes (these are actions, they come in phase 3)',
+    examples:['customer insight','knowledge sharing','process improvement','quality assurance','digital support'],
+    examplesNegList:['interviewing customers','building a dashboard','training staff','writing procedures'],
+    pQuestion:'To realise this dot on the horizon, we need to structurally improve in…',
+    addThemeField:'Add field',
+    pSubmit:'Submit themes',
+    p2WaitTitle:'Themes submitted',
+    p2WaitSub:'The facilitator is processing the answers and forming candidate themes. Please wait…',
+    p2VoteTitle:'Vote on the candidate themes',
+    p2VoteSub:'Give points to up to five candidate themes (5, 4, 3, 2 and 1). Each value only once.',
+    pVoExplainTitle:'How does dot-voting work?',
+    pVoExplainBody:'Give points to up to five candidate themes: 5 points for the most important, then 4, 3, 2 and 1. Open "View underlying input" to see which answers fall under a candidate theme.',
+    pVoteSubmit:'Submit vote',
+    pSourceOpen:'View underlying input',
+    pSourceClose:'Hide underlying input',
+    p2WRTitle:'Vote received',
+    p2WRSub:'The facilitator is now selecting the definitive themes…',
+    p2FinalTitle:'Themes determined',
+    p2FinalSub:'These are the strategic pillars',
+    p2Next:'Phase 3 starts when the facilitator indicates',
+    verbTitle:'Are you sure this is a theme?',
+    verbBody:'It looks like you entered an action or verb. A theme usually starts with a noun. Check against the three criteria:',
+    cr1:'Is what you entered <strong>structurally important</strong> for realising the dot on the horizon?',
+    cr2:'Is this <strong>broader than one action</strong>?',
+    cr3:'Can <strong>multiple actions or initiatives</strong> fall under it?',
+    verbConclusion:'Three yes-answers? Then it is a theme. Otherwise, adjust your answer.',
+    verbClose:'Close',
+    onderbouwingBtn:'Background',
+    onderbouwingTitle:'Theoretical background — phase 2',
+    onderbouwingBody:'A vision sets direction, but only becomes concrete when you know in which areas the work must move forward. Themes are those strategic pillars: broad focus areas from which actions arise. In this phase, participants each bring their own perspective: which areas must become structurally stronger to realise the dot on the horizon? AI groups similar answers into candidate themes, the team discusses and adjusts the grouping, and through dot-voting the group selects up to five definitive themes. These themes form the skeleton for phase 3 (activities), phase 4 (accelerators/obstacles) and phase 5 (roadmap).',
+    onderbouwingClose:'Close',
+    // Cross-fase shared keys (v4)
+    tipClose:'Close',
+    vkBackEdit:'Edit',
+    pOnderbouwingBtnLabel:'Theory',
+    summaryLabel:'What we are doing today',
+    pFacLabel:'Facilitated by:',
+    pFacUnknown:'(facilitator not yet filled in in phase 0)',
+    summaryTpl:'Today we are drawing up a {type}, at {scale}, under the name \'{name}\'. It is a plan with {urg} urgency, for which we have {bud} budget and a time horizon of {hor}.',
+    summaryTplNoName:'Today we are drawing up a {type}, at {scale}. It is a plan with {urg} urgency, for which we have {bud} budget and a time horizon of {hor}.',
+    summaryFallback:'The facilitator has started the session.',
+    answers:'answers',
+    avg:'avg.',
+    thema:'Theme',
+    newClusterName:'New candidate theme',
+    sourceLabel:'Underlying input',
+    tieText:'Tie score detected. Discuss with participants which themes to include.',
+    pYou:'You',
+    sessTitle:'Session info',
+    sessOrg:'Organisation',
+    sessName:'Session name',
+    sessType:'Session type',
+    sessScale:'Scale',
+    sessUrgency:'Urgency',
+    sessBudget:'Budget',
+    sessHorizon:'Time horizon',
+    sessNoData:'No session data, open phase 0 to create one.',
+    sessMiniTpl:'{org} · {name}',
+    sessTypeLbl:{strategisch:'strategic plan',jaarplan:'annual plan',project:'project',anders:'session'},
+    sessTypeLblFull:{strategisch:'Strategic plan',jaarplan:'Annual plan',project:'Project',anders:'Other'},
+    scaleLbl:{team:'team level',afdeling:'department level',organisatie:'organisation level',netwerk:'network or chain level'},
+    scaleLblFull:{team:'Team',afdeling:'Department',organisatie:'Organisation',netwerk:'Network / chain'},
+    urgLbl:{laag:'low',medium:'medium',hoog:'high'},
+    urgLblFull:{laag:'Low',medium:'Medium',hoog:'High'},
+    budLbl:{beperkt:'limited',voldoende:'sufficient',ruim:'generous',onbekend:'still unknown'},
+    budLblFull:{beperkt:'Limited',voldoende:'Sufficient',ruim:'Generous',onbekend:'Unknown'},
+    horLbl:{'<1jr':'less than 1 year','1-3jr':'1 to 3 years','3-5jr':'3 to 5 years','5+jr':'5 years or more'},
+    horLblFull:{'<1jr':'< 1 year','1-3jr':'1 to 3 years','3-5jr':'3 to 5 years','5+jr':'5 years or more'},
+    unnamedSession:'Unnamed session',
+    resetConfirm:'Clear all session data (dot sentence, themes, actions, scores, roadmap)?\n\nDemo defaults will be restored on the next page.',
+    resetDone:'Demo data cleared. Page will reload.',
+    goPhase1Confirm:'Back to phase 1? Session data is preserved.',
+    goPhase3Confirm:'Go to phase 3? Session data is preserved.',
+    infoIntro:'A theme is a structural focus or development area needed to realise the dot on the horizon. Each participant formulates up to five themes on their own device; AI groups similar answers into candidate themes; the team reviews the grouping, votes via dot-voting (5-4-3-2-1), and the facilitator selects up to five definitive themes.',
+    infoThemeInput:'Good themes are broad pillars (nouns or concepts) that hold multiple actions or initiatives. Avoid: entering one-off actions or verbs (those come in phase 3).',
+    pFacilitatorLabel:'Facilitated by',
+  }
+};
+
+/* ══════════════════════════════════════════
+   DEMO DATA
+══════════════════════════════════════════ */
+const DEMO = {
+  nl:[
+    {name:'Lisa',themes:['klantgerichtheid','kwaliteitsborging','kennisdeling','digitale ondersteuning','samenwerking']},
+    {name:'Pieter',themes:['cliënttevredenheid','procesverbetering','teamontwikkeling','ICT-infrastructuur','externe samenwerking']},
+    {name:'Sara',themes:['klantbeleving','kwaliteitsmanagement','medewerkersinzet','automatisering','partnerschap']},
+    {name:'Tom',themes:['klantinzicht','efficiencyverbetering','personeelsontwikkeling','digitalisering','netwerksamenwerking']},
+    {name:'Aisha',themes:['klantenservice','procesoptimalisatie','vakmanschap','technologie','ketenregie']},
+  ],
+  en:[
+    {name:'Lisa',themes:['customer focus','quality assurance','knowledge sharing','digital support','collaboration']},
+    {name:'Pieter',themes:['client satisfaction','process improvement','team development','IT infrastructure','external collaboration']},
+    {name:'Sara',themes:['customer experience','quality management','staff deployment','automation','partnership']},
+    {name:'Tom',themes:['customer insight','efficiency improvement','staff development','digitalisation','network collaboration']},
+    {name:'Aisha',themes:['customer service','process optimisation','craftsmanship','technology','chain management']},
+  ]
+};
+
+const DEMO_CLUSTERS = {
+  nl:[
+    {name:'Klantgerichtheid',colorCls:'cl-teal',answers:['klantgerichtheid','cliënttevredenheid','klantbeleving','klantinzicht','klantenservice']},
+    {name:'Kwaliteit & processen',colorCls:'cl-purple',answers:['kwaliteitsborging','procesverbetering','kwaliteitsmanagement','efficiencyverbetering','procesoptimalisatie']},
+    {name:'Medewerkers & ontwikkeling',colorCls:'cl-amber',answers:['kennisdeling','teamontwikkeling','personeelsontwikkeling']},
+    {name:'Vakmanschap & cultuur',colorCls:'cl-green',answers:['medewerkersinzet','vakmanschap']},
+    {name:'Digitalisering',colorCls:'cl-blue',answers:['digitale ondersteuning','ICT-infrastructuur','automatisering','digitalisering','technologie']},
+    {name:'Samenwerking',colorCls:'cl-coral',answers:['samenwerking','externe samenwerking','partnerschap','netwerksamenwerking','ketenregie']},
+  ],
+  en:[
+    {name:'Customer focus',colorCls:'cl-teal',answers:['customer focus','client satisfaction','customer experience','customer insight','customer service']},
+    {name:'Quality & processes',colorCls:'cl-purple',answers:['quality assurance','process improvement','quality management','efficiency improvement','process optimisation']},
+    {name:'Staff & development',colorCls:'cl-amber',answers:['knowledge sharing','team development','staff development']},
+    {name:'Craftsmanship & culture',colorCls:'cl-green',answers:['staff deployment','craftsmanship']},
+    {name:'Digitalisation',colorCls:'cl-blue',answers:['digital support','IT infrastructure','automation','digitalisation','technology']},
+    {name:'Collaboration',colorCls:'cl-coral',answers:['collaboration','external collaboration','partnership','network collaboration','chain management']},
+  ]
+};
+
+const DEMO_VOTES = {
+  nl:[
+    {name:'Lisa',  votes:{0:5,1:4,2:3,3:1,4:2,5:0}},
+    {name:'Pieter',votes:{0:4,1:5,2:2,3:0,4:3,5:1}},
+    {name:'Sara',  votes:{0:5,1:3,2:4,3:2,4:1,5:0}},
+    {name:'Tom',   votes:{0:3,1:4,2:5,3:1,4:2,5:0}},
+    {name:'Aisha', votes:{0:5,1:2,2:4,3:0,4:3,5:1}},
+  ],
+  en:[
+    {name:'Lisa',  votes:{0:5,1:4,2:3,3:1,4:2,5:0}},
+    {name:'Pieter',votes:{0:4,1:5,2:2,3:0,4:3,5:1}},
+    {name:'Sara',  votes:{0:5,1:3,2:4,3:2,4:1,5:0}},
+    {name:'Tom',   votes:{0:3,1:4,2:5,3:1,4:2,5:0}},
+    {name:'Aisha', votes:{0:5,1:2,2:4,3:0,4:3,5:1}},
+  ]
+};
+
+const STEPS=['intro','wait','cluster','voteopen','results','final'];
+
+/* ══════════════════════════════════════════
+   VK SHARED ENVIRONMENT DETECTION (v4)
+══════════════════════════════════════════ */
+function isProductionMode(){
+  const host = (window.location.hostname || '').toLowerCase();
+  const protocol = window.location.protocol;
+  if (protocol === 'file:') return false;
+  if (host === '' || host === 'localhost' || host === '127.0.0.1' || host === '::1') return false;
+  if (/^192\.168\./.test(host)) return false;
+  if (/^10\./.test(host)) return false;
+  if (/^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(host)) return false;
+  if (/\.local$/.test(host)) return false;
+  return true;
+}
+function vkApplyEnvironmentRules(){
+  if (!isProductionMode()) return;
+  document.querySelectorAll('[data-env="dev-only"]').forEach(el => { el.style.display = 'none'; });
+  window.__VK_PROD = true;
+}
+
+/* ══════════ VK LIVE-MODE SWITCH (Cluster A / B1) ══════════
+   VK_LIVE = echte data + AI; false = demo-simulatie. Eén bron-van-waarheid voor alle fasen. */
+const VK_LIVE = isProductionMode();
+if (typeof window.__VK_TOKEN === 'undefined') window.__VK_TOKEN = '';
+
+/* ── Rol- en sessiedetectie (Blok 2) — identiek aan fase 1 ── */
+const VK_JOIN_CODE = (function(){
+  try {
+    // Fasebestanden worden uitsluitend bereikt met ?join={code} in de query
+    // (via join.html en fase-naar-fase-navigatie), nooit onder een /join/-pad.
+    // Code alleen uit de query lezen voorkomt dat de /join/{seg}-regex per
+    // ongeluk de bestandsnaam (bv. 'visiekaart_fase1') als sessiecode oppikt.
+    const q = new URLSearchParams(location.search);
+    return q.get('join') || q.get('code') || null;
+  } catch(e){ return null; }
+})();
+const VK_IS_PARTICIPANT = !!VK_JOIN_CODE;
+function vkLiveCode(){
+  if (VK_JOIN_CODE) return VK_JOIN_CODE;
+  try { return (JSON.parse(localStorage.getItem('vk_session')||'{}')).sessionCode || ''; } catch(e){ return ''; }
+}
+function vkParseStage(raw){
+  if (raw == null) return null;
+  if (typeof raw === 'object') return raw;
+  try { return JSON.parse(raw); } catch(e){ return { stage: String(raw) }; }
+}
+/* Compacte clusters voor de deelnemer-stemkaart (reist mee in de stage-payload). */
+function vkSerializeClusters(){
+  try { return (clusters||[]).map(c=>({ id:c.id, name:c.name, colorCls:c.colorCls,
+    answers:(c.answers||[]).map(a=>({text:(a&&a.text)||''})) })); } catch(e){ return []; }
+}
+
+/* ══════════ VK AI-HELPER (Cluster A) — ingebouwde vk-ai.js ══════════
+   Roept de server-side proxy (/vk-ai-proxy.php) aan met timeout en NETTE TERUGVAL:
+   bij elke fout (offline, geen token, parse-fout) reject → de aanroeper gebruikt de
+   bestaande lokale berekening, zodat een sessie nooit vastloopt. De Anthropic-sleutel
+   zit NOOIT hier (werkboek §2/§7.3); de prompt wordt server-side opgebouwd. */
+(function (global) {
+  'use strict';
+  var VK_AI_ENDPOINT = '/vk-ai-proxy.php';
+  var VK_AI_TIMEOUT_MS = 30000;
+  function vkSessionToken() {
+    try { return global.__VK_TOKEN || ''; } catch (e) { return ''; }
+  }
+  function vkCallAI(task, data, opts) {
+    opts = opts || {};
+    var lang = opts.lang || (global.lang) || 'nl';
+    var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var timer = setTimeout(function () { if (controller) controller.abort(); }, opts.timeout || VK_AI_TIMEOUT_MS);
+    return fetch(VK_AI_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CINAB-Token': vkSessionToken() },
+      body: JSON.stringify({ task: task, lang: lang, token: vkSessionToken(), data: data }),
+      signal: controller ? controller.signal : undefined
+    }).then(function (res) {
+      clearTimeout(timer);
+      if (!res.ok) { return res.json().catch(function(){return{};}).then(function(j){ throw mkErr(res.status, j); }); }
+      return res.json();
+    }).then(function (out) {
+      var text = (out && out.text) ? out.text : '';
+      try { return JSON.parse(stripFences(text)); }
+      catch (e) { throw mkErr(0, { error: 'ai_unparsable' }); }
+    }).catch(function (err) {
+      clearTimeout(timer);
+      throw (err && err.__vk) ? err : mkErr(0, { error: 'ai_unreachable' });
+    });
+  }
+  function stripFences(s) { return String(s).replace(/```json/gi, '').replace(/```/g, '').trim(); }
+  function mkErr(status, j) { var e = new Error((j && j.error) || 'ai_error'); e.__vk = true; e.status = status; e.body = j; return e; }
+  global.vkCallAI = vkCallAI;
+})(window);
+
+/* ══════════════════════════════════════════
+   VK SHARED HELPERS (v4)
+   vkEscape() bestaat al bij de canvas-builder. Hier niet opnieuw definiëren.
+══════════════════════════════════════════ */
+function vkFillSentenceTemplate(template, vars){
+  let s = template;
+  for (const k in vars){
+    const v = (vars[k] == null) ? '' : String(vars[k]);
+    s = s.split('{' + k + '}').join(v);
+  }
+  s = s.replace(/\b(op|at)\s+(?=[,\.])/g, '');
+  s = s.replace(/,\s*,/g, ',');
+  s = s.replace(/\s+([,\.])/g, '$1');
+  s = s.replace(/[ \t]+/g, ' ');
+  s = s.replace(/\s*\u2018\s*\u2019\s*/g, ' ');
+  s = s.replace(/\s*''\s*/g, ' ');
+  return s.trim();
+}
+
+/* ══════════════════════════════════════════
+   VK SHARED TIP POPUP (v4)
+══════════════════════════════════════════ */
+function vkOpenTip(opts){
+  // opts: { size:'sm'|'lg', title?, sub?, body:string|array, anchor?:HTMLElement, closeLabel? }
+  const popup    = document.getElementById('vkTipPopup');
+  const backdrop = document.getElementById('vkTipBackdrop');
+  const titleEl  = document.getElementById('vkTipTitle');
+  const subEl    = document.getElementById('vkTipSub');
+  const bodyEl   = document.getElementById('vkTipBody');
+  const closeBtn = document.getElementById('vkTipCloseBtn');
+  if (!popup) return;
+
+  const size = opts.size === 'sm' ? 'sm' : 'lg';
+  popup.setAttribute('data-size', size);
+
+  if (opts.title){ titleEl.textContent = opts.title; titleEl.style.display = ''; }
+  else           { titleEl.textContent = ''; titleEl.style.display = 'none'; }
+  if (opts.sub && size === 'lg'){ subEl.textContent = opts.sub; subEl.style.display = ''; }
+  else                          { subEl.textContent = ''; subEl.style.display = 'none'; }
+
+  const bodyArr = Array.isArray(opts.body) ? opts.body : [opts.body];
+  bodyEl.innerHTML = bodyArr.map(item => {
+    if (item == null) return '';
+    if (typeof item === 'string') return '<p>' + vkEscape(item) + '</p>';
+    if (typeof item === 'object'){
+      let html = '';
+      if (item.h) html += '<div class="vk-tip-h">' + vkEscape(item.h) + '</div>';
+      if (item.p) html += '<p>' + vkEscape(item.p) + '</p>';
+      return html;
+    }
+    return '';
+  }).join('');
+
+  if (closeBtn) closeBtn.textContent = opts.closeLabel || (T[lang] && T[lang].tipClose) || 'Sluiten';
+
+  if (size === 'lg'){
+    backdrop.classList.add('open');
+    popup.style.top = '';
+    popup.style.left = '';
+    popup.style.transform = '';
+  } else {
+    backdrop.classList.remove('open');
+    if (opts.anchor){
+      const r = opts.anchor.getBoundingClientRect();
+      const popW = 340;
+      let left = r.left;
+      if (left + popW > window.innerWidth - 16) left = window.innerWidth - popW - 16;
+      if (left < 16) left = 16;
+      popup.style.left = left + 'px';
+      popup.style.top  = (r.bottom + 12) + 'px';
+      popup.style.transform = '';
+    } else {
+      popup.style.left = '50%';
+      popup.style.top  = '40%';
+      popup.style.transform = 'translate(-50%, -50%)';
+    }
+  }
+
+  popup.classList.add('open');
+  setTimeout(() => popup.querySelector('.vk-tip-close')?.focus(), 50);
+}
+
+function vkCloseTip(){
+  const popup    = document.getElementById('vkTipPopup');
+  const backdrop = document.getElementById('vkTipBackdrop');
+  if (popup)    popup.classList.remove('open');
+  if (backdrop) backdrop.classList.remove('open');
+}
+
+// ── INFO ICON WRAPPER (v4 BUG FIX) ────────────────────────────────────────
+// Inline onclick="..." kan T/lang (const/let) niet zien.
+// Daarom: 'i'-iconen roepen vkInfoOpen('infoXxx', this) aan.
+// Function declarations zijn wél global-bereikbaar én zien T/lang lexically.
+function vkInfoOpen(key, anchor){
+  if (typeof T === 'undefined' || !T[lang]) return;
+  const body = T[lang][key];
+  if (body == null) return;
+  vkOpenTip({ size: 'sm', body: body, anchor: anchor });
+}
+
+// Esc-toets sluit popup (oudere listener handelt onderbouwingModal — die is weg, vkCloseTip vervangt)
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') vkCloseTip();
+});
+// Klik buiten sm-popup sluit
+document.addEventListener('click', e => {
+  const popup = document.getElementById('vkTipPopup');
+  if (!popup || !popup.classList.contains('open')) return;
+  if (popup.getAttribute('data-size') !== 'sm') return;
+  if (popup.contains(e.target)) return;
+  if (e.target.classList && e.target.classList.contains('info-icon')) return;
+  vkCloseTip();
+});
+
+/* ══════════════════════════════════════════
+   LANG  +  applyT  (robuuste tekst-injectie)
+   §5.1, §5.2  uit werkboek
+══════════════════════════════════════════ */
+function setLang(l, opts){
+  if (l !== 'nl' && l !== 'en') return;
+  if (l === lang && !(opts && opts.force)) return;
+  lang = l;
+  vkCloseTip();
+  document.documentElement.lang = l;
+  document.getElementById('lNL').classList.toggle('on', l==='nl');
+  document.getElementById('lEN').classList.toggle('on', l==='en');
+  applyT();
+  // re-render alle dynamische blokken
+  buildIntroGrid();
+  buildQSteps();
+  updateQSteps();
+  renderSessPanel();
+  updatePSummary();
+  // hulp-render voor open schermen
+  if (step==='wait' || step==='voteopen') renderVoteProgress();
+  if (step==='cluster') renderClusterEditor();
+  if (step==='results') renderScoreList();
+  if (step==='final') { buildFinalScreen(); buildCanvas(); buildCanvasLegend(); buildP2Final(); }
+  rebuildPThemeFields();
+  if (document.getElementById('pVoteGrid').children.length) buildPVoteScreen();
+  // examples herrenderen
+  renderExamples();
+  // persist + cross-tab
+  if (!(opts && opts.fromStorage)) {
+    try { localStorage.setItem('vk_lang', l); } catch(e){}
+  }
+}
+
+function applyT(){
+  const t = T[lang];
+  // generieke id="t-..." vervangers — textContent first
+  const replacers = {
+    'phasePill':t.phasePill,'pvBtn':t.pvBtn,
+    'introTitle':t.introTitle,'introSub':t.introSub,
+    'visionLabel':t.visionLabel,'visionLabel2':t.visionLabel2,'vl3':t.vl3,
+    'introWhatTitle':t.introWhatTitle,'introWhatBody':t.introWhatBody,
+    'introHowTitle':t.introHowTitle,'introHowBody':t.introHowBody,
+    'introBotInfo':t.introBotInfo,'introStart':t.introStart,
+    'waitTitle':t.waitTitle,'waitSub':t.waitSub,'liveLabel':t.liveLabel,
+    'waitBot':t.waitBot,'clusterBtnLabel':t.clusterBtnLabel,
+    'aiTitle':t.aiTitle,'aiSub':t.aiSub,
+    'clTitle':t.clTitle,'clSub':t.clSub,'clEditHint':t.clEditHint,
+    'addCluster':t.addCluster,'clBot':t.clBot,'clConfirm':t.clConfirm,
+    'voTitle':t.voTitle,'voSub':t.voSub,
+    'voExplainTitle':t.voExplainTitle,'voExplainBody':t.voExplainBody,
+    'votesIn':t.votesIn,'voBot':t.voBot,'voResults':t.voResults,
+    'resTitle':t.resTitle,'resSub':t.resSub,'resBot':t.resBot,'resConfirm':t.resConfirm,
+    'finalBadge':t.finalBadge,'finalTitle':t.finalTitle,'finalNote':t.finalNote,
+    'afterConfirmTitle':t.afterConfirmTitle,'toPhase3':t.toPhase3,
+    'vtResults':t.vtResults,'vtCanvas':t.vtCanvas,
+    'canvasTitle':t.canvasTitle,'canvasSub':t.canvasSub,'canvasNote':t.canvasNote,'canvasLegendTitle':t.canvasLegendTitle,
+    'pBack':t.pBack,'p2phase':t.p2phase,
+    'pPreWaitTitle':t.pPreWaitTitle,'pPreWaitSub':t.pPreWaitSub,'pPreWaitWaiting':t.pPreWaitWaiting,
+    'pvl':t.pvl,'pvl2':t.pvl2,
+    'pIntroWhatTitle':t.pIntroWhatTitle,'pIntroWhatBody':t.pIntroWhatBody,
+    'pIntroHowTitle':t.pIntroHowTitle,'pIntroHowBody':t.pIntroHowBody,
+    'instrTitle':t.instrTitle,'instrText':t.instrText,
+    'examplesPos':t.examplesPos,'examplesNeg':t.examplesNeg,
+    'pQuestion':t.pQuestion,'addThemeField':t.addThemeField,'pSubmit':t.pSubmit,
+    'p2WaitTitle':t.p2WaitTitle,'p2WaitSub':t.p2WaitSub,
+    'p2VoteTitle':t.p2VoteTitle,'p2VoteSub':t.p2VoteSub,
+    'pVoExplainTitle':t.pVoExplainTitle,'pVoExplainBody':t.pVoExplainBody,
+    'pVoteSubmit':t.pVoteSubmit,
+    'p2WRTitle':t.p2WRTitle,'p2WRSub':t.p2WRSub,
+    'p2FinalTitle':t.p2FinalTitle,'p2FinalSub':t.p2FinalSub,'p2Next':t.p2Next,
+    'verbTitle':t.verbTitle,'verbBody':t.verbBody,
+    'cr1':t.cr1,'cr2':t.cr2,'cr3':t.cr3,
+    'verbConclusion':t.verbConclusion,'verbClose':t.verbClose,
+    'onderbouwingBtn':t.onderbouwingBtn,'onderbouwingTitle':t.onderbouwingTitle,
+    'onderbouwingBody':t.onderbouwingBody,'onderbouwingClose':t.onderbouwingClose,
+    'pOnderbouwingBtnLabel':t.pOnderbouwingBtnLabel,
+    'vkBackEdit':t.vkBackEdit,
+    'summaryLabel':t.summaryLabel,'pFacLabel':t.pFacLabel,
+    'sessTitle':t.sessTitle
+  };
+  for (const id in replacers) {
+    const el = document.getElementById('t-' + id);
+    if (!el) continue;
+    // Behoud HTML voor velden die <strong>-tags bevatten (cr1/2/3, verbBody)
+    if (id === 'cr1' || id === 'cr2' || id === 'cr3') {
+      el.innerHTML = replacers[id]; continue;
+    }
+    el.textContent = replacers[id];
+  }
+}
+
+/* ══════════════════════════════════════════
+   INFO ICOON: in v4 vervangen door vkOpenTip (zie inline onclick handlers).
+   verbPopup blijft eigen modal-systeem houden.
+══════════════════════════════════════════ */
+document.addEventListener('keydown', function(ev){
+  if (ev.key === 'Escape') {
+    closeVerbPopup();
+  }
+});
+
+/* ══════════════════════════════════════════
+   SESSIE-INFO PANEEL  (Cross-Cross §5.4)
+══════════════════════════════════════════ */
+function readSession(){
+  try { const raw = localStorage.getItem('vk_session'); if (!raw) return null; const o = JSON.parse(raw); return (o && typeof o==='object') ? o : null; }
+  catch(e){ return null; }
+}
+function toggleSessPanel(){
+  const panel = document.getElementById('sessPanel');
+  const tog = document.getElementById('sessToggle');
+  const open = !panel.classList.contains('open');
+  panel.classList.toggle('open', open);
+  tog.classList.toggle('open', open);
+  tog.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+function renderSessPanel(){
+  const s = readSession();
+  const bar = document.getElementById('sessBar');
+  const grid = document.getElementById('sessGrid');
+  const mini = document.getElementById('sessMini');
+  const t = T[lang];
+  if (!s) { bar.style.display = 'none'; return; }
+  bar.style.display = 'block';
+  const fields = [
+    {k: t.sessOrg,      v: s.org || '—'},
+    {k: t.sessName,     v: s.name || t.unnamedSession},
+    {k: t.sessType,     v: (t.sessTypeLblFull[s.type] || s.type || '—')},
+    {k: t.sessScale,    v: (t.scaleLblFull[s.scale] || s.scale || '—')},
+    {k: t.sessUrgency,  v: (t.urgLblFull[s.urgency] || s.urgency || '—')},
+    {k: t.sessBudget,   v: (t.budLblFull[s.budget] || s.budget || '—')},
+    {k: t.sessHorizon,  v: (t.horLblFull[s.horizon] || s.horizon || '—')}
+  ];
+  grid.innerHTML = fields.map(f =>
+    `<div class="sess-item"><div class="sess-k">${escapeHtml(f.k)}</div><div class="sess-v" title="${escapeHtml(f.v)}">${escapeHtml(f.v)}</div></div>`
+  ).join('');
+  const org = s.org || '';
+  const name = s.name || t.unnamedSession;
+  mini.textContent = (org ? (org + ' · ') : '') + name;
+}
+
+/* ══════════════════════════════════════════
+   DEELNEMER SAMENVATTING (sessie + facilitator)
+══════════════════════════════════════════ */
+function updatePSummary(){
+  const block = document.getElementById('pSummaryBlock');
+  const textEl = document.getElementById('pSummaryText');
+  const facBlock = document.getElementById('pFacilitatorBlock');
+  const facName = document.getElementById('pFacilitatorName');
+  const t = T[lang];
+  const s = readSession();
+  if (!s) {
+    block.style.display = 'none';
+    return;
+  }
+  block.style.display = 'block';
+  // bouw tekst
+  const typeLbl  = t.sessTypeLbl[s.type] || (s.type || '');
+  const scaleLbl = t.scaleLbl[s.scale]   || (s.scale || '');
+  const urgLbl   = t.urgLbl[s.urgency]   || (s.urgency || '');
+  const budLbl   = t.budLbl[s.budget]    || (s.budget || '');
+  const horLbl   = t.horLbl[s.horizon]   || (s.horizon || '');
+  let text;
+  if (typeLbl && scaleLbl && urgLbl && budLbl && horLbl) {
+    const tpl = s.name ? t.summaryTpl : t.summaryTplNoName;
+    text = vkFillSentenceTemplate(tpl, {
+      type:  typeLbl,
+      scale: scaleLbl,
+      name:  s.name || '',
+      urg:   urgLbl,
+      bud:   budLbl,
+      hor:   horLbl
+    });
+  } else {
+    text = t.summaryFallback;
+  }
+  textEl.textContent = text;
+  // facilitatornaam
+  if (s.facilitator && String(s.facilitator).trim()) {
+    facBlock.style.display = 'block';
+    facName.textContent = s.facilitator;
+  } else {
+    facBlock.style.display = 'block';
+    facName.textContent = t.pFacUnknown;
+    facName.style.color = 'var(--t3)';
+    facName.style.fontWeight = '500';
+  }
+}
+
+/* ══════════════════════════════════════════
+   ONDERBOUWING (v4: via vkOpenTip)
+══════════════════════════════════════════ */
+function openOnderbouwing(){
+  const t = T[lang];
+  vkOpenTip({
+    size: 'lg',
+    title: t.onderbouwingTitle,
+    body: t.onderbouwingBody,
+    closeLabel: t.tipClose || t.onderbouwingClose
+  });
+}
+
+/* ══════════════════════════════════════════
+   VK BACK-TO-EDIT (eindscherm → terug naar resultaten-selectie)
+══════════════════════════════════════════ */
+function vkBackToEdit(){
+  try{ localStorage.setItem('vk_phase2_state', 'editing'); }catch(e){}
+  goStep('results');
+}
+
+/* ══════════════════════════════════════════
+   CROSS-TAB STAGE SYNC  (vk_phase2_stage)
+══════════════════════════════════════════ */
+let _vkRestoring = false;   // niveau 1: onderdrukt (her)publicatie van de stage tijdens facilitator-herstel
+function publishStage(stage, payload){
+  if (_vkRestoring) return;   // herstel na verversing → niet (her)publiceren; deelnemers ongemoeid
+  try { localStorage.setItem('vk_phase2_stage', stage); } catch(e){}
+  if (VK_LIVE && window.vkFb){
+    try {
+      const g = Object.assign({ phase: 2, stage: stage, at: Date.now() }, payload || {});
+      vkFb.stageSet(vkLiveCode(), JSON.stringify(g));
+    } catch(e){}
+  }
+}
+function readStage(){
+  try { return localStorage.getItem('vk_phase2_stage') || 'preWait'; } catch(e){ return 'preWait'; }
+}
+
+function vkRestoreFacilitatorView(){
+  // Niveau 1: facilitator na verversing op het live werkscherm (publicatie onderdrukt).
+  if (VK_IS_PARTICIPANT) return false;
+  const s = readStage();   // fase 2: stage als losse string
+  if (s==='wait' || s==='voteopen'){
+    _vkRestoring = true;
+    try { goStep('wait', {publish:false}); }
+    catch(e){ _vkRestoring = false; return false; }
+    _vkRestoring = false;
+    return true;
+  }
+  return false;
+}
+function applyStageToPView(stObj){
+  // toon de juiste deelnemer-card op basis van de stage
+  if (facView) return;
+  let st = stObj;
+  if (!st){ const raw = readStage(); st = (raw && raw[0]==='{') ? vkParseStage(raw) : { stage: raw }; }
+  // Cross-device: facilitator is naar een latere fase → deelnemer volgt mee.
+  if (st && Number(st.phase) > 2){
+    window.location.href = 'visiekaart_fase' + Number(st.phase) + '.html?join=' + encodeURIComponent(vkLiveCode());
+    return;
+  }
+  // Stemkaart: gebruik de kandidaat-thema's die de facilitator meestuurt.
+  if (st && st.stage==='voteopen' && Array.isArray(st.clusters)){
+    clusters = st.clusters.map(c=>({ id:c.id, name:c.name, colorCls:c.colorCls,
+      answers:(c.answers||[]).map(a=>({text:(a&&a.text)||a, author:(a&&a.author)||'\u2014'})) }));
+  }
+  // Onbekende/lege stage → vangnet naar het wachtscherm (showPStage default = p2PreWait).
+  showPStage((st && st.stage) || 'preWait');
+}
+
+/* ══════════════════════════════════════════
+   INTRO GRID
+══════════════════════════════════════════ */
+function buildIntroGrid(){
+  const grid = document.getElementById('introGrid');
+  const items = T[lang].introItems;
+  grid.innerHTML = items.map(it => {
+    let icon = it.icon === 'people-svg'
+      ? `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="5.5" cy="6" r="2"/><circle cx="11" cy="6.5" r="1.5"/><path d="M2 13.5c.5-2 1.7-3 3.5-3s3 1 3.5 3"/><path d="M9 13c.4-1.5 1.2-2.2 2.5-2.2S13.6 11.5 14 13"/></svg>`
+      : escapeHtml(it.icon);
+    return `<div class="intro-item">
+      <div class="intro-icon">${icon}</div>
+      <div><div class="intro-item-title">${escapeHtml(it.title)}</div><div class="intro-item-sub">${escapeHtml(it.sub)}</div></div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   STEPS BAR (q-steps)
+══════════════════════════════════════════ */
+function buildQSteps(){
+  const bar = document.getElementById('qStepsBar');
+  bar.innerHTML = STEPS.map(s => `<div class="q-step" data-s="${s}"></div>`).join('');
+}
+function updateQSteps(){
+  const idx = STEPS.indexOf(step);
+  document.querySelectorAll('#qStepsBar .q-step').forEach((el, i) => {
+    el.classList.toggle('done',   i < idx);
+    el.classList.toggle('active', i === idx);
+  });
+}
+
+/* ══════════════════════════════════════════
+   STEP NAVIGATION
+══════════════════════════════════════════ */
+function goStep(next, opts){
+  opts = opts || {};
+  step = next;
+  document.querySelectorAll('#facView .screen').forEach(s => s.classList.remove('open'));
+  let id, pubStage=null, pubPayload=null;
+  switch(next){
+    case 'intro':    id='sIntro'; pubStage='preWait'; break;
+    case 'wait':     id='sWait'; if(!VK_LIVE) startDemoSubmissions(); pubStage='wait'; break;
+    case 'ai':       id='sAILoad'; pubStage='wait'; break;
+    case 'cluster':  id='sCluster'; buildClusters(); renderClusterEditor(); pubStage='wait'; break;
+    case 'voteopen': id='sVoteOpen'; if(!VK_LIVE) startDemoVoting(); pubStage='voteopen'; pubPayload={clusters: vkSerializeClusters()}; break;
+    case 'results':  id='sResults'; computeScores(); renderScoreList(); pubStage='voteopen'; pubPayload={clusters: vkSerializeClusters()}; break;
+    case 'final':    id='sFinal'; buildFinalScreen(); buildCanvas(); buildCanvasLegend(); buildP2Final(); pubStage='final'; break;
+  }
+  document.getElementById(id).classList.add('open');
+  updateQSteps();
+  // Niet publiceren bij init (opts.publish===false): anders reset een refresh de
+  // actieve stage en springen deelnemers terug (werkboek §9.8).
+  if (opts.publish !== false && pubStage) publishStage(pubStage, pubPayload);
+}
+
+// Wrapper voor onclick="showResults()" in HTML
+function showResults(){ goStep('results'); }
+
+/* ══════════════════════════════════════════
+   DEMO SUBMISSIONS (live binnenkomen)
+══════════════════════════════════════════ */
+function startDemoSubmissions(){
+  submissions = [];
+  document.getElementById('submittedCount').textContent = '0';
+  document.getElementById('incomingList').innerHTML = '';
+  const data = DEMO[lang];
+  data.forEach((s, i) => {
+    setTimeout(() => {
+      if (step !== 'wait') return;
+      submissions.push(s);
+      document.getElementById('submittedCount').textContent = submissions.length;
+      const list = document.getElementById('incomingList');
+      list.insertAdjacentHTML('beforeend',
+        `<span style="background:var(--tl);border:1px solid var(--tb);color:var(--teal);font-size:12px;padding:5px 11px;border-radius:18px;font-weight:600;animation:fadeUp .3s ease forwards">${escapeHtml(s.name)} · ${s.themes.length}</span>`
+      );
+    }, 800 + i*900);
+  });
+}
+
+/* ══════════════════════════════════════════
+   CLUSTERING
+══════════════════════════════════════════ */
+function startClustering(){
+  goStep('ai');
+  setTimeout(() => goStep('cluster'), 2000);
+}
+function buildClusters(){
+  if (!VK_LIVE){
+    // Demo/test: vaste demo-clusters — ongewijzigd gedrag
+    clusters = DEMO_CLUSTERS[lang].map((c, i) => ({
+      id: ++clusterIdCounter,
+      name: c.name,
+      colorCls: c.colorCls,
+      answers: c.answers.map(t => ({text: t, author: '—'}))
+    }));
+    return;
+  }
+  // Live: cluster de echte kandidaat-thema's uit de inzendingen. Lokale terugval meteen, AI verfijnt.
+  const items = vkCollectThemeItems();
+  vkLocalClusterP2(items);
+  vkCallAI('cluster', { items: items.map(it=>it.text) }, { lang })
+    .then(ai=>{
+      if (ai && Array.isArray(ai.clusters) && ai.clusters.length){
+        vkApplyAIClusterP2(items, ai.clusters);
+        renderClusterEditor();
+      }
+    })
+    .catch(()=>{ /* lokale clustering blijft leidend */ });
+}
+
+/* ═══ Cluster A: live-clustering met lokale terugval + AI-overlay ═══ */
+function vkCollectThemeItems(){
+  const items=[];
+  submissions.forEach(s=>{ (s.themes||[]).forEach(th=>{ const text=String(th||'').trim(); if(text) items.push({text, author: s.name||'—'}); }); });
+  return items;
+}
+function vkClusterGroups(texts, maxN){
+  const STOP = new Set(('de het een en of van voor met aan op in te dat die deze wij we ons onze je jij u uw is zijn worden willen meer beter goede goed naar bij om als ook nog dan zodat omdat hun '+
+    'the a an and or of for to with on in that this these we our you your is are be being more better good so because their them they').split(' '));
+  const tok = s => String(s||'').toLowerCase().replace(/[^a-zà-ÿ0-9\s]/g,' ').split(/\s+/).filter(w=>w.length>3 && !STOP.has(w));
+  const groups=[];
+  texts.forEach((txt,i)=>{
+    const words=tok(txt); let best=-1, bs=0;
+    groups.forEach((g,gi)=>{ const sc=words.filter(w=>g.words.has(w)).length; if(sc>bs){bs=sc;best=gi;} });
+    if(best>=0 && bs>0){ groups[best].members.push(i); words.forEach(w=>groups[best].words.add(w)); }
+    else if(groups.length<maxN){ groups.push({words:new Set(words), label:(words[0]||String(txt||'')), members:[i]}); }
+    else { let sm=0; groups.forEach((g,gi)=>{ if(g.members.length<groups[sm].members.length) sm=gi; }); groups[sm].members.push(i); }
+  });
+  if(!groups.length) groups.push({words:new Set(), label:'', members:texts.map((_,i)=>i)});
+  return groups;
+}
+function vkLocalClusterP2(items){
+  const groups = vkClusterGroups(items.map(it=>it.text), CLUSTER_COLORS.length);
+  clusters = groups.map((g,gi)=>({
+    id: ++clusterIdCounter,
+    name: g.label ? (g.label.charAt(0).toUpperCase()+g.label.slice(1)) : (T[lang].newClusterName||'Cluster'),
+    colorCls: CLUSTER_COLORS[gi % CLUSTER_COLORS.length],
+    answers: g.members.map(i=>({text: items[i].text, author: items[i].author||'—'}))
+  }));
+}
+function vkApplyAIClusterP2(items, aiClusters){
+  const cl = aiClusters.slice(0, CLUSTER_COLORS.length);
+  const assigned = new Set();
+  clusters = cl.map((c,ci)=>{
+    const mem = (c.members||[]).map(x=>+x).filter(i=>i>=0 && i<items.length);
+    mem.forEach(i=>assigned.add(i));
+    return { id:++clusterIdCounter, name:String(c.label || ('Cluster '+(ci+1))), colorCls:CLUSTER_COLORS[ci % CLUSTER_COLORS.length],
+             answers: mem.map(i=>({text: items[i].text, author: items[i].author||'—'})) };
+  });
+  const rest=[]; items.forEach((it,i)=>{ if(!assigned.has(i)) rest.push({text:it.text, author:it.author||'—'}); });
+  if(rest.length){
+    if(!clusters.length) clusters.push({id:++clusterIdCounter, name:(T[lang].newClusterName||'Cluster'), colorCls:CLUSTER_COLORS[0], answers:[]});
+    clusters[0].answers.push(...rest);
+  }
+}
+function renderClusterEditor(){
+  const t = T[lang];
+  const grid = document.getElementById('clusterGrid');
+  grid.innerHTML = clusters.map(c => `
+    <div class="cluster-block ${c.colorCls}" data-cid="${c.id}"
+         ondragover="onDragOver(event)" ondrop="onDrop(event,${c.id})" ondragleave="onDragLeave(event)">
+      <div class="cluster-hd">
+        <div class="cluster-color"></div>
+        <input class="cluster-name-input" value="${escapeHtml(c.name)}"
+               onchange="updateClusterName(${c.id},this.value)"
+               aria-label="${escapeHtml(t.thema)} ${escapeHtml(c.name)}">
+        <svg class="cluster-edit-pencil" width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M9.5 2L12 4.5L4.5 12H2V9.5L9.5 2Z"/></svg>
+        <span class="cluster-count">${c.answers.length} ${t.answers}</span>
+        <button class="cluster-remove" onclick="removeCluster(${c.id})" aria-label="Verwijderen" title="Verwijderen">×</button>
+      </div>
+      <div class="cluster-body ${c.answers.length===0?'empty':''}">
+        ${c.answers.length===0
+          ? '<span>—</span>'
+          : c.answers.map((a, idx) => `<span class="answer-chip" draggable="true" data-aid="${idx}" ondragstart="onDragStart(event,${c.id},${idx})" ondragend="onDragEnd(event)">${escapeHtml(a.text)}</span>`).join('')
+        }
+      </div>
+    </div>`).join('');
+}
+function addCluster(){
+  clusters.push({
+    id: ++clusterIdCounter,
+    name: T[lang].newClusterName,
+    colorCls: CLUSTER_COLORS[clusters.length % CLUSTER_COLORS.length],
+    answers: []
+  });
+  renderClusterEditor();
+}
+function removeCluster(cid){
+  // verplaats antwoorden van te-verwijderen cluster terug naar 'eerste niet-leeg' indien wenselijk?
+  // Voor MVP: alleen lege clusters mogen weg
+  const c = clusters.find(x => x.id===cid);
+  if (!c) return;
+  if (c.answers.length > 0) {
+    alert(lang==='nl' ? 'Verplaats eerst alle antwoorden voordat je dit kandidaat-thema verwijdert.' : 'Move all answers before removing this candidate theme.');
+    return;
+  }
+  clusters = clusters.filter(x => x.id !== cid);
+  renderClusterEditor();
+}
+function updateClusterName(cid, name){
+  const c = clusters.find(x => x.id === cid);
+  if (c) c.name = name.trim() || T[lang].newClusterName;
+}
+function onDragStart(e, cid, aidx){
+  draggedChip = aidx;
+  draggedFromCluster = cid;
+  e.target.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function onDragEnd(e){
+  e.target.classList.remove('dragging');
+  document.querySelectorAll('.cluster-block').forEach(b => b.classList.remove('drag-over'));
+}
+function onDragOver(e){
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  const block = e.currentTarget;
+  document.querySelectorAll('.cluster-block').forEach(b => b.classList.remove('drag-over'));
+  block.classList.add('drag-over');
+}
+function onDragLeave(e){
+  if (!e.currentTarget.contains(e.relatedTarget)) {
+    e.currentTarget.classList.remove('drag-over');
+  }
+}
+function onDrop(e, toCid){
+  e.preventDefault();
+  if (draggedFromCluster == null || draggedChip == null) return;
+  if (draggedFromCluster === toCid) return;
+  const from = clusters.find(x => x.id === draggedFromCluster);
+  const to   = clusters.find(x => x.id === toCid);
+  if (!from || !to) return;
+  const moved = from.answers.splice(draggedChip, 1)[0];
+  to.answers.push(moved);
+  draggedChip = null;
+  draggedFromCluster = null;
+  renderClusterEditor();
+}
+
+function confirmClustering(){
+  // verwijder lege clusters
+  clusters = clusters.filter(c => c.answers.length > 0);
+  goStep('voteopen');
+}
+
+/* ══════════════════════════════════════════
+   VOTING
+══════════════════════════════════════════ */
+function startDemoVoting(){
+  votes = [];
+  document.getElementById('voteCount').textContent = '0';
+  renderVoteProgress();
+  const data = DEMO_VOTES[lang];
+  data.forEach((v, i) => {
+    setTimeout(() => {
+      if (step !== 'voteopen') return;
+      // map naar daadwerkelijke cluster.ids in volgorde van clusters[]
+      const mapped = {};
+      Object.entries(v.votes).forEach(([idx, pts]) => {
+        const c = clusters[Number(idx)];
+        if (c && pts > 0) mapped[c.id] = pts;
+      });
+      votes.push({name: v.name, votes: mapped});
+      document.getElementById('voteCount').textContent = votes.length;
+      renderVoteProgress();
+    }, 800 + i*1000);
+  });
+}
+function renderVoteProgress(){
+  const list = document.getElementById('voteProgressList');
+  if (!list) return;
+  const total = votes.length;
+  list.innerHTML = clusters.map(c => {
+    const ptsArr = votes.map(v => v.votes[c.id] || 0).filter(p => p > 0);
+    const sum = ptsArr.reduce((a,b)=>a+b, 0);
+    const avg = ptsArr.length ? (sum / ptsArr.length).toFixed(1) : '0.0';
+    const widthPct = total ? Math.min(100, (ptsArr.length / total) * 100) : 0;
+    return `<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="font-weight:600">${escapeHtml(c.name)}</span><span style="color:var(--t3)">${ptsArr.length}/${total||5} · ${T[lang].avg} ${avg}</span></div>
+      <div class="sc-bar-wrap"><div class="sc-bar" style="width:${widthPct}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   RESULTS  (computeScores, render, select)
+══════════════════════════════════════════ */
+let scoreData = []; // [{cluster, sum, count, avg, rank}]
+function computeScores(){
+  scoreData = clusters.map(c => {
+    const pts = votes.map(v => v.votes[c.id] || 0).filter(p => p > 0);
+    const sum = pts.reduce((a,b)=>a+b, 0);
+    const avg = pts.length ? (sum / pts.length) : 0;
+    return { cluster: c, sum, count: pts.length, avg };
+  });
+  // sort desc by avg, dan sum
+  scoreData.sort((a,b) => b.avg - a.avg || b.sum - a.sum);
+  scoreData.forEach((d, i) => d.rank = i+1);
+  selectedThemes = scoreData.slice(0, 5).map(d => d.cluster.id);
+}
+function renderScoreList(){
+  const list = document.getElementById('scoreList');
+  const t = T[lang];
+  const maxAvg = scoreData.length ? scoreData[0].avg : 0;
+  list.innerHTML = scoreData.map(d => {
+    const sel = selectedThemes.includes(d.cluster.id);
+    const maxReached = selectedThemes.length >= 5 && !sel;
+    const wPct = maxAvg ? (d.avg / maxAvg) * 100 : 0;
+    return `<div class="score-card ${sel?'selected':''} ${maxReached?'max-reached':''}" onclick="toggleTheme(${d.cluster.id})" role="button" tabindex="0" aria-pressed="${sel?'true':'false'}">
+      <div class="sc-rank">${d.rank}</div>
+      <div class="sc-body">
+        <div class="sc-name">${escapeHtml(d.cluster.name)}</div>
+        <div class="sc-bar-wrap"><div class="sc-bar" style="width:${wPct}%"></div></div>
+      </div>
+      <div class="sc-score">${d.avg.toFixed(1)}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('selectedCount').textContent = selectedThemes.length;
+  document.getElementById('confirmThemesBtn').disabled = selectedThemes.length === 0;
+  // tie-notice
+  const tie = scoreData.some((d, i) => i > 0 && d.avg === scoreData[i-1].avg);
+  const tieEl = document.getElementById('tieNotice');
+  if (tie) { tieEl.style.display = 'block'; tieEl.textContent = t.tieText; }
+  else { tieEl.style.display = 'none'; }
+}
+function toggleTheme(cid){
+  const i = selectedThemes.indexOf(cid);
+  if (i >= 0) selectedThemes.splice(i, 1);
+  else {
+    if (selectedThemes.length >= 5) {
+      alert(lang==='nl' ? 'Maximaal 5 thema\'s selecteren.' : 'Up to 5 themes can be selected.');
+      return;
+    }
+    selectedThemes.push(cid);
+  }
+  renderScoreList();
+}
+function confirmThemes(){
+  if (selectedThemes.length === 0) return;
+  // Bewaar in volgorde van scoreData (gerangschikt)
+  const ordered = scoreData
+    .filter(d => selectedThemes.includes(d.cluster.id))
+    .map(d => ({
+      name: d.cluster.name,
+      score: Number(d.avg.toFixed(2)),
+      sourceAnswers: d.cluster.answers.map(a => ({text: a.text, author: a.author||''}))
+    }));
+  try {
+    // Hoofdkey blijft [{name,score,...}] — backward compatible met fase 3-5/rapport
+    localStorage.setItem('vk_selected_themes', JSON.stringify(ordered));
+    localStorage.setItem('vk_phase2_submissions', JSON.stringify(submissions));
+    localStorage.setItem('vk_phase2_state', 'confirmed');
+  } catch(e){}
+  goStep('final');
+}
+
+/* ══════════════════════════════════════════
+   FINAL SCREEN
+══════════════════════════════════════════ */
+function buildFinalScreen(){
+  // Visie-zin opnieuw zetten
+  document.getElementById('visionSentence3').textContent = visionSentence || (lang==='nl' ? 'Onze stip op de horizon' : 'Our dot on the horizon');
+  // Themes grid
+  const grid = document.getElementById('finalThemesGrid');
+  const ordered = scoreData.filter(d => selectedThemes.includes(d.cluster.id));
+  grid.innerHTML = ordered.map((d, i) => `
+    <div class="theme-bubble-card" style="background:${THEME_BG_CSS[i]};border-color:${THEME_COLORS_CSS[i]};color:${THEME_COLORS_CSS[i]}">
+      <div class="tbc-num">${T[lang].thema} ${i+1}</div>
+      <div class="tbc-name">${escapeHtml(d.cluster.name)}</div>
+      <div class="tbc-score">${T[lang].avg} ${d.avg.toFixed(1)}</div>
+    </div>`).join('');
+  // After-confirm
+  const ac = document.getElementById('afterConfirmGrid');
+  ac.innerHTML = T[lang].afterConfirmItems.map(it =>
+    `<div class="after-confirm-item"><h4>${escapeHtml(it.h)}</h4><p>${escapeHtml(it.b)}</p></div>`
+  ).join('');
+}
+function buildCanvasLegend(){
+  const list = document.getElementById('canvasLegendList');
+  const ordered = scoreData.filter(d => selectedThemes.includes(d.cluster.id));
+  list.innerHTML = ordered.map((d, i) =>
+    `<div class="canvas-legend-item"><div class="cl-num" style="background:${THEME_COLORS_CSS[i]}">${i+1}</div><div class="cl-text">${escapeHtml(d.cluster.name)}</div></div>`
+  ).join('');
+}
+function buildCanvas(){
+  const svg = document.getElementById('vkCanvas');
+  if (!svg) return;
+  const ordered = scoreData.filter(d => selectedThemes.includes(d.cluster.id));
+  const names = ordered.map(d => d.cluster.name);
+  // pad tot 5 met undefined
+  while (names.length < 5) names.push(undefined);
+  vkRenderInto(svg, {
+    visionSentence: visionSentence,
+    themeNames: names.slice(0,5),
+    themeActions: [],
+    versnellers: [], remmers: [], roadmapTop5: [],
+    lang: lang
+  });
+}
+function switchView(view){
+  document.querySelectorAll('.vt-btn').forEach(b => b.classList.remove('on'));
+  if (view === 'results') {
+    document.querySelectorAll('.vt-btn')[0].classList.add('on');
+    document.getElementById('fvResults').style.display = 'block';
+    document.getElementById('fvCanvas').style.display  = 'none';
+  } else {
+    document.querySelectorAll('.vt-btn')[1].classList.add('on');
+    document.getElementById('fvResults').style.display = 'none';
+    document.getElementById('fvCanvas').style.display  = 'block';
+    buildCanvas();
+    buildCanvasLegend();
+  }
+}
+
+/* ══════════════════════════════════════════
+   DEELNEMER-VIEW
+══════════════════════════════════════════ */
+function showPView(){
+  facView = false;
+  document.getElementById('facView').style.display = 'none';
+  document.getElementById('pView').classList.add('open');
+  applyStageToPView();
+  rebuildPThemeFields();
+  updatePSummary();
+}
+function hidePView(){
+  facView = true;
+  document.getElementById('facView').style.display = '';
+  document.getElementById('pView').classList.remove('open');
+}
+
+function showPStage(stage){
+  // Map stage → welke pcard tonen
+  const cards = ['p2PreWait','p2Input','p2Wait','p2Vote','p2WaitResults','p2Final'];
+  cards.forEach(c => { const el = document.getElementById(c); if (el) el.style.display = 'none'; });
+  let target = 'p2PreWait';
+  switch(stage){
+    case 'preWait':  target = 'p2PreWait'; break;
+    case 'wait':     target = 'p2Input'; break;
+    case 'voteopen': target = 'p2Vote'; buildPVoteScreen(); break;
+    case 'final':    target = 'p2Final'; buildP2Final(); break;
+  }
+  const el = document.getElementById(target);
+  if (el) el.style.display = '';
+}
+
+function rebuildPThemeFields(){
+  const container = document.getElementById('pThemeFields');
+  if (!container) return;
+  // Bewaar bestaande waarden bij rerender (bv. taalwissel)
+  const existing = [];
+  container.querySelectorAll('input.theme-input').forEach(inp => existing.push(inp.value));
+  const min = 5;
+  const total = Math.max(min, existing.length);
+  let html = '';
+  for (let i=0; i<total; i++) {
+    const val = existing[i] || '';
+    html += `<div class="theme-field">
+      <span class="theme-num">${i+1}</span>
+      <input type="text" class="theme-input" id="pTheme${i}" data-idx="${i}" value="${escapeHtml(val)}"
+             onkeydown="themeKeydown(event,${i})"
+             onblur="checkVerbValueBased(this)"
+             aria-label="${escapeHtml((T[lang].thema)+' '+(i+1))}">
+    </div>`;
+  }
+  container.innerHTML = html;
+}
+function addThemeField(){
+  const container = document.getElementById('pThemeFields');
+  // Lees bestaande
+  const existing = [];
+  container.querySelectorAll('input.theme-input').forEach(inp => existing.push(inp.value));
+  existing.push('');
+  let html = '';
+  for (let i=0; i<existing.length; i++) {
+    const val = existing[i] || '';
+    html += `<div class="theme-field">
+      <span class="theme-num">${i+1}</span>
+      <input type="text" class="theme-input" id="pTheme${i}" data-idx="${i}" value="${escapeHtml(val)}"
+             onkeydown="themeKeydown(event,${i})"
+             onblur="checkVerbValueBased(this)"
+             aria-label="${escapeHtml((T[lang].thema)+' '+(i+1))}">
+    </div>`;
+  }
+  container.innerHTML = html;
+  // focus de nieuwe
+  const last = document.getElementById('pTheme' + (existing.length - 1));
+  if (last) last.focus();
+}
+function renderExamples(){
+  const t = T[lang];
+  const row = document.getElementById('examplesRow');
+  if (row) row.innerHTML = t.examples.map(e => `<span class="ex-tag">${escapeHtml(e)}</span>`).join('');
+  const negRow = document.getElementById('examplesNegRow');
+  if (negRow) negRow.innerHTML = t.examplesNegList.map(e => `<span class="ex-tag neg">${escapeHtml(e)}</span>`).join('');
+}
+
+function themeKeydown(ev, idx){
+  if (ev.key === 'Enter') {
+    ev.preventDefault();
+    // controleer dit veld eerst
+    const inp = ev.target;
+    if (checkVerbValueBased(inp, true)) return; // popup getoond → blijf staan
+    const next = document.getElementById('pTheme' + (idx+1));
+    if (next) next.focus();
+    else addThemeField();
+  } else if (ev.key === 'Tab') {
+    // TAB: laat browser focus verplaatsen, maar valideer dit veld
+    // (onblur vuurt na de tabnavigatie, dus dat dekt het automatisch)
+    // Geen preventDefault.
+  }
+}
+function checkVerbValueBased(input, returnFlag){
+  if (!input) return false;
+  const val = String(input.value || '').trim();
+  const id = input.id;
+  if (!val) {
+    input.classList.remove('warn');
+    return false;
+  }
+  // Als de huidige waarde gelijk is aan de laatst-gewaarschuwde voor dit veld:
+  // niet nogmaals tonen
+  if (lastWarnedValueByField[id] === val) {
+    input.classList.toggle('warn', looksLikeVerb(val));
+    return false;
+  }
+  if (looksLikeVerb(val)) {
+    lastWarnedValueByField[id] = val;
+    currentVerbField = input;
+    input.classList.add('warn');
+    document.getElementById('verbPopup').classList.add('open');
+    return true;
+  }
+  input.classList.remove('warn');
+  return false;
+}
+function closeVerbPopup(){
+  document.getElementById('verbPopup').classList.remove('open');
+  if (currentVerbField) {
+    setTimeout(() => { try { currentVerbField.focus(); } catch(e){} currentVerbField = null; }, 30);
+  }
+}
+
+function submitThemes(){
+  // Valideer alle velden eenmalig (popup max 1x per gewijzigde waarde per veld)
+  const inputs = document.querySelectorAll('#pThemeFields .theme-input');
+  for (const inp of inputs) {
+    if (checkVerbValueBased(inp, true)) return; // popup → wacht op gebruiker
+  }
+  const list = [];
+  inputs.forEach(inp => {
+    const v = (inp.value || '').trim();
+    if (v) list.push(v);
+  });
+  if (list.length === 0) {
+    alert(lang==='nl' ? 'Vul minimaal één thema in.' : 'Please enter at least one theme.');
+    return;
+  }
+  // Echte deelnemernaam (uit join) waar beschikbaar.
+  let myName = T[lang].pYou;
+  try{ const j=JSON.parse(localStorage.getItem('vk_joined')||'null'); if(j && j.name) myName=j.name; }catch(e){}
+  const sub = { name: myName, themes: list };
+  if (VK_LIVE && window.vkFb){
+    try{ vkFb.push(vkLiveCode(),'phase2/submissions', sub); }catch(e){}   // facilitator-leeskant pikt 't op
+  } else {
+    submissions.push(sub);
+    try { localStorage.setItem('vk_phase2_live_subs', JSON.stringify(submissions)); } catch(e){}
+  }
+  document.getElementById('p2Input').style.display = 'none';
+  document.getElementById('p2Wait').style.display = '';
+}
+
+function buildPVoteScreen(){
+  const grid = document.getElementById('pVoteGrid');
+  if (!grid) return;
+  if (!clusters || clusters.length === 0) {
+    // Geen clusters → val terug op demo-clusters voor demo-cycle
+    clusters = DEMO_CLUSTERS[lang].map((c, i) => ({
+      id: ++clusterIdCounter, name: c.name, colorCls: c.colorCls,
+      answers: c.answers.map(t => ({text: t, author: '—'}))
+    }));
+  }
+  const t = T[lang];
+  grid.innerHTML = clusters.map(c => `
+    <div class="vote-card" data-cid="${c.id}">
+      <div class="vote-card-head">
+        <div class="vc-info">
+          <div class="vc-name">${escapeHtml(c.name)}</div>
+          <div class="vc-count">${c.answers.length} ${t.answers}</div>
+        </div>
+        <div class="vc-pts" role="group" aria-label="${escapeHtml(t.thema)} ${escapeHtml(c.name)}">
+          ${[5,4,3,2,1].map(p => `<button class="pt-btn" data-pts="${p}" onclick="assignPt(${c.id},${p},this)" aria-label="${p}">${p}</button>`).join('')}
+        </div>
+      </div>
+      <button class="vc-expand-btn" onclick="toggleVoteSource(this)" aria-expanded="false">
+        <svg class="chev" width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 4.5L6 7.5L9 4.5"/></svg>
+        <span class="vc-expand-label">${escapeHtml(t.pSourceOpen)}</span>
+      </button>
+      <div class="vc-source">
+        <div class="vc-source-list">${c.answers.map(a => `<span class="answer-chip">${escapeHtml(a.text)}</span>`).join('')}</div>
+      </div>
+    </div>`).join('');
+}
+function toggleVoteSource(btn){
+  const card = btn.closest('.vote-card');
+  const src  = card.querySelector('.vc-source');
+  const lbl  = btn.querySelector('.vc-expand-label');
+  const open = !src.classList.contains('open');
+  src.classList.toggle('open', open);
+  btn.classList.toggle('open', open);
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  lbl.textContent = open ? T[lang].pSourceClose : T[lang].pSourceOpen;
+}
+function assignPt(cid, pts, btn){
+  const card = btn.closest('.vote-card');
+  const cards = document.querySelectorAll('.vote-card');
+  // Onthoud al gebruikte punten over alle kaarten
+  // 1) Reset de used-state per puntwaarde
+  const usedByPts = {1:false,2:false,3:false,4:false,5:false};
+  // 2) Welke punten zijn elders al gekozen?
+  cards.forEach(c => {
+    if (c === card) return;
+    const sel = c.querySelector('.pt-btn.selected');
+    if (sel) usedByPts[Number(sel.getAttribute('data-pts'))] = true;
+  });
+  // 3) Klikbaarheid bepalen
+  const wasSelected = btn.classList.contains('selected');
+  // Reset de knoppen van deze kaart
+  card.querySelectorAll('.pt-btn').forEach(b => b.classList.remove('selected'));
+  if (!wasSelected) {
+    if (usedByPts[pts]) {
+      alert(lang==='nl' ? `${pts} punten zijn al gebruikt op een ander kandidaat-thema.` : `${pts} points are already used on another candidate theme.`);
+      return;
+    }
+    btn.classList.add('selected');
+    card.classList.add('has-vote');
+  } else {
+    card.classList.remove('has-vote');
+  }
+  // Refresh disabled states overal
+  refreshVoteButtons();
+}
+function refreshVoteButtons(){
+  const used = new Set();
+  document.querySelectorAll('.vote-card .pt-btn.selected').forEach(b => used.add(Number(b.getAttribute('data-pts'))));
+  document.querySelectorAll('.vote-card').forEach(card => {
+    const sel = card.querySelector('.pt-btn.selected');
+    const selVal = sel ? Number(sel.getAttribute('data-pts')) : null;
+    card.querySelectorAll('.pt-btn').forEach(b => {
+      const v = Number(b.getAttribute('data-pts'));
+      const isUsedElsewhere = used.has(v) && v !== selVal;
+      b.classList.toggle('used', isUsedElsewhere);
+    });
+  });
+}
+function submitVotes(){
+  const sel = {};
+  document.querySelectorAll('.vote-card').forEach(card => {
+    const cid = Number(card.getAttribute('data-cid'));
+    const b   = card.querySelector('.pt-btn.selected');
+    if (b) sel[cid] = Number(b.getAttribute('data-pts'));
+  });
+  let myName = T[lang].pYou;
+  try{ const j=JSON.parse(localStorage.getItem('vk_joined')||'null'); if(j && j.name) myName=j.name; }catch(e){}
+  const v = { name: myName, votes: sel };
+  if (VK_LIVE && window.vkFb){
+    try{ vkFb.push(vkLiveCode(),'phase2/votes', v); }catch(e){}   // facilitator-leeskant telt mee
+  } else {
+    votes.push(v);
+  }
+  document.getElementById('p2Vote').style.display = 'none';
+  document.getElementById('p2WaitResults').style.display = '';
+}
+
+function buildP2Final(){
+  const cont = document.getElementById('p2FinalThemes');
+  if (!cont) return;
+  if (selectedThemes.length === 0) {
+    // Probeer uit vk_selected_themes
+    try {
+      const raw = localStorage.getItem('vk_selected_themes');
+      if (raw) {
+        const arr = JSON.parse(raw);
+        cont.innerHTML = arr.map((th, i) =>
+          `<div class="theme-bubble-card" style="background:${THEME_BG_CSS[i%5]};border-color:${THEME_COLORS_CSS[i%5]};color:${THEME_COLORS_CSS[i%5]};margin-bottom:10px">
+            <div class="tbc-num">${T[lang].thema} ${i+1}</div>
+            <div class="tbc-name">${escapeHtml(th.name)}</div>
+          </div>`).join('');
+        return;
+      }
+    } catch(e){}
+    cont.innerHTML = '';
+    return;
+  }
+  const ordered = scoreData.filter(d => selectedThemes.includes(d.cluster.id));
+  cont.innerHTML = ordered.map((d, i) =>
+    `<div class="theme-bubble-card" style="background:${THEME_BG_CSS[i]};border-color:${THEME_COLORS_CSS[i]};color:${THEME_COLORS_CSS[i]};margin-bottom:10px">
+      <div class="tbc-num">${T[lang].thema} ${i+1}</div>
+      <div class="tbc-name">${escapeHtml(d.cluster.name)}</div>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════════
+   RESET DEMO-DATA
+══════════════════════════════════════════ */
+function resetDemoData(){
+  if (window.__VK_PROD) return;
+  if (!confirm(T[lang].resetConfirm)) return;
+  const keys = [
+    'vk_session','vk_session_started','vk_vision_sentence','vk_vision_keywords',
+    'vk_phase1_answers','vk_phase1_stage','vk_phase1_live_answers',
+    'vk_selected_themes','vk_phase2_submissions','vk_phase2_stage','vk_phase2_live_subs',
+    'vk_confirmed_actions','vk_versnellers','vk_remmers','vk_phase4_scores','vk_roadmap_actions'
+  ];
+  keys.forEach(k => { try { localStorage.removeItem(k); } catch(e){} });
+  alert(T[lang].resetDone);
+  location.reload();
+}
+
+/* ══════════════════════════════════════════
+   PHASE NAVIGATION
+══════════════════════════════════════════ */
+function goPhase1(){
+  window.location.href = 'visiekaart_fase1.html';
+}
+function goPhase3(){
+  publishStage('final'); // markeer fase 2 als afgerond voor open deelnemer-tabs
+  // Initialiseer fase 3 stage zodat deelnemer-view fase 3 op pre-wait start
+  try { localStorage.setItem('vk_phase3_stage', JSON.stringify({stage:'preWait', at:Date.now()})); } catch(e){}
+  // Cross-device: zet globale stage naar fase 3 zodat deelnemer-apparaten meegaan.
+  if (VK_LIVE && window.vkFb){
+    try{ vkFb.stageSet(vkLiveCode(), JSON.stringify({phase:3, stage:'preWait', at:Date.now()})); }catch(e){}
+  }
+  window.location.href = 'visiekaart_fase3.html';
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+function initLang(){
+  // v4b-fix: consistent met fase 0/1/3/4/5 — voorkeur vk_lang, dan
+  // vk_session_started.lang (taalkeuze bij sessiestart), anders default 'nl'.
+  // GEEN navigator.language meer: dat liet F2 als enige fase Engels tonen op
+  // een Engelstalige browser, terwijl de overige fasen Nederlands bleven.
+  let init = 'nl';
+  try {
+    const stored = localStorage.getItem('vk_lang');
+    if (stored === 'nl' || stored === 'en') {
+      init = stored;
+    } else {
+      const ss = localStorage.getItem('vk_session_started');
+      if (ss) { const o = JSON.parse(ss); if (o && (o.lang==='nl' || o.lang==='en')) init = o.lang; }
+    }
+  } catch(e){}
+  setLang(init, {fromStorage:true, force:true});
+}
+
+function loadVisionSentence(){
+  try {
+    const raw = localStorage.getItem('vk_vision_sentence');
+    if (raw) visionSentence = raw.trim();
+  } catch(e){}
+  if (!visionSentence) visionSentence = (lang==='nl'
+    ? 'Onze stip op de horizon (open fase 1 om te formuleren)'
+    : 'Our dot on the horizon (open phase 1 to formulate)');
+  document.getElementById('visionSentence').textContent = visionSentence;
+  document.getElementById('visionSentence2').textContent = visionSentence;
+  document.getElementById('pVisionText').textContent = visionSentence;
+  document.getElementById('pVisionTextPre').textContent = visionSentence;
+}
+
+// Cross-tab listener
+window.addEventListener('storage', function(e){
+  if (e.key === 'vk_lang' && e.newValue && (e.newValue==='nl' || e.newValue==='en')) {
+    setLang(e.newValue, {fromStorage:true});
+  }
+  if (e.key === 'vk_phase2_stage') {
+    if (!facView) applyStageToPView();
+  }
+});
+
+/* Deelnemer-rol: forceer pView en volg de globale stage uit RTDB. */
+function vkRoleInit(){
+  if(!VK_IS_PARTICIPANT) return;
+  showPView();
+  if(!(VK_LIVE && window.vkFb)) return;
+  try{
+    vkFb.stageListen(vkLiveCode(), function(raw){ applyStageToPView(vkParseStage(raw)); });
+  }catch(e){}
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  vkApplyEnvironmentRules();
+  initLang();
+  buildQSteps();
+  buildIntroGrid();
+  updateQSteps();
+  renderSessPanel();
+  loadVisionSentence();
+  renderExamples();
+  rebuildPThemeFields();
+  // Toon de intro ZONDER te publiceren: anders reset een refresh de actieve
+  // stage en springen deelnemers terug naar het wachtscherm/inlog (werkboek §9.8).
+  if (!vkRestoreFacilitatorView()) goStep('intro', {publish:false});
+  vkRoleInit();
+  // Cluster B (Blok 1): platform-context herstellen uit sessionStorage (geen poort;
+  // de betaalmuur ligt uitsluitend op fase 5 — VK_BETAAL_VANAF_FASE, bevroren door CINAB).
+  if (VK_LIVE && window.VK_CINAB && !VK_IS_PARTICIPANT){ try { VK_CINAB.restore(); } catch(e){} }
+});
+</script>
+
+
+<!-- ═══════════════ PLATFORM / FIREBASE / CINAB (Blok 1, identiek in fase 0-5 + rapport) ═══════════════ -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script type="module">
+  // De ONGEWIJZIGDE module-client; we bridgen alleen zijn publieke API naar window.
+  import { startCinabSession, createCinabClient, CinabError } from './cinab-tool-client.js';
+  window.__cinabLib = { startCinabSession, createCinabClient, CinabError };
+  window.dispatchEvent(new Event('cinab-lib-ready'));
+</script>
+<script>
+/* ── ingebouwde vk-firebase.js ── */
+/* ══════════════════════════════════════════════════════════════════════════
+   vk-firebase.js — Cluster B / Firebase-integratie (niveau B)
+   Wordt straks INGEBOUWD per fase (zelf-bevattend), net als vk-ai.js.
+
+   Levert:
+   - omgevings-config (staging vs productie; NOOIT databaseURL hardcoden in code)
+   - anonieme auth
+   - server-side sessie-state in RTDB  (/sessions/{code}/state)   — vervangt localStorage op B
+   - stage-sync                        (/sessions/{code}/stage)
+   - live-listeners + append           (/sessions/{code}/phaseN/...)
+   - session/clear                     (wist de RTDB-tak; stateless-at-rest)
+
+   ALLES degradeert netjes: ontbreekt de SDK/config of faalt het netwerk, dan
+   rejecten de helpers en de fase valt terug op de bestaande localStorage/demo-flow.
+   De beveiliging zit in database.rules.json, niet in deze config (geen secret).
+   ══════════════════════════════════════════════════════════════════════════ */
+(function (global) {
+  'use strict';
+
+  /* ── Omgevings-config (per omgeving inlezen; productie schoon omwisselbaar) ── */
+  var VK_FB_STAGING = {
+    apiKey: "AIzaSyCer_6Y7f-jUXygHnBF_UdtpTxPTEIvaoA",
+    authDomain: "visiekaart.firebaseapp.com",
+    databaseURL: "https://visiekaart-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "visiekaart",
+    storageBucket: "visiekaart.firebasestorage.app",
+    messagingSenderId: "757784606494",
+    appId: "1:757784606494:web:6f47e48fc85f15f6257b0f"
+  };
+  // Vul in zodra het schone productieproject (europe-west1, CINAB-account) staat:
+  var VK_FB_PROD = null; // bv. { apiKey:"…", databaseURL:"https://…-prod-….europe-west1.firebasedatabase.app", … }
+
+  function vkFbEnv() {
+    var h = (global.location && global.location.hostname) || '';
+    var staging = (h === 'localhost' || h.indexOf('127.') === 0 || h.indexOf('192.168.') === 0 ||
+                   h.indexOf('.local') !== -1 || h.indexOf('.web.app') !== -1 ||
+                   h.indexOf('.firebaseapp.com') !== -1 || h.indexOf('staging.') === 0);
+    return staging ? 'staging' : 'production';
+  }
+  function vkFbConfig() { return vkFbEnv() === 'production' ? VK_FB_PROD : VK_FB_STAGING; }
+
+  /* ── Init + anonieme auth ── */
+  var _readyPromise = null;
+  function vkFbInit() {
+    if (_readyPromise) return _readyPromise;
+    _readyPromise = new Promise(function (resolve, reject) {
+      try {
+        if (typeof global.firebase === 'undefined' || !global.firebase.initializeApp) {
+          return reject(new Error('firebase_sdk_missing'));
+        }
+        var cfg = vkFbConfig();
+        if (!cfg || !cfg.databaseURL) return reject(new Error('firebase_config_missing'));
+        if (!global.firebase.apps || !global.firebase.apps.length) global.firebase.initializeApp(cfg);
+        global.firebase.auth().signInAnonymously()
+          .then(function () { resolve(global.firebase); })
+          .catch(reject);
+      } catch (e) { reject(e); }
+    });
+    return _readyPromise;
+  }
+
+  function db() { return global.firebase.database(); }
+  function sessRef(code, sub) { return db().ref('sessions/' + code + (sub ? '/' + sub : '')); }
+  function nowUTC() { return Date.now(); }
+
+  /* ── Sessie-state (server-side; vervangt localStorage op niveau B) ── */
+  // payload = opaak object (volledige tool-state). WordPress leest dit nooit (data_ref).
+  function stateSave(code, payload) {
+    return vkFbInit().then(function () {
+      return sessRef(code, 'state').set({ updatedAt: nowUTC(), payload: payload });
+    });
+  }
+  function stateLoad(code) {
+    return vkFbInit().then(function () {
+      return sessRef(code, 'state').once('value').then(function (s) {
+        var v = s.val(); return v ? v.payload : null;
+      });
+    });
+  }
+  function stateClear(code) {
+    return vkFbInit().then(function () { return sessRef(code, 'state').remove(); });
+  }
+
+  /* ── Stage-sync (facilitator schrijft, deelnemer leest) ── */
+  function stageSet(code, stage) {
+    return vkFbInit().then(function () { return sessRef(code, 'stage').set(String(stage)); });
+  }
+  function stageListen(code, cb) {
+    return vkFbInit().then(function () {
+      var ref = sessRef(code, 'stage');
+      ref.on('value', function (s) { cb(s.val()); });
+      return function off() { ref.off(); };
+    });
+  }
+
+  /* ── Live inzendingen: listener (facilitator) + append (deelnemer) ── */
+  // sub bv. 'phase4/scores'. cb krijgt een array van waarden (chronologisch).
+  function liveListen(code, sub, cb) {
+    return vkFbInit().then(function () {
+      var ref = sessRef(code, sub);
+      ref.on('value', function (snap) {
+        var arr = []; snap.forEach(function (ch) { var v = ch.val(); if (v) arr.push(v); });
+        cb(arr);
+      });
+      return function off() { ref.off(); };
+    });
+  }
+  function push(code, sub, obj) {
+    return vkFbInit().then(function () {
+      obj = obj || {}; if (typeof obj.at === 'undefined') obj.at = nowUTC();
+      return sessRef(code, sub).push(obj);
+    });
+  }
+
+  /* ── Facilitator: sessie aanmaken / content publiceren / hele tak wissen ── */
+  function ensureSession(code, lang) {
+    return vkFbInit().then(function (fb) {
+      var uid = fb.auth().currentUser.uid;
+      return sessRef(code, 'meta').transaction(function (cur) {
+        if (cur) return cur; // bestaat al → niet overschrijven
+        return { createdAt: nowUTC(), lang: lang || 'nl', facilitatorUid: uid };
+      }).then(function () { return uid; });
+    });
+  }
+  function contentSet(code, content) {
+    return vkFbInit().then(function () { return sessRef(code, 'content').set(content); });
+  }
+  function contentListen(code, cb) {
+    return vkFbInit().then(function () {
+      var ref = sessRef(code, 'content');
+      ref.on('value', function (s) { cb(s.val()); });
+      return function off() { ref.off(); };
+    });
+  }
+  function sessionClear(code) {
+    return vkFbInit().then(function () { return sessRef(code).remove(); });
+  }
+
+  global.vkFb = {
+    env: vkFbEnv, config: vkFbConfig, init: vkFbInit,
+    stateSave: stateSave, stateLoad: stateLoad, stateClear: stateClear,
+    stageSet: stageSet, stageListen: stageListen,
+    liveListen: liveListen, push: push,
+    ensureSession: ensureSession, contentSet: contentSet, contentListen: contentListen,
+    sessionClear: sessionClear
+  };
+})(window);
+
+</script>
+<script>
+/* ── ingebouwde vk-cinab.js ── */
+/* ══════════════════════════════════════════════════════════════════════════
+   vk-cinab.js — Cluster B / Blok 1: koppeling, betaalmuur, rapport-opslaan
+   Glue tussen de ONGEWIJZIGDE module-client (cinab-tool-client.js) en de
+   inline fase-scripts. De client wordt NIET herschreven; deze laag roept
+   alleen zijn publieke API aan en bridget naar window.VK_CINAB.
+
+   Vereist (per fase, in deze volgorde geladen):
+     <script type="module">
+       import { startCinabSession, createCinabClient, CinabError }
+         from './cinab-tool-client.js';
+       window.__cinabLib = { startCinabSession, createCinabClient, CinabError };
+       window.dispatchEvent(new Event('cinab-lib-ready'));
+     <\/script>
+   Optioneel (voor RTDB-state t.b.v. pay-resume): vk-firebase.js (window.vkFb).
+
+   Alles draait ALLEEN in VK_LIVE; ontbreekt platform/lib, dan geeft elke functie
+   netjes null/false terug en draait de tool zelfstandig verder (demo/lokaal).
+   ══════════════════════════════════════════════════════════════════════════ */
+(function (global) {
+  'use strict';
+
+  var SS_KEY = 'vk_cinab';   // sessionStorage: token (capability) + poortconfig — NIET in URL/localStorage-at-rest
+
+  function libReady() {
+    return new Promise(function (resolve) {
+      if (global.__cinabLib) return resolve(global.__cinabLib);
+      var done = false;
+      global.addEventListener('cinab-lib-ready', function () { if (!done) { done = true; resolve(global.__cinabLib); } }, { once: true });
+      setTimeout(function () { if (!done) { done = true; resolve(global.__cinabLib || null); } }, 8000);
+    });
+  }
+
+  function saveCtx(ctx) { try { sessionStorage.setItem(SS_KEY, JSON.stringify(ctx)); } catch (e) {} }
+  function loadCtx()    { try { return JSON.parse(sessionStorage.getItem(SS_KEY) || 'null'); } catch (e) { return null; } }
+  function clearCtx()   { try { sessionStorage.removeItem(SS_KEY); } catch (e) {} }
+  function urlParam(n)  { try { return new URLSearchParams(global.location.search).get(n); } catch (e) { return null; } }
+
+  /* ── Fase 0: verse start (launch→token) of resume → client + context bewaren ── */
+  async function bootstrap() {
+    var lib = await libReady();
+    if (!lib) return null;
+    try {
+      var client = await lib.startCinabSession();           // leest ?launch/?token/?cinab/?action; wist ze uit de URL
+      saveCtx({
+        apiBase: client.apiBase, token: client.token,
+        betaalVanafFase: client.betaalVanafFase, credits: client.credits,
+        parentRapportId: client.parentRapportId || null
+      });
+      try { client.notifyLoaded(); } catch (e) {}
+      return client;
+    } catch (e) { return null; }                            // geen platform-context → tool draait zelfstandig
+  }
+
+  /* ── Andere fasen: client herstellen uit sessionStorage (token reist niet in de URL) ── */
+  async function restore() {
+    var lib = await libReady(); if (!lib) return null;
+    var ctx = loadCtx(); if (!ctx || !ctx.token || !ctx.apiBase) return null;
+    try {
+      return lib.createCinabClient({
+        apiBase: ctx.apiBase, token: ctx.token,
+        betaalVanafFase: ctx.betaalVanafFase, credits: ctx.credits,
+        parentRapportId: ctx.parentRapportId, action: urlParam('action')
+      });
+    } catch (e) { return null; }
+  }
+
+  /* ── Betaalpoort op de start van faseNr (werkboek §5.2). ──
+     resolve(true) = door; resolve(false) = stop/navigeert weg (koop of afbreken). */
+  async function gate(client, faseNr, opts) {
+    opts = opts || {};
+    if (!client || client.betaalVanafFase == null || faseNr < client.betaalVanafFase) return true;
+
+    // Terugkeer na betaling: idempotente retry (al betaald → no-op → door)
+    if (client.isResume) {
+      try { await client.settleSession(); return true; } catch (e) { /* val door naar de poort */ }
+    }
+
+    try { await client.getSaldo(); } catch (e) {}           // advisory, alleen UX
+
+    var credits = (client.credits != null) ? client.credits : null;
+    var vraag = opts.confirmText ||
+      ('Verder naar deze fase? ' + (credits != null ? ('Er worden ' + credits + ' credits afgeschreven.') : 'Er wordt saldo afgeschreven.'));
+    if (!global.confirm(vraag)) return false;               // gebruiker stopt → niets afgeschreven, sessie blijft (TTL)
+
+    try {
+      await client.settleSession();                         // bindend: atomisch + idempotent
+      return true;
+    } catch (e) {
+      if (e && e.isPaymentRequired) {
+        if (opts.beforePay) { try { await opts.beforePay(); } catch (_) {} }   // state persistent zetten vóór de redirect
+        try { global.VK_CINAB.__paying = true; } catch (_) {}                   // signaal voor de poort-UI (redirect ≠ annuleren)
+        client.goToPayment(e, { returnUrl: opts.returnUrl || global.location.href });
+        return false;                                       // navigeert weg naar de shop (window.top.location)
+      }
+      throw e;
+    }
+  }
+
+  /* ── Rapport opslaan (consumeert het token) + WordPress laten doorschakelen ── */
+  async function saveReport(client, wrapper) {
+    var out = await client.saveReport(wrapper);             // → { rapport_id, rapport_url }
+    if (out && out.rapport_url) { try { client.notifyCompleted(out.rapport_url); } catch (e) {} }
+    return out;
+  }
+
+  /* ── Wrapper bouwen uit de tool-state: 20 INK-dimensies + data_ref naar RTDB ── */
+  var INK_IDS = ['A1','A2','A3','A4','A5','A6','A7','A8','A9','A10','B1','B2','B3','B4','B5','B6','B7','B8','B9','B10'];
+
+  function buildWrapper(opts) {
+    opts = opts || {};
+    var p4 = {}; try { p4 = JSON.parse(localStorage.getItem('vk_phase4_scores') || '{}'); } catch (e) {}
+    var all = (p4 && p4.allScores && typeof p4.allScores === 'object') ? p4.allScores : {};
+    var scores = {};
+    INK_IDS.forEach(function (id) {
+      var r = all[id] || {}; var k = +r.k || 0, n = +r.n || 0, a = +r.a || 0; var tot = k + n + a;
+      scores[id.toLowerCase()] = tot ? Math.round((k * 100 + n * 50 + a * 0) / tot) : 50;  // geen stemmen → neutraal 50
+    });
+
+    var sess = {}; try { sess = JSON.parse(localStorage.getItem('vk_session') || '{}'); } catch (e) {}
+    var deelnemers = Array.isArray(sess.participants) ? sess.participants.length : (opts.deelnemers || 0);
+    var meta = {
+      organisatie: sess.org || sess.organisatie || '',
+      datum: new Date().toISOString().slice(0, 10),          // UTC ISO YYYY-MM-DD
+      deelnemers: deelnemers,
+      facilitator: sess.facilitator || sess.facilitatorName || sess.sessionName || ''
+    };
+    if (sess.sector) meta.sector = sess.sector;              // e-mailvrij: geen e-mail in meta
+
+    var code = sess.sessionCode || opts.sessionCode || '';
+    var data = { data_ref: { store: 'firebase-rtdb', path: '/sessions/' + code } };
+    if (opts.includeExport) data.export = collectExport();   // opaak; platform leest dit niet
+
+    return {
+      template_id: 'visiekaart',
+      schema_version: '1.0',
+      scores: scores,
+      meta: meta,
+      data: data,
+      parent_rapport_id: null                                // _cinab_is_vergelijkbaar = false
+    };
+  }
+
+  function collectExport() {
+    var keys = ['vk_session','vk_vision_sentence','vk_vision_keywords','vk_selected_themes',
+      'vk_confirmed_actions','vk_versnellers','vk_remmers','vk_phase4_scores','vk_roadmap_actions'];
+    var out = {};
+    keys.forEach(function (k) {
+      try {
+        var v = localStorage.getItem(k);
+        if (v == null) return;
+        try { out[k] = JSON.parse(v); } catch(e){ out[k] = v; }   // niet-JSON (bv. de visiezin) als ruwe string bewaren, niet droppen
+      } catch (e) {}
+    });
+    return out;
+  }
+
+  global.VK_CINAB = {
+    libReady: libReady, bootstrap: bootstrap, restore: restore, gate: gate,
+    saveReport: saveReport, buildWrapper: buildWrapper, collectExport: collectExport,
+    loadCtx: loadCtx, clearCtx: clearCtx
+  };
+})(window);
+
+</script>
+<script>
+/* ── Blok 2 leeskant: live thema's + stemmen (fase 2) ── */
+(function(){
+  if (!VK_LIVE) return;
+  if (typeof VK_IS_PARTICIPANT !== 'undefined' && VK_IS_PARTICIPANT) return;  // alleen facilitator leest
+  function code(){ try { return (JSON.parse(localStorage.getItem('vk_session')||'{}')).sessionCode||''; } catch(e){ return ''; } }
+  function start(){
+    if (!window.vkFb) return;
+    var c=code(); if(!c) return;
+    vkFb.ensureSession(c,(typeof lang!=='undefined'?lang:'nl'))
+      .then(function(){
+        vkFb.liveListen(c,'phase2/submissions',function(arr){
+          submissions=(arr||[]).map(function(s){ return {name:(s&&s.name)||'',themes:(s&&s.themes)||[]}; });
+          try{ var el=document.getElementById('submittedCount'); if(el) el.textContent=submissions.length; }catch(e){}
+          try{ var list=document.getElementById('incomingList'); if(list) list.innerHTML=submissions.map(function(s){ return '<span style="background:var(--tl);border:1px solid var(--tb);color:var(--teal);font-size:12px;padding:5px 11px;border-radius:18px;font-weight:600">'+escapeHtml(s.name)+' \u00b7 '+(s.themes.length)+'</span>'; }).join(''); }catch(e){}
+        });
+        vkFb.liveListen(c,'phase2/votes',function(arr){
+          votes=(arr||[]).map(function(v){ return {name:(v&&v.name)||'',votes:(v&&v.votes)||{}}; });
+          try{ var el=document.getElementById('voteCount'); if(el) el.textContent=votes.length; }catch(e){}
+          try{ renderVoteProgress(); }catch(e){}
+        });
+      })
+      .catch(function(){});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
+})();
+</script>
+
+<!-- Twee-staps-start: eenmalige bevestig-popup vóór 'Fase 2 starten' (zoals fase 0/1) -->
+<div id="startConfirmBackdrop" class="vk-tip-backdrop" onclick="vkF2ConfirmDismiss()"></div>
+<div id="startConfirmModal" class="vk-tip-popup" data-size="lg" role="dialog" aria-modal="true" aria-labelledby="t-startConfirmTitle">
+  <h3 class="vk-tip-title" id="t-startConfirmTitle">Hebben alle deelnemers de toelichting gelezen en is de vervolgaanpak voor iedereen duidelijk?</h3>
+  <div class="vk-tip-body"><p id="t-startConfirmBody"></p></div>
+  <div class="vk-tip-actions">
+    <button class="btn btn-teal" id="t-startConfirmBtn" onclick="vkF2ConfirmDismiss()" type="button">Akkoord</button>
+  </div>
+</div>
+<script>
+/* Twee-staps-start fase 2 (analoog aan fase 0/1): eerste klik op 'Fase 2 starten'
+   toont eenmalig de bevestig-popup; na 'Akkoord' wordt de knop 'armed' en start de
+   tweede klik de fase (goStep('wait')). Tekst expliciet uit T[lang] (robuust). */
+var f2StartArmed = false;
+function vkF2StartGated(){
+  if (!f2StartArmed){ vkF2ConfirmShow(); return; }
+  goStep('wait');
+}
+function vkF2ConfirmShow(){
+  try{
+    var t = (typeof T!=='undefined' && T[lang]) ? T[lang] : null;
+    if (t){
+      var ti=document.getElementById('t-startConfirmTitle'); if(ti && t.startConfirmTitle) ti.textContent=t.startConfirmTitle;
+      var bo=document.getElementById('t-startConfirmBody');  if(bo && t.startConfirmBody)  bo.textContent=t.startConfirmBody;
+      var bt=document.getElementById('t-startConfirmBtn');   if(bt && t.startConfirmBtn)   bt.textContent=t.startConfirmBtn;
+    }
+  }catch(e){}
+  var modal=document.getElementById('startConfirmModal');
+  var back=document.getElementById('startConfirmBackdrop');
+  if(!modal||!back){ vkF2Arm(); return; }
+  back.classList.add('open');
+  modal.classList.add('open');
+  setTimeout(function(){ var b=document.getElementById('t-startConfirmBtn'); if(b) b.focus(); },50);
+}
+function vkF2ConfirmDismiss(){
+  var modal=document.getElementById('startConfirmModal');
+  var back=document.getElementById('startConfirmBackdrop');
+  if(modal) modal.classList.remove('open');
+  if(back)  back.classList.remove('open');
+  vkF2Arm();
+}
+function vkF2Arm(){
+  f2StartArmed=true;
+  var btn=document.getElementById('introStartBtn');
+  if(btn){ btn.classList.add('armed'); btn.setAttribute('aria-pressed','true'); }
+}
+</script>
+</body>
+</html>
