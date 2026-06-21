@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vaardigheidsmeter Leidinggeven</title>
+<!--
+  v0.2 — GRATIS variant + 360/TEAMANALYSE (demo-modus).
+  De betaalde flow draait hier in DEMO: betaling, e-mailverzending en collega-reacties worden
+  gesimuleerd. Alle platform-afhankelijke punten zitten in het PLATFORM-ADAPTER-blok (zoek op
+  "PLATFORM ADAPTER"). De platformontwikkelaar vult de LIVE-implementatie daarvan in.
+  Productie: link gedeeld cinab-theme.css; self-host fonts; splits in CINAB-fasebestanden (blok 6).
+-->
+<style id="cinab-theme">
+:root{
+  --cinab-amber:#EF9F27;--cinab-amber-dark:#D88C14;--cinab-ink:#1C1C1A;--cinab-offwhite:#FAFAF8;
+  --cinab-line:#E5E3DB;--cinab-grey:#5F5E5A;--cinab-card:#FFFFFF;
+  --tool-red:#E8423F;--tool-green:#BDD24D;--tool-blue:#70A2D7;--tool-yellow:#FCC429;--tool-black:#262A36;
+  --tool-secondary-5:#2C539D;--tool-secondary-9:#2A9791;--tool-secondary-12:#F05736;--tool-secondary-13:#7E352E;
+  --font-heading:Fraunces,Georgia,"Times New Roman",serif;
+  --font-body:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --radius-s:8px;--radius:12px;--radius-pill:999px;--touch-target:44px;--focus-ring:3px solid var(--cinab-amber-dark);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+body{margin:0;background:var(--cinab-offwhite);color:var(--cinab-ink);font-family:var(--font-body);line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+h1,h2,h3{font-family:var(--font-heading);font-weight:600;line-height:1.1;letter-spacing:-0.01em}
+button,a,input,select,textarea{font:inherit}
+:focus-visible{outline:var(--focus-ring);outline-offset:2px;border-radius:4px}
+.cinab-shell{min-height:100vh}
+.cinab-wrap{width:min(1080px,calc(100% - 48px));margin:0 auto}
+.cinab-card{background:var(--cinab-card);border:1px solid var(--cinab-line);border-radius:var(--radius);padding:24px}
+.cinab-button{min-height:var(--touch-target);min-width:var(--touch-target);display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:var(--radius-s);padding:12px 20px;font-weight:700;cursor:pointer;text-decoration:none}
+.cinab-button:disabled,.cinab-button[aria-disabled="true"]{opacity:.55;cursor:not-allowed}
+.cinab-button--primary{background:var(--cinab-amber);color:var(--cinab-ink)}
+.cinab-button--primary:hover{background:var(--cinab-amber-dark)}
+.cinab-button--ink{background:var(--cinab-ink);color:var(--cinab-offwhite)}
+.cinab-button--outline{background:transparent;color:var(--cinab-ink);border:2px solid var(--cinab-ink)}
+.cinab-button--ghost{background:transparent;color:var(--cinab-grey);border:1px solid var(--cinab-line)}
+@media (max-width:720px){.cinab-wrap{width:min(100% - 32px,1080px)}.cinab-card{padding:18px}}
+/* app */
+:root{--fase-accent:var(--tool-secondary-9)}
+.app-header{border-bottom:1px solid var(--cinab-line)}
+.app-header__bar{height:4px;background:var(--fase-accent)}
+.app-header__row{display:flex;align-items:center;gap:12px;padding:14px 0}
+.app-logo{width:34px;height:34px;flex:none}
+.app-title-sm{font-family:var(--font-heading);font-weight:600;font-size:17px}
+.demo-ribbon{margin-left:auto;font-size:12px;font-weight:700;color:var(--tool-secondary-13);border:1px solid var(--cinab-line);border-radius:var(--radius-pill);padding:3px 11px}
+main{padding:28px 0 64px;position:relative}
+.screen[hidden]{display:none}
+.page-head{position:relative;margin-bottom:8px}
+.page-glyph{position:absolute;top:-18px;right:0;font-family:var(--font-heading);font-size:96px;line-height:1;color:var(--cinab-line);pointer-events:none;user-select:none}
+@media (max-width:900px){.page-glyph{display:none}}
+.fasepill{display:inline-block;background:var(--fase-accent);color:var(--cinab-ink);font-size:12px;font-weight:700;padding:4px 12px;border-radius:var(--radius-pill);margin-bottom:14px}
+.page-title{font-size:38px;letter-spacing:-0.025em;margin:0 0 6px;font-weight:600}
+.accent-streak{width:56px;height:5px;background:var(--fase-accent);border-radius:3px;margin:10px 0 18px}
+.lead{color:var(--cinab-grey);max-width:64ch}
+.choice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin:18px 0}
+.choice{text-align:left;background:var(--cinab-card);border:1px solid var(--cinab-line);border-radius:var(--radius);padding:18px;cursor:pointer;display:flex;gap:13px;align-items:flex-start}
+.choice[aria-pressed="true"]{border:2px solid var(--fase-accent);padding:17px}
+.choice__ic{width:26px;height:26px;flex:none;color:var(--fase-accent)}
+.choice__t{font-weight:700;margin:0 0 3px}
+.choice__d{color:var(--cinab-grey);font-size:14px;margin:0}
+.step-label{font-size:13px;font-weight:700;color:var(--cinab-grey);text-transform:uppercase;letter-spacing:.04em;margin:22px 0 2px}
+.note-box{background:var(--cinab-card);border:1px solid var(--cinab-line);border-left:4px solid var(--fase-accent);border-radius:var(--radius-s);padding:12px 14px;color:var(--cinab-grey);font-size:14px;margin:14px 0}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+/* quiz */
+.scale-legend{display:flex;justify-content:space-between;color:var(--cinab-grey);font-size:12px;max-width:520px;margin:6px 0 0}
+.domain-block{margin:26px 0}
+.domain-head{display:flex;align-items:center;gap:9px;margin:0 0 4px}
+.domain-dot{width:13px;height:13px;border-radius:3px;flex:none}
+.domain-name{font-family:var(--font-heading);font-weight:600;font-size:20px}
+.dotted{border:0;border-top:2px dotted var(--cinab-line);margin:0 0 14px}
+.comp{background:var(--cinab-card);border:1px solid var(--cinab-line);border-left:6px solid var(--comp);border-radius:var(--radius);padding:16px 18px;margin:12px 0}
+.comp__title{display:flex;align-items:center;gap:9px;font-weight:700;margin:0 0 10px}
+.coin{width:13px;height:13px;border-radius:50%;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.stmt{margin:10px 0}.stmt__txt{font-size:14px;margin:0 0 6px}
+.scale{display:flex;gap:6px}
+.scale input{position:absolute;opacity:0;width:1px;height:1px}
+.scale label{flex:1;min-width:0;text-align:center;border:1px solid var(--cinab-line);border-radius:var(--radius-s);padding:9px 4px;font-size:14px;font-weight:700;cursor:pointer;min-height:var(--touch-target);display:flex;align-items:center;justify-content:center}
+.scale label:hover{background:var(--cinab-line)}
+.scale input:checked+label{background:var(--cinab-ink);color:var(--cinab-offwhite);border-color:var(--cinab-ink)}
+.scale input:focus-visible+label{outline:var(--focus-ring);outline-offset:2px}
+.comp.na .stmt{opacity:.4;pointer-events:none}
+.na-row{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13px;color:var(--cinab-grey)}
+.na-row input{width:18px;height:18px}
+.progress-bar-track{display:flex;align-items:center;gap:12px;background:var(--cinab-card);border:1px solid var(--cinab-line);border-radius:var(--radius);padding:12px 16px;margin-top:18px;position:sticky;bottom:10px}
+.progress-bar{flex:1;height:8px;background:var(--cinab-line);border-radius:99px;overflow:hidden}
+.progress-bar>span{display:block;height:100%;background:var(--fase-accent);width:0;transition:width .2s}
+.progress-num{font-size:13px;font-weight:700;color:var(--cinab-grey);white-space:nowrap}
+/* result */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0}
+.dcard{background:var(--cinab-card);border:1px solid var(--cinab-line);border-radius:var(--radius);padding:14px 16px}
+.dcard__h{display:flex;align-items:center;gap:8px;color:var(--cinab-grey);font-size:13px;margin-bottom:6px}
+.dcard__v{font-family:var(--font-heading);font-size:28px;font-weight:600;display:flex;align-items:baseline;gap:8px}
+.dcard__v small{font-family:var(--font-body);font-size:13px;font-weight:700;color:var(--cinab-grey)}
+.legendrow{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin:14px 0 4px;color:var(--cinab-grey);font-size:13px}
+.legendrow span{display:flex;align-items:center;gap:7px}
+.tri{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:11px solid var(--cinab-grey)}
+.cir{width:11px;height:11px;border-radius:50%;background:var(--cinab-grey)}
+.bnd{width:18px;height:9px;border-radius:5px;background:var(--cinab-grey);opacity:.3}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.seg{display:inline-flex;border:1px solid var(--cinab-line);border-radius:var(--radius-s);overflow:hidden}
+.seg button{border:0;background:transparent;padding:7px 13px;font-size:13px;cursor:pointer;color:var(--cinab-grey);font-weight:700}
+.seg button[aria-pressed="true"]{background:var(--cinab-ink);color:var(--cinab-offwhite)}
+.axis{display:grid;grid-template-columns:minmax(120px,180px) 1fr 56px;gap:10px}
+.axis__zones{position:relative;height:16px;font-size:11px;color:var(--cinab-grey)}
+.prow{display:grid;grid-template-columns:minmax(120px,180px) 1fr 56px;gap:10px;align-items:center;width:100%;text-align:left;background:none;border:0;border-radius:var(--radius-s);padding:6px;cursor:pointer;font-family:inherit}
+.prow:hover,.prow.sel{background:var(--cinab-card)}
+.prow__l{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--cinab-ink)}
+.rail{position:relative;height:20px}
+.rail__base{position:absolute;left:2%;right:2%;top:50%;height:2px;transform:translateY(-50%);background:var(--cinab-line)}
+.mk-spread{position:absolute;top:50%;height:12px;transform:translateY(-50%);border-radius:6px;opacity:.2}
+.mk-conn{position:absolute;top:50%;height:3px;transform:translateY(-50%);opacity:.45}
+.mk-fb{position:absolute;top:50%;width:12px;height:12px;border-radius:50%;background:var(--c);transform:translate(-50%,-50%)}
+.mk-self{position:absolute;top:50%;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:12px solid var(--c);transform:translate(-50%,-58%)}
+.prow__v{font-size:12px;font-weight:700;color:var(--cinab-grey);text-align:right;white-space:nowrap}
+.insight{background:var(--cinab-card);border:1px solid var(--cinab-line);border-radius:var(--radius);padding:16px;margin-top:14px}
+.beschouwing{margin-top:18px}
+.besch-h{font-size:24px;margin:0 0 4px}
+.beschouwing h3{font-size:15px;margin:16px 0 4px}
+.beschouwing p{color:var(--cinab-ink);font-size:14px;margin:0 0 6px}
+.besch-adv{margin:4px 0 8px;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.besch-adv li{background:var(--cinab-offwhite);border:1px solid var(--cinab-line);border-radius:var(--radius-s);padding:10px 12px;font-size:14px}
+.ob-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;background:var(--cinab-card);border:1px solid var(--cinab-line);border-radius:var(--radius);padding:14px 16px;cursor:pointer;font-weight:700;margin-top:22px}
+.ob-panel{margin-top:10px}
+.ob-panel h3{font-size:15px;margin:16px 0 4px}.ob-panel h3:first-child{margin-top:0}
+.ob-panel p{color:var(--cinab-grey);font-size:14px;margin:0}
+.ob-leg{display:flex;flex-direction:column;gap:7px;margin-top:4px;color:var(--cinab-grey);font-size:14px}
+.ob-leg span{display:flex;align-items:center;gap:9px}
+/* teaser overlay (gratis) */
+.profile-wrap{position:relative}
+.teaser{position:absolute;inset:0;display:none;flex-direction:column;gap:11px;background:var(--cinab-card);border:2px solid var(--fase-accent);border-radius:var(--radius);padding:20px;overflow:auto}
+.teaser.show{display:flex}
+.teaser__close{background:none;border:0;cursor:pointer;color:var(--cinab-grey);font-size:20px;line-height:1;padding:0}
+/* invite / wait */
+.field{display:grid;gap:6px;margin-bottom:12px}
+.label{font-size:13px;font-weight:700}
+.input{width:100%;min-height:var(--touch-target);border:1px solid var(--cinab-line);border-radius:var(--radius-s);background:var(--cinab-card);color:var(--cinab-ink);padding:10px 12px}
+.rater{display:flex;align-items:center;gap:10px;background:var(--cinab-card);border:1px solid var(--cinab-line);border-radius:var(--radius-s);padding:10px 12px;margin:8px 0}
+.rater__meta{flex:1;min-width:0}
+.rater__name{font-weight:700;font-size:14px}
+.rater__sub{color:var(--cinab-grey);font-size:12px;word-break:break-all}
+.badge{font-size:12px;font-weight:700;border-radius:var(--radius-pill);padding:4px 10px;border:1px solid var(--cinab-line);white-space:nowrap}
+.badge--wait{color:var(--cinab-grey)}
+.badge--done{background:var(--tool-green);color:var(--cinab-ink);border-color:var(--tool-green)}
+.iconbtn{background:none;border:0;color:var(--cinab-grey);cursor:pointer;font-size:18px;padding:4px}
+.democtl{border:1px dashed var(--cinab-grey);border-radius:var(--radius-s);padding:12px 14px;margin:16px 0;font-size:13px;color:var(--cinab-grey)}
+.democtl b{color:var(--cinab-ink)}
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(28,28,26,.5);display:flex;align-items:center;justify-content:center;padding:18px;z-index:50}
+.overlay[hidden]{display:none}
+.modal{background:var(--cinab-card);border-radius:var(--radius);padding:24px;max-width:520px;width:100%}
+.modal h2{font-size:22px;margin:0 0 10px}
+.modal p{color:var(--cinab-ink);font-size:14px;margin:0 0 10px}
+/* print */
+@media print{
+  .app-header__bar,.actions,.toolbar,.ob-toggle,.progress-bar-track,.democtl,.teaser,.iconbtn,.demo-ribbon{display:none!important}
+  body:not(.can-print) main{display:none}
+  body:not(.can-print)::after{content:"Printen en downloaden zijn beschikbaar in de 360-meting.";display:block;padding:40px;font-family:var(--font-heading);font-size:20px}
+  .ob-panel[hidden]{display:block!important}
+  .page-glyph{display:none}
+}
+</style>
+</head>
+<body data-mode="free">
+<div class="cinab-shell">
+  <header class="app-header">
+    <div class="app-header__bar"></div>
+    <div class="cinab-wrap app-header__row">
+      <svg class="app-logo" viewBox="0 0 9500 9500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CINAB" style="shape-rendering:geometricPrecision;fill-rule:evenodd;clip-rule:evenodd">
+        <defs><style>.s0{stroke:#F7A710;stroke-width:300;stroke-miterlimit:22.9256}.f2{fill:none}.f3{fill:#F7A710}.f1{fill:#1B938E}.f0{fill:#1B4852}</style></defs>
+        <rect class="f0" x="1379.01" y="1979.16" width="6840.47" height="6840.47" rx="625.64" ry="625.64"/>
+        <rect class="f1" x="1329.01" y="1929.16" width="6840.47" height="6840.47" rx="625.64" ry="625.64"/>
+        <path class="f2 s0" d="M3296.39 1667.14l6.77 2886.05c0.53,225.18 44.93,223.19 131.76,299.11 64.53,56.42 712.98,613.44 1067.73,922.39m279.67 498.36c-3.85,335.14 -17.51,1600.45 -22.09,2025.82m-1460.38 -5160.51l785.98 4.94m3662.81 274.39l-6.72 591.26 -710.88 10.16 0 978.81m-1557.05 3300.95c-5.59,-19.68 -10.23,-41.55 -13.66,-65.97 -40.62,-289.42 -55.5,-1603.06 -55.5,-1603.06m0 0l-12.4 -1458.25c0,0 -44.42,-161.55 137.32,-169.63 181.74,-8.08 658.3,-4.04 658.3,-4.04l-3.77 -1608.68m459.06 3230.04l-615.21 -562.61m1311.37 -167.26l-1179.41 -4.13m-1388.18 1333.84l1210.17 -1126.72c0,0 173.66,-113.07 201.93,-286.74 28.27,-173.67 4.04,-807.74 4.04,-807.74l1579.11 0c0,0 10.18,8.09 137.31,-44.42 53.21,-21.98 127.68,-100.56 196.29,-184.51m-4091.56 3529.88c18.68,-34.96 33.6,-74 38.36,-114.44 16.15,-137.31 24.23,-1514.5 24.23,-1514.5 0,0 -4.03,-137.32 -72.69,-185.78 -68.66,-48.46 -665.89,-556.18 -665.89,-556.18m-467.07 653.4l469.73 -451.59c0,0 69.04,-77 -2.66,-201.81m-1213.8 -2.13l1213.8 2.13 -29.21 -897.55 -563.22 -1.72m-1022.85 -1671.85l3.28 541.68c0,0 -10.23,140.69 117.67,140.69 127.9,0 600.9,26.88 600.9,26.88l-1 659.21m-302.89 299.12l-178.2 -1.97c0,0 -220.41,18.58 -300.07,-21.25 -41.28,-20.64 -175.23,-151.79 -294.75,-273.38m1035.23 -2176.98l5.68 516.43 895.89 -2.1m2.16 920.01l2255.42 21.86m-1471.05 -1258.2l-0.37 394.45 -2.13 2268.51m2268.36 -3395.11c-121.47,117.05 -302.96,241.2 -548.07,278.79m-1062.71 -1009.16l-14.83 1611m313.94 307.52l452.12 4 9.35 -663.77m8.52 -604.84l5.09 -361.34m1408.26 1081.76l-2065.77 2035.4c-50.75,50 -106.04,79.05 -108.71,151.99 -1.64,44.93 10.93,491.27 20.85,827.53m-1774.69 2623.29l879.79 0 134 0 720.63 0 30.4 0 713.76 0 217.25 0 802.66 0 0 323.39 -3498.49 0 0 -323.39zm4646.55 -2710.87c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -167.05,0 -302.47,-135.42 -302.47,-302.47l0.01 -1.06 0 -0.03c0.59,-166.54 135.77,-301.38 302.46,-301.38zm-4993.86 900.52c73.14,0 140.21,25.95 192.51,69.16 8.96,7.4 17.48,15.32 25.53,23.69 52.28,54.37 84.43,128.24 84.43,209.62 0,167.05 -135.42,302.47 -302.47,302.47 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm4491.08 -4342.61c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -64.31,0 -123.92,-20.09 -172.94,-54.31 -15.25,-10.65 -29.49,-22.67 -42.51,-35.88 -53.81,-54.61 -87.02,-129.56 -87.02,-212.28 0,-167.05 135.42,-302.47 302.47,-302.47zm-2395.12 -1464.48c167.05,0 302.47,135.42 302.47,302.47 0,165.17 -132.38,299.39 -296.83,302.4l-5.64 0.07 -2.78 -0.04c-165.76,-1.5 -299.69,-136.31 -299.69,-302.43 0,-167.05 135.42,-302.47 302.47,-302.47zm762.06 1258.76l4.26 0.05c150.23,2.08 273.95,113.65 295.02,258.52 2.08,14.34 3.19,28.99 3.19,43.9 0,18.02 -1.58,35.68 -4.6,52.83 -24.99,141.86 -148.84,249.64 -297.87,249.64l-4.26 -0.05c-93.14,-1.29 -176.09,-44.66 -230.72,-111.98 -42.19,-51.99 -67.49,-118.26 -67.49,-190.44 0,-132.48 85.19,-245.05 203.76,-285.98 30.94,-10.67 64.14,-16.49 98.71,-16.49zm13.61 -966.18c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47l-4.26 -0.05c-23.15,-0.32 -45.66,-3.25 -67.28,-8.49 -132.52,-32.14 -230.93,-151.53 -230.93,-293.93 0,-167.05 135.42,-302.47 302.47,-302.47zm1020.61 503.5c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -71.19,0 -136.62,-24.6 -188.28,-65.75 -33.47,-26.66 -61.16,-60.25 -80.89,-98.62 -21.28,-41.4 -33.3,-88.35 -33.3,-138.1 0,-167.05 135.42,-302.47 302.47,-302.47zm1211.74 1335.28c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47l-3.44 -0.04c-34.1,-0.38 -66.83,-6.4 -97.33,-17.17 -117.5,-41.5 -201.7,-153.55 -201.7,-285.26 0,-167.05 135.42,-302.47 302.47,-302.47zm527.99 1410.14c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -67.13,0 -129.13,-21.88 -179.31,-58.88 -22.76,-16.78 -43.08,-36.67 -60.34,-59.05 -39.39,-51.06 -62.82,-115.06 -62.82,-184.54 0,-167.05 135.42,-302.47 302.47,-302.47zm-1413.53 2298c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-78.67 30.04,-150.32 79.27,-204.12l3.35 -3.6c55.14,-58.34 133.24,-94.75 219.85,-94.75zm-2137.51 -848.14c13.94,0 27.64,0.96 41.07,2.79 75.93,10.31 142.9,48.79 190.05,104.58 44.51,52.66 71.35,120.75 71.35,195.1 0,148.87 -107.54,272.61 -249.18,297.79 -17.3,3.08 -35.11,4.68 -53.29,4.68 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-76.96 28.76,-147.19 76.09,-200.57 55.41,-62.5 136.29,-101.9 226.38,-101.9zm8.96 -2775.7c167.05,0 302.47,135.42 302.47,302.47l-0.07 5.29c-2.82,164.61 -137.12,297.18 -302.4,297.18 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-163.19 129.23,-296.17 290.93,-302.23 3.83,-0.15 7.68,-0.24 11.54,-0.24zm-651.5 -753.18c167.05,0 302.47,135.42 302.47,302.47 0,164.14 -130.75,297.74 -293.77,302.34 -2.89,0.08 -5.79,0.13 -8.7,0.13l-0.29 0c-166.92,-0.16 -302.18,-135.52 -302.18,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm-790.81 -1081.7c167.05,0 302.47,135.42 302.47,302.47 0,142.36 -98.36,261.74 -230.82,293.91 -22.75,5.53 -46.5,8.49 -70.94,8.55l-0.71 0.01c-167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm-900.9 883.74c167.05,0 302.47,135.42 302.47,302.47 0,76.14 -28.14,145.7 -74.58,198.87 -54.77,62.7 -135,102.6 -224.57,103.56l-3.32 0.04c-167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm-678.68 805.98c167.05,0 302.47,135.42 302.47,302.47 0,121.65 -71.83,226.52 -175.38,274.53 -38.12,17.68 -80.54,27.66 -125.26,27.92l-1.83 0.02c-167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm722.22 1973.37l0.46 0.01c166.84,0.25 302.01,135.56 302.01,302.46l-0.01 0.93c-0.5,166.62 -135.72,301.54 -302.46,301.54 -34.45,0 -67.56,-5.77 -98.41,-16.38 -118.74,-40.84 -204.06,-153.49 -204.06,-286.09l0.04 -3.34c1.79,-165.5 136.5,-299.13 302.43,-299.13zm-1285.24 -517.82c39.12,0 76.51,7.43 110.83,20.95 112.22,44.21 191.64,153.59 191.64,281.52 0,85.58 -35.55,162.85 -92.68,217.88 -54.39,52.37 -128.32,84.59 -209.79,84.59 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm663.87 1415.36c66.12,0 127.28,21.24 177.05,57.23 75.98,54.95 125.42,144.31 125.42,245.24l-0.01 0.53c-0.29,166.81 -135.59,301.94 -302.46,301.94 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47z"/>
+        <rect class="f3" x="2995.41" y="8298.87" width="3395.02" height="332.88"/>
+      </svg>
+      <span class="app-title-sm">Vaardigheidsmeter Leidinggeven</span>
+      <span class="demo-ribbon" id="demo-ribbon" hidden>demo</span>
+    </div>
+  </header>
+
+  <main class="cinab-wrap">
+    <!-- KEUZE -->
+    <section class="screen" id="screen-start">
+      <div class="page-head"><div class="page-glyph">0</div>
+        <span class="fasepill">Start</span>
+        <h1 class="page-title">Hoe goed geef jij leiding?</h1><div class="accent-streak"></div>
+        <p class="lead">Breng leiderschapsvaardigheden in beeld op twintig competenties, verdeeld over vier domeinen. Begin met je invalshoek.</p>
+      </div>
+      <div class="step-label">1 · Kies je invalshoek</div>
+      <div class="choice-grid" role="group" aria-label="Invalshoek">
+        <button class="choice" id="p-lead" aria-pressed="false">
+          <svg class="choice__ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="m16 11 2 2 4-4"/></svg>
+          <span><p class="choice__t">Ik ben leidinggevende</p><p class="choice__d">Ik wil inzicht in mijn eigen leiderschap.</p></span>
+        </button>
+        <button class="choice" id="p-emp" aria-pressed="false">
+          <svg class="choice__ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="10" cy="7" r="4"/><path d="M2 21v-2a4 4 0 0 1 4-4h6"/><circle cx="18" cy="16" r="3"/><path d="m22 20-1.5-1.5"/></svg>
+          <span><p class="choice__t">Ik ben medewerker</p><p class="choice__d">Ik wil mijn leidinggevende beoordelen.</p></span>
+        </button>
+      </div>
+      <div id="step2" hidden>
+        <div class="step-label">2 · Kies je variant</div>
+        <div class="choice-grid" role="group" aria-label="Variant">
+          <button class="choice" id="v-free" aria-pressed="false">
+            <svg class="choice__ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v18"/><path d="M5 10l7-7 7 7"/></svg>
+            <span><p class="choice__t" id="v-free-t">Gratis zelftest</p><p class="choice__d" id="v-free-d"></p></span>
+          </button>
+          <button class="choice" id="v-paid" aria-pressed="false">
+            <svg class="choice__ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20v-1.5a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4V20"/><path d="M16 14h1a3 3 0 0 1 3 3v3"/></svg>
+            <span><p class="choice__t" id="v-paid-t"></p><p class="choice__d" id="v-paid-d"></p></span>
+          </button>
+        </div>
+        <div class="actions"><button class="cinab-button cinab-button--primary" id="btn-start" disabled>Volgende</button></div>
+      </div>
+    </section>
+
+    <!-- VRAGENLIJST -->
+    <section class="screen" id="screen-quiz" hidden>
+      <div class="page-head"><div class="page-glyph">?</div>
+        <span class="fasepill" style="--fase-accent:var(--tool-blue)">Vragenlijst</span>
+        <h1 class="page-title" id="quiz-title">Beoordeel de vaardigheden</h1><div class="accent-streak" style="background:var(--tool-blue)"></div>
+        <p class="lead" id="quiz-intro"></p>
+        <div class="scale-legend"><span>1 · nog in ontwikkeling</span><span>3 · voldoende</span><span>5 · zeer vaardig</span></div>
+      </div>
+      <div id="quiz-body"></div>
+      <div class="progress-bar-track">
+        <div class="progress-bar"><span id="pbar"></span></div>
+        <span class="progress-num" id="pnum">0 / 20</span>
+        <button class="cinab-button cinab-button--primary" id="btn-result" disabled>Bekijk mijn resultaat</button>
+      </div>
+    </section>
+
+    <!-- UITNODIGEN (betaald) -->
+    <section class="screen" id="screen-invite" hidden>
+      <div class="page-head"><div class="page-glyph">@</div>
+        <span class="fasepill" style="--fase-accent:var(--tool-green)">Uitnodigen</span>
+        <h1 class="page-title">Nodig collega's uit</h1><div class="accent-streak" style="background:var(--tool-green)"></div>
+        <p class="lead" id="invite-intro"></p>
+      </div>
+      <div class="cinab-card">
+        <div class="field"><label class="label" for="r-name">Naam</label><input class="input" id="r-name" placeholder="Naam van de collega"></div>
+        <div class="field"><label class="label" for="r-email">E-mailadres</label><input class="input" id="r-email" type="email" placeholder="naam@organisatie.nl"></div>
+        <button class="cinab-button cinab-button--outline" id="btn-add-rater">Toevoegen</button>
+      </div>
+      <div id="rater-list" style="margin-top:16px"></div>
+      <div class="note-box" id="invite-count"></div>
+      <div class="actions">
+        <button class="cinab-button cinab-button--ghost" id="btn-invite-back">Terug</button>
+        <button class="cinab-button cinab-button--primary" id="btn-send" disabled>Verstuur uitnodigingen</button>
+      </div>
+    </section>
+
+    <!-- VERZAMELEN (betaald) -->
+    <section class="screen" id="screen-wait" hidden>
+      <div class="page-head"><div class="page-glyph">&#8230;</div>
+        <span class="fasepill" style="--fase-accent:var(--tool-yellow)">Verzamelen</span>
+        <h1 class="page-title">Reacties verzamelen</h1><div class="accent-streak" style="background:var(--tool-yellow)"></div>
+        <p class="lead">De uitnodigingen zijn verstuurd. Zodra minimaal 3 collega's hebben gereageerd, wordt het teambeeld zichtbaar. Je kunt deze pagina later opnieuw openen vanuit je account.</p>
+      </div>
+      <div id="wait-list"></div>
+      <div class="note-box" id="wait-count"></div>
+      <div class="democtl" id="wait-demo">
+        <b>Demo:</b> in productie komen reacties binnen via de uitnodigingslinks. Voor deze demo kun je reacties simuleren.
+        <div class="actions" style="margin-top:10px">
+          <button class="cinab-button cinab-button--outline" id="btn-sim">Simuleer reacties</button>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="cinab-button cinab-button--primary" id="btn-to-result" disabled>Bekijk teambeeld</button>
+      </div>
+    </section>
+
+    <!-- RESULTAAT -->
+    <section class="screen" id="screen-result" hidden>
+      <div class="page-head"><div class="page-glyph">&#10003;</div>
+        <span class="fasepill" style="--fase-accent:var(--tool-black);color:#fff">Resultaat</span>
+        <h1 class="page-title" id="result-title">Jouw leiderschapsprofiel</h1><div class="accent-streak" style="background:var(--tool-black)"></div>
+        <p class="lead" id="result-note"></p>
+      </div>
+      <div id="result-anon" class="note-box" hidden></div>
+      <div class="cards" id="result-cards"></div>
+      <div class="toolbar">
+        <div class="legendrow" id="result-legend"></div>
+        <div class="seg" id="sortseg" hidden><button id="s-model" aria-pressed="true">Model</button><button id="s-gap" aria-pressed="false">Grootste verschil</button></div>
+      </div>
+      <div class="axis"><span></span><div class="axis__zones"><span style="position:absolute;left:2%">in ontwikkeling</span><span style="position:absolute;left:48%;transform:translateX(-50%)">voldoende</span><span style="position:absolute;right:2%">zeer vaardig</span></div><span></span></div>
+      <div class="profile-wrap">
+        <div id="result-profile"></div>
+        <div class="teaser" id="teaser">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+            <strong style="font-family:var(--font-heading);font-size:18px">Zo ziet je profiel eruit mét feedback van collega's</strong>
+            <button class="teaser__close" id="teaser-close" aria-label="Sluiten">&times;</button>
+          </div>
+          <p style="color:var(--cinab-grey);font-size:14px;margin:0">In de 360-meting zie je per competentie het gemiddelde van collega's (cirkel), de spreiding (band) en het verschil met je eigen beeld (de lijn). Daar zitten je blinde vlekken.</p>
+          <span style="font-size:11px;color:var(--cinab-grey)">voorbeeld</span>
+          <div id="teaser-demo"></div>
+          <div class="actions" style="margin-top:4px">
+            <button class="cinab-button cinab-button--primary" id="teaser-go">Start de 360-meting</button>
+            <button class="cinab-button cinab-button--ghost" id="teaser-dismiss">Bekijk mijn resultaat</button>
+          </div>
+        </div>
+      </div>
+      <div id="insight" class="insight" hidden></div>
+      <div id="beschouwing"></div>
+      <button class="ob-toggle" id="ob-toggle" aria-expanded="false"><span>Onderbouwing &amp; legenda</span><span id="ob-chev">&#9662;</span></button>
+      <div class="cinab-card ob-panel" id="ob-panel" hidden>
+        <h3>Waarop is deze test gebaseerd?</h3>
+        <p>De Vaardigheidsmeter bouwt voort op de oorspronkelijke 360-graden-methodiek met vier domeinen en is geactualiseerd naar de huidige organisatiekunde: een verschuiving van sturend "command-and-control" naar wendbaar, inclusief en mensgericht leiderschap. De competenties zijn aangescherpt op basis van actueel onderzoek (o.a. Korn Ferry, Harvard Business Impact, EY) en gevestigde concepten als psychologische veiligheid (Edmondson), emotionele intelligentie (Goleman), coachend leiderschap en zelfreflectie.</p>
+        <h3>Werkwijze</h3>
+        <p>20 competenties over 4 domeinen, elk gemeten met twee gedragsstellingen op een 5-puntsschaal. De scores worden samengevat per competentie en per domein op een schaal van 0–100. In de 360- of teamvariant worden meerdere beoordelaars uitgenodigd; hun antwoorden worden samengevat tot een gemiddelde met spreiding.</p>
+        <h3>Legenda</h3>
+        <div class="ob-leg">
+          <span><span style="width:18px;text-align:center"><span class="tri" style="display:inline-block"></span></span>Driehoek: het eigen beeld — jouw zelfbeoordeling, of jouw beoordeling van de leidinggevende.</span>
+          <span><span style="width:18px;text-align:center"><span class="cir" style="display:inline-block"></span></span>Cirkel: het gemiddelde beeld van anderen of van het team.</span>
+          <span><span style="width:18px;text-align:center"><span class="bnd" style="display:inline-block"></span></span>Band: de spreiding — laagste tot hoogste score van de beoordelaars.</span>
+        </div>
+        <h3>Periodiek meten</h3>
+        <p>Dit is een ontwikkelinstrument. Leiderschap groeit door oefening en feedback. Het is zinvol om de meting periodiek te herhalen en de voortgang te vergelijken met je vorige meting.</p>
+        <h3>Privacy en AVG</h3>
+        <p>In de gratis variant wordt niets opgeslagen. In de betaalde variant worden antwoorden van beoordelaars standaard anoniem en samengevat weergegeven; individuele antwoorden worden alleen met naam getoond als élke beoordelaar daar expliciet mee instemt. Persoonsgegevens worden uiterlijk 30 dagen na afronding verwijderd; voor het vergelijken bewaren we alleen geaggregeerde scores in je account. De gegevens worden binnen de EU verwerkt.</p>
+        <h3>Belangrijk</h3>
+        <p>Dit is een ontwikkelinstrument, geen officiële beoordeling of psychologische diagnose. De uitkomsten zijn een startpunt voor gesprek en gerichte ontwikkeling.</p>
+      </div>
+      <div class="actions" id="result-actions"></div>
+    </section>
+  </main>
+</div>
+
+<!-- POPUP -->
+<div class="overlay" id="overlay" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-t">
+  <h2 id="modal-t"></h2><div id="modal-body"></div>
+  <div class="actions"><button class="cinab-button cinab-button--ghost" id="modal-cancel">Annuleren</button><button class="cinab-button cinab-button--primary" id="modal-ok"></button></div>
+</div></div>
+
+<script type="module">
+  /* Live-bibliotheken (Firebase + CINAB-client). Faalt stil terug naar demo/standalone. */
+  window.__VLM_LIB__ = (async function(){
+    try{
+      var cinab   = await import('./cinab-tool-client.js');
+      var appMod  = await import('https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js');
+      var authMod = await import('https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js');
+      var dbMod   = await import('https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js');
+      return { cinab: cinab, fb: Object.assign({}, appMod, authMod, dbMod) };
+    }catch(e){ console.warn('[VLM] live-bibliotheken niet geladen (demo/standalone):', e); return null; }
+  })();
+</script>
+<script>
+"use strict";
+/* ── Firebase-config — project bevestigd door platform: cinab-vaardigheidsmeter-leidinggeven (europe-west1).
+   apiKey en appId zijn publieke client-waarden uit de Firebase-console (geen secrets). ── */
+var FB_CONFIG={
+  apiKey:"AIzaSyAEm1owfpl9MwzFUsyCQ_l1EYoHy0d3ZEA"
+  authDomain:"vaardigheidsmeter-leidinggeven.firebaseapp.com",
+  databaseURL:"https://vaardigheidsmeter-leidinggeven-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"vaardigheidsmeter-leidinggeven",
+  appId:"1:502450754697:web:698a06befb85eb8508e258"
+};
+/* ====================== PLATFORM ADAPTER ==================================
+   Demo-implementatie hieronder werkt standalone. De platformontwikkelaar vult
+   de LIVE-implementatie in (zie PLATFORM-WERKBOEK §3). Contract per functie:
+     init()                      -> detecteert launch/token; laadt client + Firebase (live)
+     ensureAccountAndCredits()   -> {ok, saldo}; stuurt zo nodig naar login/credit-shop
+     settle()                    -> {betaald:true}; bindende, idempotente creditafschrijving
+     sendInvites(raters, meta)   -> verstuurt uitnodigingsmails (Route 1, via platform)
+     subscribeResponses(cb)      -> levert binnenkomende beoordelingen (RTDB onValue)
+     saveReport(wrapper)         -> {rapport_url}
+     notifyLoaded()/notifyCompleted(url)
+========================================================================= */
+var Platform=(function(){
+  var live=false, demoResponses=[], cb=null;
+  var client=null, fb=null, db=null, auth=null, uid=null, code=null, apiBase=null, returnUrl=null;
+  var SKEY="vlm_cinab";
+  function loadState(){ try{return JSON.parse(sessionStorage.getItem(SKEY)||"null");}catch(e){return null;} }
+  function saveState(o){ try{sessionStorage.setItem(SKEY,JSON.stringify(o));}catch(e){} }
+  function persist(){ if(!live)return; var s=loadState()||{};
+    s.apiBase=apiBase; s.code=code; s.token=client&&client.token;
+    s.betaalVanafFase=client&&client.betaalVanafFase; s.credits=client&&client.credits;
+    s.persp=state.persp; s.variant=state.variant; s.answers=state.answers; saveState(s); }
+  function genCode(){ var s="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",o=""; for(var i=0;i<6;i++)o+=s[Math.floor(Math.random()*s.length)]; return o; }
+  return {
+    isLive:function(){return live;},
+    getCode:function(){return code;},
+    save:persist,
+    isResume:function(){return !!(live&&client&&client.isResume);},
+    restoreState:function(){return loadState();},
+    async init(){
+      var p=new URLSearchParams(location.search);
+      if(!(p.get("launch")||p.get("token"))) return false;            // geen token -> demo/standalone
+      var lib=await (window.__VLM_LIB__||Promise.resolve(null));
+      if(!lib){ live=false; return false; }
+      fb=lib.fb;
+      try{
+        client=await lib.cinab.startCinabSession();                   // launch->token, wist URL-params
+        apiBase=client.apiBase; returnUrl=location.href.split("#")[0];
+        var app=fb.initializeApp(FB_CONFIG); auth=fb.getAuth(app); db=fb.getDatabase(app);
+        var cred=await fb.signInAnonymously(auth); uid=cred.user.uid;
+        var prev=loadState();
+        if(client.isResume && prev && prev.code){                     // terugkeer na betaling
+          code=prev.code; state.persp=prev.persp; state.variant=prev.variant; state.answers=prev.answers||{};
+        } else if(p.get("session")||p.get("code")){                   // platform-relaunch (§3.7a, dashboard)
+          code=p.get("session")||p.get("code");
+        } else {                                                      // verse start: nieuwe sessie aanmaken
+          code=genCode();
+          await fb.set(fb.ref(db,'sessions/'+code+'/meta'),{createdAt:fb.serverTimestamp(),lang:'nl',facilitatorUid:uid,tool:'vaardigheidsmeter_leidinggeven'});
+        }
+        live=true; persist(); return true;
+      }catch(e){ console.warn('[VLM] live-init mislukt, val terug op demo:',e); live=false; return false; }
+    },
+    async ensureAccountAndCredits(){
+      if(!live) return {ok:true,saldo:99,demo:true};
+      try{ var r=await client.getSaldo(); return {ok:true,saldo:(r&&r.saldo)||0}; }
+      catch(e){ return {ok:true,saldo:0}; }                           // saldo is advisory; settle is bindend
+    },
+    async settle(){
+      if(!live) return {betaald:true,demo:true};
+      persist();                                                      // state persistent vóór mogelijke redirect
+      try{ var r=await client.settleSession(); var s=loadState()||{}; s.settled=true; saveState(s); return {betaald:!!(r&&r.betaald)}; }
+      catch(e){ if(e.isPaymentRequired){ persist(); client.goToPayment(e,{returnUrl:returnUrl}); return {betaald:false,redirect:true}; } throw e; }
+    },
+    async sendInvites(raters, meta){
+      if(!live){ return {sent:raters.length, demo:true}; }
+      // 1) sessie-inhoud publiceren zodat beoordelaars de join-pagina kunnen renderen
+      await fb.set(fb.ref(db,'sessions/'+code+'/content'),{
+        tool_naam:'Vaardigheidsmeter Leidinggeven', organisatie:(meta&&meta.organisatie)||'',
+        initiatiefnemer:(meta&&meta.initiatiefnemer)||'', subject:(meta&&meta.subject)||'je leidinggevende',
+        persp:state.persp, lang:'nl', createdAt:fb.serverTimestamp()
+      });
+      // 2) join-links bouwen en het platform de mails laten versturen (Route 1; geen adressen in WP)
+      var payload=raters.map(function(r){return {name:r.name, email:r.email, join_url:location.origin+'/join/'+code};});
+      var res=await fetch(apiBase+'/wp-json/cinab/v1/stuur-uitnodigingen',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({token:client.token, raters:payload,
+          meta:{initiatiefnemer:(meta&&meta.initiatiefnemer)||'', organisatie:(meta&&meta.organisatie)||'', tool_naam:'Vaardigheidsmeter Leidinggeven'}})
+      });
+      if(!res.ok) throw new Error('stuur-uitnodigingen faalde ('+res.status+')');
+      return {sent:raters.length};
+    },
+    subscribeResponses(callback){ cb=callback;
+      if(!live) return;
+      fb.onValue(fb.ref(db,'sessions/'+code+'/answers'), function(snap){
+        var list=[]; snap.forEach(function(ch){ var v=ch.val()||{};
+          list.push({name:v.name||'', email:v.email||'', naamZichtbaar:!!v.naamZichtbaar, vals:v.vals||{}}); });
+        if(cb) cb(list);
+      });
+    },
+    _demoPush(list){ demoResponses=list; if(cb) cb(list); },
+    async saveReport(wrapper){
+      if(!live) return {rapport_url:"#demo-rapport", demo:true};
+      var out=await client.saveReport(wrapper); return out||{rapport_url:""};
+    },
+    notifyLoaded(){ if(live&&client) client.notifyLoaded(); },
+    notifyCompleted(url){ if(live&&client) client.notifyCompleted(url); }
+  };
+})();
+
+/* ====================== DATA ====================== */
+var DOMAINS=[
+ {id:"richting_visie",name:"Richting & Visie",color:"#70A2D7",comps:[
+  {n:"LV1",label:"Visie & betekenis geven",a:"Maakt de richting van de organisatie concreet en verbindt het werk van het team aan een groter doel.",b:"Helpt teamleden de zin en bijdrage van hun eigen werk te zien."},
+  {n:"LV2",label:"Verwachtingen & kaders verhelderen",a:"Maakt duidelijk welke resultaten en welk gedrag van het team worden verwacht.",b:"Stelt samen met medewerkers heldere, haalbare doelen en kaders."},
+  {n:"LV3",label:"Inspireren & motiveren",a:"Genereert energie en betrokkenheid voor gezamenlijke doelen.",b:"Sluit aan bij wat individuele teamleden drijft en geeft hen ruimte en autonomie."},
+  {n:"LV4",label:"Voorbeeldgedrag & integriteit",a:"Handelt zelf naar de waarden en afspraken die van anderen worden gevraagd.",b:"Neemt verantwoordelijkheid voor eigen gedrag, fouten en ontwikkeling."},
+  {n:"LV5",label:"Stakeholders & omgeving",a:"Behartigt de belangen van het team bij anderen en haalt benodigde steun en ruimte op.",b:"Bouwt en onderhoudt goede relaties met relevante partijen binnen en buiten de organisatie."}]},
+ {id:"uitvoering_wendbaarheid",name:"Uitvoering & Wendbaarheid",color:"#BDD24D",comps:[
+  {n:"LV6",label:"Plannen & prioriteren",a:"Vertaalt doelen naar realistische plannen, prioriteiten en heldere afspraken.",b:"Organiseert het werk zo dat het ook op afstand of hybride soepel en transparant verloopt."},
+  {n:"LV7",label:"Besluitvorming & participatie",a:"Betrekt de juiste mensen en informatie bij belangrijke besluiten.",b:"Toont respect voor verschillende inzichten en durft tijdig een knoop door te hakken."},
+  {n:"LV8",label:"Probleemoplossing & analyse",a:"Doorgrondt een probleem en de onderliggende oorzaken voordat er gehandeld wordt.",b:"Genereert opties, weegt de gevolgen af en kiest een passende aanpak."},
+  {n:"LV9",label:"Eerlijkheid & rechtvaardigheid",a:"Hanteert dezelfde, transparante spelregels voor iedereen, inclusief zichzelf.",b:"Herkent ongelijke behandeling of vooroordeel en corrigeert dat."},
+  {n:"LV10",label:"Resultaat- & impactgerichtheid",a:"Stuurt op heldere, meetbare resultaten en houdt de voortgang zichtbaar.",b:"Houdt de waarde voor klant of eindgebruiker en de bedoeling centraal."}]},
+ {id:"mensen_ontwikkeling",name:"Mensen & Ontwikkeling",color:"#2A9791",comps:[
+  {n:"LV11",label:"Coachen & ontwikkelen",a:"Brengt ontwikkelbehoeften van individu en team scherp in beeld.",b:"Coacht met vragen en ruimte, in plaats van vooral voor te schrijven."},
+  {n:"LV12",label:"Delegeren & eigenaarschap",a:"Geeft taken én de bijbehorende verantwoordelijkheid aan de juiste mensen.",b:"Geeft vertrouwen en duidelijke kaders, zodat mensen zelf eigenaar worden."},
+  {n:"LV13",label:"Feedback & ontwikkelgesprekken",a:"Geeft regelmatig en tijdig waarderende én opbouwende feedback.",b:"Voert echte ontwikkelgesprekken en staat zelf open voor de dialoog."},
+  {n:"LV14",label:"Loopbaan & gelijke groeikansen",a:"Helpt teamleden een realistisch beeld te vormen van groei- en loopbaankansen.",b:"Zorgt dat iedereen gelijke kansen krijgt om te leren en door te groeien."},
+  {n:"LV15",label:"Samenwerking & psychologische veiligheid",a:"Bevordert samenwerking en goede onderlinge verhoudingen in het team.",b:"Creëert een veilige sfeer waarin mensen fouten, twijfels en ideeën durven delen."}]},
+ {id:"verandering_innovatie",name:"Verandering & Innovatie",color:"#F05736",comps:[
+  {n:"LV16",label:"Kansen & innovatie zien",a:"Spot actief kansen om het werk of de resultaten te verbeteren.",b:"Moedigt anderen aan creatief te denken en met ideeën te komen."},
+  {n:"LV17",label:"Experimenteren & leren van fouten",a:"Durft nieuwe werkwijzen uit te proberen, ook als de uitkomst onzeker is.",b:"Leert van wat misgaat en past de aanpak zichtbaar aan."},
+  {n:"LV18",label:"Communiceren over verandering",a:"Communiceert tijdig en open over veranderingen en het waarom ervan.",b:"Houdt rekening met wat verandering met mensen doet."},
+  {n:"LV19",label:"Openstaan voor feedback & reflectie",a:"Vraagt actief om feedback op het eigen functioneren.",b:"Reflecteert op die feedback en doet er zichtbaar iets mee."},
+  {n:"LV20",label:"Betrokkenheid bij verandering verwerven",a:"Benoemt en begrijpt oorzaken van weerstand tegen verandering.",b:"Neemt weerstand weg en weet mensen mee te krijgen."}]}
+];
+var COMPS=[];DOMAINS.forEach(function(d){d.comps.forEach(function(c){c._d=d;COMPS.push(c);});});
+
+var TEKST={
+ lead:{vFree:["Gratis zelftest","1 persoon · geen account · resultaat op het scherm"],
+  vPaid:["360-meting","collega's uitnodigen · account + 1 credit · download/print"],
+  quizTitle:"Beoordeel jezelf", quizIntro:"Beoordeel jezelf op elke vaardigheid. Wees eerlijk — juist je ontwikkelpunten zijn waardevol.",
+  inviteIntro:"Nodig collega's uit om jou te beoordelen op dezelfde twintig competenties. Het teambeeld wordt zichtbaar vanaf 3 reacties.",
+  resultNoteFree:"Dit is je eigen beeld van je leiderschap. Wil je weten hoe collega's je zien? Dat kan met de 360-meting.",
+  resultNote360:"Jouw beeld naast het gemiddelde van je collega's. Klik op een competentie voor de duiding van het verschil.",
+  selLeg:"jouw eigen beeld", othLeg:"gemiddelde van collega's", othCard:"anderen",
+  popupTitle:"Je kiest de 360-meting",
+  popupBody:"Hiervoor wordt <b>1 credit</b> afgeschreven. Deze analyse is pas zinvol als minimaal 3 mensen je uitnodiging beantwoorden. Nodig daarom voldoende collega's uit van wie je weet dat ze willen meewerken. Bij minder dan 3 reacties zie je wel je eigen resultaat, maar nog geen teambeeld.",
+  popupOk:"Akkoord (1 credit)"},
+ emp:{vFree:["Gratis beoordeling","1 persoon · geen account · resultaat op het scherm"],
+  vPaid:["Teamanalyse","collega's uitnodigen · account + 1 credit · download/print"],
+  quizTitle:"Beoordeel je leidinggevende", quizIntro:"Beoordeel je leidinggevende op elke vaardigheid. Wees zo eerlijk en objectief mogelijk.",
+  inviteIntro:"Nodig collega's uit om jullie leidinggevende te beoordelen op dezelfde twintig competenties. Het teambeeld wordt zichtbaar vanaf 3 reacties.",
+  resultNoteFree:"Dit is jouw beeld van je leidinggevende. Wil je dit afzetten tegen het beeld van het hele team? Dat kan met de teamanalyse.",
+  resultNote360:"Jouw beeld van de leidinggevende naast het teamgemiddelde. Klik op een competentie voor de duiding.",
+  selLeg:"jouw beoordeling", othLeg:"gemiddelde van het team", othCard:"team",
+  popupTitle:"Je start een teamanalyse van je leidinggevende",
+  popupBody:"De uitkomst is een gezamenlijk beeld van het team. Nodig je je leidinggevende zelf ook uit, dan tellen zijn/haar antwoorden mee als die van een gelijkwaardig teamlid — er is geen aparte zelfbeoordeling.<br><br>Hiervoor wordt <b>1 credit</b> afgeschreven; de analyse is pas zinvol vanaf 3 reacties.",
+  popupOk:"Akkoord (1 credit)"}
+};
+
+/* ====================== STATE & NAV ====================== */
+var state={persp:null,variant:null,answers:{},raters:[],responses:[],sort:"model",sel:null,demoNames:false};
+var $=function(id){return document.getElementById(id);};
+function show(id){["screen-start","screen-quiz","screen-invite","screen-wait","screen-result"].forEach(function(s){$(s).hidden=(s!==id);});window.scrollTo(0,0);}
+var R=function(v){return Math.round(v);};
+var pctPos=function(v){return 4+v*0.92;};
+var darken=function(hex){var n=parseInt(hex.slice(1),16);var r=Math.max(0,(n>>16)-40),g=Math.max(0,((n>>8)&255)-40),b=Math.max(0,(n&255)-40);return "#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);};
+var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});};
+
+/* ====================== KEUZE ====================== */
+function setPersp(p){state.persp=p;$("p-lead").setAttribute("aria-pressed",p==="lead");$("p-emp").setAttribute("aria-pressed",p==="emp");
+ var t=TEKST[p];$("v-free-t").textContent=t.vFree[0];$("v-free-d").textContent=t.vFree[1];$("v-paid-t").textContent=t.vPaid[0];$("v-paid-d").textContent=t.vPaid[1];$("step2").hidden=false;}
+function setVariant(v){state.variant=v;$("v-free").setAttribute("aria-pressed",v==="free");$("v-paid").setAttribute("aria-pressed",v==="paid");$("btn-start").disabled=!(state.persp&&state.variant);}
+$("p-lead").onclick=function(){setPersp("lead");};
+$("p-emp").onclick=function(){setPersp("emp");};
+$("v-free").onclick=function(){setVariant("free");};
+$("v-paid").onclick=function(){setVariant("paid");};
+$("btn-start").onclick=function(){ if(state.variant==="paid"){openPaywall();} else { document.body.dataset.mode="free"; startQuiz(); } };
+
+/* ====================== BETAALPOORT (popup) ====================== */
+function openPaywall(){
+ var t=TEKST[state.persp];
+ $("modal-t").textContent=t.popupTitle; $("modal-body").innerHTML="<p>"+t.popupBody+"</p>"+(Platform.isLive()?"":"<p style='color:var(--cinab-grey);font-size:13px'><b>Demo:</b> er wordt geen echte betaling gedaan.</p>");
+ $("modal-ok").textContent=t.popupOk; $("overlay").hidden=false;
+ $("modal-ok").onclick=async function(){
+   $("modal-ok").disabled=true;
+   var acc=await Platform.ensureAccountAndCredits(); if(!acc.ok){return;}
+   var s=await Platform.settle(); $("modal-ok").disabled=false;
+   if(s&&s.betaald){ $("overlay").hidden=true; document.body.dataset.mode="paid"; startQuiz(); }
+ };
+}
+$("modal-cancel").onclick=function(){$("overlay").hidden=true;};
+
+/* ====================== VRAGENLIJST ====================== */
+function scaleHTML(name){var h='<div class="scale" role="radiogroup">';for(var i=1;i<=5;i++){h+='<input type="radio" id="'+name+'_'+i+'" name="'+name+'" value="'+i+'"><label for="'+name+'_'+i+'">'+i+'</label>';}return h+'</div>';}
+function startQuiz(){
+ var t=TEKST[state.persp];$("quiz-title").textContent=t.quizTitle;$("quiz-intro").textContent=t.quizIntro;
+ $("btn-result").textContent=(state.variant==="paid")?"Naar uitnodigen":"Bekijk mijn resultaat";
+ buildQuiz();show("screen-quiz");
+}
+var quizBuilt=false;
+function buildQuiz(){
+ var body=$("quiz-body");body.innerHTML="";
+ DOMAINS.forEach(function(d){
+  var blk=document.createElement("div");blk.className="domain-block";
+  blk.innerHTML='<div class="domain-head"><span class="domain-dot" style="background:'+d.color+'"></span><span class="domain-name">'+d.name+'</span></div><hr class="dotted">';
+  d.comps.forEach(function(c){
+   var el=document.createElement("div");el.className="comp";el.style.setProperty("--comp",d.color);el.id="comp-"+c.n;
+   el.innerHTML='<p class="comp__title"><span class="coin" style="background:'+d.color+'"></span>'+c.n+' · '+c.label+'</p>'+
+    '<div class="stmt"><p class="stmt__txt">'+c.a+'</p>'+scaleHTML(c.n+"_a")+'</div>'+
+    '<div class="stmt"><p class="stmt__txt">'+c.b+'</p>'+scaleHTML(c.n+"_b")+'</div>'+
+    '<label class="na-row"><input type="checkbox" id="na-'+c.n+'"> Niet van toepassing voor deze functie</label>';
+   blk.appendChild(el);
+  });
+  body.appendChild(blk);
+ });
+ if(!quizBuilt){body.addEventListener("change",onAnswer);quizBuilt=true;}
+ updateProgress();
+}
+function onAnswer(e){var t=e.target;
+ if(t.type==="checkbox"){var n=t.id.replace("na-","");state.answers[n]=state.answers[n]||{};state.answers[n].na=t.checked;$("comp-"+n).classList.toggle("na",t.checked);}
+ else if(t.type==="radio"){var p=t.name.split("_");state.answers[p[0]]=state.answers[p[0]]||{};state.answers[p[0]][p[1]]=parseInt(t.value,10);}
+ if(Platform.isLive())Platform.save();
+ updateProgress();
+}
+function resolved(c){var a=state.answers[c.n];return a&&(a.na===true||(a.a&&a.b));}
+function updateProgress(){var done=COMPS.filter(resolved).length;$("pbar").style.width=(done/20*100)+"%";$("pnum").textContent=done+" / 20";$("btn-result").disabled=(done<20);}
+$("btn-result").onclick=function(){ if(state.variant==="paid"){ buildInvite(); show("screen-invite"); } else { renderResult(); show("screen-result"); } };
+
+/* ====================== UITNODIGEN ====================== */
+function buildInvite(){$("invite-intro").textContent=TEKST[state.persp].inviteIntro;renderRaters();}
+function renderRaters(){
+ var box=$("rater-list");box.innerHTML="";
+ state.raters.forEach(function(r,i){
+  var el=document.createElement("div");el.className="rater";
+  el.innerHTML='<div class="rater__meta"><div class="rater__name">'+esc(r.name)+'</div><div class="rater__sub">'+esc(r.email)+'</div></div>'+
+   '<span class="badge badge--wait">uitgenodigd</span><button class="iconbtn" data-i="'+i+'" aria-label="Verwijderen">&times;</button>';
+  box.appendChild(el);
+ });
+ box.querySelectorAll(".iconbtn").forEach(function(b){b.onclick=function(){state.raters.splice(+b.dataset.i,1);renderRaters();};});
+ $("invite-count").textContent=state.raters.length+" collega('s) toegevoegd. Advies: nodig er ruim voldoende uit, want het teambeeld verschijnt vanaf 3 reacties.";
+ $("btn-send").disabled=state.raters.length<1;
+}
+$("btn-add-rater").onclick=function(){
+ var name=$("r-name").value.trim(),email=$("r-email").value.trim();
+ if(!name||!/.+@.+\..+/.test(email)){alert("Vul een naam en een geldig e-mailadres in.");return;}
+ state.raters.push({name:name,email:email});$("r-name").value="";$("r-email").value="";renderRaters();
+};
+$("btn-invite-back").onclick=function(){show("screen-quiz");};
+$("btn-send").onclick=async function(){
+ var qp=new URLSearchParams(location.search);
+ var meta={persp:state.persp,template_id:"vaardigheidsmeter_leidinggeven",
+  organisatie:qp.get("org")||"", initiatiefnemer:qp.get("initiator")||"", subject:qp.get("subject")||"je leidinggevende"};
+ $("btn-send").disabled=true;
+ try{ await Platform.sendInvites(state.raters,meta); buildWait();show("screen-wait"); }
+ catch(e){ alert("De uitnodigingen konden niet worden verstuurd. Probeer het zo opnieuw.\n("+e.message+")"); $("btn-send").disabled=false; }
+};
+
+/* ====================== VERZAMELEN ====================== */
+function buildWait(){
+ Platform.subscribeResponses(function(list){state.responses=list;renderWait();});
+ $("wait-demo").hidden=Platform.isLive();
+ renderWait();
+}
+function renderWait(){
+ var box=$("wait-list");box.innerHTML="";
+ state.raters.forEach(function(r){
+  var done=state.responses.some(function(x){return x.email===r.email;});
+  var el=document.createElement("div");el.className="rater";
+  el.innerHTML='<div class="rater__meta"><div class="rater__name">'+esc(r.name)+'</div></div><span class="badge '+(done?"badge--done":"badge--wait")+'">'+(done?"gereageerd":"wacht")+'</span>';
+  box.appendChild(el);
+ });
+ var c=state.responses.length;
+ $("wait-count").textContent=c+" van "+state.raters.length+" hebben gereageerd."+(c<3?(" Nog "+(3-c)+" nodig voordat het teambeeld zichtbaar wordt."):" Het teambeeld is beschikbaar.");
+ $("btn-to-result").disabled=c<1;
+}
+$("btn-sim").onclick=function(){
+ var list=state.raters.map(function(r){
+  var vals={};COMPS.forEach(function(c){var s=compPct(c);var base=(s===null?60:s);var off=Math.round((Math.random()*40)-22);vals[c.n]=Math.max(0,Math.min(100,base+off));});
+  return {email:r.email,name:r.name,naamZichtbaar:state.demoNames,vals:vals};
+ });
+ var k=Math.max(1,Math.min(list.length,3+Math.floor(Math.random()*Math.max(1,list.length-2))));
+ Platform._demoPush(list.slice(0,k));
+};
+$("btn-to-result").onclick=function(){renderResult();show("screen-result");};
+
+/* ====================== SCORES ====================== */
+function compPct(c){var a=state.answers[c.n];if(!a||a.na||!a.a||!a.b)return null;return R(((a.a+a.b)-2)/8*100);}
+function teamAgg(c){var vs=state.responses.map(function(r){return r.vals[c.n];}).filter(function(v){return typeof v==="number";});
+ if(!vs.length)return null;return {avg:R(vs.reduce(function(s,x){return s+x;},0)/vs.length),lo:Math.min.apply(null,vs),hi:Math.max.apply(null,vs),n:vs.length};}
+function domainSelf(d){var v=d.comps.map(compPct).filter(function(x){return x!==null;});return v.length?R(v.reduce(function(s,x){return s+x;},0)/v.length):null;}
+function domainTeam(d){var v=d.comps.map(teamAgg).filter(function(x){return x;}).map(function(x){return x.avg;});return v.length?R(v.reduce(function(s,x){return s+x;},0)/v.length):null;}
+
+/* ====================== BESCHOUWING-ENGINE (regelgebaseerd) ======================
+   Rijke, niet-herhalende analyse: combineert veel afgeleide signalen met de echte
+   competentienamen/scores, een per-competentie adviesbibliotheek, benoemde patronen
+   en deterministische zinsvariatie (seed uit het profiel). */
+var BE={
+ FACET:{
+  LV1:["richting concreet maken","betekenis geven aan het werk"],LV2:["verwachtingen helder maken","samen haalbare doelen stellen"],
+  LV3:["energie voor gezamenlijke doelen","aansluiten bij wat mensen drijft"],LV4:["voorbeeldgedrag","verantwoordelijkheid voor eigen ontwikkeling"],
+  LV5:["belangen van het team behartigen","relaties onderhouden"],LV6:["plannen en prioriteren","hybride en transparant organiseren"],
+  LV7:["de juiste mensen betrekken","tijdig knopen doorhakken"],LV8:["het probleem doorgronden","opties afwegen en kiezen"],
+  LV9:["gelijke spelregels hanteren","vooroordeel herkennen en corrigeren"],LV10:["sturen op resultaat","waarde voor de klant centraal houden"],
+  LV11:["ontwikkelbehoeften in beeld brengen","coachen met vragen en ruimte"],LV12:["taken en verantwoordelijkheid geven","vertrouwen en kaders geven"],
+  LV13:["waarderende feedback","opbouwende feedback"],LV14:["zicht op groei- en loopbaankansen","gelijke kansen om te groeien"],
+  LV15:["samenwerking bevorderen","psychologische veiligheid creëren"],LV16:["kansen zien","anderen aanmoedigen tot ideeën"],
+  LV17:["nieuwe werkwijzen uitproberen","leren van wat misgaat"],LV18:["tijdig communiceren over verandering","rekening houden met wat het met mensen doet"],
+  LV19:["actief om feedback vragen","er zichtbaar iets mee doen"],LV20:["oorzaken van weerstand benoemen","mensen meekrijgen"]
+ },
+ ADVICE:{
+  LV1:"Vertaal de organisatiekoers elk kwartaal expliciet naar wat die voor het team betekent, en toets of mensen die rode draad herkennen.",
+  LV2:"Maak verwachtingen meetbaar: leg per teamlid een paar concrete doelen en kaders vast en bespreek die regelmatig.",
+  LV3:"Voer korte motivatiegesprekken: vraag wat mensen energie geeft en geef ze daar meer ruimte en autonomie in.",
+  LV4:"Vraag een vertrouwde collega te wijzen op momenten waarop gedrag en boodschap uiteenlopen.",
+  LV5:"Breng de belangrijkste stakeholders in kaart en plan bewust contactmomenten om steun en ruimte voor het team op te halen.",
+  LV6:"Werk met een zichtbare prioriteitenlijst en heldere afspraken over wie wat wanneer doet — ook voor wie op afstand werkt.",
+  LV7:"Maak vooraf expliciet wie bij een besluit wordt betrokken en waarom, en zet een einddatum zodat besluiten niet blijven hangen.",
+  LV8:"Besteed bij een lastig vraagstuk eerst tijd aan de probleemdefinitie en de oorzaken, vóór het zoeken naar oplossingen.",
+  LV9:"Toets besluiten op consistentie: wordt dezelfde maatstaf op iedereen toegepast, inclusief op jezelf?",
+  LV10:"Maak per doel zichtbaar wat het oplevert voor de klant of eindgebruiker, en houd de voortgang voor iedereen inzichtelijk.",
+  LV11:"Vervang in coachgesprekken een deel van de adviezen door open vragen, zodat mensen zelf tot oplossingen komen.",
+  LV12:"Delegeer bewust een taak inclusief verantwoordelijkheid en mandaat, en weersta de neiging om bij te sturen.",
+  LV13:"Plan vaste, korte feedbackmomenten en zorg dat zowel waardering als opbouwende punten aan bod komen.",
+  LV14:"Voer met elk teamlid minstens jaarlijks een loopbaangesprek en let erop dat iedereen gelijke kansen krijgt.",
+  LV15:"Maak het bespreken van fouten normaal: deel eerst een eigen misser en bedank wie kritiek of twijfel durft te uiten.",
+  LV16:"Reserveer expliciet tijd om met het team naar verbeterkansen te kijken en honoreer ideeën zichtbaar.",
+  LV17:"Kies een kleinschalig experiment met onzekere uitkomst en evalueer hardop wat het oplevert.",
+  LV18:"Communiceer bij veranderingen eerder en vaker dan vanzelf gebeurt, en benoem ook wat het voor mensen betekent.",
+  LV19:"Vraag concreet om feedback ('wat zou ik anders kunnen doen?') en laat zichtbaar zien wat ermee gebeurt.",
+  LV20:"Ga bij weerstand in gesprek over de oorzaak in plaats van die te willen wegnemen, en betrek twijfelaars vroeg."
+ }
+};
+var BE_RNG=Math.random, BE_USED={};
+function beSeedRng(seed){var a=(seed>>>0)||1;BE_RNG=function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};BE_USED={};}
+function bePick(pool){if(pool.length===1)return pool[0];var i,tries=0;do{i=Math.floor(BE_RNG()*pool.length);tries++;}while(BE_USED[pool[i]]&&tries<10);BE_USED[pool[i]]=1;return pool[i];}
+function beCap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+var BE_BAND=[["pril","beperkt","kwetsbaar"],["wisselend","gemengd","ongelijk"],["solide","degelijk","behoorlijk"],["sterk","stevig","krachtig"],["uitmuntend","zeer sterk","uitgesproken"]];
+function beBandIdx(v){return v<40?0:v<55?1:v<70?2:v<83?3:4;}
+function beDomName(id){for(var i=0;i<DOMAINS.length;i++)if(DOMAINS[i].id===id)return DOMAINS[i].name;return id;}
+function beJoin(a){if(!a.length)return "";if(a.length===1)return a[0];return a.slice(0,-1).join(", ")+" en "+a[a.length-1];}
+function beBand(v){return bePick(BE_BAND[beBandIdx(v)]);}
+function beP(s){return '<p style="margin:0 0 8px;color:var(--cinab-ink);font-size:14px;line-height:1.65">'+s+'</p>';}
+function beSectie(t,body){return '<h3 style="font-size:16px;margin:16px 0 4px">'+t+'</h3>'+body;}
+function beDiff(V,a,b){return (V[a]!=null&&V[b]!=null)?(V[a]-V[b]):-999;}
+function beMetrics(){
+ var view=is360()?"360":"self",self={},team={},gap={},ab={},spread={};
+ COMPS.forEach(function(c){ self[c.n]=compPct(c);
+  var aw=state.answers[c.n]; ab[c.n]=(aw&&!aw.na&&aw.a&&aw.b)?(aw.a-aw.b):null;
+  if(view==="360"){var tt=teamAgg(c);team[c.n]=tt?tt.avg:null;spread[c.n]=tt?(tt.hi-tt.lo):null;gap[c.n]=(self[c.n]!=null&&tt)?(self[c.n]-tt.avg):null;}});
+ var domSelf={},domTeam={},domVal={},domRange={},domOut={};
+ DOMAINS.forEach(function(d){var ps=d.comps.map(function(c){return self[c.n];}).filter(function(x){return x!=null;});
+  domSelf[d.id]=ps.length?R(ps.reduce(function(s,x){return s+x;},0)/ps.length):null;
+  domRange[d.id]=ps.length?(Math.max.apply(null,ps)-Math.min.apply(null,ps)):0;
+  if(ps.length){var mn=domSelf[d.id],best=null,bd=-1;d.comps.forEach(function(c){if(self[c.n]!=null){var dd=Math.abs(self[c.n]-mn);if(dd>bd){bd=dd;best=c;}}});domOut[d.id]={comp:best,dev:bd};}
+  if(view==="360"){var pt=d.comps.map(function(c){return team[c.n];}).filter(function(x){return x!=null;});domTeam[d.id]=pt.length?R(pt.reduce(function(s,x){return s+x;},0)/pt.length):null;}
+  domVal[d.id]=(view==="360"&&domTeam[d.id]!=null)?domTeam[d.id]:domSelf[d.id];});
+ var allSelf=COMPS.map(function(c){return self[c.n];}).filter(function(x){return x!=null;});
+ var meanSelf=allSelf.length?R(allSelf.reduce(function(s,x){return s+x;},0)/allSelf.length):0;
+ var gaps=COMPS.map(function(c){return gap[c.n];}).filter(function(x){return x!=null;});
+ var meanGap=gaps.length?R(gaps.reduce(function(s,x){return s+x;},0)/gaps.length):null;
+ return {view:view,self:self,team:team,gap:gap,ab:ab,spread:spread,domSelf:domSelf,domTeam:domTeam,domVal:domVal,domRange:domRange,domOut:domOut,meanSelf:meanSelf,meanGap:meanGap,seed:R(allSelf.reduce(function(s,x){return s+x;},0))+gaps.length};
+}
+function beArchetype(m){
+ var ids=DOMAINS.map(function(d){return d.id;}).filter(function(id){return m.domVal[id]!=null;});
+ if(ids.length<2)return null;
+ var V=m.domVal,sorted=ids.slice().sort(function(a,b){return V[b]-V[a];}),hi=sorted[0],lo=sorted[sorted.length-1],range=V[hi]-V[lo],N=beDomName;
+ if(range<=8)return bePick([
+  "De vier domeinen liggen dicht bij elkaar (rond "+V[hi]+") — een opvallend evenwichtig profiel zonder uitgesproken pieken of dalen.",
+  "Wat opvalt is de balans: de domeinen ontlopen elkaar nauwelijks (rond "+V[hi]+"). Dat geeft een stabiele basis om gericht één of twee punten aan te scherpen.",
+  "Het profiel is gelijkmatig over de vier domeinen verdeeld (rond "+V[hi]+"); geen domein domineert het beeld of trekt het scheef."]);
+ function combo(a,b,pools){return beDiff(V,a,b)>=12?bePick(pools):null;}
+ var r;
+ r=combo("richting_visie","mensen_ontwikkeling",[
+  "Richting geven ("+N("richting_visie")+", "+V.richting_visie+") gaat duidelijk beter dan het ontwikkelen van mensen ("+N("mensen_ontwikkeling")+", "+V.mensen_ontwikkeling+") — het beeld van een sturende, koersvaste stijl. De groei zit erin datzelfde eigenaarschap ook bij mensen te leggen.",
+  "Sterk in koers en kaders ("+N("richting_visie")+", "+V.richting_visie+"), lichter in het laten groeien van mensen ("+V.mensen_ontwikkeling+"). Een richtinggevende stijl die wint aan kracht zodra coachen en ruimte geven meer aandacht krijgen.",
+  "Het profiel leunt op richting en visie, terwijl het mensgerichte deel achterblijft ("+V.mensen_ontwikkeling+" tegenover "+V.richting_visie+") — typerend voor wie graag vooroploopt en de ontwikkeling van het team nog meer naar zich toe kan trekken."]);if(r)return r;
+ r=combo("uitvoering_wendbaarheid","verandering_innovatie",[
+  "De uitvoering is sterk ("+N("uitvoering_wendbaarheid")+", "+V.uitvoering_wendbaarheid+"), vernieuwen gebeurt voorzichtiger ("+N("verandering_innovatie")+", "+V.verandering_innovatie+"). Een betrouwbare, resultaatgerichte stijl; de uitdaging is meer ruimte maken voor experimenteren.",
+  "Betrouwbaar in de executie ("+V.uitvoering_wendbaarheid+"), terughoudender met vernieuwing ("+V.verandering_innovatie+"). Het profiel levert en borgt, maar mag wat vaker buiten gebaande paden durven.",
+  "Plannen, organiseren en resultaat zitten goed ("+V.uitvoering_wendbaarheid+"); experimenteren en veranderen blijven achter ("+V.verandering_innovatie+"). Een stabiele uitvoerder met ruimte om wendbaarder te worden."]);if(r)return r;
+ r=combo("mensen_ontwikkeling","richting_visie",[
+  "Het ontwikkelen van mensen ("+N("mensen_ontwikkeling")+", "+V.mensen_ontwikkeling+") gaat beter dan het neerzetten van richting ("+N("richting_visie")+", "+V.richting_visie+"). Een mensgerichte stijl die aan kracht wint door scherper te zijn op visie, kaders en verwachtingen.",
+  "Verbindend en mensgericht ("+V.mensen_ontwikkeling+"), terwijl expliciete richting en kaders lichter zijn ("+V.richting_visie+"). De groei zit in het duidelijker maken van koers en verwachtingen.",
+  "De kracht ligt bij mensen ("+V.mensen_ontwikkeling+"); de heldere stip op de horizon ("+V.richting_visie+") mag steviger — dan landt de aandacht voor mensen in een duidelijker verhaal."]);if(r)return r;
+ r=combo("verandering_innovatie","uitvoering_wendbaarheid",[
+  "Er is een duidelijke drang tot vernieuwen ("+N("verandering_innovatie")+", "+V.verandering_innovatie+"), terwijl de uitvoering achterblijft ("+N("uitvoering_wendbaarheid")+", "+V.uitvoering_wendbaarheid+"). Bewaak dat plannen en afspraken de ideeën blijven dragen.",
+  "Vernieuwend en kansgericht ("+V.verandering_innovatie+"), wat losser in de borging ("+V.uitvoering_wendbaarheid+"). Een ideeënrijke stijl die wint zodra de executie de vernieuwing bijhoudt.",
+  "Veel beweging en ideeën ("+V.verandering_innovatie+"), maar de uitvoering ("+V.uitvoering_wendbaarheid+") houdt het tempo niet altijd bij — daar is de winst te halen."]);if(r)return r;
+ return bePick([
+  "Het beeld is wisselend: "+N(hi)+" springt eruit ("+V[hi]+"), terwijl "+N(lo)+" achterblijft ("+V[lo]+"). Daar ligt de duidelijkste richting voor ontwikkeling.",
+  N(hi)+" is het sterkste domein ("+V[hi]+") en "+N(lo)+" het zwakste ("+V[lo]+"); de afstand daartussen ("+range+" punten) markeert de ontwikkelruimte.",
+  "Tussen "+N(hi)+" ("+V[hi]+") en "+N(lo)+" ("+V[lo]+") zit een verschil van "+range+" punten — het profiel is duidelijk ongelijk verdeeld."]);
+}
+function renderBeschouwing(){
+ var box=$("beschouwing");if(!box)return;
+ var lead=state.persp==="lead",m=beMetrics();beSeedRng(m.seed);
+ var subj=lead?"je leiderschap":"het leiderschap van je leidinggevende";
+ var subjShort=lead?"je":"je leidinggevende";
+ var prim={},pv=[];COMPS.forEach(function(c){var v=(m.view==="360"&&m.team[c.n]!=null)?m.team[c.n]:m.self[c.n];prim[c.n]=v;if(v!=null)pv.push(v);});
+ var meanPrim=pv.length?R(pv.reduce(function(s,x){return s+x;},0)/pv.length):m.meanSelf;
+ var withSelf=COMPS.filter(function(c){return prim[c.n]!=null;});
+ if(withSelf.length<3){box.className="";box.innerHTML="";return;}
+ var byHigh=withSelf.slice().sort(function(a,b){return prim[b.n]-prim[a.n];});
+ var byLow=withSelf.slice().sort(function(a,b){return prim[a.n]-prim[b.n];});
+ var H='<h2 style="font-size:24px;margin:0 0 4px">Beschouwing</h2>';
+ H+='<p class="lead" style="margin:0 0 8px">'+bePick([
+  "Automatisch opgesteld uit de gegeven antwoorden — bedoeld als hulpmiddel voor reflectie en gesprek, niet als oordeel.",
+  "Onderstaande analyse is afgeleid uit de scores en dient als startpunt voor het gesprek, niet als eindoordeel.",
+  "Deze beschouwing vat de antwoorden samen ter ondersteuning van reflectie; het blijft een momentopname."])+'</p>';
+
+ // 1. Beeld in het kort
+ var topD=null,botD=null;(function(){var ds=DOMAINS.filter(function(d){return m.domVal[d.id]!=null;});if(ds.length){var s=ds.slice().sort(function(a,b){return m.domVal[b.id]-m.domVal[a.id];});topD=s[0];botD=s[s.length-1];}})();
+ var mean=meanPrim,bw=beBand(mean),s1;
+ if(topD&&botD&&topD!==botD){s1=bePick([
+   beCap(bw)+" totaalbeeld: gemiddeld "+mean+" op 100. Het stevigst is "+topD.name+" ("+m.domVal[topD.id]+"); "+botD.name+" ("+m.domVal[botD.id]+") vraagt de meeste aandacht.",
+   "Over de twintig competenties komt "+subj+" uit op gemiddeld "+mean+" (op 100) — "+bw+". De pieken liggen bij "+topD.name+", het dal bij "+botD.name+".",
+   "Gemiddeld "+mean+" van de 100, een "+bw+" beeld. "+topD.name+" draagt het profiel ("+m.domVal[topD.id]+"), terwijl "+botD.name+" achterblijft ("+m.domVal[botD.id]+").",
+   "Het profiel oogt "+bw+" (gemiddeld "+mean+"), met "+topD.name+" als sterkste en "+botD.name+" als zwakste domein."]);
+ } else { s1="Over de ingevulde competenties ligt "+subj+" op een "+bw+" niveau (gemiddeld "+mean+" op 100)."; }
+ var arch=beArchetype(m);var s1full=s1+(arch?(" "+arch):"");
+ if(m.view==="360"&&m.meanGap!=null&&Math.abs(m.meanGap)>=8){
+  s1full+=" "+(m.meanGap>0
+   ?(lead?bePick(["Over de hele linie schat je jezelf iets gunstiger in dan je collega’s ("+m.meanGap+" punten gemiddeld) — goed om alert op te blijven.","Gemiddeld ligt je zelfbeeld "+m.meanGap+" punten boven dat van je collega’s; dat patroon keert op meerdere competenties terug."])
+         :bePick(["Jij beoordeelt je leidinggevende gemiddeld "+m.meanGap+" punten hoger dan het team.","Jouw beeld ligt gemiddeld "+m.meanGap+" punten boven dat van het team."]))
+   :(lead?bePick(["Opvallend: gemiddeld beoordeel je jezelf "+Math.abs(m.meanGap)+" punten lager dan je collega’s — eerder te streng dan te mild.","Je bent gemiddeld strenger voor jezelf dan je omgeving; collega’s waarderen je "+Math.abs(m.meanGap)+" punten hoger."])
+         :bePick(["Jij beoordeelt je leidinggevende gemiddeld "+Math.abs(m.meanGap)+" punten lager dan het team.","Jouw beeld ligt gemiddeld "+Math.abs(m.meanGap)+" punten onder dat van het team."])));
+ }
+ H+=beSectie("Het beeld in het kort",beP(s1full));
+
+ // 2. Sterke punten
+ var strong=byHigh.filter(function(c){return prim[c.n]>=65;}).slice(0,3);if(!strong.length)strong=byHigh.slice(0,2);
+ var st=bePick(["De duidelijkste sterktes zijn ","Het meest vaardig komt naar voren: ","De kracht zit vooral in ","Bovenaan staan ","Wat eruit springt: "])+beJoin(strong.map(function(c){return c.label+" ("+prim[c.n]+")";}))+".";
+ st+=" "+bePick(["Dit zijn de punten waarop "+subjShort+" kan bouwen.","Hier ligt een natuurlijk vertrekpunt om anderen mee te nemen.","Deze kwaliteiten geven het profiel zijn fundament.","Het loont om deze sterktes bewust in te zetten bij de ontwikkelpunten hieronder."]);
+ if(m.view==="360"){var hid=withSelf.filter(function(c){return m.gap[c.n]!=null&&m.gap[c.n]<=-10;}).sort(function(a,b){return m.gap[a.n]-m.gap[b.n];}).slice(0,2);
+  if(hid.length)st+=" "+bePick([(lead?"Je collega’s waarderen je zelfs hoger dan jij jezelf op ":"Het team waardeert hoger dan jij op ")+beJoin(hid.map(function(c){return c.label;}))+" — mogelijk onderschatte krachten.","Hoger dan "+(lead?"je zelfbeeld":"jouw beeld")+" scoort "+(lead?"de omgeving":"het team")+" op "+beJoin(hid.map(function(c){return c.label;}))+": daar zien anderen meer dan in het eigen oordeel."]);}
+ H+=beSectie("Sterke punten",beP(st));
+
+ // 3. Ontwikkelpunten
+ var weak=byLow.filter(function(c){return prim[c.n]<=60;}).slice(0,3);if(!weak.length)weak=byLow.slice(0,2);
+ var dv=bePick(["De meeste ontwikkelruimte zit bij ","De grootste winst valt te halen op ","Het laagst scoren ","Aandacht vraagt vooral ","Ruimte voor groei ligt bij "])+beJoin(weak.map(function(c){return c.label+" ("+prim[c.n]+")";}))+".";
+ if(m.view==="360"){var blind=withSelf.filter(function(c){return m.gap[c.n]!=null&&m.gap[c.n]>=12;}).sort(function(a,b){return m.gap[b.n]-m.gap[a.n];}).slice(0,2);
+  if(blind.length)dv+=" "+bePick([(lead?"Let in het bijzonder op je blinde vlekken — waar je jezelf duidelijk hoger inschat dan je collega’s: ":"Let op de blinde vlekken, waar jij hoger oordeelt dan het team: ")+beJoin(blind.map(function(c){return c.label+" (+"+m.gap[c.n]+")";}))+".","Het grootste verschil tussen "+(lead?"zelfbeeld en omgeving":"jouw beeld en het team")+" zit bij "+beJoin(blind.map(function(c){return c.label+" (+"+m.gap[c.n]+")";}))+" — juist daar is winst te boeken."]);}
+ H+=beSectie("Ontwikkelpunten",beP(dv));
+
+ // 4. Samenhang & patronen
+ var obs=[],mrD=null,mr=0;DOMAINS.forEach(function(d){if(m.domRange[d.id]>mr){mr=m.domRange[d.id];mrD=d;}});
+ if(mrD&&mr>=25&&m.domOut[mrD.id]&&m.domOut[mrD.id].comp){var oc=m.domOut[mrD.id].comp;obs.push(bePick([
+   "Binnen "+mrD.name+" is het beeld niet gelijkmatig: "+oc.label+" ("+m.self[oc.n]+") wijkt sterk af van de rest van het domein (gemiddeld "+m.domSelf[mrD.id]+").",
+   "Het domein "+mrD.name+" hangt scheef: "+oc.label+" ("+m.self[oc.n]+") trekt het beeld, terwijl de overige competenties dichter bij "+m.domSelf[mrD.id]+" liggen.",
+   "Opvallend binnen "+mrD.name+": "+oc.label+" ("+m.self[oc.n]+") springt eruit ten opzichte van de andere competenties in hetzelfde domein."]));}
+ var fc=null,fm=0;COMPS.forEach(function(c){if(m.ab[c.n]!=null&&Math.abs(m.ab[c.n])>=2&&Math.abs(m.ab[c.n])>fm){fm=Math.abs(m.ab[c.n]);fc=c;}});
+ if(fc){var f=BE.FACET[fc.n],hf=m.ab[fc.n]>0?f[0]:f[1],lf=m.ab[fc.n]>0?f[1]:f[0];obs.push(bePick([
+   "Binnen "+fc.label+" lopen de twee gedragingen uiteen: “"+hf+"” gaat beter dan “"+lf+"”.",
+   "Bij "+fc.label+" zit een interne spanning — “"+hf+"” is sterker ontwikkeld dan “"+lf+"”.",
+   fc.label+" is geen eenheid: “"+hf+"” en “"+lf+"” verschillen merkbaar."]));}
+ if(m.view==="360"){var dvd=null,dx=0;COMPS.forEach(function(c){if(m.spread[c.n]!=null&&m.spread[c.n]>=32&&m.spread[c.n]>dx){dx=m.spread[c.n];dvd=c;}});
+  if(dvd)obs.push(bePick([
+   "De collega’s zijn het duidelijk oneens over "+dvd.label+" (spreiding "+m.spread[dvd.n]+") — het beeld hangt sterk af van wie je het vraagt.",
+   "Over "+dvd.label+" lopen de meningen ver uiteen; dat verschil tussen beoordelaars is op zichzelf het bespreken waard."]));
+  var con=null,cm=999;COMPS.forEach(function(c){if(m.spread[c.n]!=null&&m.spread[c.n]<=12&&m.spread[c.n]<cm){cm=m.spread[c.n];con=c;}});
+  if(con)obs.push(bePick([
+   "Over "+con.label+" is het team het juist opvallend eens — een betrouwbaar signaal.",
+   "Bij "+con.label+" zijn de beoordelaars eensgezind; dat maakt dat deel van het beeld stevig."]));}
+ if(obs.length)H+=beSectie("Samenhang & patronen",obs.map(beP).join(""));
+
+ // 5. Advies
+ var targets=[];
+ if(m.view==="360")withSelf.filter(function(c){return m.gap[c.n]!=null&&m.gap[c.n]>=12;}).sort(function(a,b){return m.gap[b.n]-m.gap[a.n];}).slice(0,2).forEach(function(c){targets.push(c);});
+ byLow.forEach(function(c){if(targets.indexOf(c)<0&&prim[c.n]!=null&&prim[c.n]<=62)targets.push(c);});
+ targets=targets.slice(0,3);if(!targets.length)targets=byLow.slice(0,1);
+ var aLead=lead?bePick(["Waar je mee kunt beginnen:","Een paar concrete vervolgstappen:","Suggesties om mee aan de slag te gaan:","Gericht aan de slag:"])
+               :bePick(["Mogelijke ontwikkelpunten om met je leidinggevende te bespreken:","Bespreekpunten voor het gesprek met je leidinggevende:"]);
+ var items=targets.map(function(c){return '<p style="margin:0 0 8px;font-size:14px;line-height:1.65"><strong>'+c.label+'.</strong> '+BE.ADVICE[c.n]+'</p>';}).join("");
+ var combo="";
+ if(m.view==="360"&&withSelf.some(function(c){return m.gap[c.n]!=null&&m.gap[c.n]>=12;})&&prim.LV19!=null&&prim.LV19<=55){
+  combo=beP(lead?bePick(["Let op de samenhang: enkele blinde vlekken gaan samen met een lage score op actief feedback vragen (LV19). Die twee versterken elkaar — juist door gerichter om feedback te vragen verklein je de blinde vlekken.","Eén rode draad verdient aandacht: blinde vlekken én weinig om feedback vragen (LV19) horen bij elkaar. Meer feedback ophalen is de hefboom die de rest in beweging zet."])
+                :bePick(["De combinatie van blinde vlekken en een lage score op feedback vragen (LV19) houdt zichzelf in stand — een goed startpunt voor het gesprek.","Blinde vlekken en weinig feedback vragen (LV19) hangen samen; daar feedback op organiseren raakt meerdere punten tegelijk."]));}
+ var closing=beP(lead?bePick(["Bespreek deze punten met je manager, een collega of een coach — hun voorbeelden maken de feedback concreet.","Kies er één uit om de komende periode echt op te oefenen; één punt goed verankeren werkt beter dan alles tegelijk."])
+                     :bePick(["Bespreek deze punten samen met je leidinggevende; concrete voorbeelden maken het bruikbaar.","Deel deze punten als ontwikkelsignaal, niet als oordeel — de waarde zit in het gesprek erover."]));
+ H+=beSectie("Advies voor ontwikkeling",beP(aLead)+items+combo+closing);
+
+ // 6. Vervolg
+ var vv=bePick(["Leiderschap groeit door oefening en feedback.","Ontwikkeling is een kwestie van herhaling en reflectie.","Vaardigheden verschuiven langzaam — meten over tijd maakt groei zichtbaar."])+" "+(m.view==="360"
+   ?(lead?"Bespreek dit teambeeld na en herhaal de meting na verloop van tijd om je voortgang te volgen.":"Deel en bespreek dit teambeeld en herhaal de meting periodiek om de ontwikkeling te volgen.")
+   :(lead?"Wil je een vollediger beeld, nodig dan collega’s uit voor de 360-meting; herhaal de meting daarnaast periodiek.":"Wil je dit afzetten tegen het hele team, start dan de teamanalyse; herhaal de meting periodiek om de voortgang te volgen."));
+ H+=beSectie("Vervolg",beP(vv));
+ box.className="cinab-card beschouwing";box.style.marginTop="22px";box.innerHTML=H;
+}
+
+/* ====================== RESULTAAT ====================== */
+function is360(){return state.variant==="paid"&&state.responses.length>=3;}
+function renderResult(){
+ var paid=state.variant==="paid", t=TEKST[state.persp];
+ $("result-title").textContent=(state.persp==="lead")?"Jouw leiderschapsprofiel":"Profiel van je leidinggevende";
+ $("result-note").textContent=is360()?t.resultNote360:(paid?"":t.resultNoteFree);
+ document.body.classList.toggle("can-print",paid); // printen alleen in betaalde variant
+
+ // anonimiteit / drempel
+ var an=$("result-anon");
+ if(paid){
+  var c=state.responses.length;
+  if(c<3){an.hidden=false;an.textContent="Er hebben "+c+" collega('s) gereageerd. Het teambeeld verschijnt vanaf 3 reacties; hieronder zie je voorlopig je eigen beeld.";}
+  else{var unlocked=state.responses.every(function(r){return r.naamZichtbaar;});
+   an.hidden=false;an.textContent=unlocked?("Alle "+c+" beoordelaars tonen hun naam — individuele antwoorden zijn herleidbaar.")
+    :("Gebaseerd op "+c+" beoordelaars. Resultaten worden anoniem getoond (gemiddelde + spreiding); namen verschijnen alleen als élke beoordelaar daarmee instemt.");}
+ } else an.hidden=true;
+
+ // kaarten
+ var cards=$("result-cards");cards.innerHTML="";
+ DOMAINS.forEach(function(d){var s=domainSelf(d),tm=is360()?domainTeam(d):null;
+  var el=document.createElement("div");el.className="dcard";
+  el.innerHTML='<div class="dcard__h"><span class="domain-dot" style="background:'+d.color+'"></span>'+d.name+'</div>'+
+   '<div class="dcard__v">'+(s===null?"—":s)+(tm!==null?'<small>'+t.othCard+' '+tm+'</small>':'')+'</div>';
+  cards.appendChild(el);
+ });
+
+ // legenda
+ var leg=$("result-legend");
+ leg.innerHTML='<span><span class="tri"></span>'+t.selLeg+'</span>'+(is360()?'<span><span class="cir"></span>'+t.othLeg+'</span><span><span class="bnd"></span>spreiding</span>':'');
+ $("sortseg").hidden=!is360();
+
+ renderProfile();
+
+ // teaser alleen gratis
+ var showT=(!paid);
+ $("teaser").classList.toggle("show",showT);
+ if(showT)buildTeaser();
+ $("insight").hidden=!is360();
+ if(is360()){var best=null,bg=-1;COMPS.forEach(function(c){var s=compPct(c),tm=teamAgg(c);if(s!==null&&tm){var g=Math.abs(s-tm.avg);if(g>bg){bg=g;best=c;}}});if(best){state.sel=best.n;renderInsight(best);}}
+
+ renderBeschouwing();
+
+ // acties
+ var act=$("result-actions");act.innerHTML="";
+ if(paid){
+  act.innerHTML='<button class="cinab-button cinab-button--primary" id="a-print">Download als PDF / Printen</button>'+
+   '<button class="cinab-button cinab-button--outline" id="a-compare">Toon verschil met vorige meting</button>'+
+   '<button class="cinab-button cinab-button--ghost" id="a-restart">Opnieuw</button>';
+  $("a-print").onclick=async function(){ try{ var r=await Platform.saveReport(buildWrapper()); if(r&&r.rapport_url)Platform.notifyCompleted(r.rapport_url); }catch(e){ console.warn(e); } window.print(); };
+  $("a-compare").onclick=function(){alert("Vergelijken met je vorige meting wordt gekoppeld via je account (zie PLATFORM-WERKBOEK §3.3). In de demo is er nog geen eerdere meting.");};
+  $("a-restart").onclick=resetAll;
+ }else{
+  act.innerHTML='<button class="cinab-button cinab-button--outline" id="a-restart">Opnieuw beginnen</button>';
+  $("a-restart").onclick=resetAll;
+ }
+}
+function renderProfile(){
+ var prof=$("result-profile");prof.innerHTML="";
+ var rows=[];
+ if(state.sort==="gap"&&is360()){
+  COMPS.slice().sort(function(a,b){var ga=gapOf(a),gb=gapOf(b);return gb-ga;}).forEach(function(c){rows.push(rowEl(c));});
+  rows.forEach(function(r){prof.appendChild(r);});
+ }else{
+  DOMAINS.forEach(function(d){
+   var h=document.createElement("div");h.className="domain-head";h.style.margin="16px 0 4px";
+   h.innerHTML='<span class="domain-dot" style="background:'+d.color+'"></span><span class="domain-name" style="font-size:17px">'+d.name+'</span>';
+   prof.appendChild(h);
+   d.comps.forEach(function(c){prof.appendChild(rowEl(c));});
+  });
+ }
+}
+function gapOf(c){var s=compPct(c),tm=teamAgg(c);return (s!==null&&tm)?Math.abs(s-tm.avg):-1;}
+function rowEl(c){
+ var d=c._d,s=compPct(c),tm=is360()?teamAgg(c):null;
+ var el=document.createElement("button");el.className="prow"+(state.sel===c.n?" sel":"");el.type="button";
+ var rail='<div class="rail"><div class="rail__base"></div>';
+ if(tm){var lo=Math.min(s,tm.avg),w=Math.abs(s-tm.avg);
+  rail+='<div class="mk-spread" style="left:'+pctPos(tm.lo)+'%;width:'+((tm.hi-tm.lo)*0.92)+'%;background:'+d.color+'"></div>';
+  rail+='<div class="mk-conn" style="left:'+pctPos(lo)+'%;width:'+(w*0.92)+'%;background:'+d.color+'"></div>';
+  rail+='<div class="mk-fb" style="left:'+pctPos(tm.avg)+'%;--c:'+darken(d.color)+'"></div>';}
+ if(s!==null)rail+='<div class="mk-self" style="left:'+pctPos(s)+'%;--c:'+d.color+'"></div>';
+ rail+='</div>';
+ el.innerHTML='<span class="prow__l"><span class="domain-dot" style="width:8px;height:8px;background:'+d.color+'"></span>'+c.label+'</span>'+rail+
+   '<span class="prow__v">'+(s===null?"n.v.t.":s)+(tm?' · '+tm.avg:'')+'</span>';
+ el.onclick=function(){state.sel=c.n;document.querySelectorAll(".prow.sel").forEach(function(x){x.classList.remove("sel");});el.classList.add("sel");if(is360())renderInsight(c);};
+ return el;
+}
+function renderInsight(c){
+ var d=c._d,s=compPct(c),tm=teamAgg(c),lead=state.persp==="lead";if(s===null||!tm)return;
+ var g=s-tm.avg,txt;
+ if(Math.abs(g)<=7)txt=lead?"Je eigen beeld en dat van anderen liggen dicht bij elkaar — een gedeeld beeld.":"Jouw beeld en dat van het team liggen dicht bij elkaar.";
+ else if(g>0)txt=lead?("Je schat jezelf hoger in dan je collega's ("+g+" punten). Mogelijk een blinde vlek, of je kwaliteiten zijn minder zichtbaar voor anderen."):("Jij beoordeelt je leidinggevende hoger dan je collega's ("+g+" punten). Jullie beelden lopen uiteen.");
+ else txt=lead?("Je collega's waarderen dit hoger dan jij ("+Math.abs(g)+" punten). Mogelijk ben je te streng voor jezelf."):("Je collega's beoordelen je leidinggevende hoger dan jij ("+Math.abs(g)+" punten).");
+ $("insight").innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span class="domain-dot" style="width:9px;height:9px;background:'+d.color+'"></span><strong>'+c.n+' · '+c.label+'</strong></div>'+
+  '<div style="color:var(--cinab-grey);font-size:14px;margin-bottom:8px">'+(lead?"eigen beeld":"jouw beoordeling")+' <b style="color:var(--cinab-ink)">'+s+'</b> &nbsp; '+TEKST[state.persp].othCard+' <b style="color:var(--cinab-ink)">'+tm.avg+'</b> <span style="color:var(--cinab-grey)">(spreiding '+tm.lo+'–'+tm.hi+')</span></div>'+
+  '<div style="color:var(--cinab-grey);font-size:14px">'+txt+'</div>';
+}
+$("s-model").onclick=function(){state.sort="model";$("s-model").setAttribute("aria-pressed","true");$("s-gap").setAttribute("aria-pressed","false");renderProfile();};
+$("s-gap").onclick=function(){state.sort="gap";$("s-gap").setAttribute("aria-pressed","true");$("s-model").setAttribute("aria-pressed","false");renderProfile();};
+
+/* teaser demo (gratis) */
+function buildTeaser(){
+ var ex="#70A2D7",demo=[{label:"Visie & betekenis",self:80,fb:70,sp:[60,84]},{label:"Delegeren & eigenaarschap",self:50,fb:62,sp:[50,74]},{label:"Feedback & gesprekken",self:65,fb:60,sp:[52,72]}];
+ var box=$("teaser-demo");box.innerHTML="";
+ demo.forEach(function(c){var lo=Math.min(c.self,c.fb),w=Math.abs(c.self-c.fb);
+  var row=document.createElement("div");row.className="prow";row.style.cursor="default";
+  row.innerHTML='<span class="prow__l" style="color:var(--cinab-grey)">'+c.label+'</span>'+
+   '<div class="rail"><div class="rail__base"></div>'+
+   '<div class="mk-spread" style="left:'+pctPos(c.sp[0])+'%;width:'+((c.sp[1]-c.sp[0])*0.92)+'%;background:'+ex+'"></div>'+
+   '<div class="mk-conn" style="left:'+pctPos(lo)+'%;width:'+(w*0.92)+'%;background:'+ex+'"></div>'+
+   '<div class="mk-fb" style="left:'+pctPos(c.fb)+'%;--c:'+darken(ex)+'"></div>'+
+   '<div class="mk-self" style="left:'+pctPos(c.self)+'%;--c:'+ex+'"></div></div>'+
+   '<span class="prow__v" style="color:var(--cinab-grey)">'+c.self+' · '+c.fb+'</span>';
+  box.appendChild(row);
+ });
+}
+$("teaser-close").onclick=function(){$("teaser").classList.remove("show");};
+$("teaser-dismiss").onclick=function(){$("teaser").classList.remove("show");};
+$("teaser-go").onclick=function(){$("teaser").classList.remove("show");show("screen-start");setPersp(state.persp);setVariant("paid");};
+
+function buildWrapper(){
+ var scores={};DOMAINS.forEach(function(d){var v=is360()?domainTeam(d):domainSelf(d);scores[d.id]=(v===null?0:v);});
+ var org=new URLSearchParams(location.search).get("org")||"";
+ return {template_id:"vaardigheidsmeter_leidinggeven",schema_version:"1.0",scores:scores,
+  meta:{organisatie:org,datum:new Date().toISOString().slice(0,10),deelnemers:state.responses.length},
+  data:{perspectief:state.persp,eigen:COMPS.map(function(c){return {n:c.n,score:compPct(c)};}),
+   team:is360()?COMPS.map(function(c){return {n:c.n,agg:teamAgg(c)};}):null},
+  parent_rapport_id:null};
+}
+
+/* onderbouwing + reset */
+$("ob-toggle").onclick=function(){var p=$("ob-panel");var open=p.hidden;p.hidden=!open;this.setAttribute("aria-expanded",open);$("ob-chev").innerHTML=open?"&#9652;":"&#9662;";};
+function resetAll(){state={persp:null,variant:null,answers:{},raters:[],responses:[],sort:"model",sel:null,demoNames:false};
+ ["p-lead","p-emp","v-free","v-paid"].forEach(function(id){$(id).setAttribute("aria-pressed","false");});
+ $("step2").hidden=true;$("btn-start").disabled=true;document.body.classList.remove("can-print");document.body.dataset.mode="free";
+ buildQuiz();show("screen-start");}
+
+/* init */
+(async function(){
+ await Platform.init();
+ $("demo-ribbon").hidden=Platform.isLive();
+ Platform.notifyLoaded();
+ if(Platform.isLive() && Platform.isResume()){
+  var s=Platform.restoreState();
+  if(s){ state.persp=s.persp||state.persp; state.variant=s.variant||"paid"; state.answers=s.answers||{}; }
+  try{ await Platform.settle(); }catch(e){ console.warn(e); }   // idempotent; al betaald -> no-op
+  if(state.persp){ setPersp(state.persp); setVariant(state.variant||"paid"); document.body.dataset.mode="paid"; startQuiz(); return; }
+ }
+ show("screen-start");
+})();
+</script>
+</body>
+</html>
