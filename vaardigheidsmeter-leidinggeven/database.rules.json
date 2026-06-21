@@ -5,32 +5,84 @@
       ".write": false,
       "$code": {
 
+        // ── meta ──────────────────────────────────────────────────────────
+        // Alleen de facilitator schrijft en leest meta.
+        // facilitatorUid wordt bij sessie-aanmaak ingevuld en dient als
+        // ankerpunt voor alle andere beveiligingsregels.
         "meta": {
-          ".read": "auth != null",
+          ".read":  "auth != null && (data.child('facilitatorUid').val() === auth.uid || !data.exists())",
           ".write": "auth != null && (!data.exists() || data.child('facilitatorUid').val() === auth.uid)",
-          ".validate": "newData.hasChildren(['createdAt','facilitatorUid']) && newData.child('facilitatorUid').val() === auth.uid"
+          ".validate": "newData.hasChildren(['createdAt','facilitatorUid']) && newData.child('facilitatorUid').val() === auth.uid && newData.child('createdAt').isNumber()"
         },
 
+        // ── content ───────────────────────────────────────────────────────
+        // Sessie-inhoud (naam, perspectief, organisatie, …).
+        // Alleen de facilitator leest en schrijft.
         "content": {
-          ".read": "auth != null",
+          ".read":  "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid",
           ".write": "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid"
         },
 
+        // ── raters ────────────────────────────────────────────────────────
+        // Lijst van uitgenodigde beoordelaars (naam, optioneel e-mail).
+        // Alleen de facilitator schrijft (via sendInvites) en leest.
+        // E-mailadressen worden na 30 dagen gewist (AVG).
+        "raters": {
+          ".read":  "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid",
+          "$raterId": {
+            ".write": "auth != null && !data.exists() && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid",
+            ".validate": "newData.hasChildren(['name','naamZichtbaar','at']) &&
+                          newData.child('name').isString() &&
+                          newData.child('name').val().length >= 1 &&
+                          newData.child('name').val().length <= 100 &&
+                          newData.child('naamZichtbaar').isBoolean() &&
+                          newData.child('at').isNumber() &&
+                          (!newData.hasChild('email') ||
+                           (newData.child('email').isString() &&
+                            newData.child('email').val().length <= 254))"
+          }
+        },
+
+        // ── answers ───────────────────────────────────────────────────────
+        // Ingevulde vragenlijsten van beoordelaars.
+        // Elke beoordelaar schrijft één keer (append-only: !data.exists()).
+        // Alleen de facilitator leest alle antwoorden.
+        // vals: flexibele keys (LV1–LV20, maar overgeslagen competenties
+        // hoeven niet aanwezig te zijn), elke score 0–100.
         "answers": {
-          ".read": "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid",
+          ".read":  "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid",
           "$pushId": {
             ".write": "auth != null && !data.exists()",
-            ".validate": "newData.hasChildren(['vals','at','name','naamZichtbaar']) && newData.child('name').isString() && newData.child('name').val().length <= 120 && newData.child('naamZichtbaar').isBoolean() && (!newData.hasChild('email') || (newData.child('email').isString() && newData.child('email').val().length <= 200)) && newData.child('vals').hasChildren()",
+            ".validate": "newData.hasChildren(['vals','at','naamZichtbaar']) &&
+                          newData.child('naamZichtbaar').isBoolean() &&
+                          newData.child('at').isNumber() &&
+                          newData.child('vals').hasChildren() &&
+                          (!newData.hasChild('name') ||
+                           (newData.child('name').isString() &&
+                            newData.child('name').val().length <= 120)) &&
+                          (!newData.hasChild('email') ||
+                           (newData.child('email').isString() &&
+                            newData.child('email').val().length <= 200))",
             "vals": {
-              "$lv": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100" }
+              "$lv": {
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+              }
             }
           }
         },
 
+        // ── state ─────────────────────────────────────────────────────────
+        // Persistente sessie-state voor resume (data_ref, payload).
+        // Alleen de facilitator leest en schrijft.
         "state": {
-          ".read": "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid",
-          ".write": "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid"
+          ".read":  "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid",
+          ".write": "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid",
+          ".validate": "newData.hasChildren(['updatedAt','payload']) &&
+                        newData.child('updatedAt').isNumber() &&
+                        newData.child('payload').isString() &&
+                        newData.child('payload').val().length <= 50000"
         }
+
       }
     }
   }
