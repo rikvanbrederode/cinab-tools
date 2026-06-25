@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="nl" data-cinab-api="https://staging2.cinab.nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vaardigheidsmeter Leidinggeven — Rapportage</title>
+<style>
+:root{
+  --cinab-amber:#EF9F27;--cinab-amber-dark:#D88C14;--cinab-ink:#1C1C1A;--cinab-offwhite:#FAFAF8;
+  --cinab-line:#E5E3DB;--cinab-grey:#5F5E5A;--cinab-card:#FFFFFF;
+  --d-rv:#70A2D7;   /* richting_visie */
+  --d-uw:#BDD24D;   /* uitvoering_wendbaarheid */
+  --d-mo:#2A9791;   /* mensen_ontwikkeling */
+  --d-vi:#F05736;   /* verandering_innovatie */
+  --font-heading:Fraunces,Georgia,"Times New Roman",serif;
+  --font-body:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --radius-s:8px;--radius:12px;
+}
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Fraunces:wght@600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-body);background:var(--cinab-offwhite);color:var(--cinab-ink);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--font-heading);font-weight:600;line-height:1.1}
+
+/* ── PRINT BAR ── */
+.print-bar{position:fixed;top:0;left:0;right:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--cinab-line);border-top:4px solid var(--cinab-ink);padding:10px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:999;box-shadow:0 1px 3px rgba(0,0,0,.07),0 4px 12px rgba(0,0,0,.05)}
+.pb-title{font-family:var(--font-heading);font-weight:600;font-size:15px;color:var(--cinab-ink);display:flex;align-items:center;gap:8px}
+.pb-sub{font-size:12px;font-weight:400;color:var(--cinab-grey)}
+.pb-actions{display:flex;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-s);border:0;font-family:var(--font-body);font-size:13px;font-weight:700;cursor:pointer;min-height:36px}
+.btn-primary{background:var(--cinab-amber);color:var(--cinab-ink)}
+.btn-primary:hover{background:var(--cinab-amber-dark)}
+.btn-ghost{background:transparent;color:var(--cinab-grey);border:1px solid var(--cinab-line)}
+.btn-ghost:hover{background:var(--cinab-offwhite)}
+
+/* ── REPORT ── */
+.report{margin:76px auto 48px;max-width:840px;padding:0 20px}
+
+/* ── KAART ── */
+.card{background:var(--cinab-card);border:1px solid var(--cinab-line);border-radius:var(--radius);margin-bottom:18px;overflow:hidden;page-break-inside:avoid}
+.card.pb{page-break-before:always}
+
+/* ── CARD HEADER ── */
+.card-hd{padding:16px 22px;border-bottom:1px solid var(--cinab-line);display:flex;align-items:center;gap:12px}
+.card-hd-badge{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+.card-hd-t{font-family:var(--font-heading);font-size:17px}
+.card-hd-s{font-size:12px;color:var(--cinab-grey);margin-top:2px}
+
+/* ── CARD BODY ── */
+.card-body{padding:20px 22px}
+
+/* ── COVER ── */
+.cover{background:linear-gradient(145deg,var(--cinab-amber) 0%,var(--cinab-amber-dark) 100%);min-height:420px;padding:48px 52px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.cover-deco{position:absolute;border-radius:50%;background:rgba(255,255,255,.07)}
+.cover-brand{font-family:var(--font-heading);font-size:18px;color:#fff;font-weight:600;position:relative;z-index:1}
+.cover-main{position:relative;z-index:1}
+.cover-eyebrow{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.7);margin-bottom:10px}
+.cover-org{font-family:var(--font-heading);font-size:32px;color:#fff;line-height:1.2;margin-bottom:6px}
+.cover-sub{font-size:14px;color:rgba(255,255,255,.85);margin-bottom:18px}
+.cover-meta{display:flex;gap:18px;flex-wrap:wrap;position:relative;z-index:1}
+.cover-meta-item{font-size:12px;color:rgba(255,255,255,.75);display:flex;flex-direction:column;gap:2px}
+.cover-meta-item strong{color:#fff;font-weight:700}
+.cover-footer{background:rgba(255,255,255,.12);border-radius:var(--radius-s);padding:14px 18px;border:1px solid rgba(255,255,255,.2);position:relative;z-index:1}
+.cover-footer-l{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.6);margin-bottom:5px}
+.cover-footer-t{font-size:13px;color:rgba(255,255,255,.9);line-height:1.5}
+
+/* ── DIMENSIES GRID ── */
+.dim-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.dcard{background:var(--cinab-card);border:1px solid var(--cinab-line);border-radius:var(--radius-s);padding:14px 16px}
+.dcard-top{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.domain-dot{width:12px;height:12px;border-radius:3px;flex:none}
+.dcard-name{font-size:12px;font-weight:700;color:var(--cinab-grey)}
+.dcard-score{font-family:var(--font-heading);font-size:26px;font-weight:600;line-height:1;margin-bottom:5px}
+.dcard-score small{font-family:var(--font-body);font-size:12px;font-weight:400;color:var(--cinab-grey)}
+.dcard-bar{height:6px;background:var(--cinab-line);border-radius:3px;overflow:hidden;margin-bottom:7px}
+.dcard-bar-fill{height:100%;border-radius:3px}
+.dcard-desc{font-size:11px;color:var(--cinab-grey);line-height:1.5}
+
+/* ── RADAR ── */
+.radar-center{display:flex;justify-content:center;padding:16px 0 8px}
+
+/* ── LEGENDA ── */
+.legendrow{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin:0 0 10px;color:var(--cinab-grey);font-size:12px}
+.legendrow span{display:flex;align-items:center;gap:6px}
+
+/* ── AS-LABELS ── */
+.axis-labels{display:grid;grid-template-columns:minmax(140px,190px) 1fr 60px;gap:10px;margin-bottom:4px;font-size:11px;color:var(--cinab-grey)}
+.axis-zones{position:relative;height:14px}
+
+/* ── PROFIEL-RIJEN ── */
+.prow{display:grid;grid-template-columns:minmax(140px,190px) 1fr 60px;gap:10px;align-items:center;padding:5px 6px;border-radius:var(--radius-s)}
+.prow:hover{background:var(--cinab-offwhite)}
+.prow.dom-head{margin:14px 0 3px;background:none}
+.prow__l{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--cinab-ink)}
+.prow__v{font-size:11px;font-weight:700;color:var(--cinab-grey);text-align:right;white-space:nowrap}
+/* Rail als inline SVG — print-proof (geen position:absolute) */
+.rail-svg{width:100%;height:22px;display:block;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+
+/* ── INZICHT-BOX ── */
+.insight-box{background:var(--cinab-card);border:1px solid var(--cinab-line);border-left:4px solid var(--cinab-amber);border-radius:var(--radius-s);padding:14px 16px;margin-top:6px;font-size:13px;color:var(--cinab-grey);line-height:1.6}
+
+/* ── BESCHOUWING ── */
+.arch-box{background:var(--cinab-offwhite);border:1px solid var(--cinab-line);border-radius:var(--radius-s);padding:14px 16px;margin-bottom:14px;font-size:13px;color:var(--cinab-ink);line-height:1.65}
+.adv-list{list-style:none;display:flex;flex-direction:column;gap:7px;margin:6px 0 10px}
+.adv-list li{background:var(--cinab-card);border:1px solid var(--cinab-line);border-radius:var(--radius-s);padding:9px 12px;font-size:13px;color:var(--cinab-ink);display:flex;align-items:flex-start;gap:9px}
+.adv-dot{width:8px;height:8px;border-radius:50%;flex:none;margin-top:4px}
+
+/* ── ONDERBOUWING ── */
+.ob-sect h3{font-size:15px;margin:14px 0 3px}
+.ob-sect p{font-size:13px;color:var(--cinab-grey);margin:0 0 6px}
+.ob-leg{display:flex;flex-direction:column;gap:6px;margin:4px 0;font-size:13px;color:var(--cinab-grey)}
+.ob-leg span{display:flex;align-items:center;gap:9px}
+
+/* ── UPSELL ── */
+.upsell{padding:32px 40px;display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center}
+.upsell h2{font-size:20px;margin-bottom:8px}
+.upsell p{font-size:13px;color:var(--cinab-grey);line-height:1.7;margin-bottom:12px}
+.upsell-btn{display:inline-flex;align-items:center;gap:6px;background:var(--cinab-amber);color:var(--cinab-ink);padding:9px 18px;border-radius:var(--radius-s);font-weight:700;font-size:13px;text-decoration:none;margin-right:8px;margin-bottom:8px;font-family:var(--font-body)}
+.upsell-btn:hover{background:var(--cinab-amber-dark)}
+.upsell-btn.outline{background:transparent;border:2px solid var(--cinab-ink);color:var(--cinab-ink)}
+.upsell-vis{background:linear-gradient(135deg,var(--cinab-amber),var(--cinab-amber-dark));border-radius:var(--radius);padding:28px;text-align:center}
+
+/* ── LAADSCHERM ── */
+.laad{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px;gap:12px;color:var(--cinab-grey)}
+.spinner{width:30px;height:30px;border:3px solid var(--cinab-line);border-top-color:var(--cinab-amber);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── PRINT ── */
+@media print{
+  @page{size:A4;margin:12mm 14mm}
+  @page:first{margin:0}
+  body{font-size:11px;background:white}
+  .print-bar{display:none!important}
+  .report{margin:0;max-width:100%;padding:0}
+  .card{border:none;border-radius:0;box-shadow:none;margin-bottom:0;page-break-inside:avoid}
+  .card.pb{page-break-before:always}
+  .cover{min-height:auto;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .dim-grid{grid-template-columns:1fr 1fr}
+  .upsell{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="print-bar">
+  <div class="pb-title">
+    CINAB
+    <span class="pb-sub">· Vaardigheidsmeter Leidinggeven — Rapportage</span>
+  </div>
+  <div class="pb-actions">
+    <button class="btn btn-ghost" onclick="window.print()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="5" width="10" height="7" rx="1"/><path d="M4 5V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M4 9h6M4 11h3"/></svg>
+      PDF opslaan
+    </button>
+  </div>
+</div>
+
+<div class="report" id="report">
+
+  <!-- laadscherm -->
+  <div class="card" id="laadScherm">
+    <div class="laad">
+      <div class="spinner"></div>
+      <span>Rapport ophalen…</span>
+    </div>
+  </div>
+
+  <!-- rapport-inhoud (verborgen tot geladen) -->
+  <div id="rapportInhoud" style="display:none">
+
+    <!-- COVER -->
+    <div class="card">
+      <div class="cover">
+        <div class="cover-deco" style="width:200px;height:200px;right:-40px;top:-40px"></div>
+        <div class="cover-deco" style="width:140px;height:140px;right:70px;bottom:-35px"></div>
+        <div class="cover-brand">CINAB</div>
+        <div class="cover-main">
+          <div class="cover-eyebrow" id="coverEyebrow">Leiderschapsrapportage · 360-meting</div>
+          <div class="cover-org" id="coverOrg">—</div>
+          <div class="cover-sub" id="coverSub">Vaardigheidsmeter Leidinggeven</div>
+          <div class="cover-meta" id="coverMeta"></div>
+        </div>
+        <div class="cover-footer">
+          <div class="cover-footer-l">Over dit rapport</div>
+          <div class="cover-footer-t" id="coverTekst">Dit rapport bevat de uitkomsten van de 360-meting rondom leiderschapsvaardigheden.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIMENSIE-SCORES -->
+    <div class="card pb">
+      <div class="card-hd">
+        <div class="card-hd-badge" style="background:var(--cinab-ink)">1</div>
+        <div>
+          <div class="card-hd-t">Vier leiderschapsdomeinen</div>
+          <div class="card-hd-s">Gemiddelde score per domein op basis van alle beoordelingen (0–100)</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="radar-center">
+          <svg id="radarSvg" viewBox="0 0 360 300" width="360" height="300" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+        <div class="dim-grid" id="dimGrid"></div>
+      </div>
+    </div>
+
+    <!-- COMPETENTIEPROFIEL -->
+    <div class="card pb">
+      <div class="card-hd">
+        <div class="card-hd-badge" style="background:var(--cinab-ink)">2</div>
+        <div>
+          <div class="card-hd-t" id="profielTitel">Competentieprofiel</div>
+          <div class="card-hd-s" id="profielSub">Per competentie: eigen beeld · gemiddelde beoordelaars · spreiding</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="legendrow" id="legenda"></div>
+        <div class="axis-labels">
+          <span></span>
+          <div class="axis-zones">
+            <span style="position:absolute;left:2%">in ontwikkeling</span>
+            <span style="position:absolute;left:48%;transform:translateX(-50%)">voldoende</span>
+            <span style="position:absolute;right:2%">zeer vaardig</span>
+          </div>
+          <span></span>
+        </div>
+        <div id="profiel"></div>
+      </div>
+    </div>
+
+    <!-- BESCHOUWING -->
+    <div class="card pb">
+      <div class="card-hd">
+        <div class="card-hd-badge" style="background:var(--cinab-ink)">3</div>
+        <div>
+          <div class="card-hd-t">Beschouwing en aanbevelingen</div>
+          <div class="card-hd-s">Patroonduiding en gerichte adviezen op basis van de uitkomsten</div>
+        </div>
+      </div>
+      <div class="card-body" id="beschouwing"></div>
+    </div>
+
+    <!-- ONDERBOUWING -->
+    <div class="card pb">
+      <div class="card-hd">
+        <div class="card-hd-badge" style="background:var(--cinab-grey)">i</div>
+        <div>
+          <div class="card-hd-t">Onderbouwing &amp; legenda</div>
+          <div class="card-hd-s">Methodiek, werkwijze en uitleg van de visualisatie</div>
+        </div>
+      </div>
+      <div class="card-body ob-sect" id="onderbouwing"></div>
+    </div>
+
+    <!-- UPSELL -->
+    <div class="card pb">
+      <div class="upsell">
+        <div>
+          <h2>Meer doen met deze uitkomsten?</h2>
+          <p>De Vaardigheidsmeter geeft een helder beeld van leiderschapsvaardigheden. CINAB biedt aanvullende werkvormen om de inzichten te verankeren — van teamdialoog tot persoonlijk ontwikkelplan.</p>
+          <a class="upsell-btn" href="https://cinab.nl/tools/" target="_blank">Bekijk alle werkvormen</a>
+          <a class="upsell-btn outline" href="https://cinab.nl/" target="_blank">Over CINAB</a>
+          <p style="font-size:11px;color:var(--cinab-grey);margin-top:8px">cinab.nl</p>
+        </div>
+        <div class="upsell-vis">
+          <svg viewBox="0 0 180 140" width="100%" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="90,18 162,65 162,115 18,115 18,65" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
+            <polygon points="90,38 138,67 138,103 42,103 42,67" fill="rgba(255,255,255,.18)" stroke="rgba(255,255,255,.6)" stroke-width="1.5"/>
+            <circle cx="90" cy="38" r="5" fill="white" opacity=".9"/>
+            <circle cx="138" cy="67" r="5" fill="white" opacity=".9"/>
+            <circle cx="138" cy="103" r="5" fill="white" opacity=".9"/>
+            <circle cx="42" cy="103" r="5" fill="white" opacity=".9"/>
+            <circle cx="42" cy="67" r="5" fill="white" opacity=".9"/>
+          </svg>
+          <div style="color:rgba(255,255,255,.9);font-family:var(--font-heading);font-size:15px;margin-top:10px">Leidinggeven versterken</div>
+          <div style="color:rgba(255,255,255,.7);font-size:12px;margin-top:3px">360° inzicht · Gerichte ontwikkeling</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- #rapportInhoud -->
+</div><!-- .report -->
+
+<script>
+'use strict';
+/* ════════════════════════════════════════════════════════════════
+   vaardigheidsmeter_rapport.html — renderpagina
+   Ophaalbron: GET /wp-json/cinab/v1/rapport-data/{rapport_id}
+   Datacontract (s34):
+     scores: richting_visie / uitvoering_wendbaarheid / mensen_ontwikkeling / verandering_innovatie
+     data.perspectief: "lead" | "emp"
+     data.eigen:  [{n:"LV1",score:0-100}, …]        (zelfscore)
+     data.team:   [{n:"LV1",agg:{avg,lo,hi,n}}, …]  (beoordelaars-aggregaat)
+     meta: {organisatie, datum, deelnemers}
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── Domein-config (kleuren identiek aan vaardigheidsmeter-leidinggeven.html) ── */
+var DOMAINS = [
+  { id:'richting_visie',         name:'Richting & Visie',          color:'#70A2D7',
+    desc:'Richting geven, visie uitdragen, verwachtingen verhelderen en stakeholders betrekken.',
+    comps:['LV1','LV2','LV3','LV4','LV5'] },
+  { id:'uitvoering_wendbaarheid',name:'Uitvoering & Wendbaarheid',  color:'#BDD24D',
+    desc:'Plannen, besluitvorming, probleemoplossing en resultaatgerichtheid.',
+    comps:['LV6','LV7','LV8','LV9','LV10'] },
+  { id:'mensen_ontwikkeling',    name:'Mensen & Ontwikkeling',      color:'#2A9791',
+    desc:'Coachen, delegeren, feedback geven en psychologische veiligheid creëren.',
+    comps:['LV11','LV12','LV13','LV14','LV15'] },
+  { id:'verandering_innovatie',  name:'Verandering & Innovatie',    color:'#F05736',
+    desc:'Vernieuwen, experimenteren, communiceren over verandering en feedback ontvangen.',
+    comps:['LV16','LV17','LV18','LV19','LV20'] }
+];
+
+var COMP_LABELS = {
+  LV1:'Visie & betekenis geven',       LV2:'Verwachtingen & kaders verhelderen',
+  LV3:'Inspireren & motiveren',        LV4:'Voorbeeldgedrag & integriteit',
+  LV5:'Stakeholders & omgeving',       LV6:'Plannen & prioriteren',
+  LV7:'Besluitvorming & participatie', LV8:'Probleemoplossing & analyse',
+  LV9:'Eerlijkheid & rechtvaardigheid',LV10:'Resultaat- & impactgerichtheid',
+  LV11:'Coachen & ontwikkelen',        LV12:'Delegeren & eigenaarschap',
+  LV13:'Feedback & ontwikkelgesprekken',LV14:'Loopbaan & gelijke groeikansen',
+  LV15:'Samenwerking & psychologische veiligheid',
+  LV16:'Kansen & innovatie zien',      LV17:'Experimenteren & leren van fouten',
+  LV18:'Communiceren over verandering',LV19:'Openstaan voor feedback & reflectie',
+  LV20:'Betrokkenheid bij verandering verwerven'
+};
+
+var ADVICE = {
+  LV1:'Vertaal de organisatiekoers elk kwartaal expliciet naar wat die voor het team betekent, en toets of mensen die rode draad herkennen.',
+  LV2:'Maak verwachtingen meetbaar: leg per teamlid een paar concrete doelen en kaders vast en bespreek die regelmatig.',
+  LV3:'Voer korte motivatiegesprekken: vraag wat mensen energie geeft en geef ze daar meer ruimte en autonomie in.',
+  LV4:'Vraag een vertrouwde collega te wijzen op momenten waarop gedrag en boodschap uiteenlopen.',
+  LV5:'Breng de belangrijkste stakeholders in kaart en plan bewust contactmomenten om steun en ruimte voor het team op te halen.',
+  LV6:'Werk met een zichtbare prioriteitenlijst en heldere afspraken over wie wat wanneer doet — ook voor wie op afstand werkt.',
+  LV7:'Maak vooraf expliciet wie bij een besluit wordt betrokken en waarom, en zet een einddatum zodat besluiten niet blijven hangen.',
+  LV8:'Besteed bij een lastig vraagstuk eerst tijd aan de probleemdefinitie en de oorzaken, vóór het zoeken naar oplossingen.',
+  LV9:'Toets besluiten op consistentie: wordt dezelfde maatstaf op iedereen toegepast, inclusief op jezelf?',
+  LV10:'Maak per doel zichtbaar wat het oplevert voor de klant of eindgebruiker, en houd de voortgang voor iedereen inzichtelijk.',
+  LV11:'Vervang in coachgesprekken een deel van de adviezen door open vragen, zodat mensen zelf tot oplossingen komen.',
+  LV12:'Delegeer bewust een taak inclusief verantwoordelijkheid en mandaat, en weersta de neiging om bij te sturen.',
+  LV13:'Plan vaste, korte feedbackmomenten en zorg dat zowel waardering als opbouwende punten aan bod komen.',
+  LV14:'Voer met elk teamlid minstens jaarlijks een loopbaangesprek en let erop dat iedereen gelijke kansen krijgt.',
+  LV15:'Maak het bespreken van fouten normaal: deel eerst een eigen misser en bedank wie kritiek of twijfel durft te uiten.',
+  LV16:'Reserveer expliciet tijd om met het team naar verbeterkansen te kijken en honoreer ideeën zichtbaar.',
+  LV17:'Kies een kleinschalig experiment met onzekere uitkomst en evalueer hardop wat het oplevert.',
+  LV18:'Communiceer bij veranderingen eerder en vaker dan vanzelf gebeurt, en benoem ook wat het voor mensen betekent.',
+  LV19:'Vraag concreet om feedback ("wat zou ik anders kunnen doen?") en laat zichtbaar zien wat ermee gebeurt.',
+  LV20:'Ga bij weerstand in gesprek over de oorzaak in plaats van die te willen wegnemen, en betrek twijfelaars vroeg.'
+};
+
+/* ── Helpers ── */
+var R = function(v){ return Math.round(v); };
+var pctPos = function(v){ return 4 + v * 0.92; };
+var darken = function(hex){
+  var n=parseInt(hex.slice(1),16);
+  var r=Math.max(0,(n>>16)-40), g=Math.max(0,((n>>8)&255)-40), b=Math.max(0,(n&255)-40);
+  return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
+};
+function esc(s){ return String(s||'').replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]);}); }
+function el(id){ return document.getElementById(id); }
+
+function apiBase(){
+  try{
+    var a=document.documentElement.getAttribute('data-cinab-api');
+    if(a) return a.replace(/\/+$/,'');
+  }catch(e){}
+  return 'https://staging2.cinab.nl';
+}
+
+/* ── Index-opbouw uit data.eigen / data.team ── */
+function buildIndexes(data){
+  var eigenIdx={}, teamIdx={};
+  if(data.eigen && Array.isArray(data.eigen)){
+    data.eigen.forEach(function(e){ if(e&&e.n) eigenIdx[e.n]=typeof e.score==='number'?e.score:null; });
+  }
+  if(data.team && Array.isArray(data.team)){
+    data.team.forEach(function(t){ if(t&&t.n&&t.agg) teamIdx[t.n]=t.agg; });
+  }
+  return { eigenIdx:eigenIdx, teamIdx:teamIdx };
+}
+
+/* ── Cover ── */
+function bouwCover(meta, scores, persp, is360){
+  var org = (meta&&meta.organisatie)||'';
+  var datum = (meta&&meta.datum)||new Date().toLocaleDateString('nl-NL');
+  var deeln = (meta&&meta.deelnemers)||null;
+  var perspLabel = persp==='emp' ? 'teamanalyse leidinggevende' : '360-meting leidinggeven';
+
+  el('coverEyebrow').textContent = 'Leiderschapsrapportage · ' + perspLabel;
+  el('coverOrg').textContent = org || 'Vaardigheidsmeter Leidinggeven';
+  if(org) el('coverSub').textContent = 'Vaardigheidsmeter Leidinggeven';
+
+  var metaItems = [{label:'Datum', val:datum}];
+  if(deeln) metaItems.push({label:'Beoordelaars', val:String(deeln)});
+  el('coverMeta').innerHTML = metaItems.map(function(m){
+    return '<div class="cover-meta-item"><strong>'+esc(m.val)+'</strong><span>'+esc(m.label)+'</span></div>';
+  }).join('');
+
+  // intro-tekst
+  var gemScores = DOMAINS.map(function(d){ return typeof scores[d.id]==='number'?scores[d.id]:null; }).filter(function(v){return v!==null;});
+  var gem = gemScores.length ? R(gemScores.reduce(function(a,b){return a+b;},0)/gemScores.length) : null;
+  var intro = is360
+    ? 'Dit rapport toont de uitkomsten van de 360-meting op twintig leiderschapscompetenties verdeeld over vier domeinen.'
+    : 'Dit rapport toont de uitkomsten van de zelfbeoordeling op twintig leiderschapscompetenties verdeeld over vier domeinen.';
+  if(gem!==null) intro += ' De gemiddelde score over alle vier domeinen bedraagt ' + gem + '.';
+  el('coverTekst').textContent = intro;
+}
+
+/* ── Radar (4-punts) ── */
+function bouwRadar(scores){
+  var svg = el('radarSvg');
+  var cx=180, cy=150, maxR=105;
+  // hoeken: boven=richting_visie, rechts=uitvoering, onder=mensen, links=verandering
+  var hoeken = [-90, 0, 90, 180];
+  function pt(i, r){
+    var rad = hoeken[i]*Math.PI/180;
+    return {x: cx + r*Math.cos(rad), y: cy + r*Math.sin(rad)};
+  }
+  var h='';
+  // grid-ringen
+  [0.25,0.5,0.75,1].forEach(function(f){
+    var pts=[0,1,2,3].map(function(i){return pt(i,maxR*f);});
+    var d=pts.map(function(p,i){return (i===0?'M':'L')+p.x.toFixed(1)+','+p.y.toFixed(1);}).join(' ')+'Z';
+    h+='<path d="'+d+'" fill="none" stroke="rgba(0,0,0,.07)" stroke-width="1"/>';
+  });
+  // assen
+  for(var i=0;i<4;i++){
+    var e=pt(i,maxR);
+    h+='<line x1="'+cx+'" y1="'+cy+'" x2="'+e.x.toFixed(1)+'" y2="'+e.y.toFixed(1)+'" stroke="rgba(0,0,0,.08)" stroke-width="1"/>';
+  }
+  // data-vlak
+  var dataPts = DOMAINS.map(function(d,i){
+    var s=typeof scores[d.id]==='number'?scores[d.id]:50;
+    return pt(i, maxR*s/100);
+  });
+  var dd=dataPts.map(function(p,i){return (i===0?'M':'L')+p.x.toFixed(1)+','+p.y.toFixed(1);}).join(' ')+'Z';
+  h+='<path d="'+dd+'" fill="rgba(28,28,26,.08)" stroke="rgba(28,28,26,.4)" stroke-width="1.5"/>';
+  // punten per domein
+  dataPts.forEach(function(p,i){
+    h+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="5" fill="'+DOMAINS[i].color+'" stroke="white" stroke-width="1.5"/>';
+  });
+  // labels
+  var lOff=maxR+22;
+  var lAnk=[
+    {x:cx,       y:cy-lOff, ta:'middle', dy:'-3'},
+    {x:cx+lOff,  y:cy,      ta:'start',  dy:'4'},
+    {x:cx,       y:cy+lOff, ta:'middle', dy:'14'},
+    {x:cx-lOff,  y:cy,      ta:'end',    dy:'4'}
+  ];
+  DOMAINS.forEach(function(d,i){
+    var a=lAnk[i];
+    var s=typeof scores[d.id]==='number'?R(scores[d.id]):'—';
+    h+='<text x="'+a.x+'" y="'+a.y+'" text-anchor="'+a.ta+'" font-family="Plus Jakarta Sans,sans-serif" font-size="10" font-weight="700" fill="'+d.color+'" dy="'+a.dy+'">'+esc(d.name)+'</text>';
+    h+='<text x="'+a.x+'" y="'+(a.y+13)+'" text-anchor="'+a.ta+'" font-family="Plus Jakarta Sans,sans-serif" font-size="13" font-weight="700" fill="#1C1C1A">'+s+'</text>';
+  });
+  // gemiddelde centraal
+  var geldig=DOMAINS.filter(function(d){return typeof scores[d.id]==='number';});
+  var gem=geldig.length?R(geldig.reduce(function(a,d){return a+scores[d.id];},0)/geldig.length):null;
+  h+='<circle cx="'+cx+'" cy="'+cy+'" r="22" fill="white" stroke="rgba(0,0,0,.1)" stroke-width="1"/>';
+  if(gem!==null){
+    h+='<text x="'+cx+'" y="'+(cy-2)+'" text-anchor="middle" font-family="Fraunces,serif" font-size="14" font-weight="600" fill="#1C1C1A">'+gem+'</text>';
+    h+='<text x="'+cx+'" y="'+(cy+10)+'" text-anchor="middle" font-family="Plus Jakarta Sans,sans-serif" font-size="8" fill="#5F5E5A">gemiddeld</text>';
+  }
+  svg.innerHTML = h;
+}
+
+/* ── Dimensie-kaarten ── */
+function bouwDimGrid(scores){
+  var html='';
+  DOMAINS.forEach(function(d){
+    var s=typeof scores[d.id]==='number'?R(scores[d.id]):null;
+    var sv=s!==null?s:50;
+    html+='<div class="dcard">'
+      +'<div class="dcard-top"><span class="domain-dot" style="background:'+d.color+'"></span><span class="dcard-name">'+esc(d.name)+'</span></div>'
+      +'<div class="dcard-score">'+(s!==null?s:'—')+' <small>/100</small></div>'
+      +'<div class="dcard-bar"><div class="dcard-bar-fill" style="width:'+sv+'%;background:'+d.color+'"></div></div>'
+      +'<div class="dcard-desc">'+esc(d.desc)+'</div>'
+    +'</div>';
+  });
+  el('dimGrid').innerHTML = html;
+}
+
+/* ── Legenda ── */
+function bouwLegenda(is360, persp){
+  var lead = persp==='lead';
+  var selfLabel = lead ? 'eigen beeld' : 'jouw beoordeling';
+  var othLabel  = lead ? 'gemiddelde van collega\'s' : 'gemiddelde van het team';
+  // Inline SVG-iconen — print-proof
+  var triSvg = '<svg width="11" height="11" viewBox="0 0 11 11" style="-webkit-print-color-adjust:exact;print-color-adjust:exact"><polygon points="5.5,0 11,11 0,11" fill="#5F5E5A"/></svg>';
+  var cirSvg = '<svg width="11" height="11" viewBox="0 0 11 11" style="-webkit-print-color-adjust:exact;print-color-adjust:exact"><circle cx="5.5" cy="5.5" r="5" fill="#5F5E5A"/></svg>';
+  var bndSvg = '<svg width="16" height="10" viewBox="0 0 16 10" style="-webkit-print-color-adjust:exact;print-color-adjust:exact"><rect x="0" y="1" width="16" height="8" rx="4" fill="#5F5E5A" opacity="0.3"/></svg>';
+
+  var h = '<span>'+triSvg+' '+esc(selfLabel)+'</span>';
+  if(is360){
+    h += '<span>'+cirSvg+' '+esc(othLabel)+'</span>';
+    h += '<span>'+bndSvg+' spreiding (laag–hoog)</span>';
+  }
+  el('legenda').innerHTML = h;
+
+  var t = el('profielTitel');
+  var s = el('profielSub');
+  if(is360){
+    t.textContent = 'Competentieprofiel — zelfscore versus beoordelaars';
+    s.textContent = 'Per competentie: driehoek = eigen beeld · cirkel = gemiddelde beoordelaars · band = spreiding';
+  } else {
+    t.textContent = 'Competentieprofiel — zelfbeoordeling';
+    s.textContent = 'Per competentie: driehoek = zelfscore (0 = in ontwikkeling · 100 = zeer vaardig)';
+  }
+}
+
+/* ── Profiel-rijen ── */
+/* Één vaste SVG per rail, viewBox 0 0 400 22, geen uitrekking (meet), geen overflow.
+   pctPos() geeft 0–100; vermenigvuldigd met 3.92 = positie op 400px-breedte (400*0.92/100*factor).
+   Alles in één SVG — geen position:absolute, geen overflow:visible — print-proof. */
+function railSvg(self, tm, color){
+  var VW=400, VH=22, cy=11, dk=darken(color);
+  var print='-webkit-print-color-adjust:exact;print-color-adjust:exact';
+  // pctPos geeft positie als % (4 + v*0.92); omzetten naar VW-coördinaten
+  function px(v){ return (pctPos(v)/100*VW).toFixed(1); }
+
+  var s='';
+  // basislijn
+  s+='<line x1="'+(VW*0.02)+'" y1="'+cy+'" x2="'+(VW*0.98)+'" y2="'+cy+'" stroke="#E5E3DB" stroke-width="2"/>';
+
+  if(tm&&tm.avg!=null){
+    var lo=tm.lo||0, hi=tm.hi||0, avg=R(tm.avg||0);
+    var bx=parseFloat(px(lo)), bw=(parseFloat(px(hi))-bx);
+    // spreiding-band
+    s+='<rect x="'+bx.toFixed(1)+'" y="'+(cy-5.5)+'" width="'+bw.toFixed(1)+'" height="11" rx="5" fill="'+color+'" opacity="0.22"/>';
+    // verbindingslijn
+    if(self!==null&&self!==undefined){
+      var clo=Math.min(self,avg), chi=Math.max(self,avg);
+      s+='<line x1="'+px(clo)+'" y1="'+cy+'" x2="'+px(chi)+'" y2="'+cy+'" stroke="'+color+'" stroke-width="3" opacity="0.45"/>';
+    }
+    // cirkel team-gemiddelde
+    s+='<circle cx="'+px(avg)+'" cy="'+cy+'" r="5.5" fill="'+dk+'"/>';
+  }
+
+  // driehoek zelfscore — nette punt, vast formaat
+  if(self!==null&&self!==undefined){
+    var tx=parseFloat(px(self));
+    s+='<polygon points="'+tx.toFixed(1)+','+(cy-6)+' '+(tx-5.5).toFixed(1)+','+(cy+5.5)+' '+(tx+5.5).toFixed(1)+','+(cy+5.5)+'" fill="'+color+'"/>';
+  }
+
+  return '<svg style="width:100%;height:22px;display:block;'+print+'" viewBox="0 0 '+VW+' '+VH+'" preserveAspectRatio="xMinYMid meet" xmlns="http://www.w3.org/2000/svg">'+s+'</svg>';
+}
+
+function bouwProfiel(eigenIdx, teamIdx, is360){
+  var box = el('profiel');
+  var h = '';
+  DOMAINS.forEach(function(d){
+    h += '<div class="prow dom-head">'
+      +'<span style="display:flex;align-items:center;gap:7px;font-weight:700;font-size:13px">'
+        +'<span class="domain-dot" style="background:'+d.color+'"></span>'+esc(d.name)
+      +'</span>'
+      +'<span></span><span></span>'
+    +'</div>';
+    d.comps.forEach(function(n){
+      var self = eigenIdx[n];
+      var tm   = is360 ? teamIdx[n] : null;
+      var valDisp = (self!==null&&self!==undefined) ? String(self) : 'n.v.t.';
+      if(tm&&tm.avg!=null) valDisp += ' · '+R(tm.avg);
+
+      h += '<div class="prow">'
+        +'<span class="prow__l"><span class="domain-dot" style="width:8px;height:8px;background:'+d.color+'"></span>'+esc(n+' · '+(COMP_LABELS[n]||n))+'</span>'
+        + railSvg(self, tm, d.color)
+        +'<span class="prow__v">'+esc(valDisp)+'</span>'
+      +'</div>';
+    });
+  });
+  box.innerHTML = h;
+}
+
+/* ── Beschouwing (patroonduiding + adviezen) ── */
+function bouwBeschouwing(scores, eigenIdx, teamIdx, is360, persp){
+  var box = el('beschouwing');
+  var lead = persp === 'lead';
+
+  // domeinwaarden
+  var domVal = {};
+  DOMAINS.forEach(function(d){
+    if(is360 && teamIdx){
+      var teamVals = d.comps.map(function(n){ return teamIdx[n]&&teamIdx[n].avg!=null?R(teamIdx[n].avg):null; }).filter(function(v){return v!==null;});
+      domVal[d.id] = teamVals.length ? R(teamVals.reduce(function(a,b){return a+b;},0)/teamVals.length) : (typeof scores[d.id]==='number'?R(scores[d.id]):null);
+    } else {
+      domVal[d.id] = typeof scores[d.id]==='number' ? R(scores[d.id]) : null;
+    }
+  });
+
+  var geldig = DOMAINS.filter(function(d){return domVal[d.id]!==null;});
+  if(!geldig.length){ box.innerHTML='<p style="color:var(--cinab-grey);font-size:13px">Onvoldoende gegevens voor een beschouwing.</p>'; return; }
+
+  var sorted = geldig.slice().sort(function(a,b){return domVal[b.id]-domVal[a.id];});
+  var sterkste = sorted[0];
+  var zwakste  = sorted[sorted.length-1];
+
+  // archetyp-zin
+  var range = domVal[sterkste.id] - domVal[zwakste.id];
+  var arch;
+  if(range <= 8){
+    arch = 'De vier domeinen liggen dicht bij elkaar (rond '+domVal[sterkste.id]+') — een evenwichtig profiel zonder uitgesproken pieken of dalen.';
+  } else {
+    arch = (lead?'':'Het leiderschap van ') + sterkste.name + ' (' + domVal[sterkste.id] + ') is het sterkste domein. '
+      + zwakste.name + ' (' + domVal[zwakste.id] + ') biedt de meeste groeikans — een verschil van ' + range + ' punten.';
+  }
+
+  var h = '<div class="arch-box">'+esc(arch)+'</div>';
+
+  // top-3 aandachtspunten (laagste team/zelf-scores)
+  var compVals = [];
+  DOMAINS.forEach(function(d){
+    d.comps.forEach(function(n){
+      var v = is360&&teamIdx[n]&&teamIdx[n].avg!=null ? R(teamIdx[n].avg) : (eigenIdx[n]!==undefined&&eigenIdx[n]!==null?eigenIdx[n]:null);
+      if(v!==null) compVals.push({n:n, v:v, d:d});
+    });
+  });
+  compVals.sort(function(a,b){return a.v-b.v;});
+  var aandacht = compVals.slice(0,3);
+  var sterk    = compVals.slice().sort(function(a,b){return b.v-a.v;}).slice(0,3);
+
+  // sterke punten
+  h += '<h3 style="font-size:15px;margin:16px 0 6px">Sterke punten</h3>';
+  h += '<ul class="adv-list">';
+  sterk.forEach(function(c){
+    h += '<li><span class="adv-dot" style="background:'+c.d.color+'"></span><span><strong>'+esc(c.n+' · '+(COMP_LABELS[c.n]||c.n))+'</strong> <span style="color:var(--cinab-grey)">(score '+c.v+')</span></span></li>';
+  });
+  h += '</ul>';
+
+  // aandachtspunten + adviezen
+  h += '<h3 style="font-size:15px;margin:16px 0 6px">Aandachtsgebieden &amp; aanbevelingen</h3>';
+  h += '<ul class="adv-list">';
+  aandacht.forEach(function(c){
+    var adv = ADVICE[c.n]||'';
+    h += '<li><span class="adv-dot" style="background:'+c.d.color+'"></span>'
+      +'<span><strong>'+esc(c.n+' · '+(COMP_LABELS[c.n]||c.n))+'</strong> <span style="color:var(--cinab-grey)">(score '+c.v+')</span>'
+      +(adv ? '<br><span style="color:var(--cinab-grey);font-size:12px">'+esc(adv)+'</span>' : '')
+      +'</span></li>';
+  });
+  h += '</ul>';
+
+  // blinde vlekken (alleen bij 360)
+  if(is360 && eigenIdx && Object.keys(teamIdx||{}).length){
+    var gaps = [];
+    DOMAINS.forEach(function(d){
+      d.comps.forEach(function(n){
+        var s=eigenIdx[n], t=teamIdx[n]&&teamIdx[n].avg!=null?R(teamIdx[n].avg):null;
+        if(s!==null&&s!==undefined&&t!==null){ gaps.push({n:n,d:d,gap:s-t,self:s,team:t}); }
+      });
+    });
+    gaps.sort(function(a,b){return Math.abs(b.gap)-Math.abs(a.gap);});
+    var topGaps = gaps.slice(0,3).filter(function(g){return Math.abs(g.gap)>7;});
+    if(topGaps.length){
+      h += '<h3 style="font-size:15px;margin:16px 0 6px">Grootste verschillen (zelfscore vs. beoordelaars)</h3>';
+      h += '<ul class="adv-list">';
+      topGaps.forEach(function(g){
+        var richting = g.gap>0
+          ? (lead?'Zelfscore hoger dan collega\'s ('+g.gap+' punten) — mogelijk een blinde vlek.':'Jij beoordeelt hoger dan het team ('+g.gap+' punten).')
+          : (lead?'Collega\'s waarderen dit hoger dan jij ('+Math.abs(g.gap)+' punten) — mogelijk te streng voor jezelf.':'Jij beoordeelt lager dan het team ('+Math.abs(g.gap)+' punten).');
+        h += '<li><span class="adv-dot" style="background:'+g.d.color+'"></span>'
+          +'<span><strong>'+esc(g.n+' · '+(COMP_LABELS[g.n]||g.n))+'</strong>'
+          +' <span style="color:var(--cinab-grey)">(eigen '+g.self+' · team '+g.team+')</span>'
+          +'<br><span style="color:var(--cinab-grey);font-size:12px">'+esc(richting)+'</span>'
+          +'</span></li>';
+      });
+      h += '</ul>';
+    }
+  }
+
+  box.innerHTML = h;
+}
+
+/* ── Onderbouwing ── */
+function bouwOnderbouwing(){
+  el('onderbouwing').innerHTML = ''
+    +'<h3>Waarop is deze test gebaseerd?</h3>'
+    +'<p>De Vaardigheidsmeter bouwt voort op de oorspronkelijke 360-graden-methodiek met vier domeinen en is geactualiseerd naar de huidige organisatiekunde: een verschuiving van sturend "command-and-control" naar wendbaar, inclusief en mensgericht leiderschap. De competenties zijn aangescherpt op basis van actueel onderzoek (o.a. Korn Ferry, Harvard Business Impact, EY) en gevestigde concepten als psychologische veiligheid (Edmondson), emotionele intelligentie (Goleman), coachend leiderschap en zelfreflectie.</p>'
+    +'<h3>Werkwijze</h3>'
+    +'<p>20 competenties over 4 domeinen, elk gemeten met twee gedragsstellingen op een 5-puntsschaal. De scores worden samengevat per competentie en per domein op een schaal van 0–100. In de 360-meting worden meerdere beoordelaars uitgenodigd; hun antwoorden worden samengevat tot een gemiddelde met spreiding.</p>'
+    +'<h3>Legenda</h3>'
+    +'<div class="ob-leg">'
+      +'<span><svg width="11" height="11" viewBox="0 0 11 11" style="-webkit-print-color-adjust:exact;print-color-adjust:exact"><polygon points="5.5,0 11,11 0,11" fill="#5F5E5A"/></svg> Driehoek: het eigen beeld — zelfbeoordeling of beoordeling van de leidinggevende.</span>'
+      +'<span><svg width="11" height="11" viewBox="0 0 11 11" style="-webkit-print-color-adjust:exact;print-color-adjust:exact"><circle cx="5.5" cy="5.5" r="5" fill="#5F5E5A"/></svg> Cirkel: het gemiddelde beeld van beoordelaars of team.</span>'
+      +'<span><svg width="16" height="10" viewBox="0 0 16 10" style="-webkit-print-color-adjust:exact;print-color-adjust:exact"><rect x="0" y="1" width="16" height="8" rx="4" fill="#5F5E5A" opacity="0.3"/></svg> Band: de spreiding — laagste tot hoogste score van de beoordelaars.</span>'
+    +'</div>'
+    +'<h3>Belangrijk</h3>'
+    +'<p>Dit is een ontwikkelinstrument, geen officiële beoordeling of psychologische diagnose. De uitkomsten zijn een startpunt voor gesprek en gerichte ontwikkeling.</p>';
+}
+
+/* ── Foutscherm ── */
+function toonFout(msg){
+  el('laadScherm').innerHTML = '<div class="laad" style="color:var(--cinab-ink)">'
+    +'<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--cinab-amber)" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>'
+    +'<strong>Rapport niet beschikbaar</strong>'
+    +'<span style="color:var(--cinab-grey);font-size:12px">'+esc(msg)+'</span>'
+  +'</div>';
+}
+
+/* ── Hoofd-render ── */
+function render(wrapper){
+  var scores = wrapper.scores  || {};
+  var meta   = wrapper.meta    || {};
+  var data   = wrapper.data    || {};
+  var persp  = data.perspectief || 'lead';
+
+  var idx    = buildIndexes(data);
+  var eigenIdx = idx.eigenIdx;
+  var teamIdx  = idx.teamIdx;
+  var is360    = data.team && data.team.length > 0;
+
+  bouwCover(meta, scores, persp, is360);
+  bouwRadar(scores);
+  bouwDimGrid(scores);
+  bouwLegenda(is360, persp);
+  bouwProfiel(eigenIdx, teamIdx, is360);
+  bouwBeschouwing(scores, eigenIdx, teamIdx, is360, persp);
+  bouwOnderbouwing();
+
+  el('laadScherm').style.display   = 'none';
+  el('rapportInhoud').style.display = '';
+}
+
+/* ── Bootstrap ── */
+document.addEventListener('DOMContentLoaded', async function(){
+  var rid;
+  try{ rid = new URLSearchParams(location.search).get('rapport_id'); }catch(e){}
+  if(!rid){ toonFout('Geen rapport_id in de URL (?rapport_id=…).'); return; }
+
+  var base = apiBase();
+  var url  = base + '/wp-json/cinab/v1/rapport-data/' + encodeURIComponent(rid);
+  try{
+    var res = await fetch(url, {method:'GET', credentials:'omit'});
+    if(!res.ok){ toonFout('Platform antwoordde met status '+res.status+'.'); return; }
+    var json = await res.json();
+    if(!json||typeof json!=='object'){ toonFout('Onverwacht antwoord van het platform.'); return; }
+    render(json);
+  }catch(e){
+    toonFout('Verbindingsfout: '+(e&&e.message?e.message:'onbekend')+' (API: '+base+')');
+  }
+});
+</script>
+</body>
+</html>

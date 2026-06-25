@@ -267,6 +267,10 @@ main{padding:28px 0 64px;position:relative}
           <button class="cinab-button cinab-button--outline" id="btn-sim">Simuleer reacties</button>
         </div>
       </div>
+      <div id="wait-definitief" hidden style="background:#fff8ec;border:1px solid #EF9F27;border-left:4px solid #EF9F27;border-radius:8px;padding:12px 14px;font-size:14px;color:#1C1C1A;margin:14px 0">
+        <strong>Let op: het rapport is definitief na het bekijken.</strong><br>
+        Zodra je op &ldquo;Bekijk teambeeld&rdquo; klikt, wordt het rapport aangemaakt op basis van de reacties die nu binnen zijn. Latere reacties worden niet meer verwerkt. Wacht tot iedereen heeft gereageerd als je een volledig beeld wilt.
+      </div>
       <div class="actions">
         <button class="cinab-button cinab-button--primary" id="btn-to-result" disabled>Bekijk teambeeld</button>
       </div>
@@ -633,6 +637,7 @@ function renderWait(){
  var c=state.responses.length;
  $("wait-count").textContent=c+" van "+state.raters.length+" hebben gereageerd."+(c<3?(" Nog "+(3-c)+" nodig voordat het teambeeld zichtbaar wordt."):" Het teambeeld is beschikbaar.");
  $("btn-to-result").disabled=c<3;
+ $("wait-definitief").hidden=c<3;
 }
 $("btn-sim").onclick=function(){
  var list=state.raters.map(function(r){
