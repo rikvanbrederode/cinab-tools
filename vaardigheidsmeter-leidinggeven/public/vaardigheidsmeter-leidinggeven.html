@@ -280,6 +280,7 @@ main{padding:28px 0 64px;position:relative}
         <p class="lead" id="result-note"></p>
       </div>
       <div id="result-anon" class="note-box" hidden></div>
+      <div id="result-save-status" hidden style="margin:0 0 14px;font-size:13px;color:var(--cinab-grey)"></div>
       <div class="cards" id="result-cards"></div>
       <div class="toolbar">
         <div class="legendrow" id="result-legend"></div>
@@ -631,7 +632,7 @@ function renderWait(){
  });
  var c=state.responses.length;
  $("wait-count").textContent=c+" van "+state.raters.length+" hebben gereageerd."+(c<3?(" Nog "+(3-c)+" nodig voordat het teambeeld zichtbaar wordt."):" Het teambeeld is beschikbaar.");
- $("btn-to-result").disabled=c<1;
+ $("btn-to-result").disabled=c<3;
 }
 $("btn-sim").onclick=function(){
  var list=state.raters.map(function(r){
@@ -890,13 +891,32 @@ function renderResult(){
 
  renderBeschouwing();
 
+ // rapport automatisch opslaan bij 360-meting (betaald + >= 3 reacties)
+ if(is360()&&Platform.isLive()){
+  var ss=$("result-save-status");
+  ss.hidden=false; ss.textContent="Rapport wordt opgeslagen…";
+  (async function(){
+   try{
+    await Platform.settle();
+    var r=await Platform.saveReport(buildWrapper());
+    if(r&&r.rapport_url){
+     ss.innerHTML='Rapport opgeslagen. <a href="'+r.rapport_url+'" target="_top" style="color:var(--cinab-ink);font-weight:700">Bekijk het in je werkruimte →</a>';
+     Platform.notifyCompleted(r.rapport_url);
+    } else { ss.textContent="Rapport opgeslagen."; }
+   }catch(e){
+    console.warn('[VLM] rapport opslaan mislukt:',e);
+    ss.textContent="Het rapport kon niet worden opgeslagen. Probeer het opnieuw via de werkruimte.";
+   }
+  })();
+ } else { $("result-save-status").hidden=true; }
+
  // acties
  var act=$("result-actions");act.innerHTML="";
  if(paid){
   act.innerHTML='<button class="cinab-button cinab-button--primary" id="a-print">Download als PDF / Printen</button>'+
    '<button class="cinab-button cinab-button--outline" id="a-compare">Toon verschil met vorige meting</button>'+
    '<button class="cinab-button cinab-button--ghost" id="a-restart">Opnieuw</button>';
-  $("a-print").onclick=async function(){ try{ var r=await Platform.saveReport(buildWrapper()); if(r&&r.rapport_url)Platform.notifyCompleted(r.rapport_url); }catch(e){ console.warn(e); } window.print(); };
+  $("a-print").onclick=function(){ window.print(); };
   $("a-compare").onclick=function(){alert("Vergelijken met je vorige meting wordt gekoppeld via je account (zie PLATFORM-WERKBOEK §3.3). In de demo is er nog geen eerdere meting.");};
   $("a-restart").onclick=resetAll;
  }else{
