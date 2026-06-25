@@ -147,6 +147,10 @@ h1,h2,h3{font-family:var(--font-heading);font-weight:600;line-height:1.1}
     <span class="pb-sub">· Vaardigheidsmeter Leidinggeven — Rapportage</span>
   </div>
   <div class="pb-actions">
+    <button class="btn btn-ghost" id="btnTerug" onclick="window.opener||window.history.length>1?window.close():window.location.href='https://cinab.nl/account/'" style="display:none">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 1L4 7l5 6"/></svg>
+      Werkruimte
+    </button>
     <button class="btn btn-ghost" onclick="window.print()">
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="5" width="10" height="7" rx="1"/><path d="M4 5V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M4 9h6M4 11h3"/></svg>
       PDF opslaan
@@ -719,6 +723,13 @@ function render(wrapper){
 
 /* ── Bootstrap ── */
 document.addEventListener('DOMContentLoaded', async function(){
+  // Toon "Werkruimte"-knop alleen als het rapport vanuit een ander venster is geopend
+  try{
+    if(window.opener || (document.referrer && document.referrer.indexOf('cinab.nl') !== -1)){
+      var btn = document.getElementById('btnTerug');
+      if(btn) btn.style.display = '';
+    }
+  }catch(e){}
   var rid;
   try{ rid = new URLSearchParams(location.search).get('rapport_id'); }catch(e){}
   if(!rid){ toonFout('Geen rapport_id in de URL (?rapport_id=…).'); return; }
