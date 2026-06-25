@@ -189,11 +189,12 @@ export async function startCinabSession( options = {} ) {
 		// ADR 0007: per-tool poortconfig — null = gratis tool, 0 is geldig.
 		betaalVanafFase: ( out.betaal_vanaf_fase === undefined ) ? null : out.betaal_vanaf_fase,
 		credits:         ( out.credits === undefined ) ? null : out.credits,
+		sessionCode: out.session_code || null,
 	} );
 }
 
 /** Maak een client als je het token al hebt (bv. hervat uit eigen sessie-state). */
-export function createCinabClient( { apiBase, token, apiKey = null, parentRapportId = null, action = null, betaalVanafFase = null, credits = null } ) {
+export function createCinabClient( { apiBase, token, apiKey = null, parentRapportId = null, action = null, betaalVanafFase = null, credits = null, sessionCode = null } ) {
 	apiBase = stripSlash( apiBase );
 	const parentOrigin = safeOrigin( apiBase );
 	let lastRapportId  = null;
@@ -208,6 +209,7 @@ export function createCinabClient( { apiBase, token, apiKey = null, parentRappor
 		betaalVanafFase,
 		/** Credit-prijs per sessie uit de start-tool-response. */
 		credits,
+		sessionCode,
 
 		/** True bij terugkeer na betaling (?action=resume) — werkboek §5.5 stap 7. */
 		get isResume() { return action === 'resume'; },

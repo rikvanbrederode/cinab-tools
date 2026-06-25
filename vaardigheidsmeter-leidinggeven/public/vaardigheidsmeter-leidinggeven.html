@@ -334,7 +334,7 @@ main{padding:28px 0 64px;position:relative}
   <div class="actions"><button class="cinab-button cinab-button--ghost" id="modal-cancel">Annuleren</button><button class="cinab-button cinab-button--primary" id="modal-ok"></button></div>
 </div></div>
 
-<script type="module">
+<script>
   /* Live-bibliotheken (Firebase + CINAB-client). Faalt stil terug naar demo/standalone. */
   window.__VLM_LIB__ = (async function(){
     try{
@@ -385,6 +385,8 @@ var Platform=(function(){
     isLive:function(){return live;},
     getCode:function(){return code;},
     save:persist,
+    savePersp:async function(p,v){ if(!live||!db)return; try{ await fb.update(fb.ref(db,'sessions/'+code+'/meta'),{persp:p,variant:v}); }catch(e){} },
+    getMetaFromRTDB:async function(){ if(!live||!db)return null; try{ var snap=await fb.get(fb.ref(db,'sessions/'+code+'/meta')); return snap.val(); }catch(e){ return null; } },
     isResume:function(){return !!(live&&client&&client.isResume);},
     restoreState:function(){return loadState();},
     async init(){
@@ -404,7 +406,7 @@ var Platform=(function(){
         } else if(p.get("session")||p.get("code")){                   // platform-relaunch (§3.7a, dashboard)
           code=p.get("session")||p.get("code");
         } else {                                                      // verse start: nieuwe sessie aanmaken
-          code=genCode();
+          code = client.sessionCode || genCode();                   // platform-code, fallback naar lokaal (demo)
           await fb.set(fb.ref(db,'sessions/'+code+'/meta'),{createdAt:fb.serverTimestamp(),lang:'nl',facilitatorUid:uid,tool:'vaardigheidsmeter_leidinggeven'});
         }
         live=true; persist(); return true;
@@ -416,7 +418,13 @@ var Platform=(function(){
       catch(e){ return {ok:true,saldo:0}; }                           // saldo is advisory; settle is bindend
     },
     async settle(){
-      if(!live) return {betaald:true,demo:true};
+      if(!live){
+        if(location.hostname==='vaardigheidsmeter-leidinggeven.cinab.nl'){
+          location.href='https://cinab.nl/tools/vaardigheidsmeter-leidinggeven/';
+          return;
+        }
+        return {betaald:true,demo:true};
+      }
       persist();                                                      // state persistent vóór mogelijke redirect
       try{ var r=await client.settleSession(); var s=loadState()||{}; s.settled=true; saveState(s); return {betaald:!!(r&&r.betaald)}; }
       catch(e){ if(e.isPaymentRequired){ persist(); client.goToPayment(e,{returnUrl:returnUrl}); return {betaald:false,redirect:true}; } throw e; }
@@ -526,7 +534,7 @@ $("p-lead").onclick=function(){setPersp("lead");};
 $("p-emp").onclick=function(){setPersp("emp");};
 $("v-free").onclick=function(){setVariant("free");};
 $("v-paid").onclick=function(){setVariant("paid");};
-$("btn-start").onclick=function(){ if(state.variant==="paid"){openPaywall();} else { document.body.dataset.mode="free"; startQuiz(); } };
+$("btn-start").onclick=function(){ if(Platform.isLive()){ Platform.savePersp(state.persp,state.variant); } if(state.variant==="paid"){openPaywall();} else { document.body.dataset.mode="free"; startQuiz(); } };
 
 /* ====================== BETAALPOORT (popup) ====================== */
 function openPaywall(){
@@ -978,10 +986,16 @@ function resetAll(){state={persp:null,variant:null,answers:{},raters:[],response
  buildQuiz();show("screen-start");}
 
 /* init */
-(async function(){
+ (async function(){
  await Platform.init();
  $("demo-ribbon").hidden=Platform.isLive();
  Platform.notifyLoaded();
+ if(Platform.isLive() && (new URLSearchParams(location.search).get('session')||new URLSearchParams(location.search).get('code'))){
+  try{
+   var m=await Platform.getMetaFromRTDB();
+   if(m&&m.persp){ state.persp=m.persp; state.variant=m.variant||'paid'; state.answers={}; document.body.dataset.mode='paid'; setPersp(state.persp); setVariant(state.variant); show('screen-wait'); buildWait(); return; }
+  }catch(e){ console.warn('[VLM] meta restore mislukt:',e); }
+ }
  if(Platform.isLive() && Platform.isResume()){
   var s=Platform.restoreState();
   if(s){ state.persp=s.persp||state.persp; state.variant=s.variant||"paid"; state.answers=s.answers||{}; }
