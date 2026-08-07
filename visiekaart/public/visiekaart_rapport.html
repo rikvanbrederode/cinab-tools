@@ -147,6 +147,22 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .dot-n{width:28px;height:18px;border-radius:9px;background:var(--b1);color:var(--text);font-size:10px;font-weight:600;display:inline-flex;align-items:center;justify-content:center}
 .dot-a{width:28px;height:18px;border-radius:9px;background:var(--coral);color:#fff;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
 
+/* ── VOLLEDIGE TIJDLIJN / MATRIX / RISICO (§11K/§11N/§11O) ── */
+.rgantt-header{display:flex;border-bottom:2px solid var(--b1);font-size:9px;font-weight:700;color:var(--t3)}
+.rgantt-label-col{flex:0 0 150px;padding:6px 8px;text-transform:uppercase;letter-spacing:.05em}
+.rgantt-periods{flex:1;display:flex}
+.rgantt-period{flex:1;padding:6px 1px;text-align:center;white-space:nowrap;overflow:visible}
+.rgantt-row{display:flex;border-bottom:1px solid var(--b0)}
+.rgantt-theme-label{flex:0 0 150px;padding:8px;display:flex;align-items:flex-start;gap:7px}
+.rgantt-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.rgantt-name{font-size:11px;font-weight:700;line-height:1.3}
+.rgantt-lane{flex:1;position:relative;min-height:44px}
+.rgantt-grid{position:absolute;top:0;bottom:0;width:1px;background:var(--b0)}
+.rgantt-bar{position:absolute;height:16px;border-radius:8px;color:#fff;font-size:9px;font-weight:600;display:flex;align-items:center;padding:0 7px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.rrisk-intro{font-size:11.5px;color:var(--t2);line-height:1.6;margin-bottom:12px}
+.rrisk-intro strong{color:var(--text)}
+@media print{.rgantt-bar{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+
 /* ── ORDER PAGE ── */
 .order-page{background:var(--surface)}
 .order-inner{padding:32px 40px;display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center}
@@ -400,15 +416,42 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
   </div>
 </div>
 
-<!-- ═══════ PAGE 5: VERSNELLERS & REMMERS SUMMARY ═══════ -->
+<!-- ═══════ PAGE 5: VOLLEDIGE TIJDLIJN (§11K) ═══════ -->
 <div class="rpage full-break">
   <div class="section-head">
-    <div class="sh-badge" style="background:var(--green)">3</div>
+    <div class="sh-badge" style="background:var(--teal,#2A9791)">3</div>
+    <div><div class="sh-title" id="t-ftTitle">Volledige tijdlijn</div><div class="sh-sub" id="t-ftSub">Alle acties per thema, uitgezet op de tijdshorizon uit fase 0</div></div>
+  </div>
+  <div class="page-body" id="fullTimelineBody"></div>
+</div>
+
+<!-- ═══════ PAGE 6: PRIORITEITENMATRIX (§11N) ═══════ -->
+<div class="rpage full-break">
+  <div class="section-head">
+    <div class="sh-badge" style="background:var(--purple)">4</div>
+    <div><div class="sh-title" id="t-pmTitle">Prioriteitenmatrix</div><div class="sh-sub" id="t-pmSub">Alle acties op haalbaarheid en impact</div></div>
+  </div>
+  <div class="page-body" id="matrixBody"></div>
+</div>
+
+<!-- ═══════ PAGE 7: VERSNELLERS & REMMERS SUMMARY ═══════ -->
+<div class="rpage full-break">
+  <div class="section-head">
+    <div class="sh-badge" style="background:var(--green)">5</div>
     <div><div class="sh-title" id="t-vrTitle">Versnellers & Remmers</div><div class="sh-sub" id="t-vrSub">Top 5 organisatiekenmerken die de strategie versnellen of remmen</div></div>
   </div>
   <div class="page-body">
     <div class="vr-cols" id="vrContent"></div>
   </div>
+</div>
+
+<!-- ═══════ PAGE 8: RISICOANALYSE (§11O) ═══════ -->
+<div class="rpage full-break">
+  <div class="section-head">
+    <div class="sh-badge" style="background:var(--coral,#E8423F)">6</div>
+    <div><div class="sh-title" id="t-raTitle">Risicoanalyse</div><div class="sh-sub" id="t-raSub">Uitvoeringsrisico per actie, gekoppeld aan versnellers en remmers</div></div>
+  </div>
+  <div class="page-body" id="riskBody"></div>
 </div>
 
 <!-- ═══════ APPENDIX A: FASE 0 ═══════ -->
@@ -744,6 +787,51 @@ let D = {}; // all session data
 const THEME_COLORS=['#70A2D7','#BDD24D','#E8423F','#9666AA','#2A9791'];
 const THEME_LIGHT=['rgba(112,162,215,.12)','rgba(189,210,77,.12)','rgba(240,87,54,.09)','rgba(150,102,170,.1)','rgba(42,151,145,.12)'];
 
+/* ══════════ VK TIJDSCHAAL (§11K, byte-identiek in fase 5 + rapport) ══════════
+   Startpunt = de sessiedatum uit fase 0 (session.date); terugval: vandaag.
+   De tijdshorizon uit fase 0 bepaalt de lengte en de schaaleenheid:
+     '<1jr'  -> 1 jaar  vanaf startdatum, in WEKEN     (52 perioden)
+     '1-3jr' -> 3 jaar  vanaf startdatum, in MAANDEN   (36 perioden)
+     '3-5jr' -> 5 jaar  vanaf startdatum, in KWARTALEN (20 perioden)
+     '5+jr'  -> 7 jaar  vanaf startdatum, in KWARTALEN (28 perioden)
+   labelEvery bepaalt welke koppen een tekst krijgen (52 weekcellen zijn te smal om
+   allemaal te labelen); de duur van een actie schaalt mee per eenheid. */
+function vkTimelineScale(session, lang){
+  var MND = (lang==='en')
+    ? ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+    : ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+  var Q = (lang==='en') ? 'Q' : 'K';
+  var start = null;
+  try { if (session && session.date) { var d = new Date(session.date + 'T00:00:00'); if (!isNaN(d)) start = d; } } catch(e){}
+  if (!start) start = new Date();
+  var h = (session && session.horizon) || '3-5jr';
+  var cfg;
+  if (h === '<1jr')       cfg = { unit:'week',    total:52, labelEvery:4, dur:{simple:4, complex:8} };
+  else if (h === '1-3jr') cfg = { unit:'month',   total:36, labelEvery:3, dur:{simple:2, complex:4} };
+  else if (h === '3-5jr') cfg = { unit:'quarter', total:20, labelEvery:1, dur:{simple:1, complex:2} };
+  else                    cfg = { unit:'quarter', total:28, labelEvery:2, dur:{simple:1, complex:2} };
+  var labels = [];
+  for (var i = 0; i < cfg.total; i++){
+    var d2 = new Date(start.getTime());
+    if (cfg.unit === 'week')       d2.setDate(d2.getDate() + i*7);
+    else if (cfg.unit === 'month') d2.setMonth(d2.getMonth() + i);
+    else                           d2.setMonth(d2.getMonth() + i*3);
+    var txt = '';
+    if (i % cfg.labelEvery === 0){
+      if (cfg.unit === 'week')       txt = d2.getDate() + ' ' + MND[d2.getMonth()];
+      else if (cfg.unit === 'month') txt = MND[d2.getMonth()] + " '" + String(d2.getFullYear()).slice(2);
+      else                           txt = Q + (Math.floor(d2.getMonth()/3)+1) + " '" + String(d2.getFullYear()).slice(2);
+    }
+    labels.push({ label: txt, full: (cfg.unit==='week' ? d2.getDate()+' '+MND[d2.getMonth()]+' '+d2.getFullYear()
+                                     : cfg.unit==='month' ? MND[d2.getMonth()]+' '+d2.getFullYear()
+                                     : Q+(Math.floor(d2.getMonth()/3)+1)+' '+d2.getFullYear()),
+                  year: d2.getFullYear(), labeled: (i % cfg.labelEvery === 0) });
+  }
+  return { unit:cfg.unit, totalPeriods:cfg.total, labelEvery:cfg.labelEvery, periodLabels:labels,
+           dur:cfg.dur, startDate:start, horizon:h };
+}
+
+
 /* ══════ TRANSLATIONS ══════ */
 const T={
   nl:{
@@ -758,6 +846,15 @@ const T={
     bsTitle:'Top 5 strategische acties — chronologisch',
     roadmapTitle:'Strategische Roadmap',
     vrTitle:'Versnellers & Remmers',vrSub:'Top 5 organisatiekenmerken die de strategie versnellen of remmen',
+    ftTitle:'Volledige tijdlijn',ftSub:'Alle acties per thema, uitgezet op de tijdshorizon uit fase 0',
+    pmTitle:'Prioriteitenmatrix',pmSub:'Alle acties op haalbaarheid en impact',
+    raTitle:'Risicoanalyse',raSub:'Uitvoeringsrisico per actie, gekoppeld aan versnellers en remmers',
+    quickWin:'QUICK WIN',strategic:'STRATEGISCH',reconsider:'HEROVERWEGEN',fillIn:'OPVULLING',
+    matrixX:'Haalbaarheid \u2192',matrixY:'Impact \u2192',
+    feasLabel:'Haalbaarheid',impactLabel:'Impact',riskLabel:'Risico',
+    verRelated:'Gerelateerde versnellers',remRelated:'Gerelateerde remmers',periodeLabel:'Periode',
+    riskIntroTitle:'Wat laat deze risicoanalyse zien?',
+    riskIntroBody:'Per actie is een uitvoeringsrisico berekend: de kans dat de actie vertraagt of niet het beoogde resultaat oplevert. Het percentage is opgebouwd uit de haalbaarheid van de actie (complexe acties zoals implementaties en reorganisaties wegen zwaarder), met een opslag voor elke gekoppelde remmer en een korting voor elke gekoppelde versneller uit fase 4. Een hoog percentage (boven 60) betekent niet dat de actie geschrapt moet worden, maar dat zij expliciete aandacht vraagt: een eigenaar, tussentijdse mijlpalen en een plan voor de gekoppelde remmers. Een laag percentage (onder 35) betekent dat de actie relatief zelfstandig kan worden opgepakt. De acties staan gesorteerd van hoog naar laag risico.',
     rmPrio:'#',rmAction:'Actie',rmTheme:'Thema',rmVision:'Visie',rmPeriod:'Periode',rmGantt:'Tijdlijn',rmOwner:'Eigenaar',rmRisk:'Risico',rmScore:'Score',
     app0label:'Bijlage A — Fase 0: Sessie-opzet',
     app1label:'Bijlage B — Fase 1: Stip op de horizon',
@@ -801,7 +898,16 @@ const T={
     visionLabel:'Dot on the horizon',
     bsTitle:'Top 5 strategic actions — chronological',
     roadmapTitle:'Strategic Roadmap',
-    vrTitle:'Accelerators & Obstacles',vrSub:'Top 5 organisational characteristics that accelerate or hinder the strategy',
+    vrTitle:'Accelerators & Obstacles',
+    ftTitle:'Full timeline',ftSub:'All actions per theme, plotted on the phase-0 time horizon',
+    pmTitle:'Priority matrix',pmSub:'All actions by feasibility and impact',
+    raTitle:'Risk analysis',raSub:'Execution risk per action, linked to accelerators and obstacles',
+    quickWin:'QUICK WIN',strategic:'STRATEGIC',reconsider:'RECONSIDER',fillIn:'FILL-IN',
+    matrixX:'Feasibility \u2192',matrixY:'Impact \u2192',
+    feasLabel:'Feasibility',impactLabel:'Impact',riskLabel:'Risk',
+    verRelated:'Related accelerators',remRelated:'Related obstacles',periodeLabel:'Period',
+    riskIntroTitle:'What does this risk analysis show?',
+    riskIntroBody:'For each action an execution risk has been calculated: the likelihood that the action is delayed or does not deliver the intended result. The percentage is built up from the feasibility of the action (complex actions such as implementations and reorganisations weigh heavier), with a surcharge for each linked obstacle and a discount for each linked accelerator from phase 4. A high percentage (above 60) does not mean the action should be dropped, but that it needs explicit attention: an owner, interim milestones and a plan for the linked obstacles. A low percentage (below 35) means the action can be picked up relatively independently. Actions are sorted from high to low risk.',vrSub:'Top 5 organisational characteristics that accelerate or hinder the strategy',
     rmPrio:'#',rmAction:'Action',rmTheme:'Theme',rmVision:'Vision',rmPeriod:'Period',rmGantt:'Timeline',rmOwner:'Owner',rmRisk:'Risk',rmScore:'Score',
     app0label:'Appendix A — Phase 0: Session setup',
     app1label:'Appendix B — Phase 1: Dot on the horizon',
@@ -1051,9 +1157,10 @@ function buildDefaultRoadmapActions(){
         themeColor:THEME_COLORS[parseInt(ti)],
         visComp:vComps[i%vComps.length],
         priorityScore:80-i*2+Math.random()*8,
-        feasibility:6+Math.random()*3,impact:5+Math.random()*4,
-        riskScore:20+Math.random()*50,
-        startPeriod:Math.floor(i/3),duration:2,
+        feasibility:2.5+Math.random()*6.5,impact:2.5+Math.random()*6.5,
+        riskScore:10+Math.random()*70,
+        startPeriod:Math.floor(i/3)*2,duration:2,
+        relV:[],relR:[],
         owner:'',rank:i+1
       });
     });
@@ -1068,7 +1175,10 @@ function renderAll(){
   renderCanvas();
   renderExecSummary();
   renderRoadmapTable();
+  renderFullTimeline();
+  renderPriorityMatrix();
   renderVRSummary();
+  renderRiskAnalysis();
   renderApp0();
   renderApp1();
   renderApp2();
@@ -1198,13 +1308,11 @@ function renderExecSummary(){
 function renderRoadmapTable(){
   const t=T[lang];
   const s=D.session||{};
-  const h=s.horizon||'3-5jr';
-  const yr=new Date().getFullYear();
+  // §11K: schaal en labels identiek aan fase 5 (start = fase-0-datum, horizon bepaalt eenheid)
+  const scale=vkTimelineScale(s, lang);
   function periodLabel(i){
-    if(h==='<1jr') return ['Jan','Feb','Mrt','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec'][i%12];
-    if(h==='1-3jr') return `Q${(i%4)+1} '${String(yr+Math.floor(i/4)).slice(2)}`;
-    if(h==='3-5jr') return `H${(i%2)+1} '${String(yr+Math.floor(i/2)).slice(2)}`;
-    return String(yr+i);
+    const pl=scale.periodLabels[Math.max(0,Math.min(scale.totalPeriods-1,i))];
+    return (pl && (pl.label || pl.full)) || 'P'+(i+1);
   }
 
   document.getElementById('roadmapSubTitle').textContent=`${s.org||''} · ${s.sessionName||''} · ${t.horizonContext[s.horizon]||''}`;
@@ -1214,9 +1322,8 @@ function renderRoadmapTable(){
     t.urgencyContext[s.urgency],t.budgetContext[s.budget],t.horizonContext[s.horizon]
   ].filter(Boolean).map(v=>`<span class="meta-pill">${escapeHtml(v)}</span>`).join('');
 
-  // ── Bepaal totaal aantal perioden voor het mini-Gantt-spoor ──
-  // Match de horizonconfig die fase 5 hanteert.
-  const totalPeriods = (h==='<1jr') ? 12 : (h==='1-3jr') ? 12 : (h==='3-5jr') ? 10 : 7;
+  // ── Mini-Gantt-spoor volgt dezelfde §11K-schaal als fase 5 ──
+  const totalPeriods = scale.totalPeriods;
   const actions=D.roadmap_actions||[];
   const tbody=document.getElementById('roadmapTableBody');
   tbody.innerHTML=actions.map((a,i)=>{
@@ -1228,8 +1335,8 @@ function renderRoadmapTable(){
     const dur=Math.max(1,Math.min(totalPeriods-startP, a.duration||2));
     const leftPct=(startP/totalPeriods)*100;
     const widthPct=(dur/totalPeriods)*100;
-    // tickmarks elke periode (subtiel) — vermijdt voor erg lange tijdlijnen overload
-    const tickEvery = totalPeriods>10 ? 2 : 1;
+    // tickmarks alleen op gelabelde perioden — een 52-weekschaal wordt anders een raster
+    const tickEvery = scale.labelEvery;
     let ticks='';
     for(let k=1;k<totalPeriods;k+=tickEvery){
       ticks+=`<div class="mg-tick" style="left:${(k/totalPeriods)*100}%"></div>`;
@@ -1246,6 +1353,136 @@ function renderRoadmapTable(){
       <td style="font-weight:700;color:${c}">${(a.priorityScore||0).toFixed(0)}</td>
     </tr>`;
   }).join('');
+}
+
+/* ══════ VOLLEDIGE TIJDLIJN (§11K) ══════
+   Zelfde opzet als de Gantt in fase 5, statisch en print-vriendelijk. Acties zonder
+   analysevelden (ouder datacontract) krijgen veilige terugvalwaarden. */
+function renderFullTimeline(){
+  const t=T[lang];
+  const el=document.getElementById('fullTimelineBody');
+  if(!el) return;
+  const s=D.session||{};
+  const scale=vkTimelineScale(s, lang);
+  const tp=scale.totalPeriods;
+  const periodW=100/tp;
+  const actions=D.roadmap_actions||[];
+  const themes=D.selected_themes||[];
+
+  let html=`<div class="rgantt-header">
+    <div class="rgantt-label-col">${lang==='nl'?'Thema / Actie':'Theme / Action'}</div>
+    <div class="rgantt-periods">${scale.periodLabels.map(pl=>`<div class="rgantt-period" title="${escapeHtml(pl.full||'')}">${escapeHtml(pl.label)}</div>`).join('')}</div>
+  </div>`;
+
+  themes.forEach((theme,ti)=>{
+    const color=THEME_COLORS[ti%THEME_COLORS.length];
+    const acts=actions.filter(a=>a.themeIdx===ti);
+    if(!acts.length) return;
+    html+=`<div class="rgantt-row">
+      <div class="rgantt-theme-label"><div class="rgantt-dot" style="background:${color}"></div><div class="rgantt-name">${escapeHtml(theme.name||'')}</div></div>
+      <div class="rgantt-lane" style="min-height:${Math.max(44, acts.length*22+10)}px">`;
+    scale.periodLabels.forEach((pl,pi)=>{ if(pl.labeled) html+=`<div class="rgantt-grid" style="left:${pi*periodW}%"></div>`; });
+    acts.forEach((a,ai)=>{
+      const dur=Math.max(1,Math.min(tp,(typeof a.duration==='number'&&a.duration>0)?a.duration:scale.dur.simple));
+      const sp=Math.max(0,Math.min(tp-dur,a.startPeriod||0));
+      const left=(sp/tp)*100;
+      const width=Math.max(periodW*0.9,(dur/tp)*100-0.4);
+      html+=`<div class="rgantt-bar" style="left:${left}%;width:${width}%;top:${6+ai*22}px;background:${a.themeColor||color}" title="${escapeHtml(a.text||'')}">${escapeHtml(a.text||'')}</div>`;
+    });
+    html+=`</div></div>`;
+  });
+  // Legenda: startdatum + eenheid, zodat de schaal zichzelf uitlegt in print
+  const unitLbl = scale.unit==='week' ? (lang==='nl'?'weken':'weeks')
+                : scale.unit==='month' ? (lang==='nl'?'maanden':'months')
+                : (lang==='nl'?'kwartalen':'quarters');
+  html+=`<div style="font-size:10px;color:var(--t3);margin-top:8px">${lang==='nl'?'Start':'Start'}: ${escapeHtml(scale.periodLabels[0].full)} · ${lang==='nl'?'Schaal':'Scale'}: ${tp} ${unitLbl} · ${escapeHtml(t.horizonContext[scale.horizon]||scale.horizon)}</div>`;
+  el.innerHTML=html;
+}
+
+/* ══════ PRIORITEITENMATRIX (§11N) ══════ */
+function renderPriorityMatrix(){
+  const t=T[lang];
+  const el=document.getElementById('matrixBody');
+  if(!el) return;
+  const actions=D.roadmap_actions||[];
+  const themes=D.selected_themes||[];
+  const W=560,H=Math.round(W*0.72);
+  const ML=52,MR=20,MT=20,MB=48;
+  const PW=W-ML-MR,PH=H-MT-MB;
+
+  let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:${W}px;display:block;margin:0 auto">`;
+  svg+=`<rect x="${ML}" y="${MT}" width="${PW/2}" height="${PH/2}" fill="rgba(112,162,215,.06)"/>
+    <rect x="${ML+PW/2}" y="${MT}" width="${PW/2}" height="${PH/2}" fill="rgba(107,95,212,.07)"/>
+    <rect x="${ML}" y="${MT+PH/2}" width="${PW/2}" height="${PH/2}" fill="rgba(250,168,51,.06)"/>
+    <rect x="${ML+PW/2}" y="${MT+PH/2}" width="${PW/2}" height="${PH/2}" fill="rgba(189,210,77,.07)"/>`;
+  const qlabel=(x,y,txt,col)=>`<text x="${x}" y="${y}" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="${col}" font-weight="700" opacity="0.6">${txt}</text>`;
+  svg+=qlabel(ML+PW/4,MT+PH/4-5,t.strategic,'#9666AA');
+  svg+=qlabel(ML+3*PW/4,MT+PH/4-5,t.quickWin,'#2A9791');
+  svg+=qlabel(ML+PW/4,MT+3*PH/4+8,t.reconsider,'#9A9894');
+  svg+=qlabel(ML+3*PW/4,MT+3*PH/4+8,t.fillIn,'#FAA833');
+  svg+=`<line x1="${ML}" y1="${MT}" x2="${ML}" y2="${MT+PH}" stroke="rgba(0,0,0,.15)" stroke-width="1"/>
+    <line x1="${ML}" y1="${MT+PH}" x2="${ML+PW}" y2="${MT+PH}" stroke="rgba(0,0,0,.15)" stroke-width="1"/>
+    <line x1="${ML+PW/2}" y1="${MT}" x2="${ML+PW/2}" y2="${MT+PH}" stroke="rgba(0,0,0,.08)" stroke-width="1" stroke-dasharray="3 3"/>
+    <line x1="${ML}" y1="${MT+PH/2}" x2="${ML+PW}" y2="${MT+PH/2}" stroke="rgba(0,0,0,.08)" stroke-width="1" stroke-dasharray="3 3"/>`;
+  svg+=`<text x="${ML+PW/2}" y="${H-8}" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(0,0,0,.5)">${t.matrixX}</text>
+    <text x="12" y="${MT+PH/2}" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" fill="rgba(0,0,0,.5)" transform="rotate(-90 12 ${MT+PH/2})">${t.matrixY}</text>`;
+
+  actions.forEach((a,i)=>{
+    const F=(typeof a.feasibility==='number')?a.feasibility:5;
+    const I=(typeof a.impact==='number')?a.impact:5;
+    const cx=ML+(F/10)*PW;
+    const cy=MT+PH-(I/10)*PH;
+    const c=a.themeColor||THEME_COLORS[a.themeIdx%THEME_COLORS.length]||'#70A2D7';
+    svg+=`<circle cx="${cx}" cy="${cy}" r="8" fill="${c}" opacity="0.75" stroke="white" stroke-width="1.5"><title>${escapeHtml(a.text||'')}</title></circle>`;
+    svg+=`<text x="${cx}" y="${cy+3}" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8" fill="white" font-weight="700">${i+1}</text>`;
+  });
+  svg+='</svg>';
+
+  // Genummerde legenda: in print zijn tooltips niet beschikbaar
+  const leg = actions.map((a,i)=>{
+    const c=a.themeColor||THEME_COLORS[a.themeIdx%THEME_COLORS.length]||'#70A2D7';
+    return `<div style="display:flex;gap:6px;align-items:baseline;font-size:10.5px;line-height:1.45"><span style="flex:0 0 auto;font-weight:700;color:${c}">${i+1}.</span><span>${escapeHtml(a.text||'')}</span></div>`;
+  }).join('');
+  el.innerHTML=svg+`<div style="columns:2;column-gap:24px;margin-top:14px">${leg}</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:10.5px;color:var(--t2)">
+      ${themes.map((th,ti)=>`<span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${THEME_COLORS[ti%THEME_COLORS.length]};margin-right:4px;vertical-align:middle"></span>${escapeHtml(th.name||'')}</span>`).join('')}
+    </div>`;
+}
+
+/* ══════ RISICOANALYSE (§11O) ══════ */
+function renderRiskAnalysis(){
+  const t=T[lang];
+  const el=document.getElementById('riskBody');
+  if(!el) return;
+  const s=D.session||{};
+  const scale=vkTimelineScale(s, lang);
+  const actions=[...(D.roadmap_actions||[])].sort((a,b)=>(b.riskScore||0)-(a.riskScore||0));
+
+  let html=`<div class="rrisk-intro"><strong>${escapeHtml(t.riskIntroTitle)}</strong><br>${escapeHtml(t.riskIntroBody)}</div>`;
+  html+=`<table class="rm-table"><thead><tr>
+      <th>${lang==='nl'?'Actie':'Action'}</th>
+      <th>${lang==='nl'?'Thema':'Theme'}</th>
+      <th>${t.riskLabel}</th>
+      <th>${t.verRelated}</th>
+      <th>${t.remRelated}</th>
+      <th>${t.periodeLabel}</th>
+    </tr></thead><tbody>`;
+  actions.forEach(a=>{
+    const risk=(typeof a.riskScore==='number')?a.riskScore:30;
+    const riskColor=risk>60?'var(--cd,#B23327)':risk>35?'var(--amber,#D8901E)':'var(--gd,#7B8E1E)';
+    const c=a.themeColor||THEME_COLORS[a.themeIdx%THEME_COLORS.length]||'#70A2D7';
+    const pl=scale.periodLabels[Math.max(0,Math.min(scale.totalPeriods-1,a.startPeriod||0))];
+    html+=`<tr>
+      <td style="font-weight:600;max-width:200px">${escapeHtml(a.text||'')}</td>
+      <td><span style="display:inline-flex;align-items:center;gap:4px;font-size:10px"><span style="width:7px;height:7px;border-radius:50%;background:${c};display:inline-block"></span>${escapeHtml(a.themeName||'')}</span></td>
+      <td><div style="display:flex;align-items:center;gap:5px"><div style="width:46px;height:5px;background:var(--b0);border-radius:3px;overflow:hidden"><div style="height:100%;background:${riskColor};width:${risk.toFixed(0)}%"></div></div><span style="font-size:10px;font-weight:700;color:${riskColor}">${risk.toFixed(0)}%</span></div></td>
+      <td style="font-size:10px">${(a.relV||[]).map(v=>escapeHtml(String(v))).join('<br>')||'—'}</td>
+      <td style="font-size:10px">${(a.relR||[]).map(r=>escapeHtml(String(r))).join('<br>')||'—'}</td>
+      <td style="white-space:nowrap"><span style="background:var(--ol,#FDF3E3);color:var(--oh,#B77413);padding:1px 6px;border-radius:9px;font-size:10px;font-weight:600">${escapeHtml((pl&&(pl.label||pl.full))||'')}</span></td>
+    </tr>`;
+  });
+  html+='</tbody></table>';
+  el.innerHTML=html;
 }
 
 /* ══════ VR SUMMARY ══════ */

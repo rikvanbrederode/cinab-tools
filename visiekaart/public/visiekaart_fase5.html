@@ -87,6 +87,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .gtl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .gtl-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.3}
 .gantt-timeline{flex:1;position:relative;background:var(--surface);min-height:52px}
+/* Handmatig verslepen van actieblokken (§11L): horizontaal slepen met snap op periode */
+.action-bar{cursor:grab;touch-action:pan-y;user-select:none}
+.action-bar.vk-bar-dragging{cursor:grabbing;opacity:.85;z-index:30;box-shadow:0 4px 14px rgba(0,0,0,.25);transition:none!important}
 .gantt-grid-line{position:absolute;top:0;bottom:0;width:1px;background:var(--b0)}
 .action-bar{position:absolute;top:8px;height:34px;border-radius:var(--rsm);display:flex;align-items:center;padding:0 8px;font-size:11px;font-weight:600;color:#fff;overflow:hidden;white-space:nowrap;cursor:pointer;transition:filter .13s,box-shadow .13s;user-select:none;z-index:2}
 .action-bar:hover{filter:brightness(1.1);box-shadow:0 3px 10px rgba(0,0,0,.2);z-index:3}
@@ -955,6 +958,18 @@ let roadmapActions = [];
 
 // Timeline config
 let timelineConfig = {};
+/* §11K: label van periode i. Werkt ook op het deelnemer-apparaat, waar
+   buildTimelineConfig() nooit draait: dan wordt de schaal ter plekke uit
+   vk_session afgeleid. Ongelabelde weekcellen vallen terug op het volle label. */
+function vkPeriodLabel(i){
+  let tl = timelineConfig;
+  if (!tl || !Array.isArray(tl.periodLabels) || !tl.periodLabels.length){
+    try { tl = vkTimelineScale(JSON.parse(localStorage.getItem('vk_session')||'{}'), lang); } catch(e){ tl = null; }
+  }
+  if (!tl || !Array.isArray(tl.periodLabels)) return 'P' + ((i||0)+1);
+  const pl = tl.periodLabels[Math.max(0, Math.min(tl.periodLabels.length-1, i||0))];
+  return (pl && (pl.label || pl.full)) || ('P' + ((i||0)+1));
+}
 
 /* ══════════════════════════════════════
    TRANSLATIONS
@@ -1004,7 +1019,7 @@ const T = {
     pFinalNote:'De volledige roadmap volgt in de rapportage.',
     pFacLabel:'Facilitator:',
     onderbouwingBtn:'Onderbouwing',
-    onderbouwingTitle:'Theoretische onderbouwing — fase 5',
+    onderbouwingTitle:'Hoe het werkt',
     onderbouwingBody:'In deze laatste fase combineert de app alle eerdere uitkomsten tot één samenhangende roadmap. Thema-scores wegen mee in de volgorde, versnellers uit fase 4 verhogen de kans van slagen van een actie, remmers verhogen het risico en de kernwoorden uit de stip op de horizon bepalen welke actie aan welk visie-component bijdraagt. Een goede roadmap is ambitieus maar geloofwaardig, duidelijk geprioriteerd, gekoppeld aan eigenaren en realistisch in de tijd geplaatst. Hij vormt het brug tussen ambitie en uitvoering: van strategische intentie naar concrete uitvoering met heldere verantwoordelijkheden.',
     onderbouwingClose:'Sluiten',
     visionComps:['Bestaansreden','Doelgroep','Behoefte','Ambitie','Focus'],
@@ -1044,6 +1059,8 @@ const T = {
     urgencyContext:{laag:'Ruime tijdlijn',medium:'Gebalanceerde planning',hoog:'Urgente uitvoering'},
     budgetContext:{beperkt:'Beperkt budget',voldoende:'Voldoende budget',ruim:'Ruim budget',onbekend:'Budget onbekend'},
     horizonContext:{'<1jr':'< 1 jaar','1-3jr':'1-3 jaar','3-5jr':'3-5 jaar','5+jr':'5+ jaar'},
+    riskIntroTitle:'Wat laat deze risicoanalyse zien?',
+    riskIntroBody:'Per actie is een uitvoeringsrisico berekend: de kans dat de actie vertraagt of niet het beoogde resultaat oplevert. Het percentage is opgebouwd uit de haalbaarheid van de actie (complexe acties zoals implementaties en reorganisaties scoren zwaarder), met een opslag voor elke gekoppelde remmer en een korting voor elke gekoppelde versneller uit fase 4. Een hoog percentage (boven 60) betekent niet dat de actie geschrapt moet worden, maar dat zij expliciete aandacht vraagt: een eigenaar, tussentijdse mijlpalen en een plan voor de gekoppelde remmers. Een laag percentage (onder 35) betekent dat de actie relatief zelfstandig kan worden opgepakt. De acties staan gesorteerd van hoog naar laag risico, zodat de bespreking bovenaan begint.',
     summaryTpl:'Vandaag stellen we een {type} op, op {scale}, onder de naam \'{name}\'. Het is een plan met {urg} urgentie, waarvoor we {bud} budget hebben en met een tijdshorizon van {hor}.',
     summaryTplNoName:'Vandaag stellen we een {type} op, op {scale}. Het is een plan met {urg} urgentie, waarvoor we {bud} budget hebben en met een tijdshorizon van {hor}.',
     summaryFallback:'De sessie is nog niet gestart door de facilitator.',
@@ -1104,7 +1121,7 @@ const T = {
     pFinalNote:'The complete roadmap follows in the report.',
     pFacLabel:'Facilitator:',
     onderbouwingBtn:'Background',
-    onderbouwingTitle:'Theoretical background — phase 5',
+    onderbouwingTitle:'How it works',
     onderbouwingBody:'In this final phase the app combines all earlier outcomes into one coherent roadmap. Theme scores weigh into the ordering, accelerators from phase 4 raise the chance of success of an action, obstacles increase risk, and keywords from the dot on the horizon determine which action contributes to which vision component. A good roadmap is ambitious yet credible, clearly prioritised, linked to owners and realistically placed in time. It forms the bridge between ambition and execution: from strategic intent to concrete execution with clear responsibilities.',
     onderbouwingClose:'Close',
     visionComps:['Reason','Audience','Need','Ambition','Focus'],
@@ -1144,6 +1161,8 @@ const T = {
     urgencyContext:{laag:'Relaxed timeline',medium:'Balanced planning',hoog:'Urgent execution'},
     budgetContext:{beperkt:'Limited budget',voldoende:'Sufficient budget',ruim:'Ample budget',onbekend:'Budget unknown'},
     horizonContext:{'<1jr':'< 1 year','1-3jr':'1-3 years','3-5jr':'3-5 years','5+jr':'5+ years'},
+    riskIntroTitle:'What does this risk analysis show?',
+    riskIntroBody:'For each action an execution risk has been calculated: the likelihood that the action is delayed or does not deliver the intended result. The percentage is built up from the feasibility of the action (complex actions such as implementations and reorganisations weigh heavier), with a surcharge for each linked obstacle and a discount for each linked accelerator from phase 4. A high percentage (above 60) does not mean the action should be dropped, but that it needs explicit attention: an owner, interim milestones and a plan for the linked obstacles. A low percentage (below 35) means the action can be picked up relatively independently. Actions are sorted from high to low risk, so the discussion starts at the top.',
     summaryTpl:'Today we are building a {type} at {scale}, named \'{name}\'. It is a plan with {urg} urgency, for which we have {bud} budget and a time horizon of {hor}.',
     summaryTplNoName:'Today we are building a {type} at {scale}. It is a plan with {urg} urgency, for which we have {bud} budget and a time horizon of {hor}.',
     summaryFallback:'The session has not yet been started by the facilitator.',
@@ -1211,9 +1230,13 @@ function vkParseStage(raw){
 /* De definitieve roadmap reist mee in de 'final'-stage zodat het deelnemer-
    apparaat (zonder vk_roadmap_actions in localStorage) de top-5 kan tonen. */
 function vkSerializeRoadmap(){
+  // §11K/§11N: analysevelden reizen mee, zodat tijdlijn, prioriteitenmatrix en
+  // risicoanalyse ook op deelnemer-apparaten en in het rapport (recall) kloppen.
   try { return (roadmapActions||[]).map(a=>({
     text:a.text, themeIdx:a.themeIdx, themeName:a.themeName, priorityScore:a.priorityScore,
-    startPeriod:a.startPeriod, visComp:a.visComp, owner:a.owner })); } catch(e){ return []; }
+    startPeriod:a.startPeriod, duration:a.duration, visComp:a.visComp, owner:a.owner,
+    feasibility:a.feasibility, impact:a.impact, riskScore:a.riskScore,
+    relV:(a.relV||[]).slice(0,2), relR:(a.relR||[]).slice(0,2) })); } catch(e){ return []; }
 }
 
 /* ══════════ VK AI-HELPER (Cluster A) — ingebouwde vk-ai.js ══════════
@@ -1630,8 +1653,7 @@ function vkRenderCumulativeF5(){
       const items = acts.map((a, ai) => {
         const txt = a.text || '';
         const owner = (a.owner || '').trim();
-        const period = (tl && tl.periodLabels && tl.periodLabels[a.startPeriod] && tl.periodLabels[a.startPeriod].label)
-                       || (a.startPeriod != null ? `P${a.startPeriod + 1}` : '');
+        const period = (a.startPeriod != null) ? vkPeriodLabel(a.startPeriod) : '';
         const meta = [period, owner].filter(Boolean).join(' · ');
         return `<li>${vkEscape(txt)}${meta ? ` <span style="color:var(--t3);font-size:11.5px">— ${vkEscape(meta)}</span>` : ''}</li>`;
       }).join('');
@@ -1655,6 +1677,48 @@ function vkRenderCumulativeF5(){
    CROSS-TAB STAGE SYNC (fase 5)
 ══════════════════════════════════════ */
 let pStage = 'preWait';
+/* ══════════ VK SESSIE-UITKOMSTEN IN DE STAGE (§11G, identiek in fase 1 t/m 5) ══════════
+   Uitkomsten van eerdere fasen (de stip uit fase 1, de gekozen thema's uit fase 2) staan
+   alleen in de localStorage van het FACILITATOR-apparaat. Een deelnemer op een eigen
+   telefoon heeft die fase daar nooit doorlopen en ziet dus een leeg kader. De stage-tak
+   is het enige kanaal dat elke deelnemer al leest, dus reizen de uitkomsten mee in het
+   stage-object. Dit is het patroon dat fase 4 al gebruikte voor st.versnellers/st.remmers;
+   nu uniform en in elke publishStage én elke fase-overgang.
+   Bewust GEEN nieuwe RTDB-tak: de bestaande security rules en de 50.000-tekengrens op
+   stage blijven onveranderd gelden, dus geen deploy-afhankelijkheid bij Rik. */
+function vkStageResults(){
+  var r = {};
+  try { var v = localStorage.getItem('vk_vision_sentence'); if (v && String(v).trim()) r.stip = String(v).trim(); } catch(e){}
+  try { var t = JSON.parse(localStorage.getItem('vk_selected_themes') || 'null'); if (Array.isArray(t) && t.length) r.themes = t; } catch(e){}
+  return r;
+}
+function vkStageWithResults(obj){
+  var r = vkStageResults();
+  if (r && Object.keys(r).length) obj.results = r;
+  return obj;
+}
+/* Deelnemer-kant: spiegel de meegereisde uitkomsten naar localStorage, zodat alle
+   bestaande render-functies ongewijzigd blijven werken. Retourneert of er iets wijzigde. */
+function vkApplyStageResults(st){
+  var r = st && st.results;
+  if (!r || typeof r !== 'object') return false;
+  var changed = false;
+  try {
+    if (r.stip && localStorage.getItem('vk_vision_sentence') !== r.stip){
+      localStorage.setItem('vk_vision_sentence', r.stip); changed = true;
+    }
+  } catch(e){}
+  try {
+    if (Array.isArray(r.themes)){
+      var nw = JSON.stringify(r.themes);
+      if (localStorage.getItem('vk_selected_themes') !== nw){
+        localStorage.setItem('vk_selected_themes', nw); changed = true;
+      }
+    }
+  } catch(e){}
+  return changed;
+}
+
 function publishStage(stage, payload){
   try {
     const obj = {stage, at: Date.now()};
@@ -1664,7 +1728,7 @@ function publishStage(stage, payload){
   // Alleen de facilitator zendt; een deelnemer mag de live stage nooit overschrijven.
   if (VK_LIVE && window.vkFb && !VK_IS_PARTICIPANT){
     try {
-      const g = Object.assign({ phase: 5, stage: stage, at: Date.now() }, payload || {});
+      const g = vkStageWithResults(Object.assign({ phase: 5, stage: stage, at: Date.now() }, payload || {}));
       vkFb.stageSet(vkLiveCode(), JSON.stringify(g));
     } catch(e){}
   }
@@ -1678,6 +1742,9 @@ function readStage(){
 }
 function applyStageToPView(stObj){
   const st = stObj || readStage();
+  // Uitkomsten van eerdere fasen reizen mee in de stage (§11G): spiegel ze naar
+  // localStorage, zodat een deelnemer op een eigen apparaat ze ook ziet.
+  var _vkRes = vkApplyStageResults(st);
   const stage = (st && st.stage) || 'preWait';
   pStage = stage;
   // Eindscherm: gebruik de roadmap die de facilitator meestuurt (deelnemer-apparaat
@@ -1766,7 +1833,7 @@ function renderPFinal(){
   list.innerHTML = top5.map((a,i)=>{
     const themeIdx = a.themeIdx || 0;
     const color = THEME_COLORS[themeIdx] || '#262A36';
-    const periodLabel = (tl.periodLabels && tl.periodLabels[a.startPeriod] && tl.periodLabels[a.startPeriod].label) || `P${(a.startPeriod||0)+1}`;
+    const periodLabel = vkPeriodLabel(a.startPeriod);
     const visComp = (t.visionComps && t.visionComps[a.visComp]) || '';
     return `<div class="p-rm-item">
       <div class="p-rm-num" style="background:${color}">${i+1}</div>
@@ -1816,6 +1883,7 @@ function loadData(){
         const sc = JSON.parse(ph4);
         if (Array.isArray(sc.versnellersRanked) && sc.versnellersRanked.length) {
           versnellers = sc.versnellersRanked.slice(0,5).map(v => ({
+            id:    v.id || '',
             title: v.title || v.titleNl || v.titleEn || '',
             count: typeof v.count === 'number' ? v.count : 0,
             source: v.source || ''
@@ -1824,6 +1892,7 @@ function loadData(){
         }
         if (Array.isArray(sc.remmersRanked) && sc.remmersRanked.length) {
           remmers = sc.remmersRanked.slice(0,5).map(r => ({
+            id:    r.id || '',
             title: r.title || r.titleNl || r.titleEn || '',
             count: typeof r.count === 'number' ? r.count : 0,
             source: r.source || ''
@@ -1934,49 +2003,135 @@ function initIntro(){
 /* ══════════════════════════════════════
    TIMELINE CONFIG
 ══════════════════════════════════════ */
+/* ══════════ VK TIJDSCHAAL (§11K, byte-identiek in fase 5 + rapport) ══════════
+   Startpunt = de sessiedatum uit fase 0 (session.date); terugval: vandaag.
+   De tijdshorizon uit fase 0 bepaalt de lengte en de schaaleenheid:
+     '<1jr'  -> 1 jaar  vanaf startdatum, in WEKEN     (52 perioden)
+     '1-3jr' -> 3 jaar  vanaf startdatum, in MAANDEN   (36 perioden)
+     '3-5jr' -> 5 jaar  vanaf startdatum, in KWARTALEN (20 perioden)
+     '5+jr'  -> 7 jaar  vanaf startdatum, in KWARTALEN (28 perioden)
+   labelEvery bepaalt welke koppen een tekst krijgen (52 weekcellen zijn te smal om
+   allemaal te labelen); de duur van een actie schaalt mee per eenheid. */
+function vkTimelineScale(session, lang){
+  var MND = (lang==='en')
+    ? ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+    : ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+  var Q = (lang==='en') ? 'Q' : 'K';
+  var start = null;
+  try { if (session && session.date) { var d = new Date(session.date + 'T00:00:00'); if (!isNaN(d)) start = d; } } catch(e){}
+  if (!start) start = new Date();
+  var h = (session && session.horizon) || '3-5jr';
+  var cfg;
+  if (h === '<1jr')       cfg = { unit:'week',    total:52, labelEvery:4, dur:{simple:4, complex:8} };
+  else if (h === '1-3jr') cfg = { unit:'month',   total:36, labelEvery:3, dur:{simple:2, complex:4} };
+  else if (h === '3-5jr') cfg = { unit:'quarter', total:20, labelEvery:1, dur:{simple:1, complex:2} };
+  else                    cfg = { unit:'quarter', total:28, labelEvery:2, dur:{simple:1, complex:2} };
+  var labels = [];
+  for (var i = 0; i < cfg.total; i++){
+    var d2 = new Date(start.getTime());
+    if (cfg.unit === 'week')       d2.setDate(d2.getDate() + i*7);
+    else if (cfg.unit === 'month') d2.setMonth(d2.getMonth() + i);
+    else                           d2.setMonth(d2.getMonth() + i*3);
+    var txt = '';
+    if (i % cfg.labelEvery === 0){
+      if (cfg.unit === 'week')       txt = d2.getDate() + ' ' + MND[d2.getMonth()];
+      else if (cfg.unit === 'month') txt = MND[d2.getMonth()] + " '" + String(d2.getFullYear()).slice(2);
+      else                           txt = Q + (Math.floor(d2.getMonth()/3)+1) + " '" + String(d2.getFullYear()).slice(2);
+    }
+    labels.push({ label: txt, full: (cfg.unit==='week' ? d2.getDate()+' '+MND[d2.getMonth()]+' '+d2.getFullYear()
+                                     : cfg.unit==='month' ? MND[d2.getMonth()]+' '+d2.getFullYear()
+                                     : Q+(Math.floor(d2.getMonth()/3)+1)+' '+d2.getFullYear()),
+                  year: d2.getFullYear(), labeled: (i % cfg.labelEvery === 0) });
+  }
+  return { unit:cfg.unit, totalPeriods:cfg.total, labelEvery:cfg.labelEvery, periodLabels:labels,
+           dur:cfg.dur, startDate:start, horizon:h };
+}
+
 function buildTimelineConfig(){
-  const h=session.horizon||'3-5jr';
   const u=session.urgency||'medium';
   const b=session.budget||'voldoende';
-  const t=T[lang];
-  let periods, periodLabels, totalPeriods;
-
-  const now = new Date();
-  const yr = now.getFullYear();
-
-  if(h==='<1jr'){
-    totalPeriods=12;
-    periodLabels=t.periodLabel.map((m,i)=>({label:m,year:yr+(Math.floor(i/12))}));
-    periods='monthly';
-  } else if(h==='1-3jr'){
-    totalPeriods=12;
-    const qs=[];
-    for(let y=0;y<3;y++) for(let q=0;q<4;q++) qs.push({label:`${t.periodLabelQ[q]} '${String(yr+y).slice(2)}`,year:yr+y,q:q+1});
-    periodLabels=qs;periods='quarterly';
-  } else if(h==='3-5jr'){
-    totalPeriods=10;
-    const hs=[];
-    for(let y=0;y<5;y++) for(let h2=0;h2<2;h2++) hs.push({label:`H${h2+1} '${String(yr+y).slice(2)}`,year:yr+y});
-    periodLabels=hs;periods='half-yearly';
-  } else {
-    totalPeriods=7;
-    const ys=[];
-    for(let y=0;y<7;y++) ys.push({label:String(yr+y),year:yr+y});
-    periodLabels=ys;periods='yearly';
-  }
-
+  // Schaal (start, lengte, eenheid, labels) komt uit het gedeelde §11K-blok.
+  const scale = vkTimelineScale(session, lang);
   const maxParallel = b==='beperkt'?2:b==='ruim'?5:3;
   const urgencyFactor = u==='hoog'?0.55:u==='laag'?1.0:0.75;
-
-  timelineConfig={periods,periodLabels,totalPeriods,maxParallel,urgencyFactor,horizon:h};
+  timelineConfig=Object.assign({}, scale, {maxParallel, urgencyFactor});
 }
 
 /* ══════════════════════════════════════
-   KEYWORD MATCHING
+   KEYWORD MATCHING (§11M)
+   Oude gedrag: actietekst vergeleken met alleen de stelling-TITEL, op woorden
+   >3 tekens. 'ICT' (3 tekens) werd letterlijk weggefilterd en 'CRM-systeem
+   implementeren' deelt geen enkel woord met 'ICT & digitale ondersteuning'.
+   Daarom matchten versnellers/remmers vrijwel nooit. Nu: een trefwoordenlexicon
+   per stelling-id (A1..B10, NL+EN), matching op titel + lexicon, tokens >=3.
 ══════════════════════════════════════ */
+const VK_STMT_KW = {
+  A1:['richting','koers','strategie','strategisch','visie','doelen','missie','strategy','direction','course','vision','goals','mission'],
+  A2:['prioriteit','prioritering','focus','keuzes','kiezen','priorities','prioritise','choices','focus'],
+  A3:['besluit','besluiten','besluitvorming','mandaat','beslissing','beslissen','decision','decisions','mandate'],
+  A4:['eigenaar','eigenaarschap','verantwoordelijkheid','aanspreekbaar','accountability','owner','ownership','responsible'],
+  A5:['voortgang','sturing','monitoring','bijsturen','ritme','kpi','dashboard','progress','steering','monitor','review'],
+  A6:['samenwerking','samenwerken','afdelingen','teams','keten','integraal','silo','collaboration','cooperation','partnership','partners'],
+  A7:['leiderschap','leidinggevenden','management','voorbeeldgedrag','managers','leadership','directie'],
+  A8:['verandering','verandervermogen','veranderen','gedrag','routines','adoptie','transitie','transformatie','change','behaviour','transition','adoption'],
+  A9:['leren','lerend','verbeteren','verbetering','evalueren','evaluatie','feedback','lessen','learning','improve','improvement','retrospective'],
+  A10:['klant','klanten','stakeholder','stakeholders','gebruiker','gebruikers','waarde','tevredenheid','inwoner','inwoners','burger','patient','customer','client','user','value','satisfaction'],
+  B1:['structuur','organisatiestructuur','inrichting','organogram','herinrichting','structure','organisational'],
+  B2:['rollen','rol','taken','verantwoordelijkheden','functies','functieprofielen','roles','tasks','responsibilities'],
+  B3:['capaciteit','bezetting','personeel','formatie','werving','recruitment','vacatures','instroom','capacity','staffing','hiring'],
+  B4:['kennis','vaardigheden','competenties','opleiding','opleiden','training','trainen','expertise','skills','knowledge','scholing'],
+  B5:['proces','processen','werkprocessen','workflow','procedures','stroomlijnen','process','processes','lean'],
+  B6:['kwaliteit','normen','controles','borging','borgen','audit','certificering','quality','standards','compliance'],
+  B7:['ict','it','systeem','systemen','software','applicatie','applicaties','digitaal','digitalisering','digitaliseren','automatisering','automatiseren','platform','technologie','modernisering','moderniseren','cloud','crm','erp','ai','app','tooling','digital','automation','system','technology'],
+  B8:['data','gegevens','informatie','dashboards','rapportage','rapportages','inzicht','analytics','managementinformatie','datagedreven','reporting','insight'],
+  B9:['budget','budgetten','financien','financieel','middelen','geld','kosten','investering','investeringen','subsidie','finance','funding','investment','cost'],
+  B10:['huisvesting','faciliteiten','werkplek','werkplekken','hulpmiddelen','materialen','gebouw','locatie','facilities','workplace','equipment','housing'],
+};
+function vkTok3(s){
+  return String(s||'').toLowerCase().replace(/[^a-z\u00e0-\u00ff0-9\s-]/g,' ').split(/[\s-]+/).filter(w=>w.length>=3);
+}
+/* Score van actietekst tegen één versneller/remmer-item {id?, title}. Titelwoorden
+   wegen dubbel; lexicon-woorden (via de stelling-id) enkel. Substring beide kanten
+   op vangt stammen (digitaliseer ~ digitalisering). */
+function vkMatchScore(actionText, item){
+  const at = vkTok3(actionText);
+  if (!at.length) return 0;
+  let score = 0;
+  // Match op gelijkheid, substring (digitaliseer ~ digitalisering) én gedeelde stam.
+  // De stam-tak vangt Nederlandse vervoegingen die substring missen: 'automatiseer'
+  // (dubbel-e) zit niet in 'automatiseren', 'moderniseer' niet in 'modernisering'.
+  const hit = (w, list) => list.some(w2 => {
+    if (w2 === w) return true;
+    if (w.length>=4 && w2.length>=4 && (w2.includes(w) || w.includes(w2))) return true;
+    if (w.length>=6 && w2.length>=6){
+      let i=0; const m=Math.min(w.length, w2.length);
+      while (i<m && w[i]===w2[i]) i++;
+      return i>=6 && i>=m-3;   // lange gedeelde stam, hooguit 3 afwijkende slotletters
+    }
+    return false;
+  });
+  const titleToks = vkTok3(item && item.title);
+  at.forEach(w => { if (hit(w, titleToks)) score += 2; });
+  const kws = (item && item.id && VK_STMT_KW[String(item.id)]) ? VK_STMT_KW[String(item.id)] : null;
+  if (kws) at.forEach(w => { if (hit(w, kws)) score += 1; });
+  return score;
+}
+/* Beste 2 gekoppelde items boven de drempel; retourneert titels (datacontract blijft). */
+function vkMatchItems(actionText, items){
+  // Drempel 1: eén sterk lexicon-woord ('automatiseer' -> B7) is al betekenisvol.
+  // Het lexicon is domein-specifiek genoeg dat losse treffers geen ruis geven,
+  // en de opdracht is juist om acties VAKER aan versnellers/remmers te koppelen.
+  return (items||[])
+    .map(it => ({ it, sc: vkMatchScore(actionText, it) }))
+    .filter(x => x.sc >= 1)
+    .sort((a,b) => b.sc - a.sc)
+    .slice(0,2)
+    .map(x => x.it.title);
+}
+/* Behouden voor visie-matching elders */
 function kwMatch(a, b){
-  const wa=String(a||'').toLowerCase().split(/\s+/).filter(w=>w.length>3);
-  const wb=String(b||'').toLowerCase().split(/\s+/).filter(w=>w.length>3);
+  const wa=vkTok3(a);
+  const wb=vkTok3(b);
   if (!wa.length || !wb.length) return 0;
   return wa.filter(w=>wb.some(w2=>w2.includes(w)||w.includes(w2))).length;
 }
@@ -2019,6 +2174,28 @@ function matchToVision(text){
   return best;
 }
 
+/* ══════════ ACTIE-CATEGORIE (§11N) ══════════
+   De aard van de actie bepaalt mede haalbaarheid en impact:
+   - verkennen (onderzoeken, analyseren, evalueren): goed haalbaar, beperkte impact
+   - afstemmen (communiceren, organiseren, plannen): haalbaar, bescheiden impact
+   - ontwikkelen (trainen, opleiden, coachen): neutraal-plus
+   - bouwen (implementeren, digitaliseren, automatiseren): veel impact, lastiger
+   - transformeren (reorganiseren, cultuur, strategie): meeste impact, zwaarst
+   Volgorde loopt van zwaar naar licht; de eerste match wint, zodat
+   'implementatieplan onderzoeken' als verkennen telt en niet als bouwen. */
+const VK_ACT_CATS = [
+  { key:'transform', re:/(transformeer|transformatie|reorganis|herstructur|cultuur|strategieherzien|herijk|kanteling|transform|restructur|culture\b)/i, dF:-2.4, dI:+2.0 },
+  { key:'build',     re:/(implementeer|implementatie|ontwikkel|bouw|digitaliseer|digitalisering|automatiseer|automatisering|moderniseer|modernisering|vernieuw|integreer|systeem|platform|applicatie|software|implement|develop|build|automat|modern|integrat|system)/i, dF:-1.5, dI:+1.4 },
+  { key:'develop',   re:/(train|opleid|coach|scholing|workshop|leerprogramma|teach|upskill)/i, dF:+0.3, dI:+0.4 },
+  { key:'explore',   re:/(onderzoek|verken|analyseer|analyse|inventariseer|evalueer|toets|breng in kaart|assess|explore|research|investigat|review|audit)/i, dF:+1.6, dI:-1.5 },
+  { key:'align',     re:/(communiceer|informeer|deel |presenteer|organiseer|plan\b|agendeer|bespreek|overleg|afstem|share|inform|communicat|schedul|meeting)/i, dF:+1.0, dI:-0.7 },
+];
+function vkActionCategory(text){
+  const t=String(text||'');
+  for (const c of VK_ACT_CATS){ if (c.re.test(t)) return c; }
+  return { key:'other', dF:0, dI:0 };
+}
+
 /* ══════════════════════════════════════
    GENERATE ROADMAP ACTIONS
 ══════════════════════════════════════ */
@@ -2037,20 +2214,25 @@ function computeActions(){
       // Vision component
       const visComp=matchToVision(text);
 
-      // Versnellers/remmers relevance
-      const relV=versnellers.filter(v=>kwMatch(text,v.title)>0).map(v=>v.title).slice(0,2);
-      const relR=remmers.filter(r=>kwMatch(text,r.title)>0).map(r=>r.title).slice(0,2);
+      // Versnellers/remmers-relevantie via het lexicon (§11M)
+      const relV=vkMatchItems(text, versnellers);
+      const relR=vkMatchItems(text, remmers);
 
-      // Feasibility: start at 7, reduce for each relevant remmer
-      let feasibility=7+(relV.length*0.5)-(relR.length*1.5);
-      feasibility=Math.max(2,Math.min(9.5,feasibility));
+      /* ── Matrix-spreiding (§11N) ──
+         De oude formule startte haalbaarheid op 7 en impact op 5+themascore*3 (~6.8):
+         zonder V/R-match landde ELKE actie op (7, 6.8) = het quick-win-kwadrant,
+         ongeacht het aantal deelnemers. De aard van de actie weegt nu mee. */
+      const cat = vkActionCategory(text);
+      let feasibility = 6.2 + cat.dF + (relV.length*0.7) - (relR.length*1.5);
+      feasibility=Math.max(1.5,Math.min(9.5,feasibility));
 
-      // Impact: base from themeScore + versnellers boost
-      let impact=5+themeScore*3+(relV.length*0.8)-(relR.length*0.3);
-      impact=Math.max(2,Math.min(9.8,impact));
+      let impact = 3.6 + themeScore*3.4 + cat.dI + (relV.length*0.5) - (relR.length*0.2);
+      impact=Math.max(1.5,Math.min(9.8,impact));
 
-      // Risk: inverse of feasibility, amplified by remmers
-      const riskScore=(10-feasibility)/10*100; // 0-100
+      // Risico (§11O), herleidbaar: basis uit haalbaarheid + opslag per gekoppelde
+      // remmer, korting per versneller. Toelichting staat boven de risicotabel.
+      let riskScore=(10-feasibility)*8 + relR.length*15 - relV.length*6;
+      riskScore=Math.max(5,Math.min(90,riskScore)); // 0-100
 
       // Composite priority (0-100)
       const priorityScore=
@@ -2062,10 +2244,11 @@ function computeActions(){
       // Justification
       const justif=buildJustif(text,relV,relR,priorityScore,lang);
 
-      // Estimated duration (in timeline periods)
-      const complexKws=['implementeer','ontwikkel','systeem','strateg','implementat','system','develop','digitalis','program'];
+      // Geschatte duur, geschaald naar de tijdlijn-eenheid (§11K): op een weekschaal
+      // is een blok van 2 perioden onleesbaar smal en onrealistisch kort.
+      const complexKws=['implementeer','ontwikkel','systeem','strateg','implementat','system','develop','digitalis','program','transformeer','reorganiseer'];
       const isComplex=complexKws.some(kw=>text.toLowerCase().includes(kw));
-      const duration=isComplex?3:2;
+      const duration=isComplex?timelineConfig.dur.complex:timelineConfig.dur.simple;
 
       allActions.push({
         id:`T${ti}_A${ai}`, text, themeIdx:ti, themeName:theme.name, themeColor:theme.color, themeScore:theme.score||3,
@@ -2230,10 +2413,11 @@ function buildTimeline(container){
   const periodW=100/tl.totalPeriods;
 
   let html=`<div class="gantt-wrap" style="position:relative">`;
-  // Header
+  // Header: op fijne schalen (52 weken) krijgt alleen elke labelEvery-de periode een
+  // tekst; de cellen zelf blijven bestaan zodat de kolommen kloppen.
   html+=`<div class="gantt-header">
     <div class="gantt-label-col">${lang==='nl'?'Thema / Actie':'Theme / Action'}</div>
-    <div class="gantt-periods">${periods.map(p=>`<div class="gantt-period">${escapeHtml(p.label)}</div>`).join('')}</div>
+    <div class="gantt-periods">${periods.map(p=>`<div class="gantt-period" title="${escapeHtml(p.full||p.label)}">${escapeHtml(p.label)}</div>`).join('')}</div>
   </div>`;
 
   // Rows per theme
@@ -2247,9 +2431,10 @@ function buildTimeline(container){
       </div>
       <div class="gantt-timeline" id="gtl-${ti}" style="position:relative;min-height:${Math.max(52,acts.length*44)}px">`;
 
-    // Grid lines
-    periods.forEach((_,pi)=>{
-      html+=`<div class="gantt-grid-line" style="left:${pi*periodW}%"></div>`;
+    // Gridlijnen: alleen bij gelabelde perioden, anders wordt een 52-koloms
+    // weekschaal een dicht raster.
+    periods.forEach((p,pi)=>{
+      if (p.labeled) html+=`<div class="gantt-grid-line" style="left:${pi*periodW}%"></div>`;
     });
 
     // Action bars
@@ -2284,9 +2469,13 @@ function buildTimeline(container){
   const pop=document.createElement('div');
   pop.className='edit-popover';pop.id='editPopover';pop.style.display='none';
   container.appendChild(pop);
+  // Handmatig verslepen van de actieblokken (§11L)
+  vkBindBarDrag(container);
 }
 
 function selectBar(actionId,leftPct,topOffset){
+  // Na een sleep vuurt de browser alsnog een click; die mag de popup niet openen.
+  if (window._vkBarDragged){ window._vkBarDragged = false; return; }
   const a=roadmapActions.find(x=>x.id===actionId);
   if(!a) return;
   const t=T[lang];
@@ -2305,7 +2494,7 @@ function selectBar(actionId,leftPct,topOffset){
 
   const txt = a.text || '';
   const shortTxt = txt.length>50 ? txt.slice(0,50)+'…' : txt;
-  const periodLabel = (timelineConfig.periodLabels[a.startPeriod] && timelineConfig.periodLabels[a.startPeriod].label) || (a.startPeriod+1);
+  const periodLabel = vkPeriodLabel(a.startPeriod);
   pop.innerHTML=`
     <div class="ep-title">${escapeHtml(shortTxt)}</div>
     <div style="font-size:11px;color:var(--t3);margin-bottom:6px">${escapeHtml(t.justifLabel)} ${escapeHtml(a.justif||'')}</div>
@@ -2320,6 +2509,62 @@ function selectBar(actionId,leftPct,topOffset){
   pop.style.display='block';
   pop.style.left=Math.min(leftPct,70)+'%';
   pop.style.top=(topOffset+50)+'px';
+}
+
+/* ══════════ BLOKKEN HANDMATIG VERSLEPEN (§11L) ══════════
+   Pointer-based (werkt met muis én touch): horizontaal slepen, live preview,
+   loslaten snapt op de dichtstbijzijnde periode. De popup met 'eerder/later'
+   blijft bestaan als precisie-alternatief en voor de motivering.
+   Een sleep van >4px onderdrukt de daaropvolgende click (selectBar). */
+let _vkBarDrag = null;
+window._vkBarDragged = false;
+function vkBindBarDrag(container){
+  container.querySelectorAll('.action-bar').forEach(bar=>{
+    bar.addEventListener('pointerdown', vkBarDragStart);
+  });
+}
+function vkBarDragStart(e){
+  if (e.button !== undefined && e.button !== 0) return;   // alleen primaire knop
+  const bar = e.currentTarget;
+  const id = bar.id.replace(/^ab-/,'');
+  const a = roadmapActions.find(x=>x.id===id);
+  const lane = bar.parentElement;                          // .gantt-timeline
+  if (!a || !lane) return;
+  _vkBarDrag = { bar, a, lane, startX: e.clientX, origStart: a.startPeriod, moved:false,
+                 pxPerPeriod: lane.clientWidth / timelineConfig.totalPeriods };
+  try { bar.setPointerCapture(e.pointerId); } catch(_){}
+  bar.addEventListener('pointermove', vkBarDragMove);
+  bar.addEventListener('pointerup',   vkBarDragEnd);
+  bar.addEventListener('pointercancel', vkBarDragEnd);
+}
+function vkBarDragMove(e){
+  if (!_vkBarDrag) return;
+  const d = _vkBarDrag;
+  const dx = e.clientX - d.startX;
+  if (!d.moved && Math.abs(dx) < 5) return;               // click-tolerantie
+  if (!d.moved){ d.moved = true; d.bar.classList.add('vk-bar-dragging'); }
+  const tp = timelineConfig.totalPeriods;
+  const raw = d.origStart + dx / d.pxPerPeriod;
+  const clamped = Math.max(0, Math.min(tp - d.a.duration, raw));
+  d.bar.style.left = (clamped / tp * 100) + '%';          // live preview, nog niet gesnapt
+  d.pendingStart = Math.round(clamped);
+}
+function vkBarDragEnd(e){
+  if (!_vkBarDrag) return;
+  const d = _vkBarDrag;
+  d.bar.removeEventListener('pointermove', vkBarDragMove);
+  d.bar.removeEventListener('pointerup',   vkBarDragEnd);
+  d.bar.removeEventListener('pointercancel', vkBarDragEnd);
+  d.bar.classList.remove('vk-bar-dragging');
+  _vkBarDrag = null;
+  if (!d.moved) return;                                   // gewone klik -> selectBar doet zijn werk
+  window._vkBarDragged = true;                            // onderdruk de click die nu volgt
+  const tp = timelineConfig.totalPeriods;
+  const ns = Math.max(0, Math.min(tp - d.a.duration, (typeof d.pendingStart==='number' ? d.pendingStart : d.origStart)));
+  if (ns !== d.a.startPeriod){ d.a.startPeriod = ns; }
+  // Her-render zodat het blok exact op de periode snapt (en tooltips/labels kloppen).
+  const pane=document.getElementById('tabTimeline');
+  if (pane){ delete pane.dataset.built; pane.style.display='none'; switchTab('timeline'); }
 }
 
 function moveBar(actionId,dir){
@@ -2421,7 +2666,7 @@ function buildThemeView(container){
 
     acts.forEach((a,ai)=>{
       const pct=(a.priorityScore/maxScore)*100;
-      const periodLabel=(tl.periodLabels[a.startPeriod] && tl.periodLabels[a.startPeriod].label) || `P${a.startPeriod+1}`;
+      const periodLabel=vkPeriodLabel(a.startPeriod);
       const vComp=t.visionComps[a.visComp]||'';
       const riskClass=a.riskScore>60?'high':a.riskScore>35?'med':'low';
       const riskColor=riskClass==='high'?'var(--coral)':riskClass==='med'?'var(--amber)':'var(--green)';
@@ -2457,7 +2702,12 @@ function buildRiskView(container){
   const tl=timelineConfig;
   const sorted=[...roadmapActions].sort((a,b)=>b.riskScore-a.riskScore);
 
-  let html=`<div class="card" style="overflow-x:auto"><table class="risk-table">
+  // Begeleidende toelichting (§11O): wat het percentage betekent en hoe het is opgebouwd.
+  let html=`<div class="card" style="margin-bottom:14px">
+    <div style="font-size:13px;font-weight:700;margin-bottom:6px">${escapeHtml(t.riskIntroTitle)}</div>
+    <p style="font-size:12.5px;color:var(--t2);line-height:1.6;margin:0">${escapeHtml(t.riskIntroBody)}</p>
+  </div>`;
+  html+=`<div class="card" style="overflow-x:auto"><table class="risk-table">
     <thead><tr>
       <th>${lang==='nl'?'Actie':'Action'}</th>
       <th>${lang==='nl'?'Thema':'Theme'}</th>
@@ -2469,7 +2719,7 @@ function buildRiskView(container){
 
   sorted.forEach(a=>{
     const riskClass=a.riskScore>60?'risk-high':a.riskScore>35?'risk-med':'risk-low';
-    const periodLabel=(tl.periodLabels[a.startPeriod] && tl.periodLabels[a.startPeriod].label) || `P${a.startPeriod+1}`;
+    const periodLabel=vkPeriodLabel(a.startPeriod);
     html+=`<tr class="${riskClass}">
       <td style="max-width:200px;font-size:12px;font-weight:600">${escapeHtml(a.text||'')}</td>
       <td><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px"><span style="width:8px;height:8px;border-radius:50%;background:${a.themeColor};display:inline-block"></span>${escapeHtml(a.themeName||'')}</span></td>
@@ -2516,7 +2766,7 @@ function buildOwnersScreen(){
       </div>`;
 
     acts.forEach((a,ai)=>{
-      const periodLabel=(tl.periodLabels[a.startPeriod] && tl.periodLabels[a.startPeriod].label) || `P${a.startPeriod+1}`;
+      const periodLabel=vkPeriodLabel(a.startPeriod);
       const txt = a.text || '';
       const shortTxt = txt.length>55 ? txt.slice(0,53)+'…' : txt;
       html+=`<div class="owner-row">
@@ -2550,7 +2800,7 @@ function resetDemoData(){
     // fase 1
     'vk_vision_sentence','vk_vision_keywords','vk_phase1_answers','vk_phase1_stage','vk_phase1_live_answers',
     // fase 2
-    'vk_selected_themes','vk_phase2_submissions','vk_phase2_stage','vk_phase2_live_subs',
+    'vk_selected_themes','vk_phase2_sent','vk_phase2_voted','vk_phase2_submissions','vk_phase2_stage','vk_phase2_live_subs',
     // fase 3
     'vk_confirmed_actions','vk_phase3_submissions','vk_phase3_stage','vk_phase3_live_subs',
     // fase 4
@@ -2604,7 +2854,7 @@ function buildFinalScreen(){
 
     acts.forEach((a,ai)=>{
       const owner=a.owner||'—';
-      const periodLabel=(tl.periodLabels[a.startPeriod] && tl.periodLabels[a.startPeriod].label) || `P${a.startPeriod+1}`;
+      const periodLabel=vkPeriodLabel(a.startPeriod);
       const riskColor=a.riskScore>60?'var(--cd)':a.riskScore>35?'var(--amber)':'var(--gd)';
       html+=`<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 16px;border-bottom:1px solid ${theme.color}15">
         <div style="width:22px;height:22px;border-radius:50%;background:${theme.color}18;color:${theme.color};font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${ai+1}</div>

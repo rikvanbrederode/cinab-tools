@@ -1331,7 +1331,7 @@ const T = {
     incConfirm:'Toch insturen',
     // Onderbouwing modal
     onderbouwingBtn:'Onderbouwing',
-    onderbouwingTitle:'Theoretische onderbouwing — fase 3',
+    onderbouwingTitle:'Hoe het werkt',
     onderbouwingBody:'Een visie en thema\'s geven richting, maar pas met acties weet je morgen wat te doen. Per thema bedenken deelnemers concrete acties die de stip op de horizon dichterbij brengen. Een actie is klein genoeg om mee te starten en groot genoeg om iets te verschuiven. Per thema kiezen jullie de set acties die het verschil maakt. Deze acties vormen de uitvoeringskant van het plan en worden in fase 5 geprioriteerd op de roadmap.',
     onderbouwingClose:'Sluiten',
     // Cross-fase shared keys (v4)
@@ -1473,7 +1473,7 @@ const T = {
     incCancel:'Back to input',
     incConfirm:'Submit anyway',
     onderbouwingBtn:'Background',
-    onderbouwingTitle:'Theoretical background — phase 3',
+    onderbouwingTitle:'How it works',
     onderbouwingBody:'A vision and themes give direction, but only with actions do you know what to do tomorrow. Per theme, participants devise concrete actions that bring the dot on the horizon closer. An action is small enough to start with and large enough to shift something. Per theme you choose the set of actions that makes the difference. These actions form the execution side of the plan and are prioritised on the roadmap in phase 5.',
     onderbouwingClose:'Close',
     // Cross-fase shared keys (v4)
@@ -1909,12 +1909,19 @@ function initLang(){
   if (init && init !== lang) setLang(init, {fromStorage:true});
 }
 
+/* Sleutels met opmaak in de string. De generieke lus hieronder schrijft een TEXT-node
+   en zet dan de markup letterlijk in beeld ('<strong>werkwoord</strong>'), met de
+   originele <strong> als restant erachter. Die sleutels gaan via innerHTML, precies
+   zoals fase 2 dat al doet voor cr1/cr2/cr3. De strings komen uit T[] (onze eigen
+   bron, geen gebruikersinvoer), dus dit opent geen XSS-pad. */
+const VK_T_HTML_KEYS = { ac1:1, ac2:1, ac3:1 };
 function applyT(){
   const t = T[lang];
   Object.keys(t).forEach(k => {
     if (typeof t[k] !== 'string') return;
     const el = document.getElementById('t-' + k);
     if (!el) return;
+    if (VK_T_HTML_KEYS[k]) { el.innerHTML = t[k]; return; }
     if (el.children.length > 0) {
       let textNode = null;
       for (const n of el.childNodes) {
@@ -2110,6 +2117,48 @@ document.addEventListener('keydown', e => {
    CROSS-TAB STAGE-SYNC
 ══════════════════════════════════════════ */
 let _vkRestoring = false;   // niveau 1: onderdrukt (her)publicatie van de stage tijdens facilitator-herstel
+/* ══════════ VK SESSIE-UITKOMSTEN IN DE STAGE (§11G, identiek in fase 1 t/m 5) ══════════
+   Uitkomsten van eerdere fasen (de stip uit fase 1, de gekozen thema's uit fase 2) staan
+   alleen in de localStorage van het FACILITATOR-apparaat. Een deelnemer op een eigen
+   telefoon heeft die fase daar nooit doorlopen en ziet dus een leeg kader. De stage-tak
+   is het enige kanaal dat elke deelnemer al leest, dus reizen de uitkomsten mee in het
+   stage-object. Dit is het patroon dat fase 4 al gebruikte voor st.versnellers/st.remmers;
+   nu uniform en in elke publishStage én elke fase-overgang.
+   Bewust GEEN nieuwe RTDB-tak: de bestaande security rules en de 50.000-tekengrens op
+   stage blijven onveranderd gelden, dus geen deploy-afhankelijkheid bij Rik. */
+function vkStageResults(){
+  var r = {};
+  try { var v = localStorage.getItem('vk_vision_sentence'); if (v && String(v).trim()) r.stip = String(v).trim(); } catch(e){}
+  try { var t = JSON.parse(localStorage.getItem('vk_selected_themes') || 'null'); if (Array.isArray(t) && t.length) r.themes = t; } catch(e){}
+  return r;
+}
+function vkStageWithResults(obj){
+  var r = vkStageResults();
+  if (r && Object.keys(r).length) obj.results = r;
+  return obj;
+}
+/* Deelnemer-kant: spiegel de meegereisde uitkomsten naar localStorage, zodat alle
+   bestaande render-functies ongewijzigd blijven werken. Retourneert of er iets wijzigde. */
+function vkApplyStageResults(st){
+  var r = st && st.results;
+  if (!r || typeof r !== 'object') return false;
+  var changed = false;
+  try {
+    if (r.stip && localStorage.getItem('vk_vision_sentence') !== r.stip){
+      localStorage.setItem('vk_vision_sentence', r.stip); changed = true;
+    }
+  } catch(e){}
+  try {
+    if (Array.isArray(r.themes)){
+      var nw = JSON.stringify(r.themes);
+      if (localStorage.getItem('vk_selected_themes') !== nw){
+        localStorage.setItem('vk_selected_themes', nw); changed = true;
+      }
+    }
+  } catch(e){}
+  return changed;
+}
+
 function publishStage(stage, payload){
   if (_vkRestoring) return;   // herstel na verversing → niet (her)publiceren; deelnemers ongemoeid
   try {
@@ -2119,7 +2168,7 @@ function publishStage(stage, payload){
   } catch(e){}
   if (VK_LIVE && window.vkFb){
     try {
-      const g = Object.assign({ phase: 3, stage: stage, at: Date.now() }, payload || {});
+      const g = vkStageWithResults(Object.assign({ phase: 3, stage: stage, at: Date.now() }, payload || {}));
       vkFb.stageSet(vkLiveCode(), JSON.stringify(g));
     } catch(e){}
   }
@@ -2146,6 +2195,13 @@ function applyStageToPView(stObj){
   if (facView) return;
   let st = stObj || readStage();
   if (!st) st = { stage: 'preWait' };
+  // Uitkomsten van eerdere fasen reizen mee in de stage (§11G): spiegel ze naar
+  // localStorage, zodat een deelnemer op een eigen apparaat ze ook ziet.
+  var _vkRes = vkApplyStageResults(st);
+  if (_vkRes){
+    try { const _v = localStorage.getItem('vk_vision_sentence'); if (_v) visionSentence = _v.trim(); } catch(e){}
+    try { renderPView(); } catch(e){}
+  }
   // Cross-device: facilitator naar latere fase → deelnemer volgt mee.
   if (Number(st.phase) > 3){
     window.location.href = 'visiekaart_fase' + Number(st.phase) + '.html?join=' + encodeURIComponent(vkLiveCode());
@@ -3133,7 +3189,7 @@ function resetDemoData(){
   const keys = [
     'vk_session','vk_session_started',
     'vk_vision_sentence','vk_vision_keywords','vk_phase1_answers','vk_phase1_stage','vk_phase1_live_answers',
-    'vk_selected_themes','vk_phase2_submissions','vk_phase2_stage','vk_phase2_live_subs',
+    'vk_selected_themes','vk_phase2_sent','vk_phase2_voted','vk_phase2_submissions','vk_phase2_stage','vk_phase2_live_subs',
     'vk_confirmed_actions','vk_phase3_submissions','vk_phase3_stage','vk_phase3_live_subs',
     'vk_versnellers','vk_remmers','vk_phase4_scores','vk_roadmap_actions'
   ];
@@ -3151,7 +3207,7 @@ function goPhase4(){
   publishStage('done');
   // Cross-device: zet globale stage naar fase 4 zodat deelnemer-apparaten meegaan.
   if (VK_LIVE && window.vkFb){
-    try{ vkFb.stageSet(vkLiveCode(), JSON.stringify({phase:4, stage:'preWait', at:Date.now()})); }catch(e){}
+    try{ vkFb.stageSet(vkLiveCode(), JSON.stringify(vkStageWithResults({phase:4, stage:'preWait', at:Date.now()}))); }catch(e){}
   }
   window.location.href = 'visiekaart_fase4.html';
 }

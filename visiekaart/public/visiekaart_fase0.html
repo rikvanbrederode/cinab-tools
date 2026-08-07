@@ -1479,7 +1479,7 @@ const T = {
     startConfirmBody: 'Controleer of alle deelnemers de QR-code hebben gescand of de link hebben geopend en zich hebben aangemeld. Zodra de sessie start, kan niemand zich meer aanmelden. Klik deze melding weg als iedereen klaar is. De startknop wordt dan groen; klik daarna nogmaals op Sessie starten om te beginnen.',
     startConfirmBtn: 'Iedereen is ingelogd',
     theoryBtn: 'Onderbouwing',
-    modalTitle: 'Theoretische onderbouwing', modalSub: 'De visiekaart als strategische facilitatiemethode',
+    modalTitle: 'Hoe het werkt', modalSub: 'De visiekaart als strategische facilitatiemethode',
     th1: 'Waarom deze aanpak werkt',
     th1p: 'De visiekaart combineert inzichten uit de strategische planningsliteratuur (waaronder Kaplan & Norton\u2019s Balanced Scorecard en de OKR-methode) met participatieve werkvormen uit de organisatiekunde. De kracht zit in het verbinden van een heldere visie, thematische clustering en directe vertaling naar actie, allemaal in \xe9\xe9n sessie.',
     th2: 'Divergeren \u2192 convergeren (Double Diamond)',
@@ -1576,7 +1576,7 @@ const T = {
     startConfirmBody: 'Check that all participants have scanned the QR code or opened the link and signed in. Once the session starts, no one can sign in anymore. Dismiss this message when everyone is ready. The start button then turns green; click Start session again to begin.',
     startConfirmBtn: 'Everyone is signed in',
     theoryBtn: 'Theory',
-    modalTitle: 'Theoretical background', modalSub: 'The visiekaart as a strategic facilitation method',
+    modalTitle: 'How it works', modalSub: 'The visiekaart as a strategic facilitation method',
     th1: 'Why this approach works',
     th1p: 'The visiekaart combines insights from strategic planning literature (including Kaplan & Norton\u2019s Balanced Scorecard and the OKR method) with participatory facilitation methods. The strength lies in combining a clear vision, thematic clustering and direct translation into action, all in one session.',
     th2: 'Diverge \u2192 converge (Double Diamond)',
@@ -1845,6 +1845,9 @@ function pickPill(el, group) {
   document.querySelectorAll('#' + group + 'Group .pill').forEach(p => p.classList.remove('on'));
   el.classList.add('on');
   radios[group] = el.dataset.val;
+  // Urgentie/budget wijzigt -> content-tak bijwerken, zodat het deelnemer-
+  // welkomscherm in fase 1 compleet blijft (gedebounced via vkFacilitatorInit).
+  try { if (window.vkMetaBump) window.vkMetaBump(); } catch(e){}
 }
 
 /* ══════════ THEORY / ONDERBOUWING (via vkOpenTip-LG) ══════════ */
@@ -1964,7 +1967,7 @@ function resetDemoData(){
   if(!confirm(t.resetConfirm)) return;
   const keys = ['vk_session','vk_vision_sentence','vk_vision_keywords','vk_phase1_answers',
                 'vk_phase1_stage','vk_phase1_live_answers',
-                'vk_selected_themes','vk_phase2_submissions','vk_phase2_stage','vk_phase2_live_subs',
+                'vk_selected_themes','vk_phase2_sent','vk_phase2_voted','vk_phase2_submissions','vk_phase2_stage','vk_phase2_live_subs',
                 'vk_confirmed_actions','vk_phase3_submissions','vk_phase3_stage','vk_phase3_live_subs',
                 'vk_versnellers','vk_remmers','vk_phase4_scores',
                 'vk_roadmap_actions','vk_session_started'];
@@ -2038,7 +2041,7 @@ async function doStartSession() {
   // Clear downstream keys so a fresh session starts clean (vk_lang behouden)
   ['vk_vision_sentence','vk_vision_keywords','vk_phase1_answers',
    'vk_phase1_stage','vk_phase1_live_answers',
-   'vk_selected_themes','vk_phase2_submissions','vk_phase2_stage','vk_phase2_live_subs',
+   'vk_selected_themes','vk_phase2_sent','vk_phase2_voted','vk_phase2_submissions','vk_phase2_stage','vk_phase2_live_subs',
    'vk_confirmed_actions','vk_phase3_submissions','vk_phase3_stage','vk_phase3_live_subs',
    'vk_versnellers','vk_remmers','vk_phase4_scores','vk_roadmap_actions']
     .forEach(k => { try { localStorage.removeItem(k); } catch(e){} });
@@ -2054,6 +2057,10 @@ async function doStartSession() {
       await Promise.race([
         Promise.all([
           vkFb.ensureSession(sessionCode, lang),
+          // Content vóór/gelijk met het startsignaal wegschrijven, zodat het
+          // deelnemer-welkomscherm in fase 1 meteen compleet is (geen race met
+          // de facilitator die zelf nog naar fase 1 moet navigeren).
+          vkFb.contentSet(sessionCode, vkSessionContent(sessionData)),
           vkFb.stageSet(sessionCode, JSON.stringify(stageObj))
         ]),
         new Promise(res => setTimeout(res, 1500))
@@ -2158,14 +2165,29 @@ function vkParseStage(raw){
 
 /* ── Facilitator: sessie in RTDB aanmaken + live aanmeldingen tonen ── */
 let _vkMetaTimer = null;
+/* ══════════ CANONIEK CONTENT-PAYLOAD (identiek in fase 0 t/m 5) ══════════
+   contentSet() gebruikt .set() en overschrijft dus de hele content-tak. Als de
+   ene fase een kleiner payload schrijft dan de andere, wist zij de velden van de
+   ander. Daarom schrijft ELKE fase exact deze vorm. Bron mag de DOM zijn (fase 0
+   voor de start) of vk_session (fase 1 t/m 5). Uitbreiden? Dan in alle fasen. */
+function vkSessionContent(src){
+  const s = src || {};
+  return {
+    sessionName: s.sessionName || '',
+    org:         s.org         || '',
+    sessionType: s.sessionType || '',
+    scale:       s.scale       || '',
+    urgency:     s.urgency     || '',
+    budget:      s.budget      || '',
+    horizon:     s.horizon     || '',
+    lang:        (typeof lang !== 'undefined' ? lang : 'nl')
+  };
+}
 function vkPublishMeta(){
   if (!(VK_LIVE && window.vkFb)) return;
-  const content = {
-    sessionName: document.getElementById('sessionName').value.trim(),
-    org:         document.getElementById('orgName').value.trim(),
-    lang:        lang
-  };
-  try { vkFb.contentSet(sessionCode, content); } catch(e){}
+  // Volledig payload: het deelnemer-welkomscherm in fase 1 vult hiermee het blok
+  // "Wat we vandaag doen" (type, schaal, urgentie, budget, tijdshorizon).
+  try { vkFb.contentSet(sessionCode, vkSessionContent(getSessionData())); } catch(e){}
 }
 function vkFacilitatorInit(){
   if (!(VK_LIVE && window.vkFb)) return;
@@ -2181,14 +2203,26 @@ function vkFacilitatorInit(){
       })
       .catch(function(){});
   } catch(e){}
-  // Sessienaam/organisatie wijzigt → join-scherm bijwerken (gedebounced)
+  // Elk sessieveld wijzigt → content-tak bijwerken (gedebounced). Niet alleen naam/
+  // organisatie: ook type, tijdshorizon, schaal, urgentie en budget horen erbij,
+  // anders blijft het deelnemer-welkomscherm onvolledig.
+  const _vkMetaBump = function(){
+    clearTimeout(_vkMetaTimer);
+    _vkMetaTimer = setTimeout(vkPublishMeta, 400);
+  };
   ['sessionName','orgName'].forEach(function(id){
     const el = document.getElementById(id);
-    if (el) el.addEventListener('input', function(){
-      clearTimeout(_vkMetaTimer);
-      _vkMetaTimer = setTimeout(vkPublishMeta, 400);
-    });
+    if (el) el.addEventListener('input', _vkMetaBump);
   });
+  ['horizon','scale','sector'].forEach(function(id){
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', _vkMetaBump);
+  });
+  document.querySelectorAll('input[name="sesstype"]').forEach(function(el){
+    el.addEventListener('change', _vkMetaBump);
+  });
+  // Urgentie/budget lopen via de radios-state (setRadio), niet via name-groepen.
+  window.vkMetaBump = _vkMetaBump;
 }
 
 /* ── Deelnemer: join-scherm tonen, sessienaam ophalen, op start doorgaan ── */

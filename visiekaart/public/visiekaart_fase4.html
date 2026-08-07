@@ -616,7 +616,7 @@ body.sess-open .screen.open{max-height:calc(100vh - 250px)}
         <div class="count-row">
           <span class="live-dot"></span>
           <span style="font-size:13px;color:var(--t2)" id="t-deelLabel">Deelnemers</span>
-          <span class="count-chip" id="deelCount">0</span>
+          <span class="count-chip" id="deelCount">0 / 0</span>
           <span style="font-size:13px;color:var(--t2)" id="t-scoreLabel">Beoordelingen</span>
           <span class="count-chip" id="scoreCount">0</span>
           <span style="font-size:13px;color:var(--t2)" id="t-customLabel2">Eigen toevoegingen</span>
@@ -1371,7 +1371,7 @@ const T = {
     pIntroHowBody:'Je beoordeelt twintig stellingen als versneller, remmer of neutraal, ten opzichte van onze stip op de horizon. Daarna kun je zelf nog versnellers en remmers toevoegen die voor jou belangrijk zijn. Klik onderaan op \"Definitief versturen\" zodra je klaar bent.',
     pPreWaitWaiting:'Wachten op de facilitator…',
     onderbouwingBtn:'Onderbouwing',
-    onderbouwingTitle:'Theoretische onderbouwing — fase 4',
+    onderbouwingTitle:'Hoe het werkt',
     onderbouwingBody:"Een goed plan staat of valt met de uitvoering. In deze fase identificeren jullie wat de realisatie van de stip op de horizon ondersteunt (versnellers) en wat haar belemmert (remmers). De stellingen zijn opgebouwd uit twee dimensies: executiekracht (gedrag, sturing, discipline) en organisatie-elementen (structuur, middelen, processen, capaciteit, ge\u00efnspireerd op het INK-model). Door beide eerlijk te benoemen wordt het plan ambitieus \u00e9n geloofwaardig. Het doel is niet de stip kleiner te maken, maar de roadmap erop af te stemmen: de top 5 versnellers worden bewust ingezet en de top 5 remmers worden expliciet geadresseerd in fase 5.",
     onderbouwingClose:'Sluiten',
     p4phase:'Fase 4 · Versnellers & remmers',
@@ -1507,7 +1507,7 @@ const T = {
     pIntroHowBody:'You rate twenty statements as accelerator, obstacle or neutral, relative to our dot on the horizon. Then you can add your own accelerators and obstacles that matter to you. Click "Submit as final" at the bottom when you are done.',
     pPreWaitWaiting:'Waiting for the facilitator…',
     onderbouwingBtn:'Background',
-    onderbouwingTitle:'Theoretical background — phase 4',
+    onderbouwingTitle:'How it works',
     onderbouwingBody:"A good plan stands or falls with execution. In this phase you identify what supports realising the dot on the horizon (accelerators) and what hinders it (obstacles). The statements are built on two dimensions: execution power (behaviour, steering, discipline) and organisational elements (structure, resources, processes, capacity, inspired by the INK model). Naming both honestly makes the plan ambitious and credible. The goal is not to shrink the dot but to align the roadmap to it: the top 5 accelerators are consciously deployed and the top 5 obstacles are explicitly addressed in phase 5.",
     onderbouwingClose:'Close',
     p4phase:'Phase 4 · Accelerators & obstacles',
@@ -1988,6 +1988,63 @@ document.addEventListener('keydown', e => {
    CROSS-TAB STAGE-SYNC
 ══════════════════════════════════════════ */
 let _vkRestoring = false;   // niveau 1: onderdrukt (her)publicatie van de stage tijdens facilitator-herstel
+/* ══════════ DEELNEMER-TELLING (§11C, gelijk aan fase 1 en 2) ══════════ */
+function vkExpectedParticipants(){
+  try{ const s=JSON.parse(localStorage.getItem('vk_session')||'{}'); return Array.isArray(s.participants)?s.participants.length:0; }catch(e){ return 0; }
+}
+function vkUniqueBy(arr){
+  const seen = Object.create(null);
+  let n = 0;
+  (arr||[]).forEach(function(a){
+    const key = String((a && a.name) || '').trim().toLowerCase();
+    if (!key){ n++; return; }
+    if (!seen[key]){ seen[key] = 1; n++; }
+  });
+  return n;
+}
+
+/* ══════════ VK SESSIE-UITKOMSTEN IN DE STAGE (§11G, identiek in fase 1 t/m 5) ══════════
+   Uitkomsten van eerdere fasen (de stip uit fase 1, de gekozen thema's uit fase 2) staan
+   alleen in de localStorage van het FACILITATOR-apparaat. Een deelnemer op een eigen
+   telefoon heeft die fase daar nooit doorlopen en ziet dus een leeg kader. De stage-tak
+   is het enige kanaal dat elke deelnemer al leest, dus reizen de uitkomsten mee in het
+   stage-object. Dit is het patroon dat fase 4 al gebruikte voor st.versnellers/st.remmers;
+   nu uniform en in elke publishStage én elke fase-overgang.
+   Bewust GEEN nieuwe RTDB-tak: de bestaande security rules en de 50.000-tekengrens op
+   stage blijven onveranderd gelden, dus geen deploy-afhankelijkheid bij Rik. */
+function vkStageResults(){
+  var r = {};
+  try { var v = localStorage.getItem('vk_vision_sentence'); if (v && String(v).trim()) r.stip = String(v).trim(); } catch(e){}
+  try { var t = JSON.parse(localStorage.getItem('vk_selected_themes') || 'null'); if (Array.isArray(t) && t.length) r.themes = t; } catch(e){}
+  return r;
+}
+function vkStageWithResults(obj){
+  var r = vkStageResults();
+  if (r && Object.keys(r).length) obj.results = r;
+  return obj;
+}
+/* Deelnemer-kant: spiegel de meegereisde uitkomsten naar localStorage, zodat alle
+   bestaande render-functies ongewijzigd blijven werken. Retourneert of er iets wijzigde. */
+function vkApplyStageResults(st){
+  var r = st && st.results;
+  if (!r || typeof r !== 'object') return false;
+  var changed = false;
+  try {
+    if (r.stip && localStorage.getItem('vk_vision_sentence') !== r.stip){
+      localStorage.setItem('vk_vision_sentence', r.stip); changed = true;
+    }
+  } catch(e){}
+  try {
+    if (Array.isArray(r.themes)){
+      var nw = JSON.stringify(r.themes);
+      if (localStorage.getItem('vk_selected_themes') !== nw){
+        localStorage.setItem('vk_selected_themes', nw); changed = true;
+      }
+    }
+  } catch(e){}
+  return changed;
+}
+
 function publishStage(stage, payload){
   if (_vkRestoring) return;   // herstel na verversing → niet (her)publiceren; deelnemers ongemoeid
   try {
@@ -1997,7 +2054,7 @@ function publishStage(stage, payload){
   } catch(e){}
   if (VK_LIVE && window.vkFb){
     try {
-      const g = Object.assign({ phase: 4, stage: stage, at: Date.now() }, payload || {});
+      const g = vkStageWithResults(Object.assign({ phase: 4, stage: stage, at: Date.now() }, payload || {}));
       vkFb.stageSet(vkLiveCode(), JSON.stringify(g));
     } catch(e){}
   }
@@ -2024,6 +2081,9 @@ function applyStageToPView(stObj){
   if (facView) return;
   let st = stObj || readStage();
   if (!st) st = { stage: 'preWait' };
+  // Uitkomsten van eerdere fasen reizen mee in de stage (§11G): spiegel ze naar
+  // localStorage, zodat een deelnemer op een eigen apparaat ze ook ziet.
+  var _vkRes = vkApplyStageResults(st);
   // Cross-device: facilitator naar latere fase → deelnemer volgt mee.
   if (Number(st.phase) > 4){
     window.location.href = 'visiekaart_fase' + Number(st.phase) + '.html?join=' + encodeURIComponent(vkLiveCode());
@@ -2147,7 +2207,15 @@ function renderWaitFeed(){
   const feed = document.getElementById('waitFeed');
   if (!feed) return;
   const t = T[lang];
-  document.getElementById('deelCount').textContent = allScores.length;
+  // Uniform met fase 1 en 2: beantwoord / aangemeld (§11C).
+  (function(){
+    const chip = document.getElementById('deelCount');
+    if (!chip) return;
+    const answered = vkUniqueBy(allScores);
+    let expected = vkExpectedParticipants();
+    if (expected <= 0) expected = VK_LIVE ? answered : (DEMO_SCORES.length || answered);
+    chip.textContent = answered + ' / ' + expected;
+  })();
   let scoreTotal = 0, customTotal = 0;
   allScores.forEach(s => {
     scoreTotal += Object.values(s.scores || {}).filter(v => v).length;
@@ -2183,9 +2251,15 @@ function renderWaitFeed(){
    ANALYSE (facilitator)
 ══════════════════════════════════════════ */
 function onClickAnalyse(){
-  // Verwacht aantal deelnemers = DEMO_SCORES.length (5) als referentie
-  const expected = DEMO_SCORES.length;
-  if (allScores.length < expected) {
+  // BUG (v10.6 en eerder): de poort vergeleek met DEMO_SCORES.length, een vaste
+  // demo-referentie van 5. In een echte sessie met bv. 3 deelnemers die allemaal
+  // hadden ingestuurd, gold 3 < 5 en verscheen de popup 'nog niet iedereen'.
+  // Nu: het roster uit fase 0 in live-modus, de demo-referentie alleen in demo.
+  const answered = vkUniqueBy(allScores);
+  let expected = VK_LIVE ? vkExpectedParticipants() : DEMO_SCORES.length;
+  // Roster onbekend (0)? Dan mag de poort nooit blokkeren: er is geen betrouwbare
+  // verwachting, dus vertrouwen we op het oordeel van de facilitator.
+  if (expected > 0 && answered < expected) {
     document.getElementById('analyseConfirm').classList.add('open');
     return;
   }
@@ -2825,7 +2899,7 @@ function resetDemoData(){
     'vk_session','vk_session_started',
     'vk_vision_sentence','vk_vision_keywords',
     'vk_phase1_answers','vk_phase1_stage','vk_phase1_live_answers',
-    'vk_selected_themes','vk_phase2_submissions','vk_phase2_stage','vk_phase2_live_subs',
+    'vk_selected_themes','vk_phase2_sent','vk_phase2_voted','vk_phase2_submissions','vk_phase2_stage','vk_phase2_live_subs',
     'vk_confirmed_actions','vk_phase3_submissions','vk_phase3_stage','vk_phase3_live_subs',
     'vk_versnellers','vk_remmers','vk_phase4_scores','vk_phase4_submissions','vk_phase4_stage','vk_phase4_live_subs',
     'vk_roadmap_actions'
@@ -2843,7 +2917,7 @@ function goPhase5(){
   publishStage('done');
   // Cross-device: zet globale stage naar fase 5 zodat deelnemer-apparaten meegaan.
   if (VK_LIVE && window.vkFb){
-    try{ vkFb.stageSet(vkLiveCode(), JSON.stringify({phase:5, stage:'preWait', at:Date.now()})); }catch(e){}
+    try{ vkFb.stageSet(vkLiveCode(), JSON.stringify(vkStageWithResults({phase:5, stage:'preWait', at:Date.now()}))); }catch(e){}
   }
   window.location.href = 'visiekaart_fase5.html';
 }
@@ -3268,14 +3342,28 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!window.vkFb) return;
     var c=code(); if(!c) return;
     vkFb.ensureSession(c,(typeof lang!=='undefined'?lang:'nl'))
-      .then(function(){ return vkFb.liveListen(c,'phase4/scores',function(arr){
+      .then(function(){
+        // Roster live bijhouden (§11C): de analyse-poort en de teller vergelijken met
+        // het aantal AANGEMELDE deelnemers, dus dat moet actueel zijn.
+        try{
+          vkFb.liveListen(c,'participants',function(arr){
+            try{
+              var sObj={}; try{ sObj=JSON.parse(localStorage.getItem('vk_session')||'{}')||{}; }catch(e){}
+              sObj.participants=(arr||[]).map(function(p){ return { name:(p&&p.name)||'', email:(p&&p.email)||'' }; });
+              localStorage.setItem('vk_session', JSON.stringify(sObj));
+            }catch(e){}
+            try{ renderWaitFeed(); }catch(e){}
+          });
+        }catch(e){}
+        return vkFb.liveListen(c,'phase4/scores',function(arr){
         allScores=(arr||[]).map(function(s){
           var sc={},raw=(s&&s.scores)||{};
           Object.keys(raw).forEach(function(k){ sc[k]=mp(raw[k]); });
           return {name:(s&&s.name)||'',scores:sc,customV:((s&&s.customV)||[]).slice(),customR:((s&&s.customR)||[]).slice(),at:(s&&s.at)||0};
         });
         try{ renderWaitFeed(); }catch(e){}
-      }); })
+        });
+      })
       .catch(function(){});
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();

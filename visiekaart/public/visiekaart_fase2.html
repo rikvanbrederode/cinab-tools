@@ -566,7 +566,7 @@ body.sess-open .screen.open{max-height:calc(100vh - 250px)}
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
           <span class="live-dot"></span>
           <span style="font-size:13px;color:var(--t2)" id="t-liveLabel">Live antwoorden binnengekomen</span>
-          <span class="count-chip" id="submittedCount">0</span>
+          <span class="count-chip" id="submittedCount">0 / 0</span>
         </div>
         <div id="incomingList" style="display:flex;flex-wrap:wrap;gap:7px;min-height:48px"></div>
       </div>
@@ -644,7 +644,7 @@ body.sess-open .screen.open{max-height:calc(100vh - 250px)}
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
           <span class="live-dot"></span>
           <span style="font-size:13px;color:var(--t2)" id="t-votesIn">Stemmen binnengekomen</span>
-          <span class="count-chip" id="voteCount">0</span>
+          <span class="count-chip" id="voteCount">0 / 0</span>
         </div>
         <div id="voteProgressList"></div>
       </div>
@@ -1335,7 +1335,7 @@ const T = {
     verbConclusion:'Drie keer "ja"? Dan is het een thema. Anders, pas je antwoord aan.',
     verbClose:'Sluiten',
     onderbouwingBtn:'Onderbouwing',
-    onderbouwingTitle:'Theoretische onderbouwing — fase 2',
+    onderbouwingTitle:'Hoe het werkt',
     onderbouwingBody:'Een visie geeft richting, maar wordt pas concreet als jullie weten op welke gebieden het werk vooruit moet. Thema\'s zijn die strategische pijlers: brede aandachtsgebieden waar acties uit voortvloeien. In deze fase brengen deelnemers ieder hun eigen perspectief in: welke gebieden moeten structureel sterker worden om de stip op de horizon te realiseren? AI groepeert vergelijkbare antwoorden tot kandidaat-thema\'s, het team bespreekt en past de groepering aan, en via dot-voting kiest de groep maximaal vijf definitieve thema\'s. Deze thema\'s vormen het skelet voor fase 3 (activiteiten), fase 4 (versnellers/remmers) en fase 5 (roadmap).',
     onderbouwingClose:'Sluiten',
     // Cross-fase shared keys (v4)
@@ -1489,7 +1489,7 @@ const T = {
     verbConclusion:'Three yes-answers? Then it is a theme. Otherwise, adjust your answer.',
     verbClose:'Close',
     onderbouwingBtn:'Background',
-    onderbouwingTitle:'Theoretical background — phase 2',
+    onderbouwingTitle:'How it works',
     onderbouwingBody:'A vision sets direction, but only becomes concrete when you know in which areas the work must move forward. Themes are those strategic pillars: broad focus areas from which actions arise. In this phase, participants each bring their own perspective: which areas must become structurally stronger to realise the dot on the horizon? AI groups similar answers into candidate themes, the team discusses and adjusts the grouping, and through dot-voting the group selects up to five definitive themes. These themes form the skeleton for phase 3 (activities), phase 4 (accelerators/obstacles) and phase 5 (roadmap).',
     onderbouwingClose:'Close',
     // Cross-fase shared keys (v4)
@@ -2019,12 +2019,81 @@ function vkBackToEdit(){
    CROSS-TAB STAGE SYNC  (vk_phase2_stage)
 ══════════════════════════════════════════ */
 let _vkRestoring = false;   // niveau 1: onderdrukt (her)publicatie van de stage tijdens facilitator-herstel
+/* ══════════ ANTWOORDTELLER (beantwoord / aangemeld) — §11C, gelijk aan fase 1 ══════════
+   Noemer = aangemelde deelnemers uit het roster (fase 0), niet het aantal inzendingen.
+   Teller = UNIEKE deelnemers, zodat een tweede inzending niet dubbeltelt. */
+function vkExpectedParticipants(){
+  try{ const s=JSON.parse(localStorage.getItem('vk_session')||'{}'); return Array.isArray(s.participants)?s.participants.length:0; }catch(e){ return 0; }
+}
+function vkUniqueBy(arr){
+  const seen = Object.create(null);
+  let n = 0;
+  (arr||[]).forEach(function(a){
+    const key = String((a && a.name) || '').trim().toLowerCase();
+    if (!key){ n++; return; }
+    if (!seen[key]){ seen[key] = 1; n++; }
+  });
+  return n;
+}
+function vkUpdateChip(id, arr, fallbackExpected){
+  const chip = document.getElementById(id);
+  if (!chip) return;
+  const answered = vkUniqueBy(arr);
+  let expected = vkExpectedParticipants();
+  if (expected <= 0) expected = (typeof fallbackExpected === 'number' && fallbackExpected > 0) ? fallbackExpected : answered;
+  chip.textContent = answered + ' / ' + expected;
+}
+function vkUpdateSubmittedCount(){ vkUpdateChip('submittedCount', submissions, (DEMO[lang]||[]).length); }
+function vkUpdateVoteCount(){      vkUpdateChip('voteCount',      votes,       (DEMO_VOTES[lang]||[]).length); }
+
+/* ══════════ VK SESSIE-UITKOMSTEN IN DE STAGE (§11G, identiek in fase 1 t/m 5) ══════════
+   Uitkomsten van eerdere fasen (de stip uit fase 1, de gekozen thema's uit fase 2) staan
+   alleen in de localStorage van het FACILITATOR-apparaat. Een deelnemer op een eigen
+   telefoon heeft die fase daar nooit doorlopen en ziet dus een leeg kader. De stage-tak
+   is het enige kanaal dat elke deelnemer al leest, dus reizen de uitkomsten mee in het
+   stage-object. Dit is het patroon dat fase 4 al gebruikte voor st.versnellers/st.remmers;
+   nu uniform en in elke publishStage én elke fase-overgang.
+   Bewust GEEN nieuwe RTDB-tak: de bestaande security rules en de 50.000-tekengrens op
+   stage blijven onveranderd gelden, dus geen deploy-afhankelijkheid bij Rik. */
+function vkStageResults(){
+  var r = {};
+  try { var v = localStorage.getItem('vk_vision_sentence'); if (v && String(v).trim()) r.stip = String(v).trim(); } catch(e){}
+  try { var t = JSON.parse(localStorage.getItem('vk_selected_themes') || 'null'); if (Array.isArray(t) && t.length) r.themes = t; } catch(e){}
+  return r;
+}
+function vkStageWithResults(obj){
+  var r = vkStageResults();
+  if (r && Object.keys(r).length) obj.results = r;
+  return obj;
+}
+/* Deelnemer-kant: spiegel de meegereisde uitkomsten naar localStorage, zodat alle
+   bestaande render-functies ongewijzigd blijven werken. Retourneert of er iets wijzigde. */
+function vkApplyStageResults(st){
+  var r = st && st.results;
+  if (!r || typeof r !== 'object') return false;
+  var changed = false;
+  try {
+    if (r.stip && localStorage.getItem('vk_vision_sentence') !== r.stip){
+      localStorage.setItem('vk_vision_sentence', r.stip); changed = true;
+    }
+  } catch(e){}
+  try {
+    if (Array.isArray(r.themes)){
+      var nw = JSON.stringify(r.themes);
+      if (localStorage.getItem('vk_selected_themes') !== nw){
+        localStorage.setItem('vk_selected_themes', nw); changed = true;
+      }
+    }
+  } catch(e){}
+  return changed;
+}
+
 function publishStage(stage, payload){
   if (_vkRestoring) return;   // herstel na verversing → niet (her)publiceren; deelnemers ongemoeid
   try { localStorage.setItem('vk_phase2_stage', stage); } catch(e){}
   if (VK_LIVE && window.vkFb){
     try {
-      const g = Object.assign({ phase: 2, stage: stage, at: Date.now() }, payload || {});
+      const g = vkStageWithResults(Object.assign({ phase: 2, stage: stage, at: Date.now() }, payload || {}));
       vkFb.stageSet(vkLiveCode(), JSON.stringify(g));
     } catch(e){}
   }
@@ -2051,6 +2120,12 @@ function applyStageToPView(stObj){
   if (facView) return;
   let st = stObj;
   if (!st){ const raw = readStage(); st = (raw && raw[0]==='{') ? vkParseStage(raw) : { stage: raw }; }
+  // Uitkomsten van fase 1 (de stip) reizen mee in de stage: spiegel ze naar
+  // localStorage en herteken, anders blijft het kader op een telefoon leeg.
+  if (vkApplyStageResults(st)){
+    try { loadVisionSentence(); } catch(e){}
+    try { buildP2Final(); } catch(e){}
+  }
   // Cross-device: facilitator is naar een latere fase → deelnemer volgt mee.
   if (st && Number(st.phase) > 2){
     window.location.href = 'visiekaart_fase' + Number(st.phase) + '.html?join=' + encodeURIComponent(vkLiveCode());
@@ -2129,14 +2204,14 @@ function showResults(){ goStep('results'); }
 ══════════════════════════════════════════ */
 function startDemoSubmissions(){
   submissions = [];
-  document.getElementById('submittedCount').textContent = '0';
+  vkUpdateSubmittedCount();
   document.getElementById('incomingList').innerHTML = '';
   const data = DEMO[lang];
   data.forEach((s, i) => {
     setTimeout(() => {
       if (step !== 'wait') return;
       submissions.push(s);
-      document.getElementById('submittedCount').textContent = submissions.length;
+      vkUpdateSubmittedCount();
       const list = document.getElementById('incomingList');
       list.insertAdjacentHTML('beforeend',
         `<span style="background:var(--tl);border:1px solid var(--tb);color:var(--teal);font-size:12px;padding:5px 11px;border-radius:18px;font-weight:600;animation:fadeUp .3s ease forwards">${escapeHtml(s.name)} · ${s.themes.length}</span>`
@@ -2166,7 +2241,16 @@ function buildClusters(){
   // Live: cluster de echte kandidaat-thema's uit de inzendingen. Lokale terugval meteen, AI verfijnt.
   const items = vkCollectThemeItems();
   vkLocalClusterP2(items);
-  vkCallAI('cluster', { items: items.map(it=>it.text) }, { lang })
+  // Context meesturen (§11E): zonder de vraag en de fase-intentie clustert het model
+  // op woordvorm. Daardoor belandden 'automatisering optimaliseren' en 'IT modernisering'
+  // in twee clusters: ze delen geen enkel woord, alleen een bedoeling.
+  vkCallAI('cluster', {
+    items:    items.map(it=>it.text),
+    question: (T[lang].pQuestion || ''),
+    context:  (lang==='nl'
+      ? 'Fase 2 van de Visiekaart: de deelnemers benoemen de structurele thema\'s die nodig zijn om de stip op de horizon te bereiken. De stip luidt: "' + String(visionSentence||'').trim() + '". Een thema is een breed aandachts- of ontwikkelgebied, geformuleerd als zelfstandig naamwoord, breder dan één actie.'
+      : 'Phase 2 of the Visiekaart: participants name the structural themes needed to reach the dot on the horizon. The dot reads: "' + String(visionSentence||'').trim() + '". A theme is a broad focus or development area, phrased as a noun, broader than a single action.')
+  }, { lang })
     .then(ai=>{
       if (ai && Array.isArray(ai.clusters) && ai.clusters.length){
         vkApplyAIClusterP2(items, ai.clusters);
@@ -2176,6 +2260,77 @@ function buildClusters(){
     .catch(()=>{ /* lokale clustering blijft leidend */ });
 }
 
+/* ═══ Clusterlabel-keuze (terugval zonder AI) ═══
+   Oude gedrag koos label = words[0] = het eerste woord >3 tekens dat niet in de
+   stoplijst stond. Daar komen labels als "krijgen" vandaan: een kaal werkwoord dat
+   toevallig vooraan stond. Nu wordt gekozen op FREQUENTIE binnen het cluster en op
+   woordsoort: zelfstandige naamwoorden krijgen voorrang, werkwoordsvormen worden
+   gedegradeerd en nooit als enig label gebruikt zolang er een alternatief is. */
+const VK_VERBS_NL = new Set(('krijgen krijg krijgt maken maak maakt doen doe doet geven geef geeft zorgen zorg zorgt '+
+  'werken werk werkt worden word wordt zijn ben bent is blijven blijf blijft gaan ga gaat komen kom komt '+
+  'willen wil wilt kunnen kan kunt moeten moet mogen mag hebben heb heeft staan sta staat zien zie ziet '+
+  'houden houd houdt nemen neem neemt stellen stel stelt zetten zet brengen breng brengt vinden vind vindt '+
+  'weten weet denken denk denkt voelen voel voelt leren leer leert bouwen bouw bouwt halen haal haalt '+
+  'bereiken bereik bereikt verbeteren verbeter verbetert versterken versterk versterkt vergroten vergroot '+
+  'verhogen verhoog verhoogt verlagen verlaag verlaagt ontwikkelen ontwikkel ontwikkelt realiseren realiseer '+
+  'realiseert creeren creëren creeer organiseren organiseer opzetten opbouwen uitvoeren voeren investeren '+
+  'samenwerken meedenken meedoen aanpakken oppakken uitbreiden groeien groei groeit starten start begint beginnen').split(' '));
+const VK_VERBS_EN = new Set(('get gets getting make makes making do does doing give gives giving ensure ensures '+
+  'work works working become becomes be being been is are stay stays go goes going come comes coming '+
+  'want wants can could must should may have has having stand stands see sees keep keeps take takes '+
+  'put puts bring brings find finds know knows think thinks feel feels learn learns build builds '+
+  'reach reaches improve improves strengthen strengthens increase increases reduce reduces develop develops '+
+  'realise realize create creates organise organize set up carry out invest invests collaborate grow grows start starts begin begins').split(' '));
+/* Naamwoordelijke uitgangen: sterke aanwijzing voor een zelfstandig naamwoord. */
+const VK_NOUN_SUF_NL = /(ing|ingen|heid|heden|schap|schappen|teit|teiten|tie|ties|isme|nis|ment|menten|aar|aars|ij|ijen)$/;
+const VK_NOUN_SUF_EN = /(tion|tions|ment|ments|ness|ship|ity|ities|ance|ence|ism|ing)$/;
+
+function vkLabelScore(w, freq){
+  const nl   = (typeof lang==='undefined' || lang!=='en');
+  const verb = nl ? VK_VERBS_NL.has(w) : VK_VERBS_EN.has(w);
+  const noun = (nl ? VK_NOUN_SUF_NL : VK_NOUN_SUF_EN).test(w);
+  let sc = freq * 3;                       // gedeeld woordgebruik weegt het zwaarst
+  if (noun) sc += 2.5;                     // naamwoordelijke uitgang
+  if (verb) sc -= 6;                       // kaal werkwoord: bijna nooit een goed label
+  if (vkIsModifier(w)) sc -= 8;            // bijvoeglijk naamwoord: zegt hoe, niet wat
+  if (!verb && !nl && /(ed|s)$/.test(w)) sc -= 0.5;
+  sc += Math.min(w.length, 14) / 14;       // langer = specifieker
+  return sc;
+}
+/* Kies het beste label uit de woorden van een cluster; val terug op een neutrale naam. */
+function vkPickClusterLabel(texts){
+  const freq = Object.create(null);
+  texts.forEach(t => { new Set(vkClusterTok(t)).forEach(w => { freq[w] = (freq[w]||0) + 1; }); });
+  const words = Object.keys(freq);
+  if (!words.length) return '';
+  let best = '', bestSc = -Infinity;
+  words.forEach(w => { const sc = vkLabelScore(w, freq[w]); if (sc > bestSc){ bestSc = sc; best = w; } });
+  // Alle kandidaten zijn werkwoorden -> liever geen label dan een misleidend label.
+  if (bestSc < 0) return '';
+  return best;
+}
+const VK_CL_STOP = new Set(('de het een en of van voor met aan op in te dat die deze wij we ons onze je jij u uw is zijn worden willen meer beter goede goed naar bij om als ook nog dan zodat omdat hun '+
+  'the a an and or of for to with on in that this these we our you your is are be being more better good so because their them they').split(' '));
+/* Modifiers: bijvoeglijke naamwoorden en vergrotende trappen. Ze zeggen HOE, niet WAT.
+   'betere dienstverlening', 'betere communicatie' en 'betere processen' gaan over drie
+   verschillende onderwerpen; clusteren op 'betere' is precies de woordvorm-fout die we
+   willen vermijden, en het leverde ook letterlijk de clusternaam 'betere' op. Daarom
+   tellen ze niet mee als clusterwoord en kunnen ze nooit een label worden. */
+const VK_CL_MOD = new Set(('betere goede goeie nieuwe nieuw oude grote grotere kleine kleinere sterke sterkere '+
+  'snelle snellere hoge hogere lage lagere brede bredere korte kortere lange langere hele echte juiste '+
+  'duidelijke duidelijker effectieve effectievere efficiente efficientere betrouwbare moderne modernere '+
+  'slimme slimmere andere verdere iedere elke veel weinig minder meeste meerdere goeds beters '+
+  'better best good news new old big bigger small smaller strong stronger fast faster high higher low lower '+
+  'broad broader short shorter long longer whole real right clear clearer effective efficient reliable '+
+  'modern smart smarter other further every each many few less most multiple').split(' '));
+/* Vergrotende trap op -ere (betere, snellere, grotere): morfologisch vangnet naast de lijst. */
+const VK_CL_MOD_RE = /^[a-zà-ÿ]{4,}ere$/;
+function vkIsModifier(w){ return VK_CL_MOD.has(w) || VK_CL_MOD_RE.test(w); }
+function vkClusterTok(s){
+  return String(s||'').toLowerCase().replace(/[^a-zà-ÿ0-9\s]/g,' ').split(/\s+/)
+    .filter(w=>w.length>3 && !VK_CL_STOP.has(w) && !vkIsModifier(w));
+}
+
 /* ═══ Cluster A: live-clustering met lokale terugval + AI-overlay ═══ */
 function vkCollectThemeItems(){
   const items=[];
@@ -2183,18 +2338,20 @@ function vkCollectThemeItems(){
   return items;
 }
 function vkClusterGroups(texts, maxN){
-  const STOP = new Set(('de het een en of van voor met aan op in te dat die deze wij we ons onze je jij u uw is zijn worden willen meer beter goede goed naar bij om als ook nog dan zodat omdat hun '+
-    'the a an and or of for to with on in that this these we our you your is are be being more better good so because their them they').split(' '));
-  const tok = s => String(s||'').toLowerCase().replace(/[^a-zà-ÿ0-9\s]/g,' ').split(/\s+/).filter(w=>w.length>3 && !STOP.has(w));
+  // Tokenizer + labelkeuze zijn identiek aan fase 1 (§11E). Het oude label = words[0]
+  // (= eerste woord >3 tekens buiten de stoplijst) leverde namen als 'betere' op:
+  // 'beter' staat in de stoplijst, 'betere' niet.
+  const tok = vkClusterTok;
   const groups=[];
   texts.forEach((txt,i)=>{
     const words=tok(txt); let best=-1, bs=0;
     groups.forEach((g,gi)=>{ const sc=words.filter(w=>g.words.has(w)).length; if(sc>bs){bs=sc;best=gi;} });
-    if(best>=0 && bs>0){ groups[best].members.push(i); words.forEach(w=>groups[best].words.add(w)); }
-    else if(groups.length<maxN){ groups.push({words:new Set(words), label:(words[0]||String(txt||'')), members:[i]}); }
-    else { let sm=0; groups.forEach((g,gi)=>{ if(g.members.length<groups[sm].members.length) sm=gi; }); groups[sm].members.push(i); }
+    if(best>=0 && bs>0){ groups[best].members.push(i); groups[best].texts.push(txt); words.forEach(w=>groups[best].words.add(w)); }
+    else if(groups.length<maxN){ groups.push({words:new Set(words), texts:[txt], members:[i]}); }
+    else { let sm=0; groups.forEach((g,gi)=>{ if(g.members.length<groups[sm].members.length) sm=gi; }); groups[sm].members.push(i); groups[sm].texts.push(txt); words.forEach(w=>groups[sm].words.add(w)); }
   });
-  if(!groups.length) groups.push({words:new Set(), label:'', members:texts.map((_,i)=>i)});
+  if(!groups.length) groups.push({words:new Set(), texts:texts.slice(), members:texts.map((_,i)=>i)});
+  groups.forEach(g => { g.label = vkPickClusterLabel(g.texts || []); });
   return groups;
 }
 function vkLocalClusterP2(items){
@@ -2316,7 +2473,7 @@ function confirmClustering(){
 ══════════════════════════════════════════ */
 function startDemoVoting(){
   votes = [];
-  document.getElementById('voteCount').textContent = '0';
+  vkUpdateVoteCount();
   renderVoteProgress();
   const data = DEMO_VOTES[lang];
   data.forEach((v, i) => {
@@ -2329,7 +2486,7 @@ function startDemoVoting(){
         if (c && pts > 0) mapped[c.id] = pts;
       });
       votes.push({name: v.name, votes: mapped});
-      document.getElementById('voteCount').textContent = votes.length;
+      vkUpdateVoteCount();
       renderVoteProgress();
     }, 800 + i*1000);
   });
@@ -2416,7 +2573,7 @@ function confirmThemes(){
   try {
     // Hoofdkey blijft [{name,score,...}] — backward compatible met fase 3-5/rapport
     localStorage.setItem('vk_selected_themes', JSON.stringify(ordered));
-    localStorage.setItem('vk_phase2_submissions', JSON.stringify(submissions));
+    localStorage.setItem('vk_phase2_sent','vk_phase2_voted','vk_phase2_submissions', JSON.stringify(submissions));
     localStorage.setItem('vk_phase2_state', 'confirmed');
   } catch(e){}
   goStep('final');
@@ -2497,6 +2654,25 @@ function hidePView(){
   document.getElementById('pView').classList.remove('open');
 }
 
+/* ══════════ DEELNEMER-STATUS IS KLEVERIG (§11H) ══════════
+   Elke publishStage() van de facilitator zet een nieuwe timestamp en laat de
+   stageListener van ELKE deelnemer opnieuw vuren. Zonder eigen status draaide
+   showPStage('wait') de deelnemer dan terug naar het invoerveld, ook als die al
+   had ingestuurd. Daarom onthoudt het apparaat zijn eigen status, gebonden aan de
+   sessiecode (net als vk_joined), zodat een nieuwe sessie vanzelf schoon start en
+   de status ook een verversing overleeft. */
+function vkPFlagSet(key){
+  try { localStorage.setItem(key, JSON.stringify({ code: vkLiveCode(), at: Date.now() })); } catch(e){}
+}
+function vkPFlagGet(key){
+  try {
+    const o = JSON.parse(localStorage.getItem(key) || 'null');
+    return !!(o && o.code && o.code === vkLiveCode());
+  } catch(e){ return false; }
+}
+function vkPHasSubmitted(){ return vkPFlagGet('vk_phase2_sent'); }
+function vkPHasVoted(){     return vkPFlagGet('vk_phase2_voted'); }
+
 function showPStage(stage){
   // Map stage → welke pcard tonen
   const cards = ['p2PreWait','p2Input','p2Wait','p2Vote','p2WaitResults','p2Final'];
@@ -2504,8 +2680,14 @@ function showPStage(stage){
   let target = 'p2PreWait';
   switch(stage){
     case 'preWait':  target = 'p2PreWait'; break;
-    case 'wait':     target = 'p2Input'; break;
-    case 'voteopen': target = 'p2Vote'; buildPVoteScreen(); break;
+    // Al ingestuurd? Dan blijft het 'verzonden'-scherm staan, ook als de facilitator
+    // ondertussen clustert (die publiceert stage 'wait' door tijdens ai/cluster).
+    case 'wait':     target = vkPHasSubmitted() ? 'p2Wait' : 'p2Input'; break;
+    // Al gestemd? Dan niet terug naar de stemkaart als de facilitator naar de
+    // resultaten doorklikt (die publiceert stage 'voteopen' door).
+    case 'voteopen': if (vkPHasVoted()) { target = 'p2WaitResults'; }
+                     else { target = 'p2Vote'; buildPVoteScreen(); }
+                     break;
     case 'final':    target = 'p2Final'; buildP2Final(); break;
   }
   const el = document.getElementById(target);
@@ -2634,6 +2816,7 @@ function submitThemes(){
     submissions.push(sub);
     try { localStorage.setItem('vk_phase2_live_subs', JSON.stringify(submissions)); } catch(e){}
   }
+  vkPFlagSet('vk_phase2_sent');   // kleverig: latere stage-updates draaien dit niet terug
   document.getElementById('p2Input').style.display = 'none';
   document.getElementById('p2Wait').style.display = '';
 }
@@ -2736,6 +2919,7 @@ function submitVotes(){
   } else {
     votes.push(v);
   }
+  vkPFlagSet('vk_phase2_voted');  // kleverig: latere stage-updates draaien dit niet terug
   document.getElementById('p2Vote').style.display = 'none';
   document.getElementById('p2WaitResults').style.display = '';
 }
@@ -2777,7 +2961,7 @@ function resetDemoData(){
   const keys = [
     'vk_session','vk_session_started','vk_vision_sentence','vk_vision_keywords',
     'vk_phase1_answers','vk_phase1_stage','vk_phase1_live_answers',
-    'vk_selected_themes','vk_phase2_submissions','vk_phase2_stage','vk_phase2_live_subs',
+    'vk_selected_themes','vk_phase2_sent','vk_phase2_voted','vk_phase2_submissions','vk_phase2_stage','vk_phase2_live_subs',
     'vk_confirmed_actions','vk_versnellers','vk_remmers','vk_phase4_scores','vk_roadmap_actions'
   ];
   keys.forEach(k => { try { localStorage.removeItem(k); } catch(e){} });
@@ -2797,7 +2981,7 @@ function goPhase3(){
   try { localStorage.setItem('vk_phase3_stage', JSON.stringify({stage:'preWait', at:Date.now()})); } catch(e){}
   // Cross-device: zet globale stage naar fase 3 zodat deelnemer-apparaten meegaan.
   if (VK_LIVE && window.vkFb){
-    try{ vkFb.stageSet(vkLiveCode(), JSON.stringify({phase:3, stage:'preWait', at:Date.now()})); }catch(e){}
+    try{ vkFb.stageSet(vkLiveCode(), JSON.stringify(vkStageWithResults({phase:3, stage:'preWait', at:Date.now()}))); }catch(e){}
   }
   window.location.href = 'visiekaart_fase3.html';
 }
@@ -3216,14 +3400,25 @@ document.addEventListener('DOMContentLoaded', function(){
     var c=code(); if(!c) return;
     vkFb.ensureSession(c,(typeof lang!=='undefined'?lang:'nl'))
       .then(function(){
+        // Roster live bijhouden: late aanmelder telt mee in de noemer (§11C).
+        try{
+          vkFb.liveListen(c,'participants',function(arr){
+            try{
+              var sObj={}; try{ sObj=JSON.parse(localStorage.getItem('vk_session')||'{}')||{}; }catch(e){}
+              sObj.participants=(arr||[]).map(function(p){ return { name:(p&&p.name)||'', email:(p&&p.email)||'' }; });
+              localStorage.setItem('vk_session', JSON.stringify(sObj));
+            }catch(e){}
+            try{ vkUpdateSubmittedCount(); vkUpdateVoteCount(); }catch(e){}
+          });
+        }catch(e){}
         vkFb.liveListen(c,'phase2/submissions',function(arr){
           submissions=(arr||[]).map(function(s){ return {name:(s&&s.name)||'',themes:(s&&s.themes)||[]}; });
-          try{ var el=document.getElementById('submittedCount'); if(el) el.textContent=submissions.length; }catch(e){}
+          try{ vkUpdateSubmittedCount(); }catch(e){}
           try{ var list=document.getElementById('incomingList'); if(list) list.innerHTML=submissions.map(function(s){ return '<span style="background:var(--tl);border:1px solid var(--tb);color:var(--teal);font-size:12px;padding:5px 11px;border-radius:18px;font-weight:600">'+escapeHtml(s.name)+' \u00b7 '+(s.themes.length)+'</span>'; }).join(''); }catch(e){}
         });
         vkFb.liveListen(c,'phase2/votes',function(arr){
           votes=(arr||[]).map(function(v){ return {name:(v&&v.name)||'',votes:(v&&v.votes)||{}}; });
-          try{ var el=document.getElementById('voteCount'); if(el) el.textContent=votes.length; }catch(e){}
+          try{ vkUpdateVoteCount(); }catch(e){}
           try{ renderVoteProgress(); }catch(e){}
         });
       })
