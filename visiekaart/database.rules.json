@@ -1,3 +1,7 @@
+// CINAB database.rules.json — visiekaart
+// VERSIE: 1.0.0 — 7 augustus 2026 (versieregel toegevoegd; regels zelf ongewijzigd)
+// Bij elke wijziging: versie ophogen, datum bijwerken, en het bestand met een
+// regel uitleg naar de tooldeveloper sturen als het gedrag voor de tool verandert.
 {
   "rules": {
     "sessions": {

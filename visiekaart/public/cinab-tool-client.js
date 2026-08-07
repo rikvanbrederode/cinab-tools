@@ -1,6 +1,17 @@
 /**
  * CINAB tool-client — route 2 (ADR 0006), contract werkboek v3.1.
  *
+ * CLIENTVERSIE: 1.1.0 — 7 augustus 2026
+ * Dit versienummer gaat over dit bestand, niet over het contract. Bij elke
+ * wijziging: nummer ophogen, datum bijwerken, regel toevoegen aan het log.
+ *
+ * Wijzigingslog:
+ *   1.1.0 (2026-08-07) — sessionCode uit de start-tool-response beschikbaar
+ *                        op de client als .sessionCode (F2-21, herstart van
+ *                        meerdaagse sessies); versieheader toegevoegd.
+ *   1.0.0 (2026-06)    — eerste versie conform contract werkboek v3.1.
+ *
+ *
  * Framework-agnostische browser-client voor het koppelen van een tool aan het
  * CINAB-platform. Geen HMAC en geen eigen backend nodig: de tool wisselt de
  * launch-code uit de URL in voor een sessietoken en praat daarmee met de
@@ -189,11 +200,12 @@ export async function startCinabSession( options = {} ) {
 		// ADR 0007: per-tool poortconfig — null = gratis tool, 0 is geldig.
 		betaalVanafFase: ( out.betaal_vanaf_fase === undefined ) ? null : out.betaal_vanaf_fase,
 		credits:         ( out.credits === undefined ) ? null : out.credits,
+		sessionCode: out.session_code || null,
 	} );
 }
 
 /** Maak een client als je het token al hebt (bv. hervat uit eigen sessie-state). */
-export function createCinabClient( { apiBase, token, apiKey = null, parentRapportId = null, action = null, betaalVanafFase = null, credits = null } ) {
+export function createCinabClient( { apiBase, token, apiKey = null, parentRapportId = null, action = null, betaalVanafFase = null, credits = null, sessionCode = null } ) {
 	apiBase = stripSlash( apiBase );
 	const parentOrigin = safeOrigin( apiBase );
 	let lastRapportId  = null;
@@ -208,6 +220,7 @@ export function createCinabClient( { apiBase, token, apiKey = null, parentRappor
 		betaalVanafFase,
 		/** Credit-prijs per sessie uit de start-tool-response. */
 		credits,
+		sessionCode,
 
 		/** True bij terugkeer na betaling (?action=resume) — werkboek §5.5 stap 7. */
 		get isResume() { return action === 'resume'; },

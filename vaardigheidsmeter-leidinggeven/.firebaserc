@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "vaardigheidsmeter-leidin-f82f7"
+    "default": "vaardigheidsmeter-leidin-f82f7",
+    "staging": "vaardigheidsmeter-leidin-f82f7",
+    "production": "vaardigheidsmeter-leidin-f82f7"
   }
 }

@@ -1,3 +1,5 @@
+// CINAB firebase.json — vaardigheidsmeter-leidinggeven
+// VERSIE: 1.0.0 — 7 augustus 2026 (versieregel toegevoegd; configuratie zelf ongewijzigd)
 {
   "hosting": {
     "public": "public",

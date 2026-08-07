@@ -2,3 +2,9 @@
 **/.firebase/
 node_modules/
 **/node_modules/
+
+# Nooit committen: sleutels en omgevingsbestanden
+.env
+*.env
+*.key
+**/vk-ai-proxy*.php
