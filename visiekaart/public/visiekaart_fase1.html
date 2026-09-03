@@ -3697,7 +3697,19 @@ document.addEventListener('DOMContentLoaded',()=>{
     appId: "1:757784606494:web:6f47e48fc85f15f6257b0f"
   };
   // Vul in zodra het schone productieproject (europe-west1, CINAB-account) staat:
-  var VK_FB_PROD = null; // bv. { apiKey:"…", databaseURL:"https://…-prod-….europe-west1.firebasedatabase.app", … }
+  /* Productie wijst naar hetzelfde project als staging (CINAB, 3 september 2026).
+     De database staat al in europe-west1, dus de EU-eis uit HS-11 is voldaan en een
+     apart productieproject is niet nodig. Wil je staging en productie later echt
+     scheiden, maak dan een tweede project aan en vervang alleen dit blok. */
+  var VK_FB_PROD = {
+    apiKey: "AIzaSyCer_6Y7f-jUXygHnBF_UdtpTxPTEIvaoA",
+    authDomain: "visiekaart.firebaseapp.com",
+    databaseURL: "https://visiekaart-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "visiekaart",
+    storageBucket: "visiekaart.firebasestorage.app",
+    messagingSenderId: "757784606494",
+    appId: "1:757784606494:web:6f47e48fc85f15f6257b0f"
+  };
 
   function vkFbEnv() {
     var h = (global.location && global.location.hostname) || '';

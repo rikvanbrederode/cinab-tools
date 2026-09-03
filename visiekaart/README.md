@@ -2,8 +2,7 @@
 
 | | |
 |---|---|
-| Firebase-project (staging) | `visiekaart` (regio VS; historisch, blijft staging) |
-| Firebase-project (productie) | nog aanmaken in `europe-west1`; daarna project-ID invullen in `.firebaserc` onder `production` |
+| Firebase-project | `visiekaart`, database in `europe-west1`; staging en productie gebruiken hetzelfde project |
 | Subdomein | `visiekaart.cinab.nl`, live, CNAME naar `visiekaart.web.app` |
 | Regels deployt | Rik, vanuit deze map |
 | Anonymous sign-in | aan op staging; bij het productieproject direct aanzetten (Authentication, Sign-in method) |
@@ -129,17 +128,26 @@ Bij een volgende set moeten deze opnieuw, anders komen ze er zo weer uit.
 ## Open punten
 
 1. Drie of vier `cinab_tool`-posts aanmaken met de embed-URL's uit de varianttabel hierboven.
-2. Productieproject aanmaken in `europe-west1` en `VK_FB_PROD` invullen; zolang dat op `null`
-   staat is er op de productiehost geen verbinding tussen apparaten.
+2. Vóór productie: `data-cinab-api` op de html-tag van `visiekaart_rapport.html` zetten. Nu
+   staat er alleen `<html lang="nl">` en valt de rapportpagina terug op `staging2.cinab.nl`.
+   Op staging klopt dat toevallig, op productie zoekt hij het rapport dan op de verkeerde host
+   en toont een deellink niets. Het wordt `<html lang="nl" data-cinab-api="https://cinab.nl">`.
+   Nadeel: er is één gedeployde kopie, dus daarna kun je de deellink niet meer op staging testen.
+   Voorstel aan de tooldeveloper: laat de pagina de host ook uit een queryparameter accepteren,
+   dan bedient één deploy beide omgevingen.
 3. Beslissen wat er met de vermeldingen van adviesborden.nl in het rapport gebeurt.
 4. `?demo=1` ontbreekt, terwijl risicobeheersing dat wel heeft.
 5. 42 visuele metingen uit het testrapport staan nog open, vooral knopkleuren en tabellen die
    binnen een kader scrollen.
 
-## Productieproject aanmaken (nog te doen)
+## Over het Firebase-project
 
-1. Nieuw Firebase-project aanmaken, database-regio `europe-west1` (ligt daarna onherroepelijk vast).
-2. Anonymous sign-in aanzetten (Authentication, Sign-in method, Anonymous).
-3. Project-ID invullen in `.firebaserc` onder `production`.
-4. `firebase use production` en deployen.
-5. Project-ID en regio noteren in het toolpaspoort voor de tooldeveloper.
+Op 3 september 2026 nagekeken in de console: de database van het project `visiekaart` staat in
+`europe-west1`. In deze README stond eerder dat het project in de VS draaide en daarom alleen
+staging kon zijn. Dat klopte niet. De EU-eis uit HS-11 is dus al voldaan en er is geen apart
+productieproject nodig; `VK_FB_PROD` wijst nu naar hetzelfde project als `VK_FB_STAGING`,
+net als bij de vaardigheidsmeter en risicobeheersing.
+
+Gevolg: staging en productie delen één database. Wil je ze later echt scheiden, maak dan een
+tweede project aan in `europe-west1` en vervang alleen het `VK_FB_PROD`-blok. Dat blok staat in
+alle zeven bladen en moet daar byte-identiek blijven.
