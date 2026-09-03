@@ -72,5 +72,17 @@ zonder commit; de commitmessage is de changelog-regel.
 6. Renderroute voor het gedeelde rapport. `risicobeheersing_rapport.html` is nu de laatste
    fase van de sessie en leest geen opgeslagen rapport terug via `rapport-data/{rapport_id}`.
    Zolang dat er niet is, kan een deellink geen rapport tonen.
-7. Vier woff2-bestanden plaatsen, anders draait de tool met vervangende letters.
+7. Firebase-SDK komt nog van `gstatic.com` (drie scripts in elke fase, versie 8.10.1). De
+   QR-generator is op 3 september self-hosted gemaakt in `public/vendor/`; de Firebase-SDK
+   is bewust nog niet omgezet, want die haalt Google zelf en dat raakt de hele app.
 8. Bewaartermijn persoonsgegevens vastleggen en het moment waarop de sessie-state wordt gewist.
+
+## Wijzigingen van CINAB in de aanlevering van de tooldeveloper
+
+Twee dingen zijn hier aangepast na oplevering. Bij een volgende set van de tooldeveloper
+moeten ze opnieuw, anders komen ze er zo weer uit.
+
+1. `risicobeheersing_fase0.html` regel 7: de QR-generator laadt uit `vendor/qrcode.min.js`
+   in plaats van uit `cdnjs.cloudflare.com`. Zelfde bibliotheek, zelfde versie 1.0.0.
+2. De vier woff2-bestanden staan in `public/fonts/`, niet in de map `fonts/` in de toolroot.
+   Die map bevat alleen het bouwscript en wordt niet gedeployd.
