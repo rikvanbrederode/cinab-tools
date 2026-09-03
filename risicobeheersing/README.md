@@ -6,7 +6,7 @@
 | Regio | `europe-west1` (ligt onherroepelijk vast bij aanmaken, HS-11) |
 | Regels deployt | Rik, vanuit deze map |
 | Anonymous sign-in | direct aanzetten bij het aanmaken (Authentication, Sign-in method, Anonymous) |
-| Subdomein | nog te bepalen; conventie is `[instrument]-[onderwerp].cinab.nl`, zie `SUBDOMAIN-NAMING.md` |
+| Subdomein | `risicobeheersing.cinab.nl` (besluit 3 september 2026; uitzondering op het patroon, varianten lopen via `?doel=`) |
 | Tool-client | `public/cinab-tool-client.js`, versie in de header |
 | AI-proxy | `server/risicobeheersing-ai-proxy.php`, draait op SiteGround, niet op Firebase Hosting |
 | Fasen | 0 tot en met 5, plus rapport (poortindex rapport = 6) |
@@ -42,7 +42,7 @@ zonder commit; de commitmessage is de changelog-regel.
 
 ## Open punten voor livegang
 
-1. Subdomein kiezen volgens de conventie en het DNS-record aanmaken.
+1. DNS aanmaken voor `risicobeheersing.cinab.nl`: CNAME naar het Firebase-project, plus het A-record voor `www.`.
 2. Firebase-project aanmaken in `europe-west1`, anonymous sign-in aan, project-ID in `.firebaserc`.
 3. Waar draait de AI-proxy en op welke origin. De tool staat op Firebase Hosting en kan
    zelf geen PHP draaien, dus de proxy komt op SiteGround en de app praat cross-origin.
