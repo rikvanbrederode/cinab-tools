@@ -14,3 +14,14 @@ node_modules/
 */fonts/*.zip
 */fonts/*.ttf
 */fonts/*.otf
+
+# Werkmappen die buiten git blijven: aanleveringen die al in public staan en
+# bestanden die op verwijdering wachten (s86).
+_to_delete/
+**/_to_delete/
+_v13/
+**/_v13/
+_vervallen/
+**/_vervallen/
+_fontbron/
+**/_fontbron/

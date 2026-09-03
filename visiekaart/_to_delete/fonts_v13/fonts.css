@@ -1,7 +1,0 @@
-/* Visiekaart — lokale webfonts (B-13, testprotocol 2026-09-03).
-   Plaats de woff2-bestanden in ./fonts/ naast dit bestand (zie README-DEPLOY §fonts).
-   Ontbreken ze, dan vallen de bladen terug op de systeemstack; er wordt nooit een externe CDN aangeroepen. */
-@font-face{font-family:'DM Sans';font-style:normal;font-weight:300 700;font-display:swap;src:url('DMSans-Variable.woff2') format('woff2')}
-@font-face{font-family:'DM Sans';font-style:italic;font-weight:400;font-display:swap;src:url('DMSans-Italic.woff2') format('woff2')}
-@font-face{font-family:'DM Serif Display';font-style:normal;font-weight:400;font-display:swap;src:url('DMSerifDisplay-Regular.woff2') format('woff2')}
-@font-face{font-family:'DM Serif Display';font-style:italic;font-weight:400;font-display:swap;src:url('DMSerifDisplay-Italic.woff2') format('woff2')}
