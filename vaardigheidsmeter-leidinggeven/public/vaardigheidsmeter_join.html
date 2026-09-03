@@ -2,6 +2,7 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
+<link rel="stylesheet" href="fonts/fonts.css"><!-- CINAB 3-9-2026: zelfgehoste huisstijlfonts, zie fonts/fonts.css -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Beoordeling · Vaardigheidsmeter Leidinggeven</title>
@@ -42,8 +43,8 @@ main{padding:22px 0 60px}
 .btn--primary:disabled{opacity:.5;cursor:not-allowed}
 .btn--ghost{background:transparent;color:var(--cinab-grey);border:1px solid var(--cinab-line)}
 .banner{border-radius:var(--radius-s);padding:10px 14px;font-size:13.5px;margin-bottom:14px}
-.banner--demo{background:#FFF6E5;border:1px solid var(--cinab-amber);color:#7a5a12}
-.banner--err{background:#FBEBEA;border:1px solid var(--tool-coral);color:#7E352E}
+.banner--demo{background:var(--cinab-card);border:1px solid var(--cinab-amber);border-left:4px solid var(--cinab-amber);color:var(--cinab-ink)}
+.banner--err{background:var(--cinab-card);border:1px solid var(--tool-coral);border-left:4px solid var(--tool-coral);color:var(--cinab-ink)}
 .progress{position:sticky;top:0;z-index:5;background:var(--cinab-offwhite);padding:10px 0;border-bottom:1px solid var(--cinab-line);margin-bottom:8px}
 .progress .wrap{display:flex;align-items:center;gap:12px}
 .pbar{flex:1;height:8px;background:var(--cinab-line);border-radius:999px;overflow:hidden}
@@ -62,11 +63,12 @@ main{padding:22px 0 60px}
 .scale{display:flex;gap:6px;flex-wrap:wrap}
 .scale input{position:absolute;opacity:0;width:0;height:0}
 .scale label{min-width:42px;min-height:var(--touch);display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cinab-line);border-radius:var(--radius-s);cursor:pointer;font-weight:600}
-.scale input:checked+label{background:var(--tool-teal);color:#fff;border-color:var(--tool-teal)}
+.scale input:checked+label{background:var(--cinab-ink);color:var(--cinab-offwhite);border-color:var(--cinab-ink)}
 .scale input:focus-visible+label{outline:3px solid var(--cinab-amber-dark);outline-offset:2px}
 .scale-legend{display:flex;justify-content:space-between;font-size:12px;color:var(--cinab-grey);margin-top:4px}
-.na-row{display:flex;gap:8px;align-items:center;margin-top:10px;font-size:13px;color:var(--cinab-grey)}
-.sticky-actions{position:sticky;bottom:0;background:linear-gradient(180deg,transparent,var(--cinab-offwhite) 30%);padding:14px 0;display:flex;gap:10px;justify-content:flex-end}
+.na-row{display:flex;gap:8px;align-items:center;min-height:var(--touch);margin-top:6px;font-size:13px;color:var(--cinab-grey);cursor:pointer}
+.na-row input{width:18px;height:18px}
+.sticky-actions{position:sticky;bottom:0;background:var(--cinab-offwhite);border-top:1px solid var(--cinab-line);padding:14px 0;display:flex;gap:10px;justify-content:flex-end}
 .done-ico{width:54px;height:54px;border-radius:50%;background:var(--tool-green);display:flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:10px}
 [hidden]{display:none!important}
 </style>
@@ -95,12 +97,12 @@ main{padding:22px 0 60px}
     <p style="font-size:14px;margin-top:12px">Je vult zo <b>20 vaardigheden</b> in (telkens twee korte stellingen). Het kost ongeveer 7–10 minuten. Je antwoorden zijn <b>vertrouwelijk</b>: de leidinggevende ziet alleen het <b>geaggregeerde teambeeld</b> (gemiddelde en spreiding), nooit losse antwoorden — tenzij élke beoordelaar instemt met het tonen van namen.</p>
 
     <div class="field">
-      <label class="label" for="f-name">Je naam <span style="color:var(--tool-coral)">*</span></label>
-      <input class="input" id="f-name" type="text" autocomplete="name" placeholder="Voor- en achternaam">
+      <label class="label" for="f-name">Je naam <span class="help">(verplicht)</span></label>
+      <input class="input" id="f-name" type="text" maxlength="120" autocomplete="name" placeholder="Voor- en achternaam">
     </div>
     <div class="field">
       <label class="label" for="f-email">Je e-mailadres <span class="help">(optioneel — helpt de initiatiefnemer bijhouden wie al reageerde)</span></label>
-      <input class="input" id="f-email" type="email" autocomplete="email" placeholder="naam@organisatie.nl">
+      <input class="input" id="f-email" type="email" maxlength="200" autocomplete="email" placeholder="naam@organisatie.nl">
     </div>
     <label class="check"><input type="checkbox" id="f-consent">
       <span>Mijn naam mag bij mijn antwoorden zichtbaar zijn in het rapport. Dit gebeurt <b>alleen</b> als álle beoordelaars hiermee instemmen; anders blijft alles anoniem.</span>
@@ -145,18 +147,17 @@ main{padding:22px 0 60px}
 </script>
 <script>
 "use strict";
+/* ═══ VLM SHARED: FB_CONFIG (gedeeld blok) ═══ */
 var FB_CONFIG={
-  apiKey:"AIzaSyAZ64lIntEtquSEQCzxMTba9ye3pvZFgC0",
-  authDomain:"vaardigheidsmeter-leidin-f82f7.firebaseapp.com",
-  databaseURL:"https://vaardigheidsmeter-leidin-f82f7-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId:"vaardigheidsmeter-leidin-f82f7",
-  storageBucket:"vaardigheidsmeter-leidin-f82f7.firebasestorage.app",
-  messagingSenderId:"294654912465",
-  appId:"1:294654912465:web:4d835a8c3e135ea5dbe2f0"
+  apiKey:"[INVULLEN: Firebase Web API-key uit de console]",
+  authDomain:"cinab-vaardigheidsmeter-leidinggeven.firebaseapp.com",
+  databaseURL:"https://cinab-vaardigheidsmeter-leidinggeven-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"cinab-vaardigheidsmeter-leidinggeven",
+  appId:"[INVULLEN: Firebase Web App-ID uit de console]"
 };
+/* ═══ /VLM SHARED: FB_CONFIG ═══ */
 
-/* ── Zelfde 20 vaardigheden / 40 stellingen als de hoofd-app (perspectief-neutraal).
-   Houd deze array byte-identiek met DOMAINS in vaardigheidsmeter-leidinggeven.html. ── */
+/* ═══ VLM SHARED: DOMAINS (gedeeld blok — 20 competenties / 40 stellingen; contract) ═══ */
 var DOMAINS=[
  {id:"richting_visie",name:"Richting & Visie",color:"#70A2D7",comps:[
   {n:"LV1",label:"Visie & betekenis geven",a:"Maakt de richting van de organisatie concreet en verbindt het werk van het team aan een groter doel.",b:"Helpt teamleden de zin en bijdrage van hun eigen werk te zien."},
@@ -183,6 +184,7 @@ var DOMAINS=[
   {n:"LV19",label:"Openstaan voor feedback & reflectie",a:"Vraagt actief om feedback op het eigen functioneren.",b:"Reflecteert op die feedback en doet er zichtbaar iets mee."},
   {n:"LV20",label:"Betrokkenheid bij verandering verwerven",a:"Benoemt en begrijpt oorzaken van weerstand tegen verandering.",b:"Neemt weerstand weg en weet mensen mee te krijgen."}]}
 ];
+/* ═══ /VLM SHARED: DOMAINS ═══ */
 var COMPS=[];DOMAINS.forEach(function(d){d.comps.forEach(function(c){c._d=d;COMPS.push(c);});});
 
 function $(id){return document.getElementById(id);}
@@ -192,6 +194,19 @@ function show(id){["screen-intro","screen-quiz","screen-done"].forEach(function(
 function compPct(n){var a=ans[n];if(!a||a.na||!a.a||!a.b)return null;return R(((a.a+a.b)-2)/8*100);}
 
 var ans={}, code="", fb=null, db=null, demo=false, joinedKey="";
+
+/* ═══ VLM SHARED: LIBREADY (gedeeld blok — byte-identiek in hoofd-app en join) ═══ */
+function libReady(){
+  return new Promise(function(resolve){
+    var n=0;
+    (function poll(){
+      if(window.__VLM_LIB__){ Promise.resolve(window.__VLM_LIB__).then(resolve,function(){resolve(null);}); return; }
+      if(n++>150){ resolve(null); return; }   // ~3s; daarna nette terugval op demo
+      setTimeout(poll,20);
+    })();
+  });
+}
+/* ═══ /VLM SHARED: LIBREADY ═══ */
 
 /* sessiecode UITSLUITEND uit de URL (pad /join/{code} of ?join=/?code=); nooit genereren */
 function readCode(){
@@ -235,6 +250,7 @@ function progress(){var done=COMPS.filter(resolved).length;$("pbar").style.width
 async function submit(){
  var name=$("f-name").value.trim();
  var vals={}; COMPS.forEach(function(c){var p=compPct(c.n); if(p!==null) vals[c.n]=p;});
+ if(!Object.keys(vals).length){ err("Je hebt alle vaardigheden op 'niet te beoordelen' gezet. Beoordeel minimaal één vaardigheid om te kunnen versturen."); $("btn-submit").disabled=false; return; }
  var entry={ name:name, naamZichtbaar:$("f-consent").checked, vals:vals };
  var email=$("f-email").value.trim(); if(email) entry.email=email;
  if(demo){ finishDone(); return; }
@@ -259,7 +275,7 @@ function err(msg){ var b=$("banner-err"); b.textContent=msg; b.hidden=false; win
  // al ingevuld op dit apparaat? -> direct bedankt
  try{ if(code && localStorage.getItem(joinedKey)){ buildQuiz(); show("screen-done"); wireButtons(); return; } }catch(_){}
 
- var lib=await (window.__VLM_LIB__||Promise.resolve(null));
+ var lib=await libReady();
  var hasConfig = FB_CONFIG.apiKey.indexOf("INVULLEN")<0;
 
  if(!code || !lib || !hasConfig){
@@ -288,8 +304,9 @@ function err(msg){ var b=$("banner-err"); b.textContent=msg; b.hidden=false; win
 
 function wireButtons(){
  $("btn-begin").onclick=function(){
-   var name=$("f-name").value.trim();
+   var name=$("f-name").value.trim(), email=$("f-email").value.trim();
    if(!name){ err("Vul je naam in om te beginnen."); $("f-name").focus(); return; }
+   if(email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){ err("Het e-mailadres lijkt niet te kloppen. Laat het leeg of corrigeer het."); $("f-email").focus(); return; }
    $("banner-err").hidden=true; show("screen-quiz");
  };
  $("btn-back").onclick=function(){ show("screen-intro"); };

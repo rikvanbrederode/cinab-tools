@@ -19,8 +19,8 @@ node_modules/
 # bestanden die op verwijdering wachten (s86).
 _to_delete/
 **/_to_delete/
-_v13/
-**/_v13/
+_v*/
+**/_v*/
 _vervallen/
 **/_vervallen/
 _fontbron/

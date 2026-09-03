@@ -1,5 +1,10 @@
 // CINAB firebase.json — vaardigheidsmeter-leidinggeven
-// VERSIE: 1.0.0 — 7 augustus 2026 (versieregel toegevoegd; configuratie zelf ongewijzigd)
+// VERSIE: 1.1.0 — 3 september 2026
+//   1.1.0 — CSP-header nu op zowel het toolblad als het rapportblad; beide worden in een
+//           iframe geladen door het platform. Origins aangevuld met het kale cinab.nl.
+//           Samengevoegd met de aanlevering v0.5 van de tooldeveloper, die alleen het
+//           toolblad afdekte en cinab.nl miste.
+//   1.0.0 — versieregel toegevoegd; configuratie zelf ongewijzigd.
 {
   "hosting": {
     "public": "public",
@@ -15,6 +20,15 @@
       }
     ],
     "headers": [
+      {
+        "source": "/vaardigheidsmeter-leidinggeven.html",
+        "headers": [
+          {
+            "key": "Content-Security-Policy",
+            "value": "frame-ancestors 'self' https://cinab.nl https://staging2.cinab.nl https://*.cinab.nl"
+          }
+        ]
+      },
       {
         "source": "/vaardigheidsmeter_rapport.html",
         "headers": [

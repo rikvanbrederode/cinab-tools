@@ -2,10 +2,12 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
+<link rel="stylesheet" href="fonts/fonts.css"><!-- CINAB 3-9-2026: zelfgehoste huisstijlfonts, zie fonts/fonts.css -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vaardigheidsmeter Leidinggeven</title>
 <!--
-  v0.2 — GRATIS variant + 360/TEAMANALYSE (demo-modus).
+  v0.5 — GRATIS variant + 360/TEAMANALYSE; live-adapter (cinab-tool-client + Firebase RTDB) met demo-terugval.
+  Testprotocol 2026-09-03: B-01..B-15 opgelost (zie WERKBOEK).
   De betaalde flow draait hier in DEMO: betaling, e-mailverzending en collega-reacties worden
   gesimuleerd. Alle platform-afhankelijke punten zitten in het PLATFORM-ADAPTER-blok (zoek op
   "PLATFORM ADAPTER"). De platformontwikkelaar vult de LIVE-implementatie daarvan in.
@@ -60,10 +62,13 @@ main{padding:28px 0 64px;position:relative}
 .choice{text-align:left;background:var(--cinab-card);border:1px solid var(--cinab-line);border-radius:var(--radius);padding:18px;cursor:pointer;display:flex;gap:13px;align-items:flex-start}
 .choice[aria-pressed="true"]{border:2px solid var(--fase-accent);padding:17px}
 .choice__ic{width:26px;height:26px;flex:none;color:var(--fase-accent)}
-.choice__t{font-weight:700;margin:0 0 3px}
-.choice__d{color:var(--cinab-grey);font-size:14px;margin:0}
+.choice__t{display:block;font-weight:700;margin:0 0 3px}
+.choice__d{display:block;color:var(--cinab-grey);font-size:14px;margin:0}
 .step-label{font-size:13px;font-weight:700;color:var(--cinab-grey);text-transform:uppercase;letter-spacing:.04em;margin:22px 0 2px}
 .note-box{background:var(--cinab-card);border:1px solid var(--cinab-line);border-left:4px solid var(--fase-accent);border-radius:var(--radius-s);padding:12px 14px;color:var(--cinab-grey);font-size:14px;margin:14px 0}
+.msg{background:var(--cinab-card);border:1px solid var(--cinab-line);border-left:4px solid var(--tool-secondary-12);border-radius:var(--radius-s);padding:10px 14px;color:var(--cinab-ink);font-size:14px;margin:12px 0}
+.msg[hidden]{display:none}
+.cinab-button[aria-pressed="true"]{outline:3px solid var(--cinab-ink);outline-offset:2px}
 .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
 /* quiz */
 .scale-legend{display:flex;justify-content:space-between;color:var(--cinab-grey);font-size:12px;max-width:520px;margin:6px 0 0}
@@ -84,6 +89,7 @@ main{padding:28px 0 64px;position:relative}
 .scale input:focus-visible+label{outline:var(--focus-ring);outline-offset:2px}
 .comp.na .stmt{opacity:.4;pointer-events:none}
 .na-row{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13px;color:var(--cinab-grey)}
+.na-row{min-height:var(--touch-target)}
 .na-row input{width:18px;height:18px}
 .progress-bar-track{display:flex;align-items:center;gap:12px;background:var(--cinab-card);border:1px solid var(--cinab-line);border-radius:var(--radius);padding:12px 16px;margin-top:18px;position:sticky;bottom:10px}
 .progress-bar{flex:1;height:8px;background:var(--cinab-line);border-radius:99px;overflow:hidden}
@@ -102,11 +108,11 @@ main{padding:28px 0 64px;position:relative}
 .bnd{width:18px;height:9px;border-radius:5px;background:var(--cinab-grey);opacity:.3}
 .toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
 .seg{display:inline-flex;border:1px solid var(--cinab-line);border-radius:var(--radius-s);overflow:hidden}
-.seg button{border:0;background:transparent;padding:7px 13px;font-size:13px;cursor:pointer;color:var(--cinab-grey);font-weight:700}
+.seg button{border:0;background:transparent;min-height:var(--touch-target);padding:7px 13px;font-size:13px;cursor:pointer;color:var(--cinab-grey);font-weight:700}
 .seg button[aria-pressed="true"]{background:var(--cinab-ink);color:var(--cinab-offwhite)}
 .axis{display:grid;grid-template-columns:minmax(120px,180px) 1fr 56px;gap:10px}
 .axis__zones{position:relative;height:16px;font-size:11px;color:var(--cinab-grey)}
-.prow{display:grid;grid-template-columns:minmax(120px,180px) 1fr 56px;gap:10px;align-items:center;width:100%;text-align:left;background:none;border:0;border-radius:var(--radius-s);padding:6px;cursor:pointer;font-family:inherit}
+.prow{display:grid;grid-template-columns:minmax(120px,180px) 1fr 56px;gap:10px;align-items:center;width:100%;min-height:var(--touch-target);text-align:left;background:none;border:0;border-radius:var(--radius-s);padding:6px;cursor:pointer;font-family:inherit}
 .prow:hover,.prow.sel{background:var(--cinab-card)}
 .prow__l{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--cinab-ink)}
 .rail{position:relative;height:20px}
@@ -116,6 +122,11 @@ main{padding:28px 0 64px;position:relative}
 .mk-fb{position:absolute;top:50%;width:12px;height:12px;border-radius:50%;background:var(--c);transform:translate(-50%,-50%)}
 .mk-self{position:absolute;top:50%;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:12px solid var(--c);transform:translate(-50%,-58%)}
 .prow__v{font-size:12px;font-weight:700;color:var(--cinab-grey);text-align:right;white-space:nowrap}
+@media (max-width:640px){
+  .axis{grid-template-columns:1fr}.axis>span{display:none}
+  .prow{grid-template-columns:1fr 64px;grid-template-areas:"l v" "r r";row-gap:2px}
+  .prow__l{grid-area:l}.prow .rail{grid-area:r}.prow__v{grid-area:v}
+}
 .insight{background:var(--cinab-card);border:1px solid var(--cinab-line);border-radius:var(--radius);padding:16px;margin-top:14px}
 .beschouwing{margin-top:18px}
 .besch-h{font-size:24px;margin:0 0 4px}
@@ -140,7 +151,7 @@ main{padding:28px 0 64px;position:relative}
 .input{width:100%;min-height:var(--touch-target);border:1px solid var(--cinab-line);border-radius:var(--radius-s);background:var(--cinab-card);color:var(--cinab-ink);padding:10px 12px}
 .rater{display:flex;align-items:center;gap:10px;background:var(--cinab-card);border:1px solid var(--cinab-line);border-radius:var(--radius-s);padding:10px 12px;margin:8px 0}
 .rater__meta{flex:1;min-width:0}
-.rater__name{font-weight:700;font-size:14px}
+.rater__name{font-weight:700;font-size:14px;overflow-wrap:anywhere}
 .rater__sub{color:var(--cinab-grey);font-size:12px;word-break:break-all}
 .badge{font-size:12px;font-weight:700;border-radius:var(--radius-pill);padding:4px 10px;border:1px solid var(--cinab-line);white-space:nowrap}
 .badge--wait{color:var(--cinab-grey)}
@@ -170,21 +181,22 @@ main{padding:28px 0 64px;position:relative}
     <div class="app-header__bar"></div>
     <div class="cinab-wrap app-header__row">
       <svg class="app-logo" viewBox="0 0 9500 9500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CINAB" style="shape-rendering:geometricPrecision;fill-rule:evenodd;clip-rule:evenodd">
-        <defs><style>.s0{stroke:#F7A710;stroke-width:300;stroke-miterlimit:22.9256}.f2{fill:none}.f3{fill:#F7A710}.f1{fill:#1B938E}.f0{fill:#1B4852}</style></defs>
-        <rect class="f0" x="1379.01" y="1979.16" width="6840.47" height="6840.47" rx="625.64" ry="625.64"/>
-        <rect class="f1" x="1329.01" y="1929.16" width="6840.47" height="6840.47" rx="625.64" ry="625.64"/>
-        <path class="f2 s0" d="M3296.39 1667.14l6.77 2886.05c0.53,225.18 44.93,223.19 131.76,299.11 64.53,56.42 712.98,613.44 1067.73,922.39m279.67 498.36c-3.85,335.14 -17.51,1600.45 -22.09,2025.82m-1460.38 -5160.51l785.98 4.94m3662.81 274.39l-6.72 591.26 -710.88 10.16 0 978.81m-1557.05 3300.95c-5.59,-19.68 -10.23,-41.55 -13.66,-65.97 -40.62,-289.42 -55.5,-1603.06 -55.5,-1603.06m0 0l-12.4 -1458.25c0,0 -44.42,-161.55 137.32,-169.63 181.74,-8.08 658.3,-4.04 658.3,-4.04l-3.77 -1608.68m459.06 3230.04l-615.21 -562.61m1311.37 -167.26l-1179.41 -4.13m-1388.18 1333.84l1210.17 -1126.72c0,0 173.66,-113.07 201.93,-286.74 28.27,-173.67 4.04,-807.74 4.04,-807.74l1579.11 0c0,0 10.18,8.09 137.31,-44.42 53.21,-21.98 127.68,-100.56 196.29,-184.51m-4091.56 3529.88c18.68,-34.96 33.6,-74 38.36,-114.44 16.15,-137.31 24.23,-1514.5 24.23,-1514.5 0,0 -4.03,-137.32 -72.69,-185.78 -68.66,-48.46 -665.89,-556.18 -665.89,-556.18m-467.07 653.4l469.73 -451.59c0,0 69.04,-77 -2.66,-201.81m-1213.8 -2.13l1213.8 2.13 -29.21 -897.55 -563.22 -1.72m-1022.85 -1671.85l3.28 541.68c0,0 -10.23,140.69 117.67,140.69 127.9,0 600.9,26.88 600.9,26.88l-1 659.21m-302.89 299.12l-178.2 -1.97c0,0 -220.41,18.58 -300.07,-21.25 -41.28,-20.64 -175.23,-151.79 -294.75,-273.38m1035.23 -2176.98l5.68 516.43 895.89 -2.1m2.16 920.01l2255.42 21.86m-1471.05 -1258.2l-0.37 394.45 -2.13 2268.51m2268.36 -3395.11c-121.47,117.05 -302.96,241.2 -548.07,278.79m-1062.71 -1009.16l-14.83 1611m313.94 307.52l452.12 4 9.35 -663.77m8.52 -604.84l5.09 -361.34m1408.26 1081.76l-2065.77 2035.4c-50.75,50 -106.04,79.05 -108.71,151.99 -1.64,44.93 10.93,491.27 20.85,827.53m-1774.69 2623.29l879.79 0 134 0 720.63 0 30.4 0 713.76 0 217.25 0 802.66 0 0 323.39 -3498.49 0 0 -323.39zm4646.55 -2710.87c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -167.05,0 -302.47,-135.42 -302.47,-302.47l0.01 -1.06 0 -0.03c0.59,-166.54 135.77,-301.38 302.46,-301.38zm-4993.86 900.52c73.14,0 140.21,25.95 192.51,69.16 8.96,7.4 17.48,15.32 25.53,23.69 52.28,54.37 84.43,128.24 84.43,209.62 0,167.05 -135.42,302.47 -302.47,302.47 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm4491.08 -4342.61c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -64.31,0 -123.92,-20.09 -172.94,-54.31 -15.25,-10.65 -29.49,-22.67 -42.51,-35.88 -53.81,-54.61 -87.02,-129.56 -87.02,-212.28 0,-167.05 135.42,-302.47 302.47,-302.47zm-2395.12 -1464.48c167.05,0 302.47,135.42 302.47,302.47 0,165.17 -132.38,299.39 -296.83,302.4l-5.64 0.07 -2.78 -0.04c-165.76,-1.5 -299.69,-136.31 -299.69,-302.43 0,-167.05 135.42,-302.47 302.47,-302.47zm762.06 1258.76l4.26 0.05c150.23,2.08 273.95,113.65 295.02,258.52 2.08,14.34 3.19,28.99 3.19,43.9 0,18.02 -1.58,35.68 -4.6,52.83 -24.99,141.86 -148.84,249.64 -297.87,249.64l-4.26 -0.05c-93.14,-1.29 -176.09,-44.66 -230.72,-111.98 -42.19,-51.99 -67.49,-118.26 -67.49,-190.44 0,-132.48 85.19,-245.05 203.76,-285.98 30.94,-10.67 64.14,-16.49 98.71,-16.49zm13.61 -966.18c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47l-4.26 -0.05c-23.15,-0.32 -45.66,-3.25 -67.28,-8.49 -132.52,-32.14 -230.93,-151.53 -230.93,-293.93 0,-167.05 135.42,-302.47 302.47,-302.47zm1020.61 503.5c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -71.19,0 -136.62,-24.6 -188.28,-65.75 -33.47,-26.66 -61.16,-60.25 -80.89,-98.62 -21.28,-41.4 -33.3,-88.35 -33.3,-138.1 0,-167.05 135.42,-302.47 302.47,-302.47zm1211.74 1335.28c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47l-3.44 -0.04c-34.1,-0.38 -66.83,-6.4 -97.33,-17.17 -117.5,-41.5 -201.7,-153.55 -201.7,-285.26 0,-167.05 135.42,-302.47 302.47,-302.47zm527.99 1410.14c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -67.13,0 -129.13,-21.88 -179.31,-58.88 -22.76,-16.78 -43.08,-36.67 -60.34,-59.05 -39.39,-51.06 -62.82,-115.06 -62.82,-184.54 0,-167.05 135.42,-302.47 302.47,-302.47zm-1413.53 2298c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-78.67 30.04,-150.32 79.27,-204.12l3.35 -3.6c55.14,-58.34 133.24,-94.75 219.85,-94.75zm-2137.51 -848.14c13.94,0 27.64,0.96 41.07,2.79 75.93,10.31 142.9,48.79 190.05,104.58 44.51,52.66 71.35,120.75 71.35,195.1 0,148.87 -107.54,272.61 -249.18,297.79 -17.3,3.08 -35.11,4.68 -53.29,4.68 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-76.96 28.76,-147.19 76.09,-200.57 55.41,-62.5 136.29,-101.9 226.38,-101.9zm8.96 -2775.7c167.05,0 302.47,135.42 302.47,302.47l-0.07 5.29c-2.82,164.61 -137.12,297.18 -302.4,297.18 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-163.19 129.23,-296.17 290.93,-302.23 3.83,-0.15 7.68,-0.24 11.54,-0.24zm-651.5 -753.18c167.05,0 302.47,135.42 302.47,302.47 0,164.14 -130.75,297.74 -293.77,302.34 -2.89,0.08 -5.79,0.13 -8.7,0.13l-0.29 0c-166.92,-0.16 -302.18,-135.52 -302.18,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm-790.81 -1081.7c167.05,0 302.47,135.42 302.47,302.47 0,142.36 -98.36,261.74 -230.82,293.91 -22.75,5.53 -46.5,8.49 -70.94,8.55l-0.71 0.01c-167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm-900.9 883.74c167.05,0 302.47,135.42 302.47,302.47 0,76.14 -28.14,145.7 -74.58,198.87 -54.77,62.7 -135,102.6 -224.57,103.56l-3.32 0.04c-167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm-678.68 805.98c167.05,0 302.47,135.42 302.47,302.47 0,121.65 -71.83,226.52 -175.38,274.53 -38.12,17.68 -80.54,27.66 -125.26,27.92l-1.83 0.02c-167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm722.22 1973.37l0.46 0.01c166.84,0.25 302.01,135.56 302.01,302.46l-0.01 0.93c-0.5,166.62 -135.72,301.54 -302.46,301.54 -34.45,0 -67.56,-5.77 -98.41,-16.38 -118.74,-40.84 -204.06,-153.49 -204.06,-286.09l0.04 -3.34c1.79,-165.5 136.5,-299.13 302.43,-299.13zm-1285.24 -517.82c39.12,0 76.51,7.43 110.83,20.95 112.22,44.21 191.64,153.59 191.64,281.52 0,85.58 -35.55,162.85 -92.68,217.88 -54.39,52.37 -128.32,84.59 -209.79,84.59 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm663.87 1415.36c66.12,0 127.28,21.24 177.05,57.23 75.98,54.95 125.42,144.31 125.42,245.24l-0.01 0.53c-0.29,166.81 -135.59,301.94 -302.46,301.94 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47z"/>
-        <rect class="f3" x="2995.41" y="8298.87" width="3395.02" height="332.88"/>
+        <defs><style>.str0{stroke:#F7A710;stroke-width:300;stroke-miterlimit:22.9256}.fil2{fill:none}.fil3{fill:#F7A710}.fil1{fill:#1B938E}.fil0{fill:#1B4852}</style></defs>
+        <rect class="fil0" x="1379.01" y="1979.16" width="6840.47" height="6840.47" rx="625.64" ry="625.64"/>
+        <rect class="fil1" x="1329.01" y="1929.16" width="6840.47" height="6840.47" rx="625.64" ry="625.64"/>
+        <path class="fil2 str0" d="M3296.39 1667.14l6.77 2886.05c0.53,225.18 44.93,223.19 131.76,299.11 64.53,56.42 712.98,613.44 1067.73,922.39m279.67 498.36c-3.85,335.14 -17.51,1600.45 -22.09,2025.82m-1460.38 -5160.51l785.98 4.94m3662.81 274.39l-6.72 591.26 -710.88 10.16 0 978.81m-1557.05 3300.95c-5.59,-19.68 -10.23,-41.55 -13.66,-65.97 -40.62,-289.42 -55.5,-1603.06 -55.5,-1603.06m0 0l-12.4 -1458.25c0,0 -44.42,-161.55 137.32,-169.63 181.74,-8.08 658.3,-4.04 658.3,-4.04l-3.77 -1608.68m459.06 3230.04l-615.21 -562.61m1311.37 -167.26l-1179.41 -4.13m-1388.18 1333.84l1210.17 -1126.72c0,0 173.66,-113.07 201.93,-286.74 28.27,-173.67 4.04,-807.74 4.04,-807.74l1579.11 0c0,0 10.18,8.09 137.31,-44.42 53.21,-21.98 127.68,-100.56 196.29,-184.51m-4091.56 3529.88c18.68,-34.96 33.6,-74 38.36,-114.44 16.15,-137.31 24.23,-1514.5 24.23,-1514.5 0,0 -4.03,-137.32 -72.69,-185.78 -68.66,-48.46 -665.89,-556.18 -665.89,-556.18m-467.07 653.4l469.73 -451.59c0,0 69.04,-77 -2.66,-201.81m-1213.8 -2.13l1213.8 2.13 -29.21 -897.55 -563.22 -1.72m-1022.85 -1671.85l3.28 541.68c0,0 -10.23,140.69 117.67,140.69 127.9,0 600.9,26.88 600.9,26.88l-1 659.21m-302.89 299.12l-178.2 -1.97c0,0 -220.41,18.58 -300.07,-21.25 -41.28,-20.64 -175.23,-151.79 -294.75,-273.38m1035.23 -2176.98l5.68 516.43 895.89 -2.1m2.16 920.01l2255.42 21.86m-1471.05 -1258.2l-0.37 394.45 -2.13 2268.51m2268.36 -3395.11c-121.47,117.05 -302.96,241.2 -548.07,278.79m-1062.71 -1009.16l-14.83 1611m313.94 307.52l452.12 4 9.35 -663.77m8.52 -604.84l5.09 -361.34m1408.26 1081.76l-2065.77 2035.4c-50.75,50 -106.04,79.05 -108.71,151.99 -1.64,44.93 10.93,491.27 20.85,827.53m-1774.69 2623.29l879.79 0 134 0 720.63 0 30.4 0 713.76 0 217.25 0 802.66 0 0 323.39 -3498.49 0 0 -323.39zm4646.55 -2710.87c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -167.05,0 -302.47,-135.42 -302.47,-302.47l0.01 -1.06 0 -0.03c0.59,-166.54 135.77,-301.38 302.46,-301.38zm-4993.86 900.52c73.14,0 140.21,25.95 192.51,69.16 8.96,7.4 17.48,15.32 25.53,23.69 52.28,54.37 84.43,128.24 84.43,209.62 0,167.05 -135.42,302.47 -302.47,302.47 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm4491.08 -4342.61c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -64.31,0 -123.92,-20.09 -172.94,-54.31 -15.25,-10.65 -29.49,-22.67 -42.51,-35.88 -53.81,-54.61 -87.02,-129.56 -87.02,-212.28 0,-167.05 135.42,-302.47 302.47,-302.47zm-2395.12 -1464.48c167.05,0 302.47,135.42 302.47,302.47 0,165.17 -132.38,299.39 -296.83,302.4l-5.64 0.07 -2.78 -0.04c-165.76,-1.5 -299.69,-136.31 -299.69,-302.43 0,-167.05 135.42,-302.47 302.47,-302.47zm762.06 1258.76l4.26 0.05c150.23,2.08 273.95,113.65 295.02,258.52 2.08,14.34 3.19,28.99 3.19,43.9 0,18.02 -1.58,35.68 -4.6,52.83 -24.99,141.86 -148.84,249.64 -297.87,249.64l-4.26 -0.05c-93.14,-1.29 -176.09,-44.66 -230.72,-111.98 -42.19,-51.99 -67.49,-118.26 -67.49,-190.44 0,-132.48 85.19,-245.05 203.76,-285.98 30.94,-10.67 64.14,-16.49 98.71,-16.49zm13.61 -966.18c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47l-4.26 -0.05c-23.15,-0.32 -45.66,-3.25 -67.28,-8.49 -132.52,-32.14 -230.93,-151.53 -230.93,-293.93 0,-167.05 135.42,-302.47 302.47,-302.47zm1020.61 503.5c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -71.19,0 -136.62,-24.6 -188.28,-65.75 -33.47,-26.66 -61.16,-60.25 -80.89,-98.62 -21.28,-41.4 -33.3,-88.35 -33.3,-138.1 0,-167.05 135.42,-302.47 302.47,-302.47zm1211.74 1335.28c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47l-3.44 -0.04c-34.1,-0.38 -66.83,-6.4 -97.33,-17.17 -117.5,-41.5 -201.7,-153.55 -201.7,-285.26 0,-167.05 135.42,-302.47 302.47,-302.47zm527.99 1410.14c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -67.13,0 -129.13,-21.88 -179.31,-58.88 -22.76,-16.78 -43.08,-36.67 -60.34,-59.05 -39.39,-51.06 -62.82,-115.06 -62.82,-184.54 0,-167.05 135.42,-302.47 302.47,-302.47zm-1413.53 2298c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-78.67 30.04,-150.32 79.27,-204.12l3.35 -3.6c55.14,-58.34 133.24,-94.75 219.85,-94.75zm-2137.51 -848.14c13.94,0 27.64,0.96 41.07,2.79 75.93,10.31 142.9,48.79 190.05,104.58 44.51,52.66 71.35,120.75 71.35,195.1 0,148.87 -107.54,272.61 -249.18,297.79 -17.3,3.08 -35.11,4.68 -53.29,4.68 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-76.96 28.76,-147.19 76.09,-200.57 55.41,-62.5 136.29,-101.9 226.38,-101.9zm8.96 -2775.7c167.05,0 302.47,135.42 302.47,302.47l-0.07 5.29c-2.82,164.61 -137.12,297.18 -302.4,297.18 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-163.19 129.23,-296.17 290.93,-302.23 3.83,-0.15 7.68,-0.24 11.54,-0.24zm-651.5 -753.18c167.05,0 302.47,135.42 302.47,302.47 0,164.14 -130.75,297.74 -293.77,302.34 -2.89,0.08 -5.79,0.13 -8.7,0.13l-0.29 0c-166.92,-0.16 -302.18,-135.52 -302.18,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm-790.81 -1081.7c167.05,0 302.47,135.42 302.47,302.47 0,142.36 -98.36,261.74 -230.82,293.91 -22.75,5.53 -46.5,8.49 -70.94,8.55l-0.71 0.01c-167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm-900.9 883.74c167.05,0 302.47,135.42 302.47,302.47 0,76.14 -28.14,145.7 -74.58,198.87 -54.77,62.7 -135,102.6 -224.57,103.56l-3.32 0.04c-167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm-678.68 805.98c167.05,0 302.47,135.42 302.47,302.47 0,121.65 -71.83,226.52 -175.38,274.53 -38.12,17.68 -80.54,27.66 -125.26,27.92l-1.83 0.02c-167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm722.22 1973.37l0.46 0.01c166.84,0.25 302.01,135.56 302.01,302.46l-0.01 0.93c-0.5,166.62 -135.72,301.54 -302.46,301.54 -34.45,0 -67.56,-5.77 -98.41,-16.38 -118.74,-40.84 -204.06,-153.49 -204.06,-286.09l0.04 -3.34c1.79,-165.5 136.5,-299.13 302.43,-299.13zm-1285.24 -517.82c39.12,0 76.51,7.43 110.83,20.95 112.22,44.21 191.64,153.59 191.64,281.52 0,85.58 -35.55,162.85 -92.68,217.88 -54.39,52.37 -128.32,84.59 -209.79,84.59 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm663.87 1415.36c66.12,0 127.28,21.24 177.05,57.23 75.98,54.95 125.42,144.31 125.42,245.24l-0.01 0.53c-0.29,166.81 -135.59,301.94 -302.46,301.94 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47z"/>
+        <rect class="fil3" x="2995.41" y="8298.87" width="3395.02" height="332.88"/>
       </svg>
       <span class="app-title-sm">Vaardigheidsmeter Leidinggeven</span>
       <span class="demo-ribbon" id="demo-ribbon" hidden>demo</span>
     </div>
   </header>
+  <div class="cinab-wrap"><div class="msg" id="live-err" role="alert" hidden>De koppeling met je account is niet gelukt. Je ziet nu de oefenversie: er wordt niets opgeslagen, verstuurd of afgeschreven. Start de tool opnieuw vanuit je account of neem contact op met CINAB.</div></div>
 
   <main class="cinab-wrap">
     <!-- KEUZE -->
     <section class="screen" id="screen-start">
-      <div class="page-head"><div class="page-glyph">0</div>
+      <div class="page-head"><div class="page-glyph" aria-hidden="true">0</div>
         <span class="fasepill">Start</span>
         <h1 class="page-title">Hoe goed geef jij leiding?</h1><div class="accent-streak"></div>
         <p class="lead">Breng leiderschapsvaardigheden in beeld op twintig competenties, verdeeld over vier domeinen. Begin met je invalshoek.</p>
@@ -193,11 +205,11 @@ main{padding:28px 0 64px;position:relative}
       <div class="choice-grid" role="group" aria-label="Invalshoek">
         <button class="choice" id="p-lead" aria-pressed="false">
           <svg class="choice__ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="m16 11 2 2 4-4"/></svg>
-          <span><p class="choice__t">Ik ben leidinggevende</p><p class="choice__d">Ik wil inzicht in mijn eigen leiderschap.</p></span>
+          <span><span class="choice__t">Ik ben leidinggevende</span><span class="choice__d">Ik wil inzicht in mijn eigen leiderschap.</span></span>
         </button>
         <button class="choice" id="p-emp" aria-pressed="false">
           <svg class="choice__ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="10" cy="7" r="4"/><path d="M2 21v-2a4 4 0 0 1 4-4h6"/><circle cx="18" cy="16" r="3"/><path d="m22 20-1.5-1.5"/></svg>
-          <span><p class="choice__t">Ik ben medewerker</p><p class="choice__d">Ik wil mijn leidinggevende beoordelen.</p></span>
+          <span><span class="choice__t">Ik ben medewerker</span><span class="choice__d">Ik wil mijn leidinggevende beoordelen.</span></span>
         </button>
       </div>
       <div id="step2" hidden>
@@ -205,11 +217,11 @@ main{padding:28px 0 64px;position:relative}
         <div class="choice-grid" role="group" aria-label="Variant">
           <button class="choice" id="v-free" aria-pressed="false">
             <svg class="choice__ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v18"/><path d="M5 10l7-7 7 7"/></svg>
-            <span><p class="choice__t" id="v-free-t">Gratis zelftest</p><p class="choice__d" id="v-free-d"></p></span>
+            <span><span class="choice__t" id="v-free-t">Gratis zelftest</span><span class="choice__d" id="v-free-d"></span></span>
           </button>
           <button class="choice" id="v-paid" aria-pressed="false">
             <svg class="choice__ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20v-1.5a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4V20"/><path d="M16 14h1a3 3 0 0 1 3 3v3"/></svg>
-            <span><p class="choice__t" id="v-paid-t"></p><p class="choice__d" id="v-paid-d"></p></span>
+            <span><span class="choice__t" id="v-paid-t"></span><span class="choice__d" id="v-paid-d"></span></span>
           </button>
         </div>
         <div class="actions"><button class="cinab-button cinab-button--primary" id="btn-start" disabled>Volgende</button></div>
@@ -218,7 +230,7 @@ main{padding:28px 0 64px;position:relative}
 
     <!-- VRAGENLIJST -->
     <section class="screen" id="screen-quiz" hidden>
-      <div class="page-head"><div class="page-glyph">?</div>
+      <div class="page-head"><div class="page-glyph" aria-hidden="true">?</div>
         <span class="fasepill" style="--fase-accent:var(--tool-blue)">Vragenlijst</span>
         <h1 class="page-title" id="quiz-title">Beoordeel de vaardigheden</h1><div class="accent-streak" style="background:var(--tool-blue)"></div>
         <p class="lead" id="quiz-intro"></p>
@@ -234,27 +246,28 @@ main{padding:28px 0 64px;position:relative}
 
     <!-- UITNODIGEN (betaald) -->
     <section class="screen" id="screen-invite" hidden>
-      <div class="page-head"><div class="page-glyph">@</div>
+      <div class="page-head"><div class="page-glyph" aria-hidden="true">@</div>
         <span class="fasepill" style="--fase-accent:var(--tool-green)">Uitnodigen</span>
         <h1 class="page-title">Nodig collega's uit</h1><div class="accent-streak" style="background:var(--tool-green)"></div>
         <p class="lead" id="invite-intro"></p>
       </div>
       <div class="cinab-card">
-        <div class="field"><label class="label" for="r-name">Naam</label><input class="input" id="r-name" placeholder="Naam van de collega"></div>
-        <div class="field"><label class="label" for="r-email">E-mailadres</label><input class="input" id="r-email" type="email" placeholder="naam@organisatie.nl"></div>
+        <div class="field"><label class="label" for="r-name">Naam</label><input class="input" id="r-name" maxlength="120" autocomplete="off" placeholder="Naam van de collega"></div>
+        <div class="field"><label class="label" for="r-email">E-mailadres</label><input class="input" id="r-email" type="email" maxlength="200" autocomplete="off" placeholder="naam@organisatie.nl"></div>
         <button class="cinab-button cinab-button--outline" id="btn-add-rater">Toevoegen</button>
+        <div class="msg" id="invite-msg" role="alert" hidden></div>
       </div>
       <div id="rater-list" style="margin-top:16px"></div>
       <div class="note-box" id="invite-count"></div>
       <div class="actions">
         <button class="cinab-button cinab-button--ghost" id="btn-invite-back">Terug</button>
-        <button class="cinab-button cinab-button--primary" id="btn-send" disabled>Verstuur uitnodigingen</button>
+        <button class="cinab-button cinab-button--primary" id="btn-send" aria-pressed="false" disabled>Verstuur uitnodigingen</button>
       </div>
     </section>
 
     <!-- VERZAMELEN (betaald) -->
     <section class="screen" id="screen-wait" hidden>
-      <div class="page-head"><div class="page-glyph">&#8230;</div>
+      <div class="page-head"><div class="page-glyph" aria-hidden="true">&#8230;</div>
         <span class="fasepill" style="--fase-accent:var(--tool-yellow)">Verzamelen</span>
         <h1 class="page-title">Reacties verzamelen</h1><div class="accent-streak" style="background:var(--tool-yellow)"></div>
         <p class="lead">De uitnodigingen zijn verstuurd. Zodra minimaal 3 collega's hebben gereageerd, wordt het teambeeld zichtbaar. Je kunt deze pagina later opnieuw openen vanuit je account.</p>
@@ -267,10 +280,6 @@ main{padding:28px 0 64px;position:relative}
           <button class="cinab-button cinab-button--outline" id="btn-sim">Simuleer reacties</button>
         </div>
       </div>
-      <div id="wait-definitief" hidden style="background:#fff8ec;border:1px solid #EF9F27;border-left:4px solid #EF9F27;border-radius:8px;padding:12px 14px;font-size:14px;color:#1C1C1A;margin:14px 0">
-        <strong>Let op: het rapport is definitief na het bekijken.</strong><br>
-        Zodra je op &ldquo;Bekijk teambeeld&rdquo; klikt, wordt het rapport aangemaakt op basis van de reacties die nu binnen zijn. Latere reacties worden niet meer verwerkt. Wacht tot iedereen heeft gereageerd als je een volledig beeld wilt.
-      </div>
       <div class="actions">
         <button class="cinab-button cinab-button--primary" id="btn-to-result" disabled>Bekijk teambeeld</button>
       </div>
@@ -278,13 +287,12 @@ main{padding:28px 0 64px;position:relative}
 
     <!-- RESULTAAT -->
     <section class="screen" id="screen-result" hidden>
-      <div class="page-head"><div class="page-glyph">&#10003;</div>
-        <span class="fasepill" style="--fase-accent:var(--tool-black);color:#fff">Resultaat</span>
+      <div class="page-head"><div class="page-glyph" aria-hidden="true">&#10003;</div>
+        <span class="fasepill" style="--fase-accent:var(--tool-black);color:var(--cinab-card)">Resultaat</span>
         <h1 class="page-title" id="result-title">Jouw leiderschapsprofiel</h1><div class="accent-streak" style="background:var(--tool-black)"></div>
         <p class="lead" id="result-note"></p>
       </div>
       <div id="result-anon" class="note-box" hidden></div>
-      <div id="result-save-status" hidden style="margin:0 0 14px;font-size:13px;color:var(--cinab-grey)"></div>
       <div class="cards" id="result-cards"></div>
       <div class="toolbar">
         <div class="legendrow" id="result-legend"></div>
@@ -328,6 +336,7 @@ main{padding:28px 0 64px;position:relative}
         <h3>Belangrijk</h3>
         <p>Dit is een ontwikkelinstrument, geen officiële beoordeling of psychologische diagnose. De uitkomsten zijn een startpunt voor gesprek en gerichte ontwikkeling.</p>
       </div>
+      <div class="msg" id="result-msg" role="status" hidden></div>
       <div class="actions" id="result-actions"></div>
     </section>
   </main>
@@ -339,7 +348,7 @@ main{padding:28px 0 64px;position:relative}
   <div class="actions"><button class="cinab-button cinab-button--ghost" id="modal-cancel">Annuleren</button><button class="cinab-button cinab-button--primary" id="modal-ok"></button></div>
 </div></div>
 
-<script>
+<script type="module">
   /* Live-bibliotheken (Firebase + CINAB-client). Faalt stil terug naar demo/standalone. */
   window.__VLM_LIB__ = (async function(){
     try{
@@ -355,15 +364,15 @@ main{padding:28px 0 64px;position:relative}
 "use strict";
 /* ── Firebase-config — project bevestigd door platform: cinab-vaardigheidsmeter-leidinggeven (europe-west1).
    apiKey en appId zijn publieke client-waarden uit de Firebase-console (geen secrets). ── */
+/* ═══ VLM SHARED: FB_CONFIG (gedeeld blok) ═══ */
 var FB_CONFIG={
-  apiKey:"AIzaSyAZ64lIntEtquSEQCzxMTba9ye3pvZFgC0",
-  authDomain:"vaardigheidsmeter-leidin-f82f7.firebaseapp.com",
-  databaseURL:"https://vaardigheidsmeter-leidin-f82f7-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId:"vaardigheidsmeter-leidin-f82f7",
-  storageBucket:"vaardigheidsmeter-leidin-f82f7.firebasestorage.app",
-  messagingSenderId:"294654912465",
-  appId:"1:294654912465:web:4d835a8c3e135ea5dbe2f0"
+  apiKey:"[INVULLEN: Firebase Web API-key uit de console]",
+  authDomain:"cinab-vaardigheidsmeter-leidinggeven.firebaseapp.com",
+  databaseURL:"https://cinab-vaardigheidsmeter-leidinggeven-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"cinab-vaardigheidsmeter-leidinggeven",
+  appId:"[INVULLEN: Firebase Web App-ID uit de console]"
 };
+/* ═══ /VLM SHARED: FB_CONFIG ═══ */
 /* ====================== PLATFORM ADAPTER ==================================
    Demo-implementatie hieronder werkt standalone. De platformontwikkelaar vult
    de LIVE-implementatie in (zie PLATFORM-WERKBOEK §3). Contract per functie:
@@ -375,61 +384,78 @@ var FB_CONFIG={
      saveReport(wrapper)         -> {rapport_url}
      notifyLoaded()/notifyCompleted(url)
 ========================================================================= */
+/* ═══ VLM SHARED: LIBREADY (gedeeld blok — byte-identiek in hoofd-app en join) ═══ */
+function libReady(){
+  return new Promise(function(resolve){
+    var n=0;
+    (function poll(){
+      if(window.__VLM_LIB__){ Promise.resolve(window.__VLM_LIB__).then(resolve,function(){resolve(null);}); return; }
+      if(n++>150){ resolve(null); return; }   // ~3s; daarna nette terugval op demo
+      setTimeout(poll,20);
+    })();
+  });
+}
+/* ═══ /VLM SHARED: LIBREADY ═══ */
 var Platform=(function(){
   var live=false, demoResponses=[], cb=null;
-  var client=null, fb=null, db=null, auth=null, uid=null, code=null, apiBase=null, returnUrl=null;
+  var client=null, fb=null, db=null, auth=null, uid=null, code=null, apiBase=null, returnUrl=null, restored=false;
   var SKEY="vlm_cinab";
   function loadState(){ try{return JSON.parse(sessionStorage.getItem(SKEY)||"null");}catch(e){return null;} }
   function saveState(o){ try{sessionStorage.setItem(SKEY,JSON.stringify(o));}catch(e){} }
   function persist(){ if(!live)return; var s=loadState()||{};
     s.apiBase=apiBase; s.code=code; s.token=client&&client.token;
-    s.betaalVanafFase=client&&client.betaalVanafFase; s.credits=client&&client.credits;
-    s.persp=state.persp; s.variant=state.variant; s.answers=state.answers; saveState(s); }
+    /* betaalVanafFase/credits komen alléén uit start-tool; bij restore/resume nooit overschrijven met null */
+    if(client&&client.betaalVanafFase!=null) s.betaalVanafFase=client.betaalVanafFase;
+    if(client&&client.credits!=null) s.credits=client.credits;
+    s.persp=state.persp; s.variant=state.variant; s.answers=state.answers; s.raters=state.raters; s.screen=state.screen; saveState(s); }
   function genCode(){ var s="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",o=""; for(var i=0;i<6;i++)o+=s[Math.floor(Math.random()*s.length)]; return o; }
   return {
     isLive:function(){return live;},
     getCode:function(){return code;},
     save:persist,
-    savePersp:async function(p,v){ if(!live||!db)return; try{ await fb.update(fb.ref(db,'sessions/'+code+'/meta'),{persp:p,variant:v}); }catch(e){} },
-    getMetaFromRTDB:async function(){ if(!live||!db)return null; try{ var snap=await fb.get(fb.ref(db,'sessions/'+code+'/meta')); return snap.val(); }catch(e){ return null; } },
     isResume:function(){return !!(live&&client&&client.isResume);},
+    isRestored:function(){return !!(live&&restored);},
     restoreState:function(){return loadState();},
     async init(){
-      var p=new URLSearchParams(location.search);
-      if(!(p.get("launch")||p.get("token"))) return false;            // geen token -> demo/standalone
-      var lib=await (window.__VLM_LIB__||Promise.resolve(null));
-      if(!lib){ live=false; return false; }
+      var p=new URLSearchParams(location.search), prev=loadState();
+      var urlStart=!!(p.get("launch")||p.get("token"));
+      var stored=!!(prev&&prev.token&&prev.apiBase);                  // context van een eerdere load (refresh/resume)
+      if(!urlStart&&!stored) return false;                            // geen token -> demo/standalone
+      var lib=await libReady();
+      if(!lib){ live=false; this.initFailed=true; return false; }
       fb=lib.fb;
       try{
-        client=await lib.cinab.startCinabSession();                   // launch->token, wist URL-params
-        apiBase=client.apiBase; returnUrl=location.href.split("#")[0];
+        if(urlStart){
+          client=await lib.cinab.startCinabSession();                 // bootstrap: launch->token, wist URL-params
+        } else {                                                      // restore: token reist niet in de URL (standaard §9)
+          client=lib.cinab.createCinabClient({apiBase:prev.apiBase, token:prev.token, action:p.get("action")||null,
+            betaalVanafFase:prev.betaalVanafFase==null?null:prev.betaalVanafFase, credits:prev.credits==null?null:prev.credits});
+        }
+        apiBase=client.apiBase; returnUrl=location.origin+location.pathname+(p.get("cinab")?("?cinab="+encodeURIComponent(p.get("cinab"))):"");
         var app=fb.initializeApp(FB_CONFIG); auth=fb.getAuth(app); db=fb.getDatabase(app);
-        var cred=await fb.signInAnonymously(auth); uid=cred.user.uid;
-        var prev=loadState();
-        if(client.isResume && prev && prev.code){                     // terugkeer na betaling
-          code=prev.code; state.persp=prev.persp; state.variant=prev.variant; state.answers=prev.answers||{};
+        var cred=await fb.signInAnonymously(auth); uid=cred.user.uid; restored=!urlStart;
+        if(prev && prev.code && (client.isResume || !urlStart)){       // terugkeer na betaling of refresh: zelfde sessie
+          code=prev.code; state.persp=prev.persp||null; state.variant=prev.variant||null; state.answers=prev.answers||{};
+          state.raters=prev.raters||[]; state.screen=prev.screen||null;
         } else if(p.get("session")||p.get("code")){                   // platform-relaunch (§3.7a, dashboard)
           code=p.get("session")||p.get("code");
         } else {                                                      // verse start: nieuwe sessie aanmaken
-          code = client.sessionCode || genCode();                   // platform-code, fallback naar lokaal (demo)
+          code = client.sessionCode || genCode();                   // F2-21: platform-code, fallback naar lokaal (demo). Hersteld door CINAB op 3-9-2026; zonder deze regel breekt de herstart van een lopende sessie vanuit /account/.
           await fb.set(fb.ref(db,'sessions/'+code+'/meta'),{createdAt:fb.serverTimestamp(),lang:'nl',facilitatorUid:uid,tool:'vaardigheidsmeter_leidinggeven'});
         }
         live=true; persist(); return true;
-      }catch(e){ console.warn('[VLM] live-init mislukt, val terug op demo:',e); live=false; return false; }
+      }catch(e){ console.warn('[VLM] live-init mislukt, val terug op demo:',e); live=false; this.initFailed=true; return false; }
     },
+    initFailed:false,
+    isSettled:function(){ var s=loadState(); return !!(s&&s.settled); },
+    rapportId:function(id){ var s=loadState()||{}; if(id!==undefined){ s.rapportId=id; saveState(s); } return s.rapportId||null; },
     async ensureAccountAndCredits(){
       if(!live) return {ok:true,saldo:99,demo:true};
       try{ var r=await client.getSaldo(); return {ok:true,saldo:(r&&r.saldo)||0}; }
       catch(e){ return {ok:true,saldo:0}; }                           // saldo is advisory; settle is bindend
     },
     async settle(){
-      if(!live){
-        if(location.hostname==='vaardigheidsmeter-leidinggeven.cinab.nl'){
-          location.href='https://cinab.nl/tools/vaardigheidsmeter-leidinggeven/';
-          return;
-        }
-        return {betaald:true,demo:true};
-      }
+      if(!live) return {betaald:true,demo:true};
       persist();                                                      // state persistent vóór mogelijke redirect
       try{ var r=await client.settleSession(); var s=loadState()||{}; s.settled=true; saveState(s); return {betaald:!!(r&&r.betaald)}; }
       catch(e){ if(e.isPaymentRequired){ persist(); client.goToPayment(e,{returnUrl:returnUrl}); return {betaald:false,redirect:true}; } throw e; }
@@ -463,7 +489,14 @@ var Platform=(function(){
     _demoPush(list){ demoResponses=list; if(cb) cb(list); },
     async saveReport(wrapper){
       if(!live) return {rapport_url:"#demo-rapport", demo:true};
-      var out=await client.saveReport(wrapper); return out||{rapport_url:""};
+      var s=loadState()||{};
+      if(s.rapportId){                                                 // al opgeslagen: token is single-use -> bijwerken (patch)
+        var upd=await client.patchReport(s.rapportId,{scores:wrapper.scores,meta:wrapper.meta,data:wrapper.data});
+        return {rapport_url:(upd&&upd.rapport_url)||s.rapportUrl||"", updated:true};
+      }
+      var out=await client.saveReport(wrapper);
+      if(out&&out.rapport_id){ s.rapportId=out.rapport_id; s.rapportUrl=out.rapport_url||""; saveState(s); }
+      return out||{rapport_url:""};
     },
     notifyLoaded(){ if(live&&client) client.notifyLoaded(); },
     notifyCompleted(url){ if(live&&client) client.notifyCompleted(url); }
@@ -471,6 +504,7 @@ var Platform=(function(){
 })();
 
 /* ====================== DATA ====================== */
+/* ═══ VLM SHARED: DOMAINS (gedeeld blok — 20 competenties / 40 stellingen; contract) ═══ */
 var DOMAINS=[
  {id:"richting_visie",name:"Richting & Visie",color:"#70A2D7",comps:[
   {n:"LV1",label:"Visie & betekenis geven",a:"Maakt de richting van de organisatie concreet en verbindt het werk van het team aan een groter doel.",b:"Helpt teamleden de zin en bijdrage van hun eigen werk te zien."},
@@ -497,6 +531,7 @@ var DOMAINS=[
   {n:"LV19",label:"Openstaan voor feedback & reflectie",a:"Vraagt actief om feedback op het eigen functioneren.",b:"Reflecteert op die feedback en doet er zichtbaar iets mee."},
   {n:"LV20",label:"Betrokkenheid bij verandering verwerven",a:"Benoemt en begrijpt oorzaken van weerstand tegen verandering.",b:"Neemt weerstand weg en weet mensen mee te krijgen."}]}
 ];
+/* ═══ /VLM SHARED: DOMAINS ═══ */
 var COMPS=[];DOMAINS.forEach(function(d){d.comps.forEach(function(c){c._d=d;COMPS.push(c);});});
 
 var TEKST={
@@ -523,9 +558,10 @@ var TEKST={
 };
 
 /* ====================== STATE & NAV ====================== */
-var state={persp:null,variant:null,answers:{},raters:[],responses:[],sort:"model",sel:null,demoNames:false};
+var state={persp:null,variant:null,answers:{},raters:[],responses:[],sort:"model",sel:null,demoNames:false,screen:null};
 var $=function(id){return document.getElementById(id);};
-function show(id){["screen-start","screen-quiz","screen-invite","screen-wait","screen-result"].forEach(function(s){$(s).hidden=(s!==id);});window.scrollTo(0,0);}
+function show(id){["screen-start","screen-quiz","screen-invite","screen-wait","screen-result"].forEach(function(s){$(s).hidden=(s!==id);});state.screen=id.replace("screen-","");if(Platform.isLive())Platform.save();window.scrollTo(0,0);}
+function msg(id,txt){var el=$(id);if(!el)return;el.textContent=txt||"";el.hidden=!txt;}
 var R=function(v){return Math.round(v);};
 var pctPos=function(v){return 4+v*0.92;};
 var darken=function(hex){var n=parseInt(hex.slice(1),16);var r=Math.max(0,(n>>16)-40),g=Math.max(0,((n>>8)&255)-40),b=Math.max(0,(n&255)-40);return "#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);};
@@ -539,24 +575,37 @@ $("p-lead").onclick=function(){setPersp("lead");};
 $("p-emp").onclick=function(){setPersp("emp");};
 $("v-free").onclick=function(){setVariant("free");};
 $("v-paid").onclick=function(){setVariant("paid");};
-$("btn-start").onclick=function(){ if(Platform.isLive()){ Platform.savePersp(state.persp,state.variant); } if(state.variant==="paid"){openPaywall();} else { document.body.dataset.mode="free"; startQuiz(); } };
+$("btn-start").onclick=function(){ if(!(state.persp&&state.variant)) return; if(state.variant==="paid"){openPaywall();} else { document.body.dataset.mode="free"; startQuiz(); } };
 
 /* ====================== BETAALPOORT (popup) ====================== */
 function openPaywall(){
  var t=TEKST[state.persp];
  $("modal-t").textContent=t.popupTitle; $("modal-body").innerHTML="<p>"+t.popupBody+"</p>"+(Platform.isLive()?"":"<p style='color:var(--cinab-grey);font-size:13px'><b>Demo:</b> er wordt geen echte betaling gedaan.</p>");
  $("modal-ok").textContent=t.popupOk; $("overlay").hidden=false;
+ $("modal-ok").disabled=false; $("modal-ok").focus();
  $("modal-ok").onclick=async function(){
+   if($("modal-ok").disabled) return;                                   // dubbelklik-guard
    $("modal-ok").disabled=true;
-   var acc=await Platform.ensureAccountAndCredits(); if(!acc.ok){return;}
-   var s=await Platform.settle(); $("modal-ok").disabled=false;
-   if(s&&s.betaald){ $("overlay").hidden=true; document.body.dataset.mode="paid"; startQuiz(); }
+   try{
+     var acc=await Platform.ensureAccountAndCredits(); if(!acc.ok){ $("modal-ok").disabled=false; return; }
+     var s=await Platform.settle();
+     if(s&&s.betaald){ $("overlay").hidden=true; document.body.dataset.mode="paid"; startQuiz(); return; }
+     if(s&&s.redirect) return;                                         // onderweg naar de credit-shop
+     $("modal-ok").disabled=false;
+   }catch(e){ console.warn('[VLM] betaalpoort:',e);
+     $("modal-body").insertAdjacentHTML("beforeend","<p class='msg' role='alert'>Afrekenen is niet gelukt ("+esc((e&&e.message)||"onbekende fout")+"). Probeer het opnieuw.</p>");
+     $("modal-ok").disabled=false; }
  };
 }
-$("modal-cancel").onclick=function(){$("overlay").hidden=true;};
+function closeModal(){$("overlay").hidden=true;}
+$("modal-cancel").onclick=closeModal;
+$("overlay").addEventListener("click",function(e){ if(e.target===this) closeModal(); });
+document.addEventListener("keydown",function(e){ if(e.key==="Escape"&&!$("overlay").hidden) closeModal(); });
+/* §11B pageshow-reset: na browser-terug / bfcache transiënte UI herstellen */
+window.addEventListener("pageshow",function(){ closeModal(); $("modal-ok").disabled=false; disarmSend(); if(!$("screen-invite").hidden) renderRaters(); });
 
 /* ====================== VRAGENLIJST ====================== */
-function scaleHTML(name){var h='<div class="scale" role="radiogroup">';for(var i=1;i<=5;i++){h+='<input type="radio" id="'+name+'_'+i+'" name="'+name+'" value="'+i+'"><label for="'+name+'_'+i+'">'+i+'</label>';}return h+'</div>';}
+function scaleHTML(name,label){var h='<div class="scale" role="radiogroup" aria-label="'+esc(label||"")+'">';for(var i=1;i<=5;i++){h+='<input type="radio" id="'+name+'_'+i+'" name="'+name+'" value="'+i+'"><label for="'+name+'_'+i+'">'+i+'</label>';}return h+'</div>';}
 function startQuiz(){
  var t=TEKST[state.persp];$("quiz-title").textContent=t.quizTitle;$("quiz-intro").textContent=t.quizIntro;
  $("btn-result").textContent=(state.variant==="paid")?"Naar uitnodigen":"Bekijk mijn resultaat";
@@ -571,15 +620,23 @@ function buildQuiz(){
   d.comps.forEach(function(c){
    var el=document.createElement("div");el.className="comp";el.style.setProperty("--comp",d.color);el.id="comp-"+c.n;
    el.innerHTML='<p class="comp__title"><span class="coin" style="background:'+d.color+'"></span>'+c.n+' · '+c.label+'</p>'+
-    '<div class="stmt"><p class="stmt__txt">'+c.a+'</p>'+scaleHTML(c.n+"_a")+'</div>'+
-    '<div class="stmt"><p class="stmt__txt">'+c.b+'</p>'+scaleHTML(c.n+"_b")+'</div>'+
+    '<div class="stmt"><p class="stmt__txt">'+c.a+'</p>'+scaleHTML(c.n+"_a",c.a)+'</div>'+
+    '<div class="stmt"><p class="stmt__txt">'+c.b+'</p>'+scaleHTML(c.n+"_b",c.b)+'</div>'+
     '<label class="na-row"><input type="checkbox" id="na-'+c.n+'"> Niet van toepassing voor deze functie</label>';
    blk.appendChild(el);
   });
   body.appendChild(blk);
  });
  if(!quizBuilt){body.addEventListener("change",onAnswer);quizBuilt=true;}
+ restoreAnswers();
  updateProgress();
+}
+/* B-01: state.answers is de bron; de DOM volgt (teaser->betaald, resume, refresh) */
+function restoreAnswers(){
+ COMPS.forEach(function(c){var a=state.answers[c.n];if(!a)return;
+  ["a","b"].forEach(function(k){var v=a[k];if(v>=1&&v<=5){var r=$(c.n+"_"+k+"_"+v);if(r)r.checked=true;}});
+  var na=$("na-"+c.n);if(na){na.checked=(a.na===true);$("comp-"+c.n).classList.toggle("na",a.na===true);}
+ });
 }
 function onAnswer(e){var t=e.target;
  if(t.type==="checkbox"){var n=t.id.replace("na-","");state.answers[n]=state.answers[n]||{};state.answers[n].na=t.checked;$("comp-"+n).classList.toggle("na",t.checked);}
@@ -589,7 +646,8 @@ function onAnswer(e){var t=e.target;
 }
 function resolved(c){var a=state.answers[c.n];return a&&(a.na===true||(a.a&&a.b));}
 function updateProgress(){var done=COMPS.filter(resolved).length;$("pbar").style.width=(done/20*100)+"%";$("pnum").textContent=done+" / 20";$("btn-result").disabled=(done<20);}
-$("btn-result").onclick=function(){ if(state.variant==="paid"){ buildInvite(); show("screen-invite"); } else { renderResult(); show("screen-result"); } };
+$("btn-result").onclick=function(){ if(COMPS.filter(resolved).length<20) return;            // voorwaarde ook bij directe aanroep
+ if(state.variant==="paid"){ buildInvite(); show("screen-invite"); } else { renderResult(); show("screen-result"); } };
 
 /* ====================== UITNODIGEN ====================== */
 function buildInvite(){$("invite-intro").textContent=TEKST[state.persp].inviteIntro;renderRaters();}
@@ -598,26 +656,33 @@ function renderRaters(){
  state.raters.forEach(function(r,i){
   var el=document.createElement("div");el.className="rater";
   el.innerHTML='<div class="rater__meta"><div class="rater__name">'+esc(r.name)+'</div><div class="rater__sub">'+esc(r.email)+'</div></div>'+
-   '<span class="badge badge--wait">uitgenodigd</span><button class="iconbtn" data-i="'+i+'" aria-label="Verwijderen">&times;</button>';
+   '<span class="badge badge--wait">toegevoegd</span><button class="iconbtn" data-i="'+i+'" aria-label="Verwijderen">&times;</button>';
   box.appendChild(el);
  });
- box.querySelectorAll(".iconbtn").forEach(function(b){b.onclick=function(){state.raters.splice(+b.dataset.i,1);renderRaters();};});
+ box.querySelectorAll(".iconbtn").forEach(function(b){b.onclick=function(){state.raters.splice(+b.dataset.i,1);renderRaters();if(Platform.isLive())Platform.save();};});
  $("invite-count").textContent=state.raters.length+" collega('s) toegevoegd. Advies: nodig er ruim voldoende uit, want het teambeeld verschijnt vanaf 3 reacties.";
- $("btn-send").disabled=state.raters.length<1;
+ disarmSend(); $("btn-send").disabled=state.raters.length<1;
 }
+/* §11B twee-staps-knop: versturen is onomkeerbaar */
+var sendArmed=false;
+function disarmSend(){sendArmed=false;var b=$("btn-send");b.setAttribute("aria-pressed","false");b.textContent="Verstuur uitnodigingen";}
 $("btn-add-rater").onclick=function(){
- var name=$("r-name").value.trim(),email=$("r-email").value.trim();
- if(!name||!/.+@.+\..+/.test(email)){alert("Vul een naam en een geldig e-mailadres in.");return;}
+ var name=$("r-name").value.trim(),email=$("r-email").value.trim().toLowerCase();
+ if(!name||!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){msg("invite-msg","Vul een naam en een geldig e-mailadres in.");return;}
+ if(state.raters.some(function(r){return r.email.toLowerCase()===email;})){msg("invite-msg","Dit e-mailadres staat al in de lijst.");return;}
+ msg("invite-msg","");
  state.raters.push({name:name,email:email});$("r-name").value="";$("r-email").value="";renderRaters();
+ if(Platform.isLive())Platform.save();
 };
 $("btn-invite-back").onclick=function(){show("screen-quiz");};
 $("btn-send").onclick=async function(){
+ if(!sendArmed){ sendArmed=true; $("btn-send").setAttribute("aria-pressed","true"); $("btn-send").textContent="Klik nogmaals om "+state.raters.length+" uitnodiging(en) definitief te versturen"; msg("invite-msg","Controleer de namen en e-mailadressen. Na versturen kun je de lijst niet meer wijzigen."); return; }
  var qp=new URLSearchParams(location.search);
  var meta={persp:state.persp,template_id:"vaardigheidsmeter_leidinggeven",
   organisatie:qp.get("org")||"", initiatiefnemer:qp.get("initiator")||"", subject:qp.get("subject")||"je leidinggevende"};
  $("btn-send").disabled=true;
- try{ await Platform.sendInvites(state.raters,meta); buildWait();show("screen-wait"); }
- catch(e){ alert("De uitnodigingen konden niet worden verstuurd. Probeer het zo opnieuw.\n("+e.message+")"); $("btn-send").disabled=false; }
+ try{ await Platform.sendInvites(state.raters,meta); msg("invite-msg",""); buildWait();show("screen-wait"); }
+ catch(e){ msg("invite-msg","De uitnodigingen konden niet worden verstuurd. Probeer het zo opnieuw. ("+((e&&e.message)||"")+")"); disarmSend(); $("btn-send").disabled=false; }
 };
 
 /* ====================== VERZAMELEN ====================== */
@@ -628,16 +693,16 @@ function buildWait(){
 }
 function renderWait(){
  var box=$("wait-list");box.innerHTML="";
+ var norm=function(s){return String(s||"").trim().toLowerCase();};
  state.raters.forEach(function(r){
-  var done=state.responses.some(function(x){return x.email===r.email;});
+  var done=state.responses.some(function(x){return (x.email&&norm(x.email)===norm(r.email))||(!x.email&&x.name&&norm(x.name)===norm(r.name));});
   var el=document.createElement("div");el.className="rater";
   el.innerHTML='<div class="rater__meta"><div class="rater__name">'+esc(r.name)+'</div></div><span class="badge '+(done?"badge--done":"badge--wait")+'">'+(done?"gereageerd":"wacht")+'</span>';
   box.appendChild(el);
  });
  var c=state.responses.length;
  $("wait-count").textContent=c+" van "+state.raters.length+" hebben gereageerd."+(c<3?(" Nog "+(3-c)+" nodig voordat het teambeeld zichtbaar wordt."):" Het teambeeld is beschikbaar.");
- $("btn-to-result").disabled=c<3;
- $("wait-definitief").hidden=c<3;
+ $("btn-to-result").disabled=c<1;
 }
 $("btn-sim").onclick=function(){
  var list=state.raters.map(function(r){
@@ -647,7 +712,7 @@ $("btn-sim").onclick=function(){
  var k=Math.max(1,Math.min(list.length,3+Math.floor(Math.random()*Math.max(1,list.length-2))));
  Platform._demoPush(list.slice(0,k));
 };
-$("btn-to-result").onclick=function(){renderResult();show("screen-result");};
+$("btn-to-result").onclick=function(){ if(state.responses.length<1) return; renderResult();show("screen-result");};
 
 /* ====================== SCORES ====================== */
 function compPct(c){var a=state.answers[c.n];if(!a||a.na||!a.a||!a.b)return null;return R(((a.a+a.b)-2)/8*100);}
@@ -896,33 +961,22 @@ function renderResult(){
 
  renderBeschouwing();
 
- // rapport automatisch opslaan bij 360-meting (betaald + >= 3 reacties)
- if(is360()&&Platform.isLive()){
-  var ss=$("result-save-status");
-  ss.hidden=false; ss.textContent="Rapport wordt opgeslagen…";
-  (async function(){
-   try{
-    await Platform.settle();
-    var r=await Platform.saveReport(buildWrapper());
-    if(r&&r.rapport_url){
-     ss.innerHTML='Rapport opgeslagen. <a href="'+r.rapport_url+'" target="_top" style="color:var(--cinab-ink);font-weight:700">Bekijk het in je werkruimte →</a>';
-     Platform.notifyCompleted(r.rapport_url);
-    } else { ss.textContent="Rapport opgeslagen."; }
-   }catch(e){
-    console.warn('[VLM] rapport opslaan mislukt:',e);
-    ss.textContent="Het rapport kon niet worden opgeslagen. Probeer het opnieuw via de werkruimte.";
-   }
-  })();
- } else { $("result-save-status").hidden=true; }
-
  // acties
  var act=$("result-actions");act.innerHTML="";
  if(paid){
   act.innerHTML='<button class="cinab-button cinab-button--primary" id="a-print">Download als PDF / Printen</button>'+
    '<button class="cinab-button cinab-button--outline" id="a-compare">Toon verschil met vorige meting</button>'+
+   '<button class="cinab-button cinab-button--ghost" id="a-back-wait">Terug naar reacties</button>'+
    '<button class="cinab-button cinab-button--ghost" id="a-restart">Opnieuw</button>';
-  $("a-print").onclick=function(){ window.print(); };
-  $("a-compare").onclick=function(){alert("Vergelijken met je vorige meting wordt gekoppeld via je account (zie PLATFORM-WERKBOEK §3.3). In de demo is er nog geen eerdere meting.");};
+  $("a-print").onclick=async function(){
+   window.print();                                                    // eerst printen; notifyCompleted kan de parent laten doorschakelen
+   try{ var r=await Platform.saveReport(buildWrapper());
+     if(r&&r.demo) msg("result-msg","Demo: het rapport wordt niet opgeslagen in een account.");
+     else { msg("result-msg",r&&r.updated?"Rapport in je account bijgewerkt.":"Rapport opgeslagen in je account."); if(r&&r.rapport_url)Platform.notifyCompleted(r.rapport_url); }
+   }catch(e){ console.warn(e); msg("result-msg","Het rapport kon niet worden opgeslagen in je account ("+((e&&e.message)||"")+"). Printen werkt wel; probeer opslaan later opnieuw."); }
+  };
+  $("a-compare").onclick=function(){msg("result-msg",Platform.isLive()?"Vergelijken met je vorige meting komt beschikbaar zodra er een eerdere meting in je account staat.":"Demo: in de oefenversie is er geen eerdere meting om mee te vergelijken.");};
+  $("a-back-wait").onclick=function(){buildWait();show("screen-wait");};
   $("a-restart").onclick=resetAll;
  }else{
   act.innerHTML='<button class="cinab-button cinab-button--outline" id="a-restart">Opnieuw beginnen</button>';
@@ -996,36 +1050,42 @@ $("teaser-go").onclick=function(){$("teaser").classList.remove("show");show("scr
 function buildWrapper(){
  var scores={};DOMAINS.forEach(function(d){var v=is360()?domainTeam(d):domainSelf(d);scores[d.id]=(v===null?0:v);});
  var org=new URLSearchParams(location.search).get("org")||"";
- return {template_id:"vaardigheidsmeter_leidinggeven",schema_version:"1.0",scores:scores,
-  meta:{organisatie:org,datum:new Date().toISOString().slice(0,10),deelnemers:state.responses.length},
+ var w={template_id:"vaardigheidsmeter_leidinggeven",schema_version:"1.0",scores:scores,
+  meta:{organisatie:org,datum:new Date().toISOString().slice(0,10),deelnemers:state.responses.length,perspectief:state.persp,variant:state.variant||"free"},
   data:{perspectief:state.persp,eigen:COMPS.map(function(c){return {n:c.n,score:compPct(c)};}),
    team:is360()?COMPS.map(function(c){return {n:c.n,agg:teamAgg(c)};}):null},
   parent_rapport_id:null};
+ if(Platform.isLive()&&Platform.getCode()) w.data_ref={store:"firebase-rtdb",path:"/sessions/"+Platform.getCode()};   // herstel-/auditbron (standaard §12)
+ return w;
 }
 
 /* onderbouwing + reset */
 $("ob-toggle").onclick=function(){var p=$("ob-panel");var open=p.hidden;p.hidden=!open;this.setAttribute("aria-expanded",open);$("ob-chev").innerHTML=open?"&#9652;":"&#9662;";};
-function resetAll(){state={persp:null,variant:null,answers:{},raters:[],responses:[],sort:"model",sel:null,demoNames:false};
+function resetAll(){state={persp:null,variant:null,answers:{},raters:[],responses:[],sort:"model",sel:null,demoNames:false,screen:null};msg("result-msg","");msg("invite-msg","");
  ["p-lead","p-emp","v-free","v-paid"].forEach(function(id){$(id).setAttribute("aria-pressed","false");});
  $("step2").hidden=true;$("btn-start").disabled=true;document.body.classList.remove("can-print");document.body.dataset.mode="free";
  buildQuiz();show("screen-start");}
 
 /* init */
- (async function(){
+(async function(){
  await Platform.init();
  $("demo-ribbon").hidden=Platform.isLive();
+ $("live-err").hidden=!Platform.initFailed;                       // B-11: token aanwezig maar koppeling mislukt -> zeg het
  Platform.notifyLoaded();
- if(Platform.isLive() && (new URLSearchParams(location.search).get('session')||new URLSearchParams(location.search).get('code'))){
-  try{
-   var m=await Platform.getMetaFromRTDB();
-   if(m&&m.persp){ state.persp=m.persp; state.variant=m.variant||'paid'; state.answers={}; document.body.dataset.mode='paid'; setPersp(state.persp); setVariant(state.variant); show('screen-wait'); buildWait(); return; }
-  }catch(e){ console.warn('[VLM] meta restore mislukt:',e); }
- }
- if(Platform.isLive() && Platform.isResume()){
-  var s=Platform.restoreState();
-  if(s){ state.persp=s.persp||state.persp; state.variant=s.variant||"paid"; state.answers=s.answers||{}; }
-  try{ await Platform.settle(); }catch(e){ console.warn(e); }   // idempotent; al betaald -> no-op
-  if(state.persp){ setPersp(state.persp); setVariant(state.variant||"paid"); document.body.dataset.mode="paid"; startQuiz(); return; }
+ if(Platform.isLive() && (Platform.isResume() || Platform.isRestored())){
+  var s=Platform.restoreState()||{};
+  state.persp=s.persp||state.persp; state.variant=s.variant||state.variant; state.answers=s.answers||{}; state.raters=s.raters||[];
+  if(Platform.isResume() || (state.variant==="paid" && !Platform.isSettled())){
+   try{ var st=await Platform.settle(); if(st&&st.redirect) return; }catch(e){ console.warn(e); }   // idempotent; al betaald -> no-op
+  }
+  if(state.persp){
+   setPersp(state.persp); setVariant(state.variant||"paid");
+   if(state.variant==="paid") document.body.dataset.mode="paid";
+   var scr=Platform.isResume()?"quiz":(s.screen||"quiz");
+   if(state.variant==="paid" && (scr==="wait"||scr==="result") && state.raters.length){ buildQuiz(); buildWait(); show("screen-wait"); return; }
+   if(state.variant==="paid" && scr==="invite"){ buildQuiz(); buildInvite(); show("screen-invite"); return; }
+   startQuiz(); return;
+  }
  }
  show("screen-start");
 })();
