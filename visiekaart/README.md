@@ -27,6 +27,59 @@ De tool accepteert ook `?sessietype=` en kent aliassen (`visiekaart`, `strategie
 Bij een herstart via `?action=` wint de opgeslagen sessie-state boven de parameter, bij een verse
 start wint de parameter. De keuze blijft in de tool wijzigbaar; dit is voorinvulling, geen slot.
 
+## Wat de variant precies verandert
+
+Getest op 3 september 2026: `?doel=` vinkt in fase 0 het sessietype aan en roept `toggleCard()`
+aan, waarmee de kaartstijl, de naam en het voorbeeld meteen meelopen. De facilitator ziet dus
+geen openstaande vraag meer maar een ingevulde keuze, die hij kan wijzigen.
+
+Wat er per variant wisselt, in alle zeven bladen:
+
+1. De naam in paginatitels, koppen en het rapport.
+2. Het voorbeeld in het naamveld van de sessie.
+3. Het woord achter `{type}` in lopende tekst: strategisch plan, jaarplan of project.
+4. Het zinsframe van de stip op de horizon in fase 1. Dit is het inhoudelijke verschil:
+
+| Slot | strategisch | jaarplan | project |
+|---|---|---|---|
+| 2 | richten wij ons op | richten wij ons dit jaar op | starten wij dit project voor |
+| 4 | Wij willen bereiken dat | Aan het eind van dit jaar hebben wij bereikt dat | Bij oplevering hebben wij bereikt dat |
+| 5 | Daarom ligt onze focus de komende periode op | Daarom ligt onze focus dit jaar op | Daarom ligt onze focus voor dit project op |
+
+Slot 1 en 3 zijn bewust identiek, en slot 4 houdt overal de constructie "dat plus bijzin" aan,
+zodat de AI-voorstelgenerator en bestaande antwoordpatronen blijven werken.
+
+Het type stuurt daarnaast de tijdsplanning en prioritering in de roadmap van fase 5.
+
+Niet variantafhankelijk: de opmaak, de kleuren, het rapportsjabloon, en de aanvullende context
+in fase 0 (tijdshorizon, schaalniveau, urgentie, budget). Die vult de facilitator zelf.
+
+## Meerdere sessies, één tool: wat gelijk moet blijven
+
+Elke variant is een eigen `cinab_tool`-post, dus een eigen product in de etalage met een eigen
+naam, pagina en teksten. De motor is dezelfde en `template_id` blijft `visiekaart`, dus het
+rapport is voor alle varianten gelijk.
+
+Deze velden moeten in alle posts dezelfde waarde houden. Wijzig je er één, werk de andere
+meteen bij:
+
+| Veld | Waarom |
+|---|---|
+| `_cinab_credits` | dezelfde sessie mag niet op de ene pagina meer kosten dan op de andere |
+| `_cinab_duur` | zelfde sessie, zelfde duur |
+| `_cinab_origin` | `https://visiekaart.cinab.nl`, voor alle varianten |
+| `_cinab_betaal_vanaf_fase` | de poort ligt op dezelfde plek in de flow |
+| `_cinab_token_geldig_uren` | idem |
+| `_cinab_deel_geldig` | idem |
+| `_cinab_render_url_pattern` | idem |
+| Rapport-template | idem, want `template_id` is gelijk |
+
+Alleen de Start-URL verschilt, in de `?doel=`. En de etalageteksten natuurlijk.
+
+De variant `anders` krijgt bewust geen eigen post: die heeft geen eigen situatie en geen eigen
+zinsframe en valt terug op het strategische. Hij blijft binnen de tool bestaan als keuze voor
+de facilitator.
+
 ## Deployen
 
 ```powershell
