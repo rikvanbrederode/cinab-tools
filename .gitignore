@@ -8,3 +8,9 @@ node_modules/
 *.env
 *.key
 **/vk-ai-proxy*.php
+
+# Bronbestanden voor fonts: zips en TTF's blijven lokaal, alleen de
+# gegenereerde woff2 in public/fonts gaat mee (s86).
+*/fonts/*.zip
+*/fonts/*.ttf
+*/fonts/*.otf
