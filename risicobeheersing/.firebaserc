@@ -1,7 +1,9 @@
 {
   "projects": {
-    "default": "PROJECT-ID-INVULLEN-BIJ-AANMAAK",
-    "staging": "PROJECT-ID-INVULLEN-BIJ-AANMAAK",
-    "production": "PROJECT-ID-INVULLEN-BIJ-AANMAAK"
-  }
+    "default": "risicobeheersing-e174f",
+    "staging": "risicobeheersing-e174f",
+    "production": "risicobeheersing-e174f"
+  },
+  "targets": {},
+  "etags": {}
 }

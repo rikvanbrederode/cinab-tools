@@ -2,10 +2,11 @@
 
 | | |
 |---|---|
-| Firebase-project | nog aanmaken, daarna project-ID invullen in `.firebaserc` |
-| Regio | `europe-west1` (ligt onherroepelijk vast bij aanmaken, HS-11) |
+| Firebase-project | `risicobeheersing-e174f` (Spark-plan, aangemaakt 3 september 2026); hosting op `risicobeheersing-e174f.web.app` |
+| Regio | `europe-west1` (vastgelegd bij aanmaken RTDB, 3 september 2026, HS-11) |
+| Database-URL | `https://risicobeheersing-e174f-default-rtdb.europe-west1.firebasedatabase.app` |
 | Regels deployt | Rik, vanuit deze map |
-| Anonymous sign-in | direct aanzetten bij het aanmaken (Authentication, Sign-in method, Anonymous) |
+| Anonymous sign-in | aan sinds 3 september 2026, met auto clean-up na 30 dagen |
 | Subdomein | `risicobeheersing.cinab.nl` (besluit 3 september 2026; uitzondering op het patroon, varianten lopen via `?doel=`) |
 | Tool-client | `public/cinab-tool-client.js`, versie in de header |
 | AI-proxy | `server/risicobeheersing-ai-proxy.php`, draait op SiteGround, niet op Firebase Hosting |
@@ -28,6 +29,24 @@ risicobeheersing/
 Alleen `public/` wordt gedeployd. De zeven HTML-bestanden importeren
 `./cinab-tool-client.js` als module, dus die staat daar naast en niet in de root.
 
+## Firebase web-config
+
+Voor `RB_FB_STAGING` en `RB_FB_PROD` in het glue-blok van de tool. Eén project voor beide,
+dus beide constanten krijgen deze waarden. De `apiKey` is publiek van opzet en hoort in de
+browser; de beveiliging zit in `database.rules.json`, niet in deze sleutel.
+
+```js
+{
+  apiKey: "AIzaSyB5fpBg_jmPT1pacDjuX_rZ7LA_DdWi5wQ",
+  authDomain: "risicobeheersing-e174f.firebaseapp.com",
+  databaseURL: "https://risicobeheersing-e174f-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "risicobeheersing-e174f",
+  storageBucket: "risicobeheersing-e174f.firebasestorage.app",
+  messagingSenderId: "254623665118",
+  appId: "1:254623665118:web:79607b597daf0deb3eab4f"
+}
+```
+
 ## Deployen
 
 ```powershell
@@ -43,7 +62,7 @@ zonder commit; de commitmessage is de changelog-regel.
 ## Open punten voor livegang
 
 1. DNS aanmaken voor `risicobeheersing.cinab.nl`: CNAME naar het Firebase-project, plus het A-record voor `www.`.
-2. Firebase-project aanmaken in `europe-west1`, anonymous sign-in aan, project-ID in `.firebaserc`.
+2. Realtime Database aanmaken in `europe-west1` en anonymous sign-in aanzetten. Project en `.firebaserc` zijn klaar.
 3. Waar draait de AI-proxy en op welke origin. De tool staat op Firebase Hosting en kan
    zelf geen PHP draaien, dus de proxy komt op SiteGround en de app praat cross-origin.
 4. `ANTHROPIC_MODEL`, de sleutel als omgevingsvariabele, `CINAB_REQUIRE_TOKEN = true` en de
