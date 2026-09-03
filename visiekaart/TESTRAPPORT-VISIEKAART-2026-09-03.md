@@ -1,0 +1,102 @@
+# Testrapport — Visiekaart (werksessie) · CINAB-testprotocol
+
+```text
+Werksessie:            Visiekaart (fase 0–5 + rapport), bestanden d.d. 2026-08-31 in map …/werksessies/visiekaart
+Uitgevoerd:            2026-09-03, sandbox (Playwright/Chromium), vinden → fixen → hertesten
+Testkaart:             7 HTML-bladen, 27 vk_*-sleutels, 2 AI-taken (cluster ×3 fasen, roadmap), RTDB-stage-sync, CINAB-glue
+Teams:                 1 Netjes (Woonzorg De Linde, strategie) · 2 Slordig (Gemeente Westerveld, jaarplan) ·
+                       3 Extreem (Kinderopvang Boemerang, 25 deelnemers/47 inzendingen/XSS) · 4 Engelstalig (Nordic
+                       Logistics, project canvas, EN→NL→EN) · 5 Ongeduldig (Hogeschool Zuid, refresh/tabs/URL) ·
+                       6 Mobiel (deelnemer op 380 px in team 1 en 4)
+Resultaat per stap:    0 ✓ · 1 ✓ (145/152; 7 gedocumenteerde hex) · 2 ✓ (160 checks) · 3 ✓ (100 checks) · 4 ✓ (4 stub-modi,
+                       herkomst bewezen) · 5 ◐ (256/298; 42 open visuele punten, zie B-12/B-14) · 6 ✓ (T-pariteit 100 %) ·
+                       7 ✓ · 8 ✓ (0 uncaught exceptions) · 9 ✓
+Bevindingen:           27 (B-01…B-27): 6 hoog, 12 midden, 9 laag — 22 opgelost en hertest, 5 open/beslispunt
+Niet testbaar hier:    echte Anthropic-call, echte Firebase RTDB cross-device, betaalflow/platform-token — staging-stappen in README-DEPLOY
+Opgeleverd:            deploy-2026-09-03/ (7 bladen + proxy-template + fonts/fonts.css + README-DEPLOY.md),
+                       testprotocol-2026-09-03/ (dit rapport, qa_*-scripts, qa_seed.json, screenshots, logs)
+```
+
+## Stap 0 — Testkaart
+
+| Onderdeel | Vastgesteld |
+|---|---|
+| Bestanden | `visiekaart_fase0..5.html`, `visiekaart_rapport.html` (elk zelfstandig, 130–225 kB), `cinab-tool-client.js` (ongewijzigde module-client), `cinab-ai-proxy_template.php`, `smoke_cluster5.js`. Het app-startblad, werkboek en CINAB-APP-STANDAARD/EXPRESSIE-STIJL stonden niet in de map of het project; getoetst is aan het protocol, de code-commentaren (§11B/§11E/§11G/werkboek-verwijzingen) en de cinab-frontend-skill (inkt op amber, geen font-CDN). |
+| Fasen en schermen | F0: facilitatorView / joinView (formulier → wachtkaart). F1: sIntro → sWait (vraag 1–5) → sCluster → sAILoad → sSentence → sFinal; deelnemer preWait/question/postWait/final; stages question/cluster/ai/sentence/final/done. F2: intro → wait → ai → cluster → voteopen → results → final; deelnemer preWait/input/wait/vote/waitResults/final. F3: intro → wait → ai → cluster (per thema) → final; deelnemer preWait/input/wait/final. F4: intro → wait → ai → ranking → final; deelnemer preWait/form/wait/final. F5: sIntro → sGenerate → sRoadmap → sOwners → sFinal (deelnemer volgt alleen). Rapport: render uit opgeslagen data. |
+| Rollen | Facilitator (zelfde apparaat), deelnemer op eigen apparaat (`?join=<code>` → `VK_IS_PARTICIPANT`), deelnemer in tweede tabblad (demo-modus, storage-events), rapportlezer (lokaal of via `?rapport_id=`). |
+| Datacontract | Bron: `vk_session` (F0), `vk_vision_sentence`/`vk_vision_keywords`/`vk_phase1_answers` (F1), `vk_selected_themes` (F2), `vk_confirmed_actions`/`vk_phase3_submissions` (F3), `vk_versnellers`/`vk_remmers`/`vk_phase4_scores`/`vk_phase4_submissions` (F4), `vk_roadmap_actions` (F5). Stage per fase `vk_phaseN_stage` (F2 als losse string, overige object). Vlaggen: `vk_session_started`, `vk_phaseN_state`, `vk_phase2_sent/voted`, `vk_joined`, `vk_lang`. Nieuw (B-05): `vk_phaseN_work` (werkstate, geen bron). RTDB: `/sessions/{code}/{meta,content,stage,participants,phase1/answers,phase2/submissions,phase2/votes,phase3/submissions,phase4/scores,state}`. sessionStorage: `vk_cinab` (token), `vk_rapport_url`, `vk_report_data`, `vk_lang_manual` (nieuw). |
+| Invoervelden | F0: org/sessienaam/facilitator (verplicht, trim), type/sector/horizon/schaal/urgentie/budget; join naam + e-mail (verplicht; formaatcheck nieuw). F1: antwoord (textarea, trim), kernwoord (dedupe nieuw), zinvelden sp0–4. F2: 5+ themavelden (werkwoord-waarschuwing), stemknoppen 1–5 uniek. F3: 2+ actievelden per thema (actie-waarschuwing). F4: 20 stellingen ×3 + eigen versnellers/remmers. F5: eigenaar per actie. Alles via `escapeHtml` behalve twee plekken in F1 (B-02, gefixt). |
+| AI-taken | `cluster` (F1 per vraag met question+context; F2 met stip in context; F3 per thema — context ontbrak, B-18) en `roadmap` (F5). Contract `POST /vk-ai-proxy.php {task,lang,token,data}` → `{task,text}` (JSON, fences gestript). Terugval lokaal. Herkomstmelding ontbrak (B-03). Proxy-template kende `roadmap` niet (B-23). Token werd nooit gezet (B-24). |
+| Popups | Twee-staps-start F0–F3 (F4 ontbrak, B-18), cluster-waarschuwing F1, analyse-waarschuwing F4, onderbouwing (vkOpenTip lg), info-icons (vkInfoOpen), werkwoord/actie-popups, incomplete-bevestiging, betaalmuur-overlay F5. |
+| Vertaling | T-dicts nl/en per blad (112–171 sleutels), `t-`-id's, `data-t-placeholder`, `{app}`/`{type}`-variantsubstitutie, `vk_lang` + storage-event. |
+| Expressielaag | Gedeeld blok VK SHARED EXPRESSIE (md5-identiek), fase-accenten via `--fase-accent`, `:focus-visible`, `prefers-reduced-motion` aanwezig, F6 afwezig. |
+| Platform | Glue vk-firebase.js + vk-cinab.js ingebouwd (byte-identiek), `bootstrap()` op F0, `restore()` elders, poort op F5 (`VK_BETAAL_VANAF_FASE = 5`), wrapper `template_id: visiekaart`, 20 INK-scores, e-mailvrij. Demo-modus is host-gebaseerd (`isProductionMode`), geen `?demo=1`. |
+| Bekende zwakke plekken | Code-commentaren: refresh-herstel "niveau 1" (alleen wachtscherm), `/join/{code}` vereist hosting-rewrite, `VK_FB_PROD = null`, `CINAB_REQUIRE_TOKEN=false` op staging. |
+
+## Testomgeving (herbruikbaar)
+
+* `qa_harness.py`: twee omgevingen. **Demo** op `http://127.0.0.1:8790` (VK_LIVE=false). **Live** op `http://vk.test` via Playwright-routes: VK_LIVE=true, AI-stub op het echte proxy-contract in vier modi (ok / ```json-fences / HTTP 502 / malformed), en een in-memory nep-RTDB die `window.vkFb` vervangt (accessor-property) zodat stage-sync, live-listeners, push en content cross-device écht doorlopen worden met één facilitator-context en N deelnemer-contexten met eigen localStorage.
+* `qa_scenario.py` (team 1, 160 checks), `qa_teams.py` (teams 2–5, 100 checks), `qa_aspects.py` (popups/i18n, viewports 1280/1024/768/380 × NL/EN × schermen, contrast, print, productie-host), `qa_static.py` (syntax, md5 gedeelde blokken, verwijzingen, huisstijl, security), `qa_tparity.js` (T-pariteit).
+* `qa_seed.json` = eindstand van team 1 (alle sleutels) om fasen direct in de juiste toestand te zetten.
+
+## Bevindingenregister
+
+| Nr | Ernst | Fase | Bevinding (reproductie) | Oorzaak | Fix | Hertest |
+|---|---|---|---|---|---|---|
+| B-01 | hoog | F0 | Deelnemer scant QR/link `origin/join/<code>`; na start navigeert het apparaat naar `/join/visiekaart_fase1.html` → 404 (of bij rewrite: terug op join-scherm, lus). | Join-URL gebruikt een pretty path dat een server-rewrite vereist; alle fase-navigaties zijn relatief. | `vkJoinURL()` wijst naar `visiekaart_fase0.html?join=<code>` in de eigen map; `vkDetectJoinCode` accepteert `?join=` én `/join/`. | ✓ team 1/2/3/4: 4 apparaten volgen F0→F5 |
+| B-02 | hoog | F1 | Organisatienaam `<b>…` of kernwoord `<img onerror>` wordt als HTML gerenderd in het sessiepaneel en op het eindscherm (XSS). | `renderSessPanel` en `buildFinalScreen` interpoleerden zonder `escapeHtml`. | `escapeHtml` op waarden en labels. | ✓ team 1 + team 3 (hufterinvoer), `window.__xss` nooit gezet |
+| B-03 | hoog | F1/F2/F3/F5 | UI meldde nooit of een uitkomst van AI of van de lokale terugval kwam; F1 toonde altijd "AI heeft de antwoorden geclusterd"; geen herkomstvariabele; in demo/zonder token werd toch gecalld. | `.catch(()=>{})` zonder melding. | Gedeeld blok in AI-helper: `vkAiSource[task]`, `vkAiAllowed()` (demo → geen call; productie alleen met token of `__VK_AI_OPEN`), `vkAiSetSource()` met melding nl/en (`.vk-ai-note`, role=status/alert). F3 per thema. | ✓ 4 modi: ok→ai, fenced→ai, 502→local + "AI niet bereikbaar", malformed→local; roadmap idem |
+| B-04 | hoog | Rapport | Ontbreekt fase 4/5-data, dan toont het rapport verzonnen versnellers ("Eigenaarschap en accountability"), demo-organisatie "Zorgorganisatie Noord" — ook op de productiehost. | `applyDefaults()` vulde altijd voorbeelddata. | Defaults alleen als `!VK_LIVE`; live → lege secties + melding "Onvolledige sessie: geen gegevens voor …". | ✓ team 2 (zonder F4/F5) en team 5 (directe URL) |
+| B-05 | hoog | F1–F5 | Refresh vernietigde bevestigde tussenstappen: kernwoorden van eerdere vragen (F1), clusters tijdens de stemronde (F2 — stemmen verwijzen naar cluster-id's), clusters/selecties per thema (F3), handmatige rangorde (F4), roadmap (F5); facilitator kwam terug op intro/wachtscherm. | Werkstate alleen in geheugen; herstel "niveau 1". | `vk_phaseN_work` bij elke wezenlijke wijziging; `vkRestoreFacilitatorView` herstelt op de lopende werkstage (F1 question/sentence/final, F2 cluster/voteopen/final, F3 cluster/final, F4 ranking/final, F5 roadmap/owners/final) met publicatie onderdrukt. Nieuwe sessie wist de werkstate. | ✓ team 1 (refresh bij vraag 3 en op F2-clusterscherm), team 5 (9 herstelgevallen, stage niet herpubliceerd) |
+| B-06 | midden | F2 | `vk_phase2_submissions` werd nooit geschreven en `vk_phase2_sent` kreeg de waarde `'vk_phase2_voted'`. | `localStorage.setItem('vk_phase2_sent','vk_phase2_voted','vk_phase2_submissions', …)` (4 argumenten). | Correcte `setItem`; extra `vk_phase2_votes` voor het rapport. | ✓ team 1 |
+| B-07 | midden | F1 + popups | `{type}` zichtbaar in vraagteksten na taalwissel; `{app}` letterlijk in de onderbouwing-popup. | `refreshQuestionTexts` zonder `vkTypeSub`; `vkOpenTip` substitueerde niet. | `vkTypeSub` in refresh; `vkTipSub()` centraal in het gedeelde popup-blok. | ✓ aspects A (NL/EN geen placeholders), team 4 |
+| B-08 | midden | alle | Terug naar een vorige fase zonder bevestiging (goPhase0/1/2/3, navPhase). | Ontbrak. | `confirm()` nl/en; bevestigde data blijft. | ✓ team 2 + team 5 |
+| B-09 | midden | F0–F5 | Deelnemer op eigen apparaat kreeg NL-vragen in een EN-sessie; F0 bewaarde de taal niet. | `content.lang`/stage-taal werd niet gelezen. | Taal reist mee in de RTDB-stage en content; `vkAdoptLang()` op deelnemer-apparaten tenzij zelf gewisseld (`vk_lang_manual`); F0 leest/schrijft `vk_lang`. | ✓ team 4: deelnemer EN, vraag "Question 1", NL↔EN mid-flow |
+| B-10 | midden | F0 | Dezelfde persoon telde dubbel in het roster (tweede aanmelding); e-mail `karin@` werd geaccepteerd. | Geen dedupe, geen formaatcheck. | `vkDedupeRoster()` (naam+e-mail, hoofdletterongevoelig) in F0 en de leeskant F1–F4; e-mail-regex + T-sleutel `joinEmailInvalid`; heraanmelding op hetzelfde apparaat → direct wachtkaart. | ✓ team 2/3 |
+| B-11 | midden | F1–F4 (demo) | In dezelfde browser bereikte een deelnemer-tabblad de facilitator niet (`vk_phaseN_live_*` werd niet gelezen). | Geen storage-listener aan facilitatorzijde. | Storage-listeners (alleen `!VK_LIVE`) mergen in `answers`/`submissions`/`themeSubmissions`/`allScores`. | ✓ team 5 (2e tabblad) |
+| B-12 | midden | alle | Witte tekst op amber/groen (1.96:1 / 1.6:1), `--t3`-labels 2.9:1, themakleuren als tekst 1.7–3.5:1. Huisstijl: inkt op amber. | Kleuren als tekst gebruikt. | `--t3`/`--text-3` → `#74726E`; inkt op `.btn-orange/.btn-green/.start-btn/.join-btn`; gekleurde chips/labels → inkt met kleur als rand/vlak. | ◐ 22 restpunten gemeten (witte tekst op teal/paars-knoppen 3.5–4.4:1 bij 13 px, stip-banner wit op amber-verloop in F5/rapport, themanaam-spans F5) — ontwerpkeuze, zie *Open* |
+| B-13 | midden | alle | Google-Fonts-CDN (`@import fonts.googleapis.com`) in alle bladen — protocol en cinab-frontend-skill (AVG) verbieden dat. | Legacy. | `fonts/fonts.css` (self-hosted woff2, `font-display:swap`) + bredere fallback-stack; geen externe fontcall meer. | ✓ static; woff2-bestanden plaatsen = deploy-stap |
+| B-14 | midden | alle | Overloop: header + taaltoggle op 380 px (facilitator F0–F4 én deelnemer-header F1), F1-eindscherm 860 px vast, rapporttabellen/print-bar ≤ 768 px, F5-gantt/eigenaren op 380. | Vaste breedtes, geen wrap. | Wrap/scroll-CSS (B-14/B-14b). | ◐ header/eindscherm/gantt opgelost; 20 restmetingen zijn kinderen binnen scrollbare kaders (rapporttabel, gantt) en facilitator-clusterschermen op 380 px — zie *Open* |
+| B-15 | laag | alle | Gedeelde blokken niet byte-identiek: LOGO-CSS (F0 extra regel), CANVAS-BUILDER (commentaar), TIP-POPUP-JS (commentaar), CINAB-GLUE (`meta.variant` alleen F5/rapport). | Divergentie. | Gesynchroniseerd; md5 identiek. | ✓ static |
+| B-16 | laag | F0 | Nieuwe sessie wist `vk_phase4_stage`, `vk_phase5_stage`, `vk_phase*_state`, `vk_phase4_submissions`, live-subs en `vk_joined` niet. | Onvolledige lijst. | Eén canonieke lijst incl. werkstate. | ✓ team 5 |
+| B-17 | laag | F0/F1 | Taalwissel ontwapende de startknop; dubbel kernwoord mogelijk. | `applyT→validate()` disarmt; geen dedupe. | `validate(keepArmed)`; dedupe met hint. | ✓ team 2 |
+| B-18 | laag | F3/F4 | F4 zonder twee-staps-start (F1–F3 wel); F3-AI-call zonder vraag/context (§11E). | Inconsistentie. | Poort + T-sleutels + armed-stijl in F4; context per thema in F3. | ✓ team 1 |
+| B-19 | laag | F1 | Sessiepaneel toont sleutel `project` i.p.v. label. | `sessTypeLbl` bewust in kleine letters voor zinnen. | Cosmetisch, open (gebruik `sessTypeLblFull`). | – |
+| B-20 | hoog (beslispunt) | glue | `VK_FB_PROD = null`: op elke niet-staging-host is er géén RTDB → deelnemers op eigen apparaat kunnen niet meedoen en hun acties verdwenen stil; de facilitator zag niets. | Productieproject Firebase nog niet ingevuld. | Nette degradatie (B-22): één zichtbare melding voor facilitator én deelnemer, geen "Uncaught (in promise)". **Config invullen blijft nodig** (README-DEPLOY). | ✓ melding getest; echte RTDB niet testbaar hier |
+| B-21 | beslispunt | rapport | `adviesborden.nl`-vermeldingen (bestel-CTA, caption) naast het CINAB-merk; `?demo=1` niet ondersteund (demo is host-gebaseerd, standaard §7). | Merk-/standaardkeuze. | Niet gewijzigd. | – |
+| B-22 | laag | glue | Promise-rejections van `vkFb.*` niet afgevangen (`try/catch` vangt alleen synchroon). | – | `unhandledrejection`-guard + degradatiemelding in het gedeelde glue-blok. | ✓ 0 console-errors in alle runs |
+| B-23 | hoog | proxy | Proxy-template kende taak `roadmap` niet → F5 kreeg altijd 422 en viel stil terug op lokaal. | Taak nooit toegevoegd. | Server-side prompt `roadmap` (contract `{actions:[{text,priorityScore,justif,owner}]}`). | ✓ stub-contract; echte call = staging |
+| B-24 | hoog | glue | Platform-token werd nooit op `window.__VK_TOKEN` gezet → met `CINAB_REQUIRE_TOKEN=true` altijd 401. | `bootstrap()/restore()` zetten het niet. | Token uit de client naar `__VK_TOKEN` (gedeeld blok). | ✓ statisch + scenario (`token` in payload) |
+| B-25 | hoog | F1 | Live-modus zonder inzendingen toonde vijf demo-antwoorden met demo-namen alsof deelnemers ze hadden ingestuurd. | Terugval op `QD.demos`. | In live-modus lege staat "Nog geen inzendingen". | ✓ team 2 (1 antwoord, geen demo-namen) |
+| B-26 | laag | alle | Losse hex buiten tokens (226 stuks) — nu gemapt op `var(--…)`; resterend: logo-fills (officiële SVG) en 4 AA-donkere tinten zonder token (`#7e5395`, `#8a5a06`, `#E8930A`, `#FCC429`). | Legacy. | Gemapt; rest gedocumenteerd — voorstel: tokens toevoegen aan de app-standaard. | ✓ static (7 gedocumenteerde regels) |
+| B-27 | laag | F2 | `vk_phase2_stage` is een losse string, F1/F3/F4/F5 gebruiken een object. | Historisch. | Open (raakt de leeskant van deelnemers; beide vormen worden gelezen). | – |
+
+## Resultaat per stap
+
+**Stap 1 — statisch.** `node --check` op 61 inline scripts: schoon. Tagbalans: schoon. Gedeelde blokken: 11 blokken md5-identiek (TIP-POPUP-DOM is bewust per fase). Idle code: `vkVariantVoorbeeld` (gedeeld blok, ongebruikt buiten F0 — bewust), `dragStart/dragEnd/dropOnCluster` (F3, vervangen door gebonden handlers), `goScreen_owners`, `kwMatch` (F5) — gedocumenteerd, niet gesnoeid; AI-zinvoorstel in F1 bewust verborgen (`aiSuggestBar display:none`, code behouden). Markers: 0. Security: geen Anthropic-sleutel, token niet in URL, Firebase-apiKey publiek (rules bepalen), proxy-template structureel gelijk (plus `roadmap`). Huisstijl: font-CDN weg, hex gemapt, `adviesborden.nl` als beslispunt.
+
+**Stap 2/3 — doorloop en hufterproef.** Team 1 volledig van F0 tot rapport met vier deelnemer-apparaten (één op 380 px), alle contractsleutels gecontroleerd op vorm en aantallen, wrapper 20 scores/4 deelnemers/e-mailvrij, JSON-export, `window.print`, EN-rapport. Teams 2–5: 100 checks groen; expliciete gebruiksfoutenlijst afgewerkt (leeg/spaties, dubbel, e-mail, bevestigen zonder voorwaarde via UI én functie, AI-knop dubbel/te weinig invoer, taal wisselen bij bewapende knop en open popup, rapport zonder data, tweede tabblad). Gedocumenteerde ontwerpkeuzes: startknop F0 is al actief zonder deelnemers (late aanmelders tellen mee); dubbele `submitAnswer()` via functie geeft twee records (UI verbergt het formulier synchroon; facilitator dedupliceert per naam).
+
+**Stap 4 — AI.** Keten-bewijs met stub-proxy op `/vk-ai-proxy.php` in vier modi voor `cluster` (F1 ×5 vragen, F2, F3 per thema) en `roadmap` (F5): veldcontract compleet (items/question/context/lang/token; roadmap: stip/themes/acties/versnellers/remmers/sessie), fences geparsed, 502 en malformed verworpen met lokale terugval én melding. Eerlijkheid: één bronvariabele per taak, demo → geen call, productie zonder token → geen call. Prompt-hygiëne: prompt server-side, model/max_tokens server-side. **Echte call: niet mogelijk zonder sleutel — curl-test in README-DEPLOY.**
+
+**Stap 5 — visueel.** 298 metingen op 7 bladen × schermen × 4 viewports × 2 talen; 256 groen. Watermerk < 900 px verborgen, `:focus-visible`, reduced-motion, F6 afwezig. Kwalitatief: F1-clusterscherm oogt rustig en leesbaar; F5-roadmap concurreert met zichzelf (drie contextbadges + tabbalk + gantt boven de vouw) — voorstel: badges in de kaartkop. Rapport: stip-banner in wit-op-amber is de meest zichtbare contrastzwakte.
+
+**Stap 6 — vertaling.** T-pariteit 100 % (7 bladen), geen `{placeholder}`/`undefined`/`NaN`, geen NL-restanten op EN-schermen (heuristiek), placeholders/aria vertaald, taal overleeft fase-navigatie, refresh, rollen (na B-09) en tabbladen.
+
+**Stap 7 — data.** Contractketen gecontroleerd per fase; afgeleide waarden worden herberekend (werkstate is geen bron). Refresh-overleving in alle fasen zonder herpublicatie; deelnemer-sync pre-wait → werkstage → done op tweede apparaat (nep-RTDB) en tweede tabblad; `?join=` rolbehoud; sessiecode uit query; terug met bevestiging; nieuwe sessie schoon met behoud van `vk_lang`; directe load zonder data zonder crash en zonder demo-data (live).
+
+**Stap 8 — robuustheid.** 0 uncaught exceptions / console-errors in alle runs (resource-404's op fonts/gstatic/cdnjs benoemd: geblokkeerd in de sandbox). XSS-proef met `<img onerror>` op naam, organisatie, antwoord, kernwoord, thema, actie: nergens uitgevoerd. 47 inzendingen + 25 deelnemers: clusterscherm < 3 s. Productie-host: dev-only verborgen, `resetDemoData` inert, geen demo-seed.
+
+**Stap 9 — rapport.** Rendert uit opgeslagen data, casusdata in alle secties, geen demo-restanten, lege staten bij gedeeltelijke data (B-04), `@media print` met 13 paginabreuken (~8,6 A4), print-bar verborgen, JSON-export met volledige sessie.
+
+## Niet testbaar in deze omgeving — staging-stappen
+
+1. **Echte AI-call** (geen sleutel/netwerk): zie README-DEPLOY §5 (curl op `cluster` en `roadmap`; verwachte `{task,text}` met JSON; in de UI de melding "AI-resultaat: …").
+2. **Echte Firebase RTDB cross-device**: alleen met ingevuld `VK_FB_PROD` (of op een staging-host met het staging-project). Bewijs: facilitator op laptop, deelnemer op telefoon; roster live, vraag 1 verschijnt, teller 1/1, stage volgt tot F5.
+3. **Betaalflow/platform-token**: start via het platform (`?launch=`), controleer `sessionStorage.vk_cinab`, `window.__VK_TOKEN`, poort op F5, `saveReport` → `rapport_url`.
+
+## Open punten (niet gefixt, bewust)
+
+* B-12/B-14 restpunten (ontwerpkeuzes): witte tekst op teal/paars-knoppen (3.5–4.4:1 bij 13 px → 14 px bold maakt ze AA-large), stip-banner wit op amber (F5/rapport), themanaam-spans in F5, facilitator-cluster- en zinschermen op 380 px (facilitator werkt op ≥ 1024 px).
+* B-19, B-21, B-27 (cosmetisch/beslispunt).
+* Meervoud "(1 antwoorden)" in F1-clusterkop.

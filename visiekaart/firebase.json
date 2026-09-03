@@ -1,5 +1,10 @@
 // CINAB firebase.json — visiekaart
-// VERSIE: 1.0.0 — 7 augustus 2026 (versieregel toegevoegd; configuratie zelf ongewijzigd)
+// VERSIE: 1.1.0 — 3 september 2026
+//   1.1.0 — join-rewrite vervangen door een 302-redirect naar visiekaart_fase0.html?join=,
+//           conform B-01 uit het testprotocol: visiekaart_join.html bestaat niet meer en een
+//           interne rewrite laat de URL op /join/ staan, waardoor de relatieve fase-navigatie
+//           op het deelnemer-apparaat breekt. CSP aangevuld met het kale cinab.nl.
+//   1.0.0 — versieregel toegevoegd; configuratie zelf ongewijzigd.
 {
   "hosting": {
     "public": "public",
@@ -8,8 +13,12 @@
       "**/.*",
       "**/node_modules/**"
     ],
-    "rewrites": [
-      { "source": "/join/**", "destination": "/visiekaart_join.html" }
+    "redirects": [
+      {
+        "source": "/join/:code",
+        "destination": "/visiekaart_fase0.html?join=:code",
+        "type": 302
+      }
     ],
     "headers": [
       {
@@ -17,7 +26,7 @@
         "headers": [
           {
             "key": "Content-Security-Policy",
-            "value": "frame-ancestors 'self' https://staging2.cinab.nl https://*.cinab.nl"
+            "value": "frame-ancestors 'self' https://cinab.nl https://staging2.cinab.nl https://*.cinab.nl"
           }
         ]
       }
