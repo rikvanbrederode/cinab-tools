@@ -1,0 +1,27 @@
+// CINAB firebase.json — risicobeheersing
+// VERSIE: 1.0.0 — 3 september 2026 (versieregel toegevoegd; CSP aangevuld met het kale
+// cinab.nl; join-rewrite verwijderd zolang risicobeheersing_join.html niet bestaat)
+{
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "headers": [
+      {
+        "source": "/risicobeheersing_rapport.html",
+        "headers": [
+          {
+            "key": "Content-Security-Policy",
+            "value": "frame-ancestors 'self' https://cinab.nl https://staging2.cinab.nl https://*.cinab.nl"
+          }
+        ]
+      }
+    ]
+  },
+  "database": {
+    "rules": "database.rules.json"
+  }
+}

@@ -1,0 +1,48 @@
+// CINAB database.rules.json — risicobeheersing
+// VERSIE: 1.0.0 — 3 september 2026 (versieregel toegevoegd; regels zelf ongewijzigd)
+// Bij elke wijziging: versie ophogen, datum bijwerken, en het bestand met een
+// regel uitleg naar de tooldeveloper sturen als het gedrag voor de tool verandert.
+{
+  "rules": {
+    "sessions": {
+      ".read": false,
+      ".write": false,
+      "$code": {
+        "meta": {
+          ".read": "auth != null",
+          ".write": "auth != null && (!data.exists() || data.child('facilitatorUid').val() === auth.uid)",
+          ".validate": "newData.hasChildren(['createdAt','facilitatorUid']) && newData.child('facilitatorUid').val() === auth.uid"
+        },
+        "stage": {
+          ".read": "auth != null",
+          ".write": "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid",
+          ".validate": "newData.isString() && newData.val().length <= 50000"
+        },
+        "content": {
+          ".read": "auth != null",
+          ".write": "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid"
+        },
+        "state": {
+          ".read": "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid",
+          ".write": "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid"
+        },
+        "participants": {
+          ".read": "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid",
+          "$pushId": {
+            ".write": "auth != null && !data.exists()",
+            ".validate": "newData.hasChildren(['name','at']) && newData.child('name').isString() && newData.child('name').val().length <= 120 && (!newData.hasChild('email') || (newData.child('email').isString() && newData.child('email').val().length <= 200))"
+          }
+        },
+        "$phase": {
+          ".read": "auth != null && root.child('sessions').child($code).child('meta/facilitatorUid').val() === auth.uid",
+          "$collection": {
+            "$pushId": {
+              ".write": "auth != null && !data.exists()",
+              ".validate": "newData.hasChild('at')"
+            }
+          }
+        }
+      }
+    }
+  }
+}

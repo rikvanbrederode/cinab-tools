@@ -1,0 +1,2442 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Risicobeheersing — Fase 4: Matrix &amp; interpretatie</title>
+<style>
+/* ═══ RB SHARED CINAB FONTS (standaard §5: Fraunces 600 / Plus Jakarta Sans 400-600-700;
+   productie self-hosted .woff2 op het tool-subdomein; geen font-CDN; fallback-stacks dekken
+   de periode tot de woff2-bestanden geplaatst zijn) ═══ */
+@font-face{font-family:'Fraunces';font-style:normal;font-weight:600;font-display:swap;src:url('./fonts/fraunces-600.woff2') format('woff2');}
+@font-face{font-family:'Plus Jakarta Sans';font-style:normal;font-weight:400;font-display:swap;src:url('./fonts/plus-jakarta-sans-400.woff2') format('woff2');}
+@font-face{font-family:'Plus Jakarta Sans';font-style:normal;font-weight:600;font-display:swap;src:url('./fonts/plus-jakarta-sans-600.woff2') format('woff2');}
+@font-face{font-family:'Plus Jakarta Sans';font-style:normal;font-weight:700;font-display:swap;src:url('./fonts/plus-jakarta-sans-700.woff2') format('woff2');}
+/* ═══ END RB SHARED CINAB FONTS ═══ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* ═══ RB SHARED CINAB TOKENS (cinab-theme.css / cinab-design-tokens.ts, standaard §4-§5) ═══ */
+  --cinab-amber:#EF9F27; --cinab-amber-dark:#D88C14; --cinab-ink:#1C1C1A; --cinab-offwhite:#FAFAF8;
+  --cinab-line:#E5E3DB; --cinab-grey:#5F5E5A; --cinab-card:#FFFFFF;
+  --tool-red:#E8423F; --tool-green:#BDD24D; --tool-blue:#70A2D7; --tool-yellow:#FCC429; --tool-black:#262A36;
+  --tool-secondary-1:#ED3237; --tool-secondary-2:#952942; --tool-secondary-3:#5D253E; --tool-secondary-4:#9666AA;
+  --tool-secondary-5:#2C539D; --tool-secondary-6:#0366B0; --tool-secondary-7:#21414F; --tool-secondary-8:#234D56;
+  --tool-secondary-9:#2A9791; --tool-secondary-10:#C5D93D; --tool-secondary-11:#FAA833; --tool-secondary-12:#F05736; --tool-secondary-13:#7E352E;
+  --font-heading:'Fraunces',Georgia,'Times New Roman',serif;
+  --font-body:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --touch-target:44px; --focus-ring:3px solid var(--cinab-amber-dark);
+  /* ═══ END RB SHARED CINAB TOKENS ═══ */
+  --orange:var(--tool-secondary-11); --orange-hover:#D8901E; --orange-light:rgba(250,168,51,0.12); --orange-border:rgba(250,168,51,0.35);
+  --green:var(--tool-green); --green-light:rgba(189,210,77,0.20); --green-d:#7B8E1E;
+  --purple:var(--tool-secondary-4); --purple-light:rgba(150,102,170,0.14);
+  --coral:var(--tool-secondary-12); --red:var(--tool-red); --coral-light:rgba(240,87,54,0.10);
+  --teal:var(--tool-secondary-9); --teal-light:rgba(42,151,145,0.14);
+  --blue:var(--tool-blue); --blue-light:rgba(112,162,215,0.15);
+  --bg:var(--cinab-offwhite); --surface:#FFFFFF;
+  --border:rgba(0,0,0,0.09); --border-md:rgba(0,0,0,0.14); --border-strong:rgba(0,0,0,0.20);
+  --text:var(--tool-black); --text-2:#5A5956; --text-3:#9A9894;
+  --r:10px; --r-sm:6px; --r-lg:16px; --r-xl:22px;
+  --shadow:0 1px 3px rgba(0,0,0,0.07), 0 4px 12px rgba(0,0,0,0.05);
+  /* methodiek-uitbreiding (standaardkleuren) */
+  --coin-geel:var(--tool-yellow); --coin-rood:var(--tool-red); --coin-blauw:var(--tool-blue);
+  --zone-aanvaardbaar:var(--tool-green); --zone-laag:var(--tool-secondary-10); --zone-beperkt:var(--tool-yellow);
+  --zone-midden:var(--tool-secondary-11); --zone-hoog:var(--tool-secondary-12); --zone-urgent:var(--tool-red);
+}
+
+html { scroll-behavior: smooth; }
+body { font-family:var(--font-body); background:var(--bg); color:var(--text); min-height:100vh; font-size:15px; line-height:1.55; }
+.serif { font-family:var(--font-heading); }
+
+/* HEADER */
+.header { background:var(--surface); border-bottom:1px solid var(--border); padding:0 28px; height:58px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:200; }
+.logo { display:flex; align-items:center; gap:10px; text-decoration:none; padding-left:6px; cursor:pointer; }
+/* ═══ RB SHARED LOGO STYLES ═══ */
+.logo-img{height:32px;width:auto;display:block}
+.logo-img .fil-logo-main   { fill:#2A9791; }
+.logo-img .fil-logo-shadow { fill:#2A9791; filter:brightness(0.5); }
+.logo-img .fil-logo-accent { fill:#F7A710; stroke:#F7A710; stroke-width:300; stroke-miterlimit:22.9256; }
+.logo-img .fil-logo-line   { fill:none; stroke:#F7A710; stroke-width:300; stroke-miterlimit:22.9256; }
+.logo-img .fil-logo-bar    { fill:#F7A710; }
+/* ═══ END RB SHARED LOGO STYLES ═══ */
+.header-right { display:flex; align-items:center; gap:8px; }
+.hdr-mid { flex:1; display:flex; justify-content:center; align-items:center; gap:12px; }
+.phase-pill { background:var(--orange-light); color:var(--orange-hover); font-size:11px; font-weight:700; padding:4px 12px; border-radius:20px; border:1px solid var(--orange-border); letter-spacing:.06em; text-transform:uppercase; white-space:nowrap; }
+
+/* PHASE PROGRESS DOTS */
+.phase-prog { display:flex; align-items:center; gap:5px; }
+.pp-dot { width:7px; height:7px; border-radius:50%; background:var(--border-md); transition:all .2s; }
+.pp-dot.done { background:var(--orange); }
+.pp-dot.cur { background:var(--orange); box-shadow:0 0 0 3px var(--orange-light); }
+
+/* BUTTONS */
+.btn { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:var(--r-sm); border:1px solid var(--border-md); background:var(--surface); color:var(--text-2); font-family:var(--font-body); font-size:13px; font-weight:500; cursor:pointer; transition:all .13s; white-space:nowrap; }
+.btn:hover { background:var(--bg); border-color:var(--border-strong); color:var(--text); }
+.btn-orange { background:var(--orange); border-color:var(--orange-hover); color:var(--cinab-ink); }
+.btn-orange:hover { background:var(--orange-hover); color:var(--cinab-ink); }
+.btn-orange:disabled { opacity:.38; cursor:not-allowed; transform:none!important; box-shadow:none!important; }
+.btn-green { background:var(--green); border-color:var(--green-d); color:#fff; }
+.btn-green:hover { background:var(--green-d); color:#fff; }
+.btn-purple { background:var(--purple); border-color:var(--purple); color:#fff; }
+.btn-purple:hover { background:#7e5395; color:#fff; }
+.btn-ghost { background:transparent; border-color:var(--border); color:var(--text-3); }
+.btn-ghost:hover { background:var(--bg); color:var(--text); }
+.btn-lg { padding:11px 26px; font-size:15px; font-weight:600; border-radius:var(--r); box-shadow:0 2px 8px rgba(250,168,51,.3); }
+.btn-lg:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 4px 14px rgba(250,168,51,.4); }
+.demo-pill { font-size:11px; padding:5px 10px; color:var(--text-3); border-color:var(--border); }
+.lang-toggle { display:flex; border:1px solid var(--border-md); border-radius:var(--r-sm); overflow:hidden; background:var(--surface); }
+.lang-btn { padding:5px 12px; font-family:var(--font-body); font-size:12px; font-weight:600; border:none; background:transparent; cursor:pointer; color:var(--text-3); transition:all .13s; letter-spacing:.04em; }
+.lang-btn.active { background:var(--orange); color:var(--cinab-ink); }
+
+/* ═══ SESSIE-INFO PANEEL (gedeeld) ═══ */
+.sess-bar { background:var(--surface); border-bottom:1px solid var(--border); padding:0 28px; }
+.sess-toggle { display:flex; align-items:center; gap:8px; padding:8px 0; font-size:12px; font-weight:600; color:var(--text-2); background:none; border:none; cursor:pointer; font-family:var(--font-body); letter-spacing:.02em; }
+.sess-toggle:hover { color:var(--text); }
+.sess-toggle .chev { transition:transform .2s ease; }
+.sess-toggle.open .chev { transform:rotate(180deg); }
+.sess-toggle .sess-mini { color:var(--text-3); font-weight:500; margin-left:6px; }
+.sess-panel { max-height:0; overflow:hidden; transition:max-height .25s ease, padding .25s ease; padding:0; border-top:0 solid transparent; }
+.sess-panel.open { max-height:260px; padding:14px 0 16px; border-top:1px solid var(--border); }
+.sess-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px 18px; }
+.sess-item { display:flex; flex-direction:column; gap:2px; min-width:0; }
+.sess-item.cons-item { grid-column:1/-1; }
+.sess-k { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-3); }
+.sess-v { font-size:13px; font-weight:500; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sess-item.cons-item .sess-v { white-space:normal; color:var(--coral); font-weight:600; }
+
+/* MAIN / WRAP */
+.wrap { max-width:980px; margin:0 auto; padding:30px 24px 100px; }
+.phase-header { margin-bottom:22px; }
+.phase-title { font-family:var(--font-heading); font-size:30px; color:var(--text); margin-bottom:5px; letter-spacing:-0.02em; }
+.phase-sub { font-size:14px; color:var(--text-2); }
+
+/* CARDS */
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r-xl); padding:26px 28px; margin-bottom:16px; box-shadow:var(--shadow); }
+.card-head { display:flex; align-items:center; gap:12px; margin-bottom:18px; padding-bottom:16px; border-bottom:1px solid var(--border); }
+.card-icon { width:44px; height:44px; background:var(--orange); border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.card-title-wrap { flex:1; min-width:0; }
+.card-title { font-family:var(--font-heading); font-size:23px; letter-spacing:-.01em; color:var(--text); }
+.card-sub { font-size:13px; color:var(--text-2); margin-top:1px; }
+
+/* INTRO BLOCKS */
+.intro-block { background:var(--bg); border:1px solid var(--border); border-radius:var(--r); padding:16px 18px; margin-bottom:12px; }
+.intro-block-title { display:flex; align-items:center; gap:8px; font-size:14px; font-weight:700; color:var(--text); margin-bottom:7px; }
+.intro-block-title .dot { width:7px; height:7px; border-radius:50%; background:var(--orange); flex-shrink:0; }
+.intro-block p { font-size:13.5px; color:var(--text-2); line-height:1.65; }
+.intro-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; margin-top:4px; }
+.intro-item { display:flex; align-items:flex-start; gap:11px; padding:13px 15px; background:var(--surface); border:1px solid var(--border); border-radius:var(--r); }
+.intro-icon { width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.intro-icon svg { width:18px; height:18px; }
+.intro-item-title { font-size:13px; font-weight:600; color:var(--text); }
+.intro-item-sub { font-size:12px; color:var(--text-2); line-height:1.45; margin-top:1px; }
+
+/* CONSEQUENCE ANCHOR (read-only banner — "punt A") */
+.cons-anchor { display:flex; align-items:flex-start; gap:12px; border:1px solid var(--coral); border-radius:var(--r-lg); background:var(--coral-light); padding:14px 18px; margin-bottom:18px; }
+.cons-anchor .ca-dot { width:9px; height:9px; border-radius:50%; background:var(--coral); margin-top:5px; flex-shrink:0; }
+.cons-anchor .ca-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--coral); margin-bottom:2px; }
+.cons-anchor .ca-text { font-size:15px; font-weight:600; color:var(--text); line-height:1.4; }
+
+/* INFO ICON */
+.info-icon { width:16px; height:16px; border-radius:50%; border:1px solid var(--border-strong); background:var(--surface); color:var(--text-3); font-size:10px; font-weight:700; font-style:italic; font-family:var(--font-heading); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; transition:all .13s; user-select:none; flex-shrink:0; }
+.info-icon:hover { background:var(--orange-light); border-color:var(--orange-hover); color:var(--orange-hover); }
+
+/* LIVE FEED (collect-stage) */
+.live-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:10px; }
+.live-label { display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600; color:var(--text); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+.live-dot { width:8px; height:8px; border-radius:50%; background:var(--green); animation:pulse 2s ease-in-out infinite; display:inline-block; flex-shrink:0; }
+.count-chip { background:var(--green-light); color:var(--green-d); border:1px solid rgba(189,210,77,0.3); border-radius:20px; padding:2px 11px; font-size:12px; font-weight:700; }
+.feed-list { display:flex; flex-direction:column; gap:7px; min-height:60px; }
+.feed-item { display:flex; align-items:flex-start; gap:11px; padding:11px 14px; background:var(--surface); border:1px solid var(--border); border-radius:var(--r-sm); animation:slideIn .25s ease; }
+@keyframes slideIn { from{opacity:0;transform:translateY(-6px);} to{opacity:1;transform:none;} }
+.feed-avatar { width:28px; height:28px; border-radius:50%; background:var(--purple-light); border:1px solid rgba(150,102,170,0.2); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--purple); flex-shrink:0; }
+.feed-body { flex:1; min-width:0; }
+.feed-text { font-size:14px; color:var(--text); line-height:1.4; }
+.feed-author { font-size:11px; color:var(--text-3); margin-top:2px; }
+.feed-empty { text-align:center; padding:30px 18px; color:var(--text-3); font-size:13px; border:1px dashed var(--border-md); border-radius:var(--r-sm); }
+
+/* CLUSTER / EDITABLE RISK LIST */
+.risk-list { display:flex; flex-direction:column; gap:8px; }
+.risk-row { display:flex; align-items:center; gap:12px; padding:9px 12px 9px 9px; background:var(--surface); border:1px solid var(--border-md); border-radius:var(--r); transition:border-color .13s, box-shadow .13s; animation:slideIn .2s ease; }
+.risk-row:hover { border-color:var(--border-strong); }
+.risk-row.dragging { opacity:.5; }
+.risk-row.drag-over { border-color:var(--orange); box-shadow:0 0 0 2px var(--orange-light); }
+.coin { width:30px; height:30px; border-radius:50%; background:var(--coin-geel); color:var(--text); font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:inset 0 0 0 1px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.12); }
+.drag-handle { color:var(--text-3); cursor:grab; flex-shrink:0; display:flex; align-items:center; padding:2px; touch-action:none; }
+.drag-handle:active { cursor:grabbing; }
+.risk-input { flex:1; min-width:0; border:none; background:transparent; font-family:var(--font-body); font-size:14px; color:var(--text); padding:4px 2px; }
+.risk-input:focus { outline:none; }
+.risk-input.flash { background:var(--orange-light); border-radius:var(--r-sm); }
+.risk-del { background:transparent; border:none; color:var(--text-3); cursor:pointer; padding:5px; border-radius:var(--r-sm); display:flex; flex-shrink:0; transition:all .13s; }
+.risk-del:hover { background:var(--coral-light); color:var(--coral); }
+.add-row { display:flex; gap:9px; align-items:center; margin-top:12px; }
+.add-input { flex:1; padding:10px 13px; border:1px dashed var(--border-strong); border-radius:var(--r-sm); font-size:14px; font-family:var(--font-body); color:var(--text); background:var(--bg); }
+.add-input:focus { outline:none; border-style:solid; border-color:var(--orange); box-shadow:0 0 0 3px var(--orange-light); }
+
+/* PENDING (suggesties uit de feed nog te accepteren) */
+.pending-wrap { margin-top:18px; padding-top:16px; border-top:1px dashed var(--border-md); }
+.pending-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-3); margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+.pending-list { display:flex; flex-direction:column; gap:6px; }
+.pending-item { display:flex; align-items:center; gap:10px; padding:8px 11px; background:var(--bg); border:1px solid var(--border); border-radius:var(--r-sm); }
+.pending-text { flex:1; min-width:0; font-size:13.5px; color:var(--text-2); }
+.pend-add { background:var(--green-light); border:1px solid rgba(189,210,77,.4); color:var(--green-d); padding:4px 10px; font-size:12px; font-weight:600; border-radius:20px; cursor:pointer; transition:all .13s; }
+.pend-add:hover { background:var(--green); color:#fff; }
+.pend-skip { background:transparent; border:none; color:var(--text-3); cursor:pointer; padding:4px 6px; display:flex; border-radius:var(--r-sm); }
+.pend-skip:hover { color:var(--coral); }
+.pend-addall { font-size:12px; }
+
+/* CANVAS PREVIEW (tweeluik) */
+.canvas-wrap { background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); padding:16px; margin-bottom:16px; box-shadow:var(--shadow); }
+.canvas-wrap svg { width:100%; height:auto; display:block; }
+
+/* FINAL summary list */
+.final-note { display:flex; align-items:flex-start; gap:10px; background:var(--green-light); border:1px solid rgba(189,210,77,.4); border-radius:var(--r); padding:13px 16px; font-size:13.5px; color:#3D5210; margin-bottom:16px; }
+.final-note svg { flex-shrink:0; margin-top:2px; }
+
+/* BANNER */
+.banner { display:none; align-items:center; gap:10px; padding:12px 16px; background:var(--green-light); border:1px solid rgba(189,210,77,0.35); border-radius:var(--r); font-size:13px; font-weight:500; color:#2D5A10; margin-bottom:16px; animation:slideIn .25s ease; }
+.banner.show { display:flex; }
+
+/* BOTTOM BAR */
+.bot-bar { position:fixed; bottom:0; left:0; right:0; background:rgba(255,255,255,0.93); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border-top:1px solid var(--border); padding:12px 28px; display:flex; justify-content:space-between; align-items:center; gap:12px; z-index:100; }
+.bot-info { font-size:13px; color:var(--text-2); }
+.bot-info.ready { color:var(--green-d); font-weight:600; }
+.bot-left { display:flex; align-items:center; gap:14px; }
+
+/* ═══ RB SHARED FINAL ACTIONS STYLES ═══ */
+.rb-final-actions { display:flex; justify-content:space-between; align-items:center; gap:14px; }
+.rb-back-edit-btn { display:inline-flex; align-items:center; gap:8px; font-size:13.5px; color:var(--text-2); }
+.rb-back-edit-btn:hover { color:var(--text); background:var(--bg); }
+.rb-back-edit-btn svg { color:var(--text-3); }
+.rb-back-edit-btn:hover svg { color:var(--text); }
+/* ═══ END RB SHARED FINAL ACTIONS STYLES ═══ */
+
+/* SCREENS */
+.screen { display:none; }
+.screen.open { display:block; animation:fadeIn .25s ease; }
+@keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+
+/* ═══ RB SHARED TIP POPUP ═══ */
+.rb-tip-backdrop{display:none;position:fixed;inset:0;background:rgba(38,42,54,.55);z-index:999;}
+.rb-tip-backdrop.open{display:block}
+.rb-tip-popup{display:none;position:fixed;background:var(--surface);border-radius:var(--r-xl);box-shadow:0 12px 40px rgba(0,0,0,.22);z-index:1000;font-family:var(--font-body);animation:rbTipIn .18s ease;}
+@keyframes rbTipIn{from{opacity:0;transform:translateY(6px) scale(.985)}to{opacity:1;transform:none}}
+.rb-tip-popup.open{display:flex;flex-direction:column}
+.rb-tip-popup[data-size="lg"]{top:5vh;left:50%;transform:translateX(-50%);max-width:640px;width:calc(100% - 40px);max-height:90vh;padding:32px 36px 28px;}
+.rb-tip-popup[data-size="lg"].open{transform:translateX(-50%)}
+.rb-tip-popup[data-size="sm"]{max-width:340px;padding:14px 16px 12px;}
+.rb-tip-popup .rb-tip-close{position:absolute;top:10px;right:12px;width:30px;height:30px;background:var(--surface);border:1px solid var(--border-md);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--text-2);padding:0;line-height:1;transition:all .13s;}
+.rb-tip-popup .rb-tip-close:hover{background:var(--bg);color:var(--text)}
+.rb-tip-popup[data-size="sm"] .rb-tip-close{width:22px;height:22px;font-size:14px;top:6px;right:6px;border-color:var(--border);}
+.rb-tip-popup .rb-tip-title{font-family:var(--font-heading);color:var(--text);margin:0 36px 4px 0;letter-spacing:-0.01em;}
+.rb-tip-popup[data-size="lg"] .rb-tip-title{font-size:22px}
+.rb-tip-popup[data-size="sm"] .rb-tip-title{font-size:14px;font-weight:700;font-family:var(--font-body);margin-right:28px;}
+.rb-tip-popup .rb-tip-sub{font-size:13px;color:var(--text-2);margin-bottom:22px;}
+.rb-tip-popup[data-size="sm"] .rb-tip-sub{display:none}
+.rb-tip-popup .rb-tip-body{color:var(--text-2);line-height:1.7;overflow-y:auto;}
+.rb-tip-popup[data-size="lg"] .rb-tip-body{font-size:13.5px;max-height:calc(90vh - 140px)}
+.rb-tip-popup[data-size="sm"] .rb-tip-body{font-size:12.5px;line-height:1.55}
+.rb-tip-popup .rb-tip-body p{margin:0 0 10px}
+.rb-tip-popup .rb-tip-body p:last-child{margin-bottom:0}
+.rb-tip-popup .rb-tip-h{font-size:14px;font-weight:700;color:var(--orange-hover);margin:16px 0 5px;display:flex;align-items:center;gap:7px;}
+.rb-tip-popup .rb-tip-h:first-child{margin-top:0}
+.rb-tip-popup .rb-tip-h::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--orange);flex-shrink:0;}
+.rb-tip-popup .rb-tip-actions{display:flex;justify-content:flex-end;margin-top:18px;}
+.rb-tip-popup[data-size="sm"] .rb-tip-actions{display:none}
+@media(max-width:520px){ .rb-tip-popup[data-size="sm"]{left:20px !important;right:20px !important;max-width:none;width:auto;} .rb-tip-popup[data-size="lg"]{padding:24px 22px 20px;} }
+/* ═══ END RB SHARED TIP POPUP ═══ */
+
+/* ═══ PARTICIPANT VIEW ═══ */
+.pview { display:none; min-height:100vh; background:var(--bg); padding:0 0 40px; }
+.pview.open { display:block; }
+.phdr { display:flex; align-items:center; justify-content:space-between; background:var(--surface); border-bottom:1px solid var(--border); padding:0 28px; height:58px; position:sticky; top:0; z-index:50; }
+.phdr .hdr-r { display:flex; align-items:center; gap:8px; }
+.pwrap { max-width:560px; margin:28px auto 0; padding:0 20px; }
+.pcard { background:var(--surface); border:1px solid var(--border); border-radius:var(--r-xl); padding:32px; box-shadow:var(--shadow); }
+.p-summary { margin-bottom:18px; padding:14px 16px; background:var(--coral-light); border:1px solid var(--coral); border-radius:var(--r); }
+.p-summary-label { font-size:11px; font-weight:700; color:var(--coral); text-transform:uppercase; letter-spacing:.06em; margin-bottom:5px; }
+.p-summary-text { font-size:13.5px; line-height:1.6; color:var(--text); }
+.p-cons { display:flex; align-items:flex-start; gap:10px; border:1px solid var(--coral); border-radius:var(--r); background:var(--coral-light); padding:12px 15px; margin-bottom:18px; }
+.p-cons .ca-dot { width:8px; height:8px; border-radius:50%; background:var(--coral); margin-top:5px; flex-shrink:0; }
+.p-cons .ca-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--coral); margin-bottom:2px; }
+.p-cons .ca-text { font-size:14px; font-weight:600; color:var(--text); line-height:1.35; }
+.p-field { margin-bottom:14px; }
+.p-field label { display:block; font-size:13px; font-weight:600; margin-bottom:6px; }
+.p-input { width:100%; padding:11px 13px; border:1px solid var(--border-strong); border-radius:var(--r-sm); font-size:14px; font-family:var(--font-body); color:var(--text); background:var(--surface); }
+.p-input:focus { outline:none; border-color:var(--orange); box-shadow:0 0 0 3px var(--orange-light); }
+.p-submit { width:100%; padding:12px; background:var(--orange); border:none; border-radius:var(--r-sm); color:var(--cinab-ink); font-family:var(--font-body); font-size:15px; font-weight:600; cursor:pointer; transition:all .13s; }
+.p-submit:hover { background:var(--orange-hover); }
+.p-mine { margin-top:18px; padding-top:16px; border-top:1px solid var(--border); }
+.p-mine-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text-3); margin-bottom:8px; }
+.p-mine-item { display:flex; align-items:center; gap:9px; padding:8px 11px; background:var(--bg); border:1px solid var(--border); border-radius:var(--r-sm); margin-bottom:6px; font-size:13.5px; }
+.p-mine-item .chk { color:var(--green-d); flex-shrink:0; display:flex; }
+.p-wait-icon { width:60px; height:60px; background:var(--green-light); border-radius:50%; margin:0 auto 16px; display:flex; align-items:center; justify-content:center; }
+.p-center { text-align:center; }
+.p-title { font-family:var(--font-heading); font-size:21px; margin-bottom:5px; }
+.p-sub { font-size:13.5px; color:var(--text-2); line-height:1.6; }
+.p-numbered { display:flex; flex-direction:column; gap:7px; margin-top:6px; text-align:left; }
+.p-num-row { display:flex; align-items:center; gap:11px; padding:9px 12px; background:var(--bg); border:1px solid var(--border); border-radius:var(--r-sm); }
+.p-num-row .coin { width:26px; height:26px; font-size:12px; }
+.p-num-row span { font-size:13.5px; }
+
+@media (max-width:760px) {
+  .header { padding:0 14px; }
+  .hdr-mid { display:none; }
+  .wrap { padding:22px 14px 96px; }
+  .card { padding:20px 18px; }
+  .phdr { padding:0 14px; }
+  .bot-bar { padding:10px 14px; }
+  .bot-info { font-size:12px; }
+}
+/* ══════════ FASE 4 — MATRIX & INTERPRETATIE ══════════ */
+/* zone-legenda boven de lijst */
+.zone-legend { display:flex; flex-wrap:wrap; gap:8px; padding:12px 14px; background:var(--bg); border:1px solid var(--border); border-radius:var(--r-sm); margin-bottom:16px; }
+.zl-item { display:inline-flex; align-items:center; gap:7px; font-size:12px; color:var(--text-2); padding:3px 9px 3px 3px; }
+.zl-swatch { width:16px; height:16px; border-radius:5px; flex-shrink:0; border:1px solid rgba(0,0,0,0.12); }
+.zl-name { font-weight:700; color:var(--text); }
+.zl-act { color:var(--text-3); }
+/* per-risico interpretatiekaart */
+.intp-card { background:var(--surface); border:1px solid var(--border); border-left-width:5px; border-radius:var(--r); padding:15px 17px 16px; margin-bottom:13px; box-shadow:var(--shadow); }
+.intp-head { display:flex; align-items:flex-start; gap:11px; margin-bottom:12px; }
+.intp-coin { width:28px; height:28px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:var(--text); flex-shrink:0; box-shadow:inset 0 0 0 1px rgba(0,0,0,.14), 0 1px 2px rgba(0,0,0,.14); }
+.intp-risk-text { flex:1; min-width:0; font-size:14.5px; font-weight:600; line-height:1.35; color:var(--text); padding-top:3px; }
+.intp-cellbadge { flex-shrink:0; font-size:12px; font-weight:700; padding:4px 10px; border-radius:20px; background:var(--bg); border:1px solid var(--border-md); color:var(--text-2); letter-spacing:.03em; }
+/* cel → zone → actie keten */
+.intp-chain { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:11px; }
+.intp-chip { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; padding:5px 11px; border-radius:20px; font-weight:600; }
+.intp-chip.zone { color:#fff; }
+.intp-chip.iso { background:var(--teal-light); color:#1F6E69; border:1px solid rgba(42,151,145,0.3); }
+.intp-chip.score { background:var(--surface); border:1px solid var(--border-md); color:var(--text-2); }
+.intp-arrow { color:var(--text-3); display:inline-flex; align-items:center; }
+.intp-arrow svg { width:14px; height:14px; }
+.intp-action-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text-3); margin-bottom:5px; display:flex; align-items:center; gap:7px; }
+.intp-advice { font-size:13.5px; line-height:1.6; color:var(--text); background:var(--bg); border:1px solid var(--border); border-radius:var(--r-sm); padding:11px 13px; }
+.intp-advice.refined { border-color:var(--purple); background:var(--purple-light); }
+.intp-advice .ai-tag { display:inline-flex; align-items:center; gap:5px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--purple); margin-bottom:5px; }
+.intp-refine-row { display:flex; justify-content:flex-end; margin-top:9px; }
+.intp-refine-btn { font-size:12px; padding:5px 12px; }
+.intp-refine-btn svg { width:13px; height:13px; }
+.intp-refine-btn.busy { opacity:.6; pointer-events:none; }
+@keyframes rbSpin { to { transform:rotate(360deg); } }
+.intp-spin { animation:rbSpin .8s linear infinite; }
+/* beheersprioriteiten-lijst */
+.prio-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r-xl); padding:22px 24px; margin-bottom:16px; box-shadow:var(--shadow); }
+.prio-list { display:flex; flex-direction:column; gap:7px; }
+.prio-row { display:flex; align-items:center; gap:12px; padding:10px 13px; background:var(--bg); border:1px solid var(--border); border-left-width:4px; border-radius:var(--r-sm); }
+.prio-rank { font-size:12px; font-weight:700; color:var(--text-3); min-width:20px; text-align:center; flex-shrink:0; }
+.prio-coin { width:26px; height:26px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--text); flex-shrink:0; box-shadow:inset 0 0 0 1px rgba(0,0,0,.14); }
+.prio-text { flex:1; min-width:0; font-size:13.5px; color:var(--text); overflow:hidden; text-overflow:ellipsis; }
+.prio-meta { flex-shrink:0; display:flex; align-items:center; gap:8px; }
+.prio-zone { font-size:11px; font-weight:700; padding:2px 9px; border-radius:20px; color:#fff; }
+.prio-score { font-size:11px; font-weight:700; color:var(--text-3); background:var(--surface); border:1px solid var(--border-md); border-radius:20px; padding:2px 8px; }
+/* no-data hint */
+.cons-nodata { text-align:center; padding:34px 20px; color:var(--text-3); font-size:13.5px; font-style:italic; }
+/* deelnemer: read-only matrixresultaat-overzicht */
+.p-mine-score { font-weight:700; color:#fff; font-size:11px; flex-shrink:0; border-radius:20px; padding:2px 10px; }
+
+/* ── F4: bewerkbaar advies + eindscherm-schuif + inventarisatie-box ── */
+.intp-edit-hint{font-weight:400;font-size:11px;color:var(--text-3);font-style:italic}
+.intp-ai-tag-row{margin:6px 0 0}
+.intp-ai-tag-row:empty{display:none}
+.intp-advice-edit{width:100%;box-sizing:border-box;margin-top:6px;padding:10px 12px;border:1px solid var(--border-md,var(--border));border-radius:var(--r-sm);font-family:inherit;font-size:13.5px;line-height:1.5;color:var(--text);background:var(--surface);resize:vertical;min-height:60px}
+.intp-advice-edit:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 3px var(--purple-light)}
+.intp-advice-edit.refined{border-color:var(--purple);background:var(--purple-light)}
+.view-toggle{display:flex;background:var(--bg);border:1px solid var(--border-md,var(--border));border-radius:var(--r);padding:3px;gap:2px;width:fit-content;margin-bottom:16px}
+.vt-btn{padding:7px 18px;border-radius:var(--r-sm);font-size:13px;font-weight:500;border:none;background:transparent;cursor:pointer;color:var(--text-2);font-family:inherit;transition:all .13s}
+.vt-btn.on{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.rinv-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;box-shadow:var(--shadow)}
+.rinv-list{display:flex;flex-direction:column;gap:14px}
+.rinv-row{display:flex;align-items:flex-start;gap:12px}
+.rinv-coin{flex-shrink:0;width:26px;height:26px;border-radius:50%;color:#262A36;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:1px solid rgba(0,0,0,.14)}
+.rinv-main{flex:1;min-width:0}
+.rinv-text{font-size:14px;font-weight:600;color:var(--text);margin-bottom:7px}
+.rinv-axis{display:flex;align-items:center;gap:10px;margin-top:5px}
+.rinv-axis-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);width:52px;flex-shrink:0}
+.rinv-cells{display:inline-flex;gap:5px;flex-wrap:wrap}
+.rinv-cell{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--text-3);background:var(--bg);border:1px solid var(--border)}
+.rinv-cell.on{background:var(--coin-blauw);border-color:var(--coin-blauw);color:#fff;font-weight:700}
+
+/* ═══ RB SHARED A11Y (standaard §6: zichtbare focus, 44px tikdoelen, reduced motion) ═══ */
+:focus-visible{outline:var(--focus-ring);outline-offset:2px;border-radius:4px;}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto;}
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;}
+}
+.btn,.lang-btn,.join-btn{min-height:var(--touch-target);}
+.lang-btn{min-width:var(--touch-target);}
+.info-icon{position:relative;}
+.info-icon::after{content:"";position:absolute;inset:-10px;}
+/* ═══ END RB SHARED A11Y ═══ */
+
+/* ═══ RB SHARED EXPRESSIE (E1–E5 + F1–F5; besluit 2026-06-12, F6 vervallen) ═══
+   Niet-invasieve expressielaag op bestaande klassen. Per bestand verschillen alleen de vars
+   --fase-accent / --fase-accent-text / --fase-nummer (zie RB FASE-EXPRESSIE VARS).
+   Selectors die in een bestand niet voorkomen zijn bewust no-ops (bv. .cover alleen rapport). */
+/* E1 — fase-identiteit */
+.header{ border-bottom:3px solid var(--fase-accent); }
+.phase-pill{ background:var(--fase-accent); color:var(--fase-accent-text); border-color:var(--fase-accent); }
+.card-icon{ background:var(--fase-accent); }
+.intro-block-title .dot{ background:var(--fase-accent); width:10px; height:10px; box-shadow:inset 0 0 0 1px rgba(0,0,0,.12); }
+/* E2 — coin- en bord-DNA */
+.card{ border-left:6px solid var(--fase-accent); }
+.card-title{ display:flex; align-items:center; gap:10px; }
+.card-title::before{ content:""; width:14px; height:14px; border-radius:50%; flex-shrink:0;
+  background:var(--coin-geel); box-shadow:inset 0 0 0 1px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.12); }
+.phase-header{ border-bottom:2px dotted var(--border-md); padding-bottom:16px; position:relative; }
+/* E3 — Fraunces laten spreken + decoratief watermerk (tone-on-tone, solide lijnkleur-token) */
+.phase-title{ font-size:38px; letter-spacing:-0.025em; }
+.phase-title::after{ content:""; display:block; width:56px; height:5px; border-radius:3px;
+  background:var(--fase-accent); margin-top:12px; }
+.phase-header::before{ content:var(--fase-nummer); position:absolute; right:0; top:-14px;
+  font-family:var(--font-heading); font-weight:600; font-size:96px; line-height:1;
+  color:var(--cinab-line); pointer-events:none; }
+@media (max-width:900px){ .phase-header::before{ display:none; } }
+/* E4 — diepte en micro-beweging (prefers-reduced-motion in RB SHARED A11Y dekt dit af) */
+.card{ transition:transform .15s ease, box-shadow .15s ease; }
+.card:hover{ transform:translateY(-2px); box-shadow:0 4px 10px rgba(0,0,0,0.07), 0 14px 30px rgba(0,0,0,0.09); }
+.btn{ transition:all .13s, transform .13s; }
+.btn:hover{ transform:translateY(-1px); }
+/* E5 — duotone statement: Punt A als donker vlak met accentstip */
+.cons-anchor{ background:var(--tool-black); border-color:var(--tool-black); }
+.cons-anchor .ca-dot{ background:var(--fase-accent); width:12px; height:12px; }
+.cons-anchor .ca-label{ color:var(--fase-accent); }
+.cons-anchor .ca-text{ color:var(--cinab-offwhite); }
+/* F1 — wisselend watermerk per schermtype (no-op waar het scherm-id niet bestaat) */
+#sCollect .phase-header::before{ content:"?"; }
+#sCluster .phase-header::before{ content:"123"; font-size:72px; top:0; }
+#sFinal  .phase-header::before{ content:"\2713"; }
+/* F2 — zone-ladder: zes stippen in de zes zonekleuren als ornament op de bordlijn */
+.phase-header::after{ content:""; position:absolute; left:0; bottom:-7px; width:12px; height:12px; border-radius:50%;
+  background:var(--zone-aanvaardbaar);
+  box-shadow: 20px 0 0 var(--zone-laag), 40px 0 0 var(--zone-beperkt), 60px 0 0 var(--zone-midden),
+              80px 0 0 var(--zone-hoog), 100px 0 0 var(--zone-urgent); }
+/* F3 — voortgangsstippen als mini-coins (afgerond = coin-geel, actueel = fase-accent) */
+.pp-dot{ width:11px; height:11px; box-shadow:inset 0 0 0 1px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.10); }
+.pp-dot.done{ background:var(--coin-geel); }
+.pp-dot.cur{ background:var(--fase-accent); box-shadow:inset 0 0 0 1px rgba(0,0,0,.12), 0 0 0 3px var(--orange-light); }
+/* F4 — coin-trio (geel/rood/blauw) op wachtschermen met .p-wait-icon */
+.p-wait-icon{ background:var(--coin-geel); width:34px; height:34px; margin:0 auto 16px; margin-left:calc(50% - 41px);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.12),
+              24px 0 0 0 var(--coin-rood),
+              48px 0 0 0 var(--coin-blauw); }
+.p-wait-icon svg{ display:none; }
+/* F5 — 6×6-rasterwatermerk, ALLEEN rapport (.section-head bestaat alleen daar; besluit 2026-06-12) */
+.section-head{ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath d='M28 0H0v28' fill='none' stroke='%23E5E3DB' stroke-width='1'/%3E%3C/svg%3E");
+  background-size:28px 28px; background-repeat:repeat; background-position:right top; }
+/* ═══ END RB SHARED EXPRESSIE ═══ */
+
+/* ═══ RB FASE-EXPRESSIE VARS (fase-specifiek; enige per-bestand verschil in de expressielaag) ═══ */
+:root{ --fase-accent:var(--tool-secondary-12); --fase-accent-text:var(--cinab-ink); --fase-nummer:"4"; }
+/* ═══ END RB FASE-EXPRESSIE VARS ═══ */
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ FACILITATOR VIEW ═══════════════ -->
+<div id="facilitatorView">
+
+  <header class="header">
+    <a class="logo" onclick="goPrevPhase()" aria-label="Risicobeheersing — vorige fase">
+      <svg class="logo-img" xmlns="http://www.w3.org/2000/svg" viewBox="6392 11502 7040 7040" aria-hidden="true" focusable="false">
+        <rect class="fil-logo-shadow" x="6542.13" y="11652.68" width="6840.47" height="6840.47" rx="625.64" ry="625.64"/>
+        <rect class="fil-logo-main"   x="6492.13" y="11602.68" width="6840.47" height="6840.47" rx="625.64" ry="625.64"/>
+        <path class="fil-logo-line" d="M8459.51 11340.66l6.77 2886.05c0.53,225.18 44.93,223.19 131.76,299.11 64.53,56.42 712.98,613.44 1067.73,922.39m279.67 498.36c-3.85,335.14 -17.51,1600.45 -22.09,2025.82m-1460.38 -5160.51l785.98 4.94m3662.81 274.39l-6.72 591.26 -710.88 10.16 0 978.81m-1557.05 3300.95c-5.59,-19.68 -10.23,-41.55 -13.66,-65.97 -40.62,-289.42 -55.5,-1603.06 -55.5,-1603.06m0 0l-12.4 -1458.25c0,0 -44.42,-161.55 137.32,-169.63 181.74,-8.08 658.3,-4.04 658.3,-4.04l-3.77 -1608.68m459.06 3230.04l-615.21 -562.61m1311.37 -167.26l-1179.41 -4.13m-1388.18 1333.84l1210.17 -1126.72c0,0 173.66,-113.07 201.93,-286.74 28.27,-173.67 4.04,-807.74 4.04,-807.74l1579.11 0c0,0 10.18,8.09 137.31,-44.42 53.21,-21.98 127.68,-100.56 196.29,-184.51m-4091.56 3529.88c18.68,-34.96 33.6,-74 38.36,-114.44 16.15,-137.31 24.23,-1514.5 24.23,-1514.5 0,0 -4.03,-137.32 -72.69,-185.78 -68.66,-48.46 -665.89,-556.18 -665.89,-556.18m-467.07 653.4l469.73 -451.59c0,0 69.04,-77 -2.66,-201.81m-1213.8 -2.13l1213.8 2.13 -29.21 -897.55 -563.22 -1.72m-1022.85 -1671.85l3.28 541.68c0,0 -10.23,140.69 117.67,140.69 127.9,0 600.9,26.88 600.9,26.88l-1 659.21m-302.89 299.12l-178.2 -1.97c0,0 -220.41,18.58 -300.07,-21.25 -41.28,-20.64 -175.23,-151.79 -294.75,-273.38m1035.23 -2176.98l5.68 516.43 895.89 -2.1m2.16 920.01l2255.42 21.86m-1471.05 -1258.2l-0.37 394.45 -2.13 2268.51m2268.36 -3395.11c-121.47,117.05 -302.96,241.2 -548.07,278.79m-1062.71 -1009.16l-14.83 1611m313.94 307.52l452.12 4 9.35 -663.77m8.52 -604.84l5.09 -361.34m1408.26 1081.76l-2065.77 2035.4c-50.75,50 -106.04,79.05 -108.71,151.99 -1.64,44.93 10.93,491.27 20.85,827.53m-1774.69 2623.29l879.79 0 134 0 720.63 0 30.4 0 713.76 0 217.25 0 802.66 0 0 323.39 -3498.49 0 0 -323.39z"/>
+        <rect class="fil-logo-bar" x="8158.53" y="17972.39" width="3395.02" height="332.88"/>
+      </svg>
+    </a>
+    <div class="hdr-mid">
+      <div class="phase-prog" aria-hidden="true">
+        <span class="pp-dot done"></span><span class="pp-dot done"></span><span class="pp-dot done"></span><span class="pp-dot done"></span><span class="pp-dot cur"></span><span class="pp-dot"></span>
+      </div>
+      <span class="phase-pill" id="t-phasePill">Fase 4 &bull; Matrix</span>
+    </div>
+    <div class="header-right">
+      <button class="btn demo-pill" data-env="dev-only" onclick="showPView()" id="t-pvBtn">Deelnemer-view &rarr;</button>
+      <button class="btn" onclick="openTheory()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="7" cy="7" r="5.5"/><path d="M7 9.5V7M7 4.5h.01"/></svg>
+        <span id="t-theoryBtn">Onderbouwing</span>
+      </button>
+      <button class="btn btn-ghost" data-env="dev-only" onclick="resetDemoData()" title="Reset demo-data" style="padding:6px 10px"><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 7a5 5 0 0 1 8.5-3.5L12 5M12 2v3h-3M12 7a5 5 0 0 1-8.5 3.5L2 9M2 12V9h3"/></svg></button>
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="langNL" onclick="setLang('nl')">NL</button>
+        <button class="lang-btn" id="langEN" onclick="setLang('en')">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ──────── SESSIE-INFO PANEEL (gedeeld) ──────── -->
+  <div class="sess-bar" id="sessBar" style="display:none">
+    <button class="sess-toggle" id="sessToggle" onclick="toggleSessPanel()" aria-expanded="false" aria-controls="sessPanel">
+      <svg class="chev" width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 4.5L6 7.5L9 4.5"/></svg>
+      <span id="t-sessTitle">Sessie-info</span>
+      <span class="sess-mini" id="sessMini"></span>
+    </button>
+    <div class="sess-panel" id="sessPanel" role="region" aria-label="Sessiecontext">
+      <div class="sess-grid" id="sessGrid"></div>
+    </div>
+  </div>
+
+  <main class="wrap">
+
+    <div style="margin-bottom:18px">
+      <div class="banner" id="topBanner">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 8l3.5 3.5L13 4.5"/></svg>
+        <span id="topBannerMsg"></span>
+      </div>
+    </div>
+
+    <!-- ══════════ SCREEN: INTRO ══════════ -->
+    <div id="sIntro" class="screen open">
+      <div class="phase-header">
+        <h1 class="phase-title" id="t-phaseTitle">Van groepsscore naar matrix</h1>
+        <p class="phase-sub" id="t-phaseSub">Elke groepsscore krijgt een plek in de 6&times;6-matrix; de celpositie bepaalt de zone en de passende beheersrichting.</p>
+      </div>
+
+      <div class="cons-anchor">
+        <span class="ca-dot"></span>
+        <div>
+          <div class="ca-label" id="t-consAnchorLabel">Punt A &mdash; centraal analysepunt</div>
+          <div class="ca-text" id="consAnchorText">&mdash;</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M3 8h14M3 12.5h14M8 3v14M12.5 3v14"/></svg>
+          </div>
+          <div class="card-title-wrap">
+            <div style="display:flex;align-items:center;gap:8px">
+              <h2 class="card-title" id="t-introTitle">Fase 4 &mdash; Matrix &amp; interpretatie</h2>
+              <span class="info-icon" onclick="event.stopPropagation();rbInfoOpen('infoMatrix',this)" aria-label="Uitleg matrix" role="button" tabindex="0">i</span>
+            </div>
+            <p class="card-sub" id="t-introSub">Celpositie &rarr; zone &rarr; beheersrichting per risico</p>
+          </div>
+        </div>
+
+        <div class="intro-block">
+          <div class="intro-block-title"><span class="dot"></span><span id="t-introWhatTitle">Wat doen we in deze fase?</span></div>
+          <p id="t-introWhatBody">De vastgestelde groepsscores uit fase 3 plaatsen we in de risicomatrix. Elke combinatie van kans (A&ndash;F) en impact (1&ndash;6) valt in een vaste cel, en elke cel hoort bij &eacute;&eacute;n van de zes zones &mdash; van aanvaardbaar tot urgent. De zone bepaalt de passende beheersrichting (ISO 31000-respons) en een generiek maatregeladvies. Zo wordt in &eacute;&eacute;n oogopslag zichtbaar welke risico&rsquo;s als eerste aandacht verdienen.</p>
+        </div>
+
+        <div class="intro-block">
+          <div class="intro-block-title"><span class="dot"></span><span id="t-introHowTitle">Hoe verloopt het?</span></div>
+          <p id="t-introBody">Je ziet de ingevulde matrix met alle risico&rsquo;s als genummerde coins op hun celpositie, gekleurd naar zone. Per risico tonen we de keten cel &rarr; zone &rarr; beheersrichting en een generiek advies. Met de knop &ldquo;Verfijn met AI&rdquo; spits je dat advies toe op de concrete risicotekst. Onderaan staat de lijst beheersprioriteiten: gesorteerd op zone-ernst en daarbinnen op risicoscore. Daarna leg je het matrixresultaat vast voor de maatregelen in fase 5.</p>
+        </div>
+
+        <div class="intro-grid" id="introGrid"></div>
+      </div>
+
+      <div class="bot-bar">
+        <div class="bot-left">
+          <div class="bot-info" id="t-introBotInfo">De groepsscores zijn klaar voor de matrix</div>
+        </div>
+        <button class="btn btn-orange btn-lg" onclick="startInterpret()" id="t-introStart">
+          <span>Toon de matrix</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3.5 8h9M9 4l4 4-4 4"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ══════════ SCREEN: INTERPRET (matrix + per-risico + prioriteiten) ══════════ -->
+    <div id="sCollect" class="screen">
+      <div class="phase-header">
+        <h1 class="phase-title" id="t-collectTitle">De risicomatrix</h1>
+        <p class="phase-sub" id="t-collectSub">Elke coin staat op zijn celpositie en is gekleurd naar zone. De celpositie bepaalt de beheersrichting.</p>
+      </div>
+
+      <div class="cons-anchor">
+        <span class="ca-dot"></span>
+        <div>
+          <div class="ca-label" id="t-consAnchorLabel2">Punt A &mdash; centraal analysepunt</div>
+          <div class="ca-text" id="consAnchorText2">&mdash;</div>
+        </div>
+      </div>
+
+      <div class="canvas-wrap" id="canvasWrap" aria-label="Risicomatrix met alle risico's op celpositie">
+        <div id="rbCanvas"></div>
+      </div>
+
+      <div class="zone-legend" id="zoneLegend"></div>
+
+      <!-- Beheersprioriteiten -->
+      <div class="prio-card">
+        <div class="card-head" style="margin-bottom:14px;padding-bottom:13px">
+          <div class="card-title-wrap">
+            <div style="display:flex;align-items:center;gap:8px">
+              <h2 class="card-title" style="font-size:19px" id="t-prioTitle">Beheersprioriteiten</h2>
+              <span class="info-icon" onclick="event.stopPropagation();rbInfoOpen('infoPrio',this)" aria-label="Uitleg prioriteiten" role="button" tabindex="0">i</span>
+            </div>
+            <p class="card-sub" id="t-prioSub">Gesorteerd op zone-ernst, daarbinnen op risicoscore (kans &times; impact)</p>
+          </div>
+        </div>
+        <div class="prio-list" id="prioList"></div>
+      </div>
+
+      <!-- Per-risico interpretatie -->
+      <div style="margin-bottom:10px;display:flex;align-items:center;gap:8px">
+        <h2 class="card-title" style="font-size:19px" id="t-intpTitle">Interpretatie per risico</h2>
+        <span class="info-icon" onclick="event.stopPropagation();rbInfoOpen('infoAdvice',this)" aria-label="Uitleg advies" role="button" tabindex="0">i</span>
+      </div>
+      <div id="intpList"></div>
+
+      <div class="bot-bar">
+        <div class="bot-left">
+          <button class="btn btn-purple" data-env="dev-only" onclick="refineAllAdvice()" id="t-refineAllBtn">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.5l1.6 3.7L13.5 6l-3.1 2.4.9 4.1L8 10.7 4.7 12.5l.9-4.1L2.5 6l3.9-.8L8 1.5z"/></svg>
+            <span id="t-refineAllLabel">Verfijn alle adviezen met AI</span>
+          </button>
+          <div class="bot-info" id="t-collectBotInfo">De matrix is gevuld &mdash; klaar om vast te leggen</div>
+        </div>
+        <button class="btn btn-orange btn-lg" onclick="confirmMatrix()" id="t-toFinal">
+          <span>Matrixresultaat vastleggen</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 8l3.5 3.5L13 4.5"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ══════════ SCREEN: FINAL ══════════ -->
+    <div id="sFinal" class="screen">
+      <div class="phase-header">
+        <h1 class="phase-title" id="t-finalTitle">Matrixresultaat vastgelegd</h1>
+        <p class="phase-sub" id="t-finalSub">De zones en beheersrichtingen staan vast &mdash; klaar om in fase 5 maatregelen te koppelen.</p>
+      </div>
+
+      <div class="final-note">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 8l3.5 3.5L13 4.5"/></svg>
+        <span id="finalNoteText">&mdash;</span>
+      </div>
+
+      <div class="view-toggle" role="group" aria-label="Weergave-keuze">
+        <button class="vt-btn on" onclick="switchView('uitkomsten')" id="t-vtUitkomsten">Uitkomsten</button>
+        <button class="vt-btn" onclick="switchView('visueel')" id="t-vtVisual">Visuele weergave</button>
+      </div>
+      <div id="fvUitkomsten">
+        <div class="rinv-card"><div class="rinv-list" id="rinvList"></div></div>
+      </div>
+      <div id="fvCanvas" style="display:none">
+        <div class="canvas-wrap" id="canvasWrapFinal"><div id="rbCanvasFinal"></div></div>
+        <div class="zone-legend" id="zoneLegendFinal"></div>
+      </div>
+
+      <div class="bot-bar">
+        <div class="rb-final-actions" style="width:100%">
+          <button class="btn btn-ghost rb-back-edit-btn" onclick="backToCollect()" type="button" id="t-rbBackEdit">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            <span id="t-backEditLabel">Aanpassen</span>
+          </button>
+          <button class="btn btn-orange btn-lg" onclick="goToNextPhase()" type="button" id="t-rbNextPhase">
+            <span>Naar fase 5 &mdash; Maatregelen</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3.5 8h9M9 4l4 4-4 4"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div><!-- /facilitatorView -->
+
+
+<!-- ═══════════════ PARTICIPANT VIEW ═══════════════ -->
+<div id="pView" class="pview">
+  <header class="phdr" role="banner">
+    <div class="logo" style="cursor:default" aria-label="Risicobeheersing">
+      <svg class="logo-img" xmlns="http://www.w3.org/2000/svg" viewBox="6392 11502 7040 7040" aria-hidden="true" focusable="false">
+        <rect class="fil-logo-shadow" x="6542.13" y="11652.68" width="6840.47" height="6840.47" rx="625.64" ry="625.64"/>
+        <rect class="fil-logo-main"   x="6492.13" y="11602.68" width="6840.47" height="6840.47" rx="625.64" ry="625.64"/>
+        <path class="fil-logo-line" d="M8459.51 11340.66l6.77 2886.05c0.53,225.18 44.93,223.19 131.76,299.11 64.53,56.42 712.98,613.44 1067.73,922.39m279.67 498.36c-3.85,335.14 -17.51,1600.45 -22.09,2025.82m-1460.38 -5160.51l785.98 4.94m3662.81 274.39l-6.72 591.26 -710.88 10.16 0 978.81m-1557.05 3300.95c-5.59,-19.68 -10.23,-41.55 -13.66,-65.97 -40.62,-289.42 -55.5,-1603.06 -55.5,-1603.06m0 0l-12.4 -1458.25c0,0 -44.42,-161.55 137.32,-169.63 181.74,-8.08 658.3,-4.04 658.3,-4.04l-3.77 -1608.68m459.06 3230.04l-615.21 -562.61m1311.37 -167.26l-1179.41 -4.13m-1388.18 1333.84l1210.17 -1126.72c0,0 173.66,-113.07 201.93,-286.74 28.27,-173.67 4.04,-807.74 4.04,-807.74l1579.11 0c0,0 10.18,8.09 137.31,-44.42 53.21,-21.98 127.68,-100.56 196.29,-184.51m-4091.56 3529.88c18.68,-34.96 33.6,-74 38.36,-114.44 16.15,-137.31 24.23,-1514.5 24.23,-1514.5 0,0 -4.03,-137.32 -72.69,-185.78 -68.66,-48.46 -665.89,-556.18 -665.89,-556.18m-467.07 653.4l469.73 -451.59c0,0 69.04,-77 -2.66,-201.81m-1213.8 -2.13l1213.8 2.13 -29.21 -897.55 -563.22 -1.72m-1022.85 -1671.85l3.28 541.68c0,0 -10.23,140.69 117.67,140.69 127.9,0 600.9,26.88 600.9,26.88l-1 659.21m-302.89 299.12l-178.2 -1.97c0,0 -220.41,18.58 -300.07,-21.25 -41.28,-20.64 -175.23,-151.79 -294.75,-273.38m1035.23 -2176.98l5.68 516.43 895.89 -2.1m2.16 920.01l2255.42 21.86m-1471.05 -1258.2l-0.37 394.45 -2.13 2268.51m2268.36 -3395.11c-121.47,117.05 -302.96,241.2 -548.07,278.79m-1062.71 -1009.16l-14.83 1611m313.94 307.52l452.12 4 9.35 -663.77m8.52 -604.84l5.09 -361.34m1408.26 1081.76l-2065.77 2035.4c-50.75,50 -106.04,79.05 -108.71,151.99 -1.64,44.93 10.93,491.27 20.85,827.53m-1774.69 2623.29l879.79 0 134 0 720.63 0 30.4 0 713.76 0 217.25 0 802.66 0 0 323.39 -3498.49 0 0 -323.39z"/>
+        <rect class="fil-logo-bar" x="8158.53" y="17972.39" width="3395.02" height="332.88"/>
+      </svg>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span class="phase-pill" id="t-pPhasePill">Fase 4 &middot; Matrix</span>
+    </div>
+    <div class="hdr-r">
+      <button class="btn" data-env="dev-only" onclick="hidePView()" style="font-size:12px;color:var(--text-3)" id="t-pBack">&larr; Facilitator-view</button>
+      <div class="lang-toggle" role="group" aria-label="Taalkeuze">
+        <button class="lang-btn active" id="pLNL" onclick="setLang('nl')">NL</button>
+        <button class="lang-btn" id="pLEN" onclick="setLang('en')">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="pwrap">
+
+    <!-- p: pre-wait -->
+    <div id="pPreWait" class="pcard">
+      <div class="p-center">
+        <svg class="rb-board-illu" width="150" height="96" viewBox="0 0 150 96" role="img" aria-label="Risicobord met coins" style="display:block;margin:0 auto 14px"><rect x="14" y="6" width="122" height="84" rx="8" style="fill:var(--surface,#FFFFFF);stroke:var(--cinab-line,#E5E3DB)"/><path d="M14 34h122M14 62h122M54 6v84M95 6v84" style="fill:none;stroke:var(--cinab-line,#E5E3DB)"/><rect x="14" y="6" width="122" height="84" rx="8" style="fill:none;stroke:var(--tool-black,#262A36);stroke-width:1.4"/><circle cx="40" cy="22" r="9" style="fill:var(--coin-geel,#FCC429);stroke:var(--orange-hover,#D8901E)"/><circle cx="75" cy="48" r="9" style="fill:var(--coin-rood,#E8423F);stroke:var(--tool-secondary-2,#952942)"/><circle cx="116" cy="76" r="9" style="fill:var(--coin-blauw,#70A2D7);stroke:var(--tool-secondary-5,#2C539D)"/></svg>
+        <div class="p-title" id="t-pPreTitle">Klaar om te scoren</div>
+        <p class="p-sub" id="t-pPreSub">De facilitator opent zo het scoren. Hieronder zie je waar we ons vandaag op richten.</p>
+      </div>
+      <div class="p-summary" id="pSummaryBlock" style="display:none;margin-top:18px">
+        <div class="p-summary-label" id="t-pSummaryLabel">Wat we vandaag doen</div>
+        <div class="p-summary-text" id="pSummaryText"></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:18px;font-size:12.5px;color:var(--text-2)">
+        <span class="live-dot"></span>
+        <span id="t-pPreWaiting">Wachten op de facilitator…</span>
+      </div>
+    </div>
+
+    <!-- p: consensus loopt (read-only meekijken) -->
+    <div id="pScore" class="pcard" style="display:none">
+      <div class="p-cons">
+        <span class="ca-dot"></span>
+        <div>
+          <div class="ca-label" id="t-pConsLabel">Ongewenst gevolg</div>
+          <div class="ca-text" id="pConsText">—</div>
+        </div>
+      </div>
+      <div class="p-center" style="margin-bottom:8px">
+        <div class="p-wait-icon" style="background:var(--blue-light)">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#3F6FA8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="p-title" style="font-size:18px" id="t-pConsLiveTitle">Groepsscore wordt bepaald</div>
+        <p class="p-sub" id="t-pConsLiveSub">De facilitator stelt nu met de groep de definitieve scores vast. Je hoeft niets te doen — kijk mee op het scherm.</p>
+      </div>
+      <div class="p-mine" id="pMineWrap" style="display:none">
+        <div class="p-mine-label" id="t-pMineLabel">Vastgestelde groepsscores</div>
+        <div id="pMineList"></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;font-size:12.5px;color:var(--text-2)">
+        <span class="live-dot"></span>
+        <span id="t-pPreWaiting2">Wachten op de facilitator…</span>
+      </div>
+    </div>
+
+    <!-- p: done -->
+    <div id="pDone" class="pcard p-center" style="display:none">
+      <div class="p-wait-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#7B8E1E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l4 4L19 6"/></svg>
+      </div>
+      <div class="p-title" id="t-pDoneTitle">Bedankt voor je scores</div>
+      <p class="p-sub" id="t-pDoneSub">De facilitator verwerkt zo alle scores tot een gedeeld groepsbeeld in fase 3.</p>
+      <div class="p-mine" id="pDoneMineWrap" style="display:none;text-align:left">
+        <div class="p-mine-label" id="t-pDoneMineLabel">Jouw scores</div>
+        <div id="pDoneMineList"></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;font-size:12.5px;color:var(--text-2)">
+        <span class="live-dot"></span>
+        <span id="t-pDoneLive">Wachten op de volgende stap…</span>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /pView -->
+
+
+<!-- ═══ RB SHARED TIP POPUP (DOM) ═══ -->
+<div id="rbTipBackdrop" class="rb-tip-backdrop" onclick="rbCloseTip()"></div>
+<div id="rbTipPopup" class="rb-tip-popup" role="dialog" aria-modal="true" aria-labelledby="rbTipTitle">
+  <button class="rb-tip-close" onclick="rbCloseTip()" aria-label="Sluiten" type="button">&times;</button>
+  <h3 class="rb-tip-title" id="rbTipTitle"></h3>
+  <div class="rb-tip-sub" id="rbTipSub"></div>
+  <div class="rb-tip-body" id="rbTipBody"></div>
+  <div class="rb-tip-actions" id="rbTipActions">
+    <button class="btn btn-orange" onclick="rbCloseTip()" id="rbTipCloseBtn" type="button">Sluiten</button>
+  </div>
+</div>
+<!-- ═══ END RB SHARED TIP POPUP (DOM) ═══ -->
+<script>
+/* ══════════ STATE ══════════ */
+let lang = 'nl';
+let facView = true;
+let risks = [];            // [{id, text, author}] — genummerd uit fase 1 (rb_risks)
+let groupScores = {};      // {<riskId>:{kans:'A'..'F', impact:1..6}} — bevestigde groepsscore uit fase 3 (rb_group_scores)
+let matrixByRisk = {};     // {<riskId>:{kans,impact,score,zone,actie,isoResponse,celAdvies,refined?}} — afgeleid in deze fase
+let refinedAdvice = {};    // {<riskId>:<string>} — verfijnde/handmatige adviezen (override op celAdvies)
+let aiRefined = {};        // {<riskId>:true} — vlag: advies kwam van AI (toont de AI-tag)
+
+/* ══════════ TRANSLATIONS ══════════ */
+const T = {
+  nl: {
+    phasePill:'Fase 4 \u2022 Matrix',
+    pPhasePill:'Fase 4 \u00b7 Matrix',
+    phaseTitle:'Van groepsscore naar matrix',
+    phaseSub:'Elke groepsscore krijgt een plek in de 6\u00d76-matrix; de celpositie bepaalt de zone en de passende beheersrichting.',
+    theoryBtn:'Onderbouwing',
+    sessTitle:'Sessie-info',
+    consAnchorLabel:'Punt A \u2014 centraal analysepunt',
+    consAnchorLabel2:'Punt A \u2014 centraal analysepunt',
+    /* intro */
+    introTitle:'Fase 4 \u2014 Matrix \u0026 interpretatie',
+    introSub:'Celpositie \u2192 zone \u2192 beheersrichting per risico',
+    introWhatTitle:'Wat doen we in deze fase?',
+    introWhatBody:'De vastgestelde groepsscores uit fase 3 plaatsen we in de risicomatrix. Elke combinatie van kans (A\u2013F) en impact (1\u20136) valt in een vaste cel, en elke cel hoort bij \u00e9\u00e9n van de zes zones \u2014 van aanvaardbaar tot urgent. De zone bepaalt de passende beheersrichting (ISO 31000-respons) en een generiek maatregeladvies. Zo wordt in \u00e9\u00e9n oogopslag zichtbaar welke risico\u2019s als eerste aandacht verdienen.',
+    introHowTitle:'Hoe verloopt het?',
+    introBody:'Je ziet de ingevulde matrix met alle risico\u2019s als genummerde coins op hun celpositie, gekleurd naar zone. Per risico tonen we de keten cel \u2192 zone \u2192 beheersrichting en een generiek advies. Met de knop \u201cVerfijn met AI\u201d spits je dat advies toe op de concrete risicotekst. Onderaan staat de lijst beheersprioriteiten: gesorteerd op zone-ernst en daarbinnen op risicoscore. Daarna leg je het matrixresultaat vast voor de maatregelen in fase 5.',
+    introBotInfo:'De groepsscores zijn klaar voor de matrix',
+    introBotInfoNoData:'Geen groepsscores gevonden \u2014 leg eerst fase 3 vast.',
+    introStart:'Toon de matrix',
+    introItems:[
+      {icon:'grid', title:'6\u00d76-matrix', sub:'Elke groepsscore op zijn celpositie, gekleurd naar zone'},
+      {icon:'zone', title:'Zes zones', sub:'Van aanvaardbaar tot urgent \u2014 elke cel heeft een vaste zone'},
+      {icon:'ai', title:'AI-advies', sub:'Generiek maatregeladvies per cel, toe te spitsen op het risico'},
+    ],
+    /* interpret (collect-equivalent) */
+    collectTitle:'De risicomatrix',
+    collectSub:'Elke coin staat op zijn celpositie en is gekleurd naar zone. De celpositie bepaalt de beheersrichting.',
+    collectBotInfo:'De matrix is gevuld \u2014 klaar om vast te leggen',
+    refineAllLabel:'Verfijn alle adviezen met AI',
+    vtUitkomsten:'Uitkomsten', vtVisual:'Visuele weergave', rinvKans:'kans', rinvImpact:'impact', intpEditHint:'(je kunt dit advies hieronder zelf aanpassen)',
+    refineAllBusy:'AI verfijnt de adviezen\u2026',
+    toFinal:'Matrixresultaat vastleggen',
+    /* prioriteiten + interpretatie */
+    prioTitle:'Beheersprioriteiten',
+    prioSub:'Gesorteerd op zone-ernst, daarbinnen op risicoscore (kans \u00d7 impact)',
+    intpTitle:'Interpretatie per risico',
+    intpCellLabel:'cel',
+    intpScoreLabel:'score',
+    intpActionLabel:'Beheersadvies',
+    intpRefineBtn:'Verfijn met AI',
+    intpRefineBusy:'Verfijnen\u2026',
+    intpAiTag:'AI-verfijnd advies',
+    isoLabel:{ verminderen:'Verminderen', monitoren:'Monitoren', accepteren:'Accepteren', delen:'Delen' },
+    noData:'Er zijn nog geen vastgestelde groepsscores. Leg eerst fase 3 (Consensus) vast.',
+    /* zones */
+    zoneLabel:{ urgent:'Urgent', hoog:'Hoog', midden:'Midden', beperkt:'Beperkt', laag:'Laag', aanvaardbaar:'Veilig' },
+    zoneAction:{ urgent:'Oplossen', hoog:'Regelen', midden:'Beheersen', beperkt:'Bewaken', laag:'Check', aanvaardbaar:'Aanvaarden' },
+    /* final */
+    finalTitle:'Matrixresultaat vastgelegd',
+    finalSub:'De zones en beheersrichtingen staan vast \u2014 klaar om in fase 5 maatregelen te koppelen.',
+    finalNote:'{n} risico\u2019s kregen een zone en beheersrichting. Klaar voor fase 5.',
+    backEditLabel:'Aanpassen',
+    rbNextPhase:'Naar fase 5 \u2014 Maatregelen',
+    /* canvas labels (gedeeld) */
+    canvInvTitle:'inventarisatie',
+    canvResTitle:'resultaat',
+    canvKans:'kans',
+    canvImpact:'impact',
+    canvGroupScore:'groepsscore',
+    canvEmptyInv:'nog geen risico\u2019s',
+    /* participant */
+    pBack:'\u2190 Facilitator-view',
+    pPreTitle:'De matrix wordt opgesteld',
+    pPreSub:'De facilitator plaatst nu de groepsscores in de risicomatrix. Hieronder zie je waar we ons vandaag op richten.',
+    pSummaryLabel:'Wat we vandaag doen',
+    pPreWaiting:'Wachten op de facilitator\u2026',
+    pPreWaiting2:'Wachten op de facilitator\u2026',
+    pConsLabel:'Ongewenst gevolg',
+    pNameLabel:'Jouw naam',
+    pMineLabel:'Risico\u2019s in de matrix',
+    pDoneTitle:'Matrix vastgelegd',
+    pDoneSub:'De risico\u2019s zijn in de matrix geplaatst en per zone ingedeeld. De facilitator gaat verder met de maatregelen in fase 5.',
+    pDoneMineLabel:'Matrixresultaat',
+    pDoneLive:'Wachten op de volgende stap\u2026',
+    pConsLiveTitle:'Matrix wordt ingevuld',
+    pConsLiveSub:'De facilitator plaatst de risico\u2019s in de matrix en bepaalt per risico de beheersrichting. Je hoeft niets te doen \u2014 kijk mee op het scherm.',
+    /* kans/impact niveaus */
+    kansSub:['Zeer klein','Klein','Matig','Groot','Zeer groot','Vrijwel zeker'],
+    impactSub:['Zeer laag','Laag','Matig','Aanzienlijk','Hoog','Zeer hoog'],
+    /* info popups */
+    infoMatrix:'De risicomatrix zet kans (A\u2013F, horizontaal) tegen impact (1\u20136, verticaal). Elke groepsscore valt in precies \u00e9\u00e9n cel. De cel bepaalt de zone: aangrenzende cellen met dezelfde beheersrichting vormen samen de zes diagonale zones, gescheiden door gestippelde grenzen. Het bord is leidend \u2014 niet een losse rekenformule.',
+    infoPrio:'De beheersprioriteiten ordenen alle risico\u2019s eerst op zone-ernst (urgent bovenaan, aanvaardbaar onderaan) en daarbinnen op de risicoscore (kans-index \u00d7 impact, 1\u201336). De score dient alleen om binnen een zone te rangschikken, niet om de zone te bepalen.',
+    infoAdvice:'Per risico tonen we de keten: cel \u2192 zone \u2192 ISO 31000-beheersrichting \u2192 generiek maatregeladvies uit de 36-cel-kennisbank. Dit advies is vooraf gegenereerd en werkt ook zonder internet. Met \u201cVerfijn met AI\u201d spits je het toe op de concrete risicotekst.',
+    tipClose:'Sluiten',
+    /* theory modal (gedeeld met fase 0/1/2/3) */
+    modalTitle:'Theoretische onderbouwing', modalSub:'Risicobeheersing als gefaciliteerde risk-heatmap-methode',
+    th1:'Gebaseerd op COSO ERM', th1p:'De methode volgt het COSO Enterprise Risk Management-raamwerk: risico\u2019s worden ge\u00efdentificeerd en beoordeeld op kans (probability) en impact, waarna een passende risicorespons wordt gekozen. Internationaal omarmd en toegepast.',
+    th2:'Kans \u00d7 impact: de risk heatmap', th2p:'Elk risico krijgt een score op twee assen \u2014 hoe waarschijnlijk is het (kans A\u2013F) en hoe groot zijn de gevolgen (impact 1\u20136). De combinatie plaatst het risico in een 6\u00d76-matrix (risk heatmap of probability-impact matrix), waarmee in \u00e9\u00e9n oogopslag de relatieve ernst zichtbaar wordt.',
+    th3:'ISO 31000: van risico naar respons', th3p:'Voor elk risico kies je \u2014 conform ISO 31000 \u2014 een respons: vermijden (activiteit staken), verminderen (kans of impact verlagen), delen of overdragen (bijv. verzekeren), of accepteren (bewust binnen de risicobereidheid laten). De matrixpositie geeft richting aan die keuze.',
+    th4:'Zes zones, van aanvaarden tot oplossen', th4p:'De matrix kent zes aandachtsniveaus: urgent (oplossen), hoog (regelen), midden (beheersen), beperkt (bewaken), laag (check) en aanvaardbaar (aanvaarden). Dit volgt het Tolerability-of-Risk-principe (ALARP): sommige risico\u2019s zijn onaanvaardbaar, sommige breed aanvaardbaar, en daartussen ligt het gebied waar beheersing loont.',
+    th5:'Samen scoren schept draagvlak', th5p:'Door risico\u2019s gezamenlijk te inventariseren en te scoren ontstaat een gedeeld beeld en eigenaarschap voor de beheersmaatregelen. De analyse hangt in een PDCA-cyclus: na deze sessie volgen uitvoeren (Do), evalueren (Check) en bijstellen (Act).',
+    /* sess panel + summary */
+    sessOrg:'Organisatie', sessName:'Sessie', sessFac:'Facilitator', sessType:'Type analyse', sessDomain:'Risicodomein', sessScope:'Scope', sessCons:'Ongewenst gevolg',
+    sessMiniTpl:'{org} \u2014 {name}',
+    anaTypeLbl:{ preventief:'Preventief', incident:'Na incident', project:'Project', periodiek:'Periodiek' },
+    domainLbl:{ operationeel:'Operationeel', financieel:'Financieel', veiligheid:'Veiligheid', kwaliteit:'Kwaliteit', it:'IT en cyber', verander:'Verander- en projectrisico' },
+    scopeLbl:{ team:'Team', afdeling:'Afdeling', organisatie:'Hele organisatie', keten:'Netwerk / keten' },
+    summaryTpl:'Vandaag analyseren we {type} onder de naam \u2018{name}\u2019. Het centrale gevolg dat we willen voorkomen: {cons}.',
+    summaryTplNoName:'Vandaag analyseren we {type}. Het centrale gevolg dat we willen voorkomen: {cons}.',
+    summaryTypeLbl:{ preventief:'preventief risico\u2019s', incident:'de oorzaken van een incident', project:'projectrisico\u2019s', periodiek:'het risicobeeld' },
+    unnamedSession:'Naamloze sessie',
+    bannerRefined:'Alle adviezen verfijnd met AI.',
+    bannerRefinedOne:'Advies verfijnd voor risico {n}.',
+    resetConfirm:'Alle sessiedata wissen (risico\u2019s, scores, matrix, maatregelen)?\n\nDe taalvoorkeur blijft behouden.',
+    resetDone:'Sessiedata gewist. Pagina wordt herladen.',
+    confirmAlert:'{n} risico\u2019s kregen een zone en beheersrichting. Klaar voor fase 5 (Maatregelen).',
+    goPrevConfirm:'Terug naar fase 3 (Consensus)? Het matrixresultaat blijft bewaard.',
+    noConsequence:'(nog geen ongewenst gevolg vastgelegd in fase 0)',
+    aiError:'AI-verfijning lukte niet. Het generieke advies blijft staan.',
+  },
+  en: {
+    phasePill:'Phase 4 \u2022 Matrix',
+    pPhasePill:'Phase 4 \u00b7 Matrix',
+    phaseTitle:'From group score to matrix',
+    phaseSub:'Each group score gets a place in the 6\u00d76 matrix; the cell position determines the zone and the appropriate control direction.',
+    theoryBtn:'Background',
+    sessTitle:'Session info',
+    consAnchorLabel:'Point A \u2014 central analysis point',
+    consAnchorLabel2:'Point A \u2014 central analysis point',
+    introTitle:'Phase 4 \u2014 Matrix \u0026 interpretation',
+    introSub:'Cell position \u2192 zone \u2192 control direction per risk',
+    introWhatTitle:'What do we do in this phase?',
+    introWhatBody:'We place the locked group scores from phase 3 in the risk matrix. Each combination of probability (A\u2013F) and impact (1\u20136) falls into a fixed cell, and each cell belongs to one of the six zones \u2014 from acceptable to urgent. The zone determines the appropriate control direction (ISO 31000 response) and a generic measure advice. This makes it clear at a glance which risks deserve attention first.',
+    introHowTitle:'How does it work?',
+    introBody:'You see the filled matrix with all risks as numbered coins on their cell position, coloured by zone. Per risk we show the chain cell \u2192 zone \u2192 control direction and a generic advice. With the \u201cRefine with AI\u201d button you tailor that advice to the concrete risk text. Below is the list of control priorities: sorted by zone severity and within that by risk score. Then you lock the matrix result for the measures in phase 5.',
+    introBotInfo:'The group scores are ready for the matrix',
+    introBotInfoNoData:'No group scores found \u2014 lock phase 3 first.',
+    introStart:'Show the matrix',
+    introItems:[
+      {icon:'grid', title:'6\u00d76 matrix', sub:'Each group score on its cell position, coloured by zone'},
+      {icon:'zone', title:'Six zones', sub:'From acceptable to urgent \u2014 each cell has a fixed zone'},
+      {icon:'ai', title:'AI advice', sub:'Generic measure advice per cell, tailorable to the risk'},
+    ],
+    collectTitle:'The risk matrix',
+    collectSub:'Each coin sits on its cell position and is coloured by zone. The cell position determines the control direction.',
+    collectBotInfo:'The matrix is filled \u2014 ready to lock',
+    refineAllLabel:'Refine all advice with AI',
+    vtUitkomsten:'Results', vtVisual:'Visual view', rinvKans:'prob.', rinvImpact:'impact', intpEditHint:'(you can edit this advice below)',
+    refineAllBusy:'AI is refining the advice\u2026',
+    toFinal:'Lock the matrix result',
+    prioTitle:'Control priorities',
+    prioSub:'Sorted by zone severity, within that by risk score (probability \u00d7 impact)',
+    intpTitle:'Interpretation per risk',
+    intpCellLabel:'cell',
+    intpScoreLabel:'score',
+    intpActionLabel:'Control advice',
+    intpRefineBtn:'Refine with AI',
+    intpRefineBusy:'Refining\u2026',
+    intpAiTag:'AI-refined advice',
+    isoLabel:{ verminderen:'Reduce', monitoren:'Monitor', accepteren:'Accept', delen:'Share' },
+    noData:'There are no locked group scores yet. Lock phase 3 (Consensus) first.',
+    zoneLabel:{ urgent:'Urgent', hoog:'High', midden:'Medium', beperkt:'Limited', laag:'Low', aanvaardbaar:'Safe' },
+    zoneAction:{ urgent:'Resolve', hoog:'Arrange', midden:'Manage', beperkt:'Monitor', laag:'Check', aanvaardbaar:'Accept' },
+    finalTitle:'Matrix result locked',
+    finalSub:'The zones and control directions are set \u2014 ready to link measures in phase 5.',
+    finalNote:'{n} risks received a zone and control direction. Ready for phase 5.',
+    backEditLabel:'Adjust',
+    rbNextPhase:'To phase 5 \u2014 Measures',
+    canvInvTitle:'inventory',
+    canvResTitle:'result',
+    canvKans:'probability',
+    canvImpact:'impact',
+    canvGroupScore:'group score',
+    canvEmptyInv:'no risks yet',
+    pBack:'\u2190 Facilitator view',
+    pPreTitle:'The matrix is being built',
+    pPreSub:'The facilitator is now placing the group scores in the risk matrix. Below you can see what we focus on today.',
+    pSummaryLabel:'What we will do today',
+    pPreWaiting:'Waiting for the facilitator\u2026',
+    pPreWaiting2:'Waiting for the facilitator\u2026',
+    pConsLabel:'Undesirable consequence',
+    pNameLabel:'Your name',
+    pMineLabel:'Risks in the matrix',
+    pDoneTitle:'Matrix locked',
+    pDoneSub:'The risks have been placed in the matrix and classified by zone. The facilitator continues with the measures in phase 5.',
+    pDoneMineLabel:'Matrix result',
+    pDoneLive:'Waiting for the next step\u2026',
+    pConsLiveTitle:'Matrix being filled',
+    pConsLiveSub:'The facilitator is placing the risks in the matrix and setting the control direction per risk. You do not need to do anything \u2014 follow along on the screen.',
+    kansSub:['Very low','Low','Moderate','High','Very high','Almost certain'],
+    impactSub:['Very low','Low','Moderate','Considerable','High','Very high'],
+    infoMatrix:'The risk matrix plots probability (A\u2013F, horizontal) against impact (1\u20136, vertical). Each group score falls into exactly one cell. The cell determines the zone: adjacent cells with the same control direction together form the six diagonal zones, separated by dotted borders. The board leads \u2014 not a stand-alone formula.',
+    infoPrio:'The control priorities order all risks first by zone severity (urgent at the top, acceptable at the bottom) and within that by the risk score (probability index \u00d7 impact, 1\u201336). The score only ranks within a zone, it does not determine the zone.',
+    infoAdvice:'Per risk we show the chain: cell \u2192 zone \u2192 ISO 31000 control direction \u2192 generic measure advice from the 36-cell knowledge base. This advice is pre-generated and works offline. With \u201cRefine with AI\u201d you tailor it to the concrete risk text.',
+    tipClose:'Close',
+    modalTitle:'Theoretical background', modalSub:'Risk management as a facilitated risk-heatmap method',
+    th1:'Based on COSO ERM', th1p:'The method follows the COSO Enterprise Risk Management framework: risks are identified and assessed on probability and impact, after which an appropriate risk response is chosen. Internationally adopted and applied.',
+    th2:'Probability \u00d7 impact: the risk heatmap', th2p:'Each risk is scored on two axes \u2014 how likely it is (probability A\u2013F) and how severe the consequences are (impact 1\u20136). The combination places the risk in a 6\u00d76 matrix (risk heatmap or probability-impact matrix), making relative severity visible at a glance.',
+    th3:'ISO 31000: from risk to response', th3p:'For each risk you choose \u2014 per ISO 31000 \u2014 a response: avoid (stop the activity), reduce (lower probability or impact), share or transfer (e.g. insure), or accept (consciously retain within risk appetite). The matrix position guides that choice.',
+    th4:'Six zones, from accept to resolve', th4p:'The matrix has six attention levels: urgent (resolve), high (arrange), medium (manage), limited (monitor), low (check) and acceptable (accept). This follows the Tolerability-of-Risk principle (ALARP): some risks are unacceptable, some broadly acceptable, and in between lies the area where control pays off.',
+    th5:'Scoring together builds support', th5p:'Inventorying and scoring risks together creates a shared picture and ownership of the control measures. The analysis sits in a PDCA cycle: after this session come do, check and act.',
+    sessOrg:'Organisation', sessName:'Session', sessFac:'Facilitator', sessType:'Analysis type', sessDomain:'Risk domain', sessScope:'Scope', sessCons:'Undesirable consequence',
+    sessMiniTpl:'{org} \u2014 {name}',
+    anaTypeLbl:{ preventief:'Preventive', incident:'After incident', project:'Project', periodiek:'Periodic' },
+    domainLbl:{ operationeel:'Operational', financieel:'Financial', veiligheid:'Safety', kwaliteit:'Quality', it:'IT and cyber', verander:'Change and project risk' },
+    scopeLbl:{ team:'Team', afdeling:'Department', organisatie:'Whole organisation', keten:'Network / chain' },
+    summaryTpl:'Today we analyse {type} under the name \u2018{name}\u2019. The central consequence we want to prevent: {cons}.',
+    summaryTplNoName:'Today we analyse {type}. The central consequence we want to prevent: {cons}.',
+    summaryTypeLbl:{ preventief:'preventive risks', incident:'the causes of an incident', project:'project risks', periodiek:'the risk picture' },
+    unnamedSession:'Unnamed session',
+    bannerRefined:'All advice refined with AI.',
+    bannerRefinedOne:'Advice refined for risk {n}.',
+    resetConfirm:'Clear all session data (risks, scores, matrix, measures)?\n\nThe language preference is kept.',
+    resetDone:'Session data cleared. Page will reload.',
+    confirmAlert:'{n} risks received a zone and control direction. Ready for phase 5 (Measures).',
+    goPrevConfirm:'Back to phase 3 (Consensus)? The matrix result is kept.',
+    noConsequence:'(no undesirable consequence recorded in phase 0 yet)',
+    aiError:'AI refinement failed. The generic advice is kept.',
+  }
+};
+
+/* ══════════ RB SHARED ENVIRONMENT DETECTION ══════════ */
+/* Expliciete demo-modus op de website (standaard §7): ?demo=1 zet een sessie-vlag; de tool draait dan
+   zonder platform, zonder AI-call en zonder opslag op het platform — ook op het productie-subdomein. */
+function rbIsDemo(){
+  try{
+    if(new URLSearchParams(window.location.search).get('demo')==='1') sessionStorage.setItem('rb_demo','1');
+    return sessionStorage.getItem('rb_demo')==='1';
+  }catch(e){ return false; }
+}
+function isProductionMode(){
+  if(rbIsDemo()) return false;
+  const host=(window.location.hostname||'').toLowerCase();
+  if(window.location.protocol==='file:') return false;
+  if(host===''||host==='localhost'||host==='127.0.0.1'||host==='::1') return false;
+  if(/^192\.168\./.test(host)||/^10\./.test(host)||/^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(host)) return false;
+  if(/\.local$/.test(host)) return false;
+  return true;
+}
+/* live = echte data + AI; false = demo/simulatie (baseline §2). __VK_TOKEN wordt door de platformkoppeling gezet (route 2). */
+var VK_LIVE = isProductionMode();
+window.VK_LIVE = VK_LIVE;
+if (typeof window.__VK_TOKEN === 'undefined') window.__VK_TOKEN = '';
+function rbApplyEnvironmentRules(){
+  if(!isProductionMode()) return;
+  document.querySelectorAll('[data-env="dev-only"]').forEach(el=>{ el.style.display='none'; });
+  window.__RB_PROD=true;
+}
+
+/* ══════════ RB SHARED AI HELPER (proxy + lokale terugval) ══════════ */
+/* Roept de server-side AI-proxy op het tool-subdomein aan (baseline §3). De browser stuurt ALLEEN een
+   taaktype + gestructureerde data; de prompt wordt server-side opgebouwd (geen prompt-as-a-service).
+   Token via window.__VK_TOKEN. Rejectt bij ELKE fout (offline, geen token, 4xx/5xx, onparsebaar,
+   timeout) zodat de aanroeper zijn eigen lokale terugval gebruikt. Tot proxy+token live staan vuurt
+   AI niet en draait alles lokaal — correct gedrag, geen bug (baseline §3.4). */
+function rbAiProxyUrl(){
+  if (typeof window.__RB_AI_PROXY_URL === 'string' && window.__RB_AI_PROXY_URL) return window.__RB_AI_PROXY_URL;
+  return '/risicobeheersing-ai-proxy.php'; // zelfde origin als de tool (proxy op het tool-subdomein)
+}
+function vkCallAI(task, data, opts){
+  opts = opts || {};
+  var timeoutMs = opts.timeoutMs || 30000;
+  // Geen token in productie = de proxy weigert toch: reject direct zodat de lokale terugval pakt.
+  if (rbIsDemo()) return Promise.reject(new Error('demo-mode'));            // demo: nooit een echte AI-call (standaard §7)
+  if (isProductionMode() && !window.__VK_TOKEN) return Promise.reject(new Error('no-token'));
+  var ctrl = (typeof AbortController!=='undefined') ? new AbortController() : null;
+  var timer = setTimeout(function(){ if(ctrl) ctrl.abort(); }, timeoutMs);
+  return fetch(rbAiProxyUrl(), {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ task:task, data:data||{}, lang: opts.lang || (typeof lang!=='undefined'?lang:'nl'), token: window.__VK_TOKEN || '' }),
+    signal: ctrl ? ctrl.signal : undefined
+  }).then(function(res){
+    clearTimeout(timer);
+    if(!res.ok) throw new Error('http '+res.status);
+    return res.json();
+  }).then(function(json){
+    // Offici\u00eble proxy-respons (cinab-ai-proxy.template.php → {tool}-ai-proxy.php): { task, text }.
+    // text = ruwe modeltekst; de aanroeper parse't JSON zelf (cluster) of gebruikt 'm als platte tekst (verfijn_advies).
+    if(!json || typeof json.text!=='string' || !json.text.trim()) throw new Error('bad-shape');
+    return json.text;
+  }).catch(function(e){
+    clearTimeout(timer);
+    throw e;
+  });
+}
+/* ══════════ END RB SHARED AI HELPER ══════════ */
+
+/* ══════════ RB SHARED ESCAPE ══════════ */
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function rbEscape(s){ return escapeHtml(s); }
+
+/* ══════════ RB SHARED TIP POPUP (LOGIC) ══════════ */
+function rbOpenTip(opts){
+  const popup=document.getElementById('rbTipPopup');
+  const backdrop=document.getElementById('rbTipBackdrop');
+  const titleEl=document.getElementById('rbTipTitle');
+  const subEl=document.getElementById('rbTipSub');
+  const bodyEl=document.getElementById('rbTipBody');
+  const closeBtn=document.getElementById('rbTipCloseBtn');
+  if(!popup) return;
+  const size=opts.size==='sm'?'sm':'lg';
+  popup.setAttribute('data-size',size);
+  if(opts.title){ titleEl.textContent=opts.title; titleEl.style.display=''; } else { titleEl.textContent=''; titleEl.style.display='none'; }
+  if(opts.sub && size==='lg'){ subEl.textContent=opts.sub; subEl.style.display=''; } else { subEl.textContent=''; subEl.style.display='none'; }
+  const bodyArr=Array.isArray(opts.body)?opts.body:[opts.body];
+  bodyEl.innerHTML=bodyArr.map(item=>{
+    if(item==null) return '';
+    if(typeof item==='string') return '<p>'+rbEscape(item)+'</p>';
+    if(typeof item==='object'){ let h=''; if(item.h) h+='<div class="rb-tip-h">'+rbEscape(item.h)+'</div>'; if(item.p) h+='<p>'+rbEscape(item.p)+'</p>'; return h; }
+    return '';
+  }).join('');
+  if(closeBtn) closeBtn.textContent=opts.closeLabel||(T[lang]&&T[lang].tipClose)||'Sluiten';
+  if(size==='lg'){ backdrop.classList.add('open'); popup.style.top=''; popup.style.left=''; popup.style.transform=''; }
+  else {
+    backdrop.classList.remove('open');
+    if(opts.anchor){
+      const r=opts.anchor.getBoundingClientRect(); const popW=340; let left=r.left;
+      if(left+popW>window.innerWidth-16) left=window.innerWidth-popW-16;
+      if(left<16) left=16;
+      popup.style.left=left+'px'; popup.style.top=(r.bottom+12)+'px'; popup.style.transform='';
+    } else { popup.style.left='50%'; popup.style.top='40%'; popup.style.transform='translate(-50%, -50%)'; }
+  }
+  popup.classList.add('open');
+  setTimeout(()=>popup.querySelector('.rb-tip-close')?.focus(),50);
+}
+function rbCloseTip(){
+  const popup=document.getElementById('rbTipPopup'); const backdrop=document.getElementById('rbTipBackdrop');
+  if(popup) popup.classList.remove('open'); if(backdrop) backdrop.classList.remove('open');
+}
+function rbInfoOpen(key, anchor){ if(typeof T==='undefined'||!T[lang]) return; const body=T[lang][key]; if(body==null) return; rbOpenTip({size:'sm', body:body, anchor:anchor}); }
+function openTheory(){
+  const t=T[lang];
+  rbOpenTip({ size:'lg', title:t.modalTitle, sub:t.modalSub,
+    body:[ {h:t.th1,p:t.th1p},{h:t.th2,p:t.th2p},{h:t.th3,p:t.th3p},{h:t.th4,p:t.th4p},{h:t.th5,p:t.th5p} ],
+    closeLabel:t.tipClose });
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') rbCloseTip(); });
+document.addEventListener('click', e=>{
+  const popup=document.getElementById('rbTipPopup');
+  if(!popup||!popup.classList.contains('open')) return;
+  if(popup.getAttribute('data-size')!=='sm') return;
+  if(popup.contains(e.target)) return;
+  if(e.target.classList && e.target.classList.contains('info-icon')) return;
+  rbCloseTip();
+});
+
+/* ══════════ LANGUAGE ══════════ */
+function setLang(l, opts){
+  lang=l;
+  rbCloseTip();
+  document.documentElement.lang=l;
+  document.getElementById('langNL').classList.toggle('active', l==='nl');
+  document.getElementById('langEN').classList.toggle('active', l==='en');
+  const pNL=document.getElementById('pLNL'); if(pNL) pNL.classList.toggle('active', l==='nl');
+  const pEN=document.getElementById('pLEN'); if(pEN) pEN.classList.toggle('active', l==='en');
+  applyT();
+  /* dynamische renderfuncties opnieuw aanroepen, zonder invoer te resetten */
+  buildIntroGrid();
+  renderSessPanel();
+  computeMatrix();        // celAdvies-taal volgt mee (NL/EN), refinedAdvice blijft behouden
+  renderInterpret();
+  renderRinvList();
+  renderCanvasAll();
+  renderConsequenceAnchors();
+  if(!facView) applyStageToPView();
+  updatePSummary();
+  updateIntroReady();
+  updateCollectBotInfo();
+  if(!opts||!opts.fromStorage){ try{ localStorage.setItem('rb_lang', l); }catch(e){} }
+}
+function applyT(){
+  const t=T[lang];
+  Object.keys(t).forEach(k=>{
+    if(typeof t[k]!=='string') return;
+    const el=document.getElementById('t-'+k); if(!el) return;
+    if(el.children.length>0){
+      let tn=null; for(const n of el.childNodes){ if(n.nodeType===3 && n.textContent.trim()){ tn=n; break; } }
+      if(tn){ tn.textContent=t[k]+' '; }
+      else { const lbl=[].slice.call(el.children).find(c=>c.tagName==='SPAN' && !c.id && !c.className); if(lbl){ lbl.textContent=t[k]; } else { el.insertBefore(document.createTextNode(t[k]+' '), el.firstChild); } }
+    } else { el.textContent=t[k]; }
+  });
+  document.querySelectorAll('[data-t-placeholder]').forEach(el=>{ const key=el.dataset.tPlaceholder; if(t[key]) el.placeholder=t[key]; });
+}
+function initLang(){
+  let init=null;
+  try{
+    const stored=localStorage.getItem('rb_lang'); if(stored==='nl'||stored==='en') init=stored;
+    if(!init){ const ss=localStorage.getItem('rb_session_started'); if(ss){ const o=JSON.parse(ss); if(o&&(o.lang==='nl'||o.lang==='en')) init=o.lang; } }
+  }catch(e){}
+  if(init && init!==lang) setLang(init, {fromStorage:true});
+}
+
+/* ══════════ RB SHARED CROSS-TAB SYNC ══════════ */
+function publishStage(stage, payload){
+  if(window.__rbNoPublish) return;   // herstel na refresh leest alleen; publiceert nooit opnieuw
+  try{
+    const obj={stage, at:Date.now()};
+    if(payload) Object.assign(obj, payload);
+    localStorage.setItem('rb_phase4_stage', JSON.stringify(obj));
+  }catch(e){}
+}
+function readStage(){
+  try{ const raw=localStorage.getItem('rb_phase4_stage'); return raw?JSON.parse(raw):null; }catch(e){ return null; }
+}
+window.addEventListener('storage', e=>{
+  if(!e.key) return;
+  if(e.key==='rb_lang' && e.newValue && e.newValue!==lang){ setLang(e.newValue,{fromStorage:true}); }
+  if(e.key==='rb_session' || e.key==='rb_session_started' || e.key==='rb_consequence'){ renderSessPanel(); renderConsequenceAnchors(); updatePSummary(); }
+  if(e.key==='rb_risks' || e.key==='rb_group_scores'){ loadRisks(); loadGroupScores(); computeMatrix(); renderInterpret(); renderCanvasAll(); updateIntroReady(); updateCollectBotInfo(); if(!facView) applyStageToPView(); }
+  if(e.key==='rb_phase4_stage'){ if(!facView) applyStageToPView(); }
+});
+/* ⚠️ Roep publishStage(..., 'idle') NOOIT bij page-init aan. */
+
+/* ══════════ RB SHARED DERIVATIONS ══════════ */
+function rbKansIndex(k){ k=String(k).toUpperCase(); return /^[A-F]$/.test(k) ? (k.charCodeAt(0)-64) : null; }
+function rbScore(kans, impact){
+  const ki=rbKansIndex(kans); const im=Number(impact);
+  if(ki==null || !(im>=1 && im<=6)) return null;
+  return ki*im;
+}
+function rbCell(kans, impact){ const ki=rbKansIndex(kans); const im=Number(impact); return (ki&&im)?(kans.toUpperCase()+im):null; }
+function rbAdvice(kans, impact){ const c=rbCell(kans,impact); return (c && typeof RB_CELL_ADVICE!=='undefined') ? RB_CELL_ADVICE[c] : null; } // {zone,isoResponse,isoEn,nl,en}
+function rbKansLetter(idx){ const i=Number(idx); return (i>=1&&i<=6) ? String.fromCharCode(64+i) : null; } // 1..6 -> A..F
+function rbCentral(values){ // values = array van getallen (kans-index of impact)
+  if(!values || !values.length) return null;
+  const arr=values.slice().filter(v=>typeof v==='number' && !isNaN(v)).sort((a,b)=>a-b);
+  if(!arr.length) return null;
+  const mean=arr.reduce((s,v)=>s+v,0)/arr.length;
+  const mid=Math.floor(arr.length/2);
+  const median=arr.length%2 ? arr[mid] : (arr[mid-1]+arr[mid])/2;
+  const counts={}; let mode=arr[0], best=0;
+  arr.forEach(v=>{ counts[v]=(counts[v]||0)+1; if(counts[v]>best){best=counts[v];mode=v;} });
+  return { mean:Math.round(mean*100)/100, median, mode };
+}
+
+/* ══════════ RB SHARED CANVAS BUILDER ══════════ */
+const RB_GEOM = {
+  viewBox:[0,0,1200,720],
+  inv:{ x:40, y:60, w:540, h:600, rowH:28, numR:9, scoreStrip:{kansX:380, impactX:470, w:90} },
+  mat:{ x:640, y:60, w:520, h:520, cols:6, rows:6, cellGap:4, rx:6,
+        kansLabels:['A','B','C','D','E','F'], impactLabels:[1,2,3,4,5,6] },
+  coin:{ r:14, numFont:13 },
+  zoneStroke:{ color:'#70A2D7', dash:'6 5', w:1 },
+  // crop-viewBoxes voor de panel-optie (A1): één paneel breeduit i.p.v. het volledige tweeluik
+  panelView:{ both:[0,0,1200,720], left:[14,10,590,668], right:[590,10,600,626] }
+};
+const RB_ZONE_COLORS = {
+  aanvaardbaar:'#BDD24D', laag:'#C5D93D', beperkt:'#FCC429',
+  midden:'#FAA833', hoog:'#F05736', urgent:'#E8423F'
+};
+/* 36-cel kennisbank (C1=B, vooraf gegenereerd uit de confrontatiematrix in risico_categorieen + ISO 31000-responsen).
+   zone = bordzone (§0); isoResponse/isoEn = default ISO-respons; nl/en = generiek maatregel-sjabloon. */
+const RB_CELL_ADVICE = {
+  'A1':{zone:'aanvaardbaar',isoResponse:'accepteren',isoEn:'accept',nl:'Accepteer dit risico; er is geen directe maatregel nodig.',en:'Accept the risk; no immediate action required.'},
+  'A2':{zone:'aanvaardbaar',isoResponse:'accepteren',isoEn:'accept',nl:'Accepteer dit risico; er is geen directe maatregel nodig.',en:'Accept the risk; no immediate action required.'},
+  'A3':{zone:'aanvaardbaar',isoResponse:'accepteren',isoEn:'accept',nl:'Accepteer dit risico; er is geen directe maatregel nodig.',en:'Accept the risk; no immediate action required.'},
+  'A4':{zone:'laag',isoResponse:'monitoren',isoEn:'monitor',nl:'Controleer dit risico periodiek en onderneem alleen actie als de kans of impact toeneemt.',en:'Periodically review and only intervene if likelihood or impact increases.'},
+  'A5':{zone:'laag',isoResponse:'monitoren',isoEn:'monitor',nl:'Controleer dit risico periodiek en onderneem alleen actie als de kans of impact toeneemt.',en:'Periodically review and only intervene if likelihood or impact increases.'},
+  'A6':{zone:'laag',isoResponse:'monitoren',isoEn:'monitor',nl:'Controleer dit risico periodiek en onderneem alleen actie als de kans of impact toeneemt.',en:'Periodically review and only intervene if likelihood or impact increases.'},
+  'B1':{zone:'aanvaardbaar',isoResponse:'accepteren',isoEn:'accept',nl:'Accepteer dit risico; er is geen directe maatregel nodig.',en:'Accept the risk; no immediate action required.'},
+  'B2':{zone:'laag',isoResponse:'monitoren',isoEn:'monitor',nl:'Controleer dit risico periodiek en onderneem alleen actie als de kans of impact toeneemt.',en:'Periodically review and only intervene if likelihood or impact increases.'},
+  'B3':{zone:'laag',isoResponse:'monitoren',isoEn:'monitor',nl:'Controleer dit risico periodiek en onderneem alleen actie als de kans of impact toeneemt.',en:'Periodically review and only intervene if likelihood or impact increases.'},
+  'B4':{zone:'beperkt',isoResponse:'monitoren',isoEn:'monitor',nl:'Monitor dit risico en implementeer extra beheersmaatregelen nadat urgentere risico\u2019s zijn aangepakt.',en:'Monitor this risk and implement controls after higher-level risks are addressed.'},
+  'B5':{zone:'beperkt',isoResponse:'monitoren',isoEn:'monitor',nl:'Monitor dit risico en implementeer extra beheersmaatregelen nadat urgentere risico\u2019s zijn aangepakt.',en:'Monitor this risk and implement controls after higher-level risks are addressed.'},
+  'B6':{zone:'beperkt',isoResponse:'monitoren',isoEn:'monitor',nl:'Monitor dit risico en implementeer extra beheersmaatregelen nadat urgentere risico\u2019s zijn aangepakt.',en:'Monitor this risk and implement controls after higher-level risks are addressed.'},
+  'C1':{zone:'aanvaardbaar',isoResponse:'accepteren',isoEn:'accept',nl:'Accepteer dit risico; er is geen directe maatregel nodig.',en:'Accept the risk; no immediate action required.'},
+  'C2':{zone:'laag',isoResponse:'monitoren',isoEn:'monitor',nl:'Controleer dit risico periodiek en onderneem alleen actie als de kans of impact toeneemt.',en:'Periodically review and only intervene if likelihood or impact increases.'},
+  'C3':{zone:'beperkt',isoResponse:'monitoren',isoEn:'monitor',nl:'Monitor dit risico en implementeer extra beheersmaatregelen nadat urgentere risico\u2019s zijn aangepakt.',en:'Monitor this risk and implement controls after higher-level risks are addressed.'},
+  'C4':{zone:'beperkt',isoResponse:'monitoren',isoEn:'monitor',nl:'Monitor dit risico en implementeer extra beheersmaatregelen nadat urgentere risico\u2019s zijn aangepakt.',en:'Monitor this risk and implement controls after higher-level risks are addressed.'},
+  'C5':{zone:'midden',isoResponse:'verminderen',isoEn:'reduce',nl:'Neem dit risico op in het risicomanagementplan en beheer het gestructureerd volgens het afgesproken plan.',en:'Include in your risk management plan and manage with structured attention.'},
+  'C6':{zone:'midden',isoResponse:'verminderen',isoEn:'reduce',nl:'Neem dit risico op in het risicomanagementplan en beheer het gestructureerd volgens het afgesproken plan.',en:'Include in your risk management plan and manage with structured attention.'},
+  'D1':{zone:'laag',isoResponse:'monitoren',isoEn:'monitor',nl:'Controleer dit risico periodiek en onderneem alleen actie als de kans of impact toeneemt.',en:'Periodically review and only intervene if likelihood or impact increases.'},
+  'D2':{zone:'beperkt',isoResponse:'monitoren',isoEn:'monitor',nl:'Monitor dit risico en implementeer extra beheersmaatregelen nadat urgentere risico\u2019s zijn aangepakt.',en:'Monitor this risk and implement controls after higher-level risks are addressed.'},
+  'D3':{zone:'beperkt',isoResponse:'monitoren',isoEn:'monitor',nl:'Monitor dit risico en implementeer extra beheersmaatregelen nadat urgentere risico\u2019s zijn aangepakt.',en:'Monitor this risk and implement controls after higher-level risks are addressed.'},
+  'D4':{zone:'midden',isoResponse:'verminderen',isoEn:'reduce',nl:'Neem dit risico op in het risicomanagementplan en beheer het gestructureerd volgens het afgesproken plan.',en:'Include in your risk management plan and manage with structured attention.'},
+  'D5':{zone:'hoog',isoResponse:'verminderen',isoEn:'reduce',nl:'Pak dit risico prioritair aan (bijvoorbeeld via een taakgroep) en voer kortetermijnmaatregelen uit.',en:'Prioritize and address the risk short-term, possibly using a dedicated task force.'},
+  'D6':{zone:'hoog',isoResponse:'verminderen',isoEn:'reduce',nl:'Pak dit risico prioritair aan (bijvoorbeeld via een taakgroep) en voer kortetermijnmaatregelen uit.',en:'Prioritize and address the risk short-term, possibly using a dedicated task force.'},
+  'E1':{zone:'laag',isoResponse:'monitoren',isoEn:'monitor',nl:'Controleer dit risico periodiek en onderneem alleen actie als de kans of impact toeneemt.',en:'Periodically review and only intervene if likelihood or impact increases.'},
+  'E2':{zone:'beperkt',isoResponse:'monitoren',isoEn:'monitor',nl:'Monitor dit risico en implementeer extra beheersmaatregelen nadat urgentere risico\u2019s zijn aangepakt.',en:'Monitor this risk and implement controls after higher-level risks are addressed.'},
+  'E3':{zone:'midden',isoResponse:'verminderen',isoEn:'reduce',nl:'Neem dit risico op in het risicomanagementplan en beheer het gestructureerd volgens het afgesproken plan.',en:'Include in your risk management plan and manage with structured attention.'},
+  'E4':{zone:'hoog',isoResponse:'verminderen',isoEn:'reduce',nl:'Pak dit risico prioritair aan (bijvoorbeeld via een taakgroep) en voer kortetermijnmaatregelen uit.',en:'Prioritize and address the risk short-term, possibly using a dedicated task force.'},
+  'E5':{zone:'urgent',isoResponse:'verminderen',isoEn:'reduce',nl:'Behandel dit risico met onmiddellijke prioriteit en neem direct corrigerende maatregelen om de impact te beperken.',en:'Take immediate corrective action to reduce the impact and mitigate harm.'},
+  'E6':{zone:'urgent',isoResponse:'verminderen',isoEn:'reduce',nl:'Behandel dit risico met onmiddellijke prioriteit en neem direct corrigerende maatregelen om de impact te beperken.',en:'Take immediate corrective action to reduce the impact and mitigate harm.'},
+  'F1':{zone:'laag',isoResponse:'monitoren',isoEn:'monitor',nl:'Controleer dit risico periodiek en onderneem alleen actie als de kans of impact toeneemt.',en:'Periodically review and only intervene if likelihood or impact increases.'},
+  'F2':{zone:'beperkt',isoResponse:'monitoren',isoEn:'monitor',nl:'Monitor dit risico en implementeer extra beheersmaatregelen nadat urgentere risico\u2019s zijn aangepakt.',en:'Monitor this risk and implement controls after higher-level risks are addressed.'},
+  'F3':{zone:'midden',isoResponse:'verminderen',isoEn:'reduce',nl:'Neem dit risico op in het risicomanagementplan en beheer het gestructureerd volgens het afgesproken plan.',en:'Include in your risk management plan and manage with structured attention.'},
+  'F4':{zone:'hoog',isoResponse:'verminderen',isoEn:'reduce',nl:'Pak dit risico prioritair aan (bijvoorbeeld via een taakgroep) en voer kortetermijnmaatregelen uit.',en:'Prioritize and address the risk short-term, possibly using a dedicated task force.'},
+  'F5':{zone:'urgent',isoResponse:'verminderen',isoEn:'reduce',nl:'Behandel dit risico met onmiddellijke prioriteit en neem direct corrigerende maatregelen om de impact te beperken.',en:'Take immediate corrective action to reduce the impact and mitigate harm.'},
+  'F6':{zone:'urgent',isoResponse:'verminderen',isoEn:'reduce',nl:'Behandel dit risico met onmiddellijke prioriteit en neem direct corrigerende maatregelen om de impact te beperken.',en:'Take immediate corrective action to reduce the impact and mitigate harm.'}
+};
+const RB_ZONE_ORDER = ['urgent','hoog','midden','beperkt','laag','aanvaardbaar']; // ernst aflopend
+function rbDensityStrip(cx0, w, cy, counts){
+  // counts = array van 6 (index 0..5). Tekent 6 posities over breedte w, gecentreerd op cx0.
+  // Rode dichtheid (fase 2): grotere/fellere stip = meer deelnemers op die positie.
+  const n=6, pad=9, innerW=w-2*pad, x0=cx0-w/2+pad;
+  let mx=1; for(let i=0;i<n;i++){ if(counts[i]>mx) mx=counts[i]; }
+  let out='';
+  for(let i=0;i<n;i++){
+    const px=(x0 + (n>1 ? (i*innerW/(n-1)) : innerW/2));
+    out+='<circle cx="'+px.toFixed(1)+'" cy="'+cy+'" r="1.6" fill="rgba(0,0,0,0.12)"/>';
+    if(counts[i]>0){
+      const frac=counts[i]/mx;
+      const rr=2.8 + frac*5.2;       // 2.8..8.0
+      const op=(0.34 + 0.56*frac);   // 0.34..0.90
+      out+='<circle cx="'+px.toFixed(1)+'" cy="'+cy+'" r="'+rr.toFixed(1)+'" fill="#E8423F" fill-opacity="'+op.toFixed(2)+'"/>';
+    }
+  }
+  return out;
+}
+function rbGroupCoinX(cx0, w, idx0){
+  // positie binnen een 6-punts strip (idx0 = 0..5), zelfde rekenwijze als rbDensityStrip
+  const n=6, pad=9, innerW=w-2*pad, x0=cx0-w/2+pad;
+  return x0 + (n>1 ? (idx0*innerW/(n-1)) : innerW/2);
+}
+function rbGroupCoin(cx, cy, label){
+  // blauwe groeps-coin (consensus, fase 3) op een strippositie
+  let o='<circle cx="'+cx.toFixed(1)+'" cy="'+cy+'" r="9.5" fill="#70A2D7" stroke="#FFFFFF" stroke-width="1.6"/>';
+  o+='<text x="'+cx.toFixed(1)+'" y="'+(cy+3.4)+'" font-size="9.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">'+escapeHtml(String(label))+'</text>';
+  return o;
+}
+function rbBuildCanvas(data, phase, opts){
+  // tekent het tweeluik o.b.v. RB_GEOM; toont lagen t/m `phase`.
+  // opts.panel: 'both' (default) | 'left' (alleen inventarisatie, breeduit) | 'right' (alleen matrix, breeduit)
+  opts = opts || {};
+  const panel = (opts.panel==='left'||opts.panel==='right') ? opts.panel : 'both';
+  const showLeft = (panel!=='right'), showRight = (panel!=='left');
+  const t = (typeof T!=='undefined' && T[lang]) ? T[lang] : {};
+  const G=RB_GEOM, inv=G.inv, mat=G.mat, ss=inv.scoreStrip;
+  const vbArr = (G.panelView && G.panelView[panel]) ? G.panelView[panel] : G.viewBox;
+  const vb=vbArr.join(' ');
+  const risksArr = (data && Array.isArray(data.risks)) ? data.risks : [];
+  const scoresData = (data && data.scores) ? data.scores : null;
+  const groupData = (data && data.group) ? data.group : null;
+  const matrixData = (data && data.matrix) ? data.matrix : null; // {<id>:{kans,impact,zone}} (fase >=4)
+  const measuresData = (data && data.measures) ? data.measures : null; // {<id>:{action,owner,deadline}} (fase >=5)
+  let s='<svg viewBox="'+vb+'" xmlns="http://www.w3.org/2000/svg" font-family="Plus Jakarta Sans, system-ui, sans-serif" role="img">';
+
+  /* ── panelkoppen (serif, conform sheets) ── */
+  if(showLeft) s+='<text x="'+(inv.x)+'" y="'+(inv.y-22)+'" font-family="Fraunces, Georgia, serif" font-size="22" fill="#262A36">'+escapeHtml(t.canvInvTitle||'inventarisatie')+'</text>';
+  if(showRight) s+='<text x="'+(mat.x)+'" y="'+(inv.y-22)+'" font-family="Fraunces, Georgia, serif" font-size="22" fill="#262A36">'+escapeHtml(t.canvResTitle||'resultaat')+'</text>';
+
+  /* ══ LINKERPANEEL: inventarisatie ══ */
+  if(showLeft){
+  s+='<rect x="'+inv.x+'" y="'+inv.y+'" width="'+inv.w+'" height="'+inv.h+'" rx="14" fill="#FFFFFF" stroke="rgba(0,0,0,0.11)"/>';
+
+  // kolomkoppen voor de scorestrips (fase >=2)
+  if(phase>=2){
+    s+='<text x="'+ss.kansX+'" y="'+(inv.y+34)+'" font-size="11" font-weight="700" fill="#9A9894" text-anchor="middle" letter-spacing="0.05em">'+escapeHtml((t.canvKans||'kans').toUpperCase())+'</text>';
+    s+='<text x="'+ss.impactX+'" y="'+(inv.y+34)+'" font-size="11" font-weight="700" fill="#9A9894" text-anchor="middle" letter-spacing="0.05em">'+escapeHtml((t.canvImpact||'impact').toUpperCase())+'</text>';
+  }
+
+  const listTop=inv.y+(phase>=2?56:50);
+  const rowH=inv.rowH;
+  if(phase>=1){
+    if(risksArr.length===0){
+      s+='<text x="'+(inv.x+18)+'" y="'+(listTop+24)+'" font-size="13" fill="#9A9894" font-style="italic">'+escapeHtml(t.canvEmptyInv||'nog geen risico\u2019s')+'</text>';
+    } else {
+      const avail=inv.h-(listTop-inv.y)-16;
+      const maxVisible=Math.max(1, Math.floor(avail/rowH));
+      const shown=risksArr.slice(0, maxVisible);
+      const maxChars = (phase>=2) ? 38 : 58;
+      shown.forEach((r,i)=>{
+        const ry=listTop+i*rowH;
+        const cx=inv.x+20, cy=ry+rowH/2;
+        // coin (nummering) — geel; fase >=4 kleurt de coin naar de definitieve zone
+        let coinFill='#FCC429';
+        if(phase>=4 && matrixData && matrixData[r.id] && RB_ZONE_COLORS[matrixData[r.id].zone]){ coinFill=RB_ZONE_COLORS[matrixData[r.id].zone]; }
+        s+='<circle cx="'+cx+'" cy="'+cy+'" r="11" fill="'+coinFill+'" stroke="rgba(0,0,0,0.14)"/>';
+        s+='<text x="'+cx+'" y="'+(cy+4)+'" font-size="11" font-weight="700" fill="#262A36" text-anchor="middle">'+r.id+'</text>';
+        // fase >=5: groene vink-badge op de nummering-coin bij een ingevulde maatregel
+        if(phase>=5 && measuresData){
+          const mm=measuresData[r.id];
+          if(mm && mm.action && String(mm.action).trim()){
+            const bx=cx+8.5, by=cy-8.5;
+            s+='<circle cx="'+bx.toFixed(1)+'" cy="'+by.toFixed(1)+'" r="5" fill="#BDD24D" stroke="#FFFFFF" stroke-width="1.3"/>';
+            s+='<path d="M'+(bx-2.3).toFixed(1)+' '+by.toFixed(1)+'l1.7 1.7 2.7-3.1" fill="none" stroke="#3D5210" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>';
+          }
+        }
+        // risicotekst (afgekapt)
+        let txt=String(r.text||'');
+        if(txt.length>maxChars) txt=txt.slice(0,maxChars-1)+'\u2026';
+        s+='<text x="'+(inv.x+40)+'" y="'+(cy+4)+'" font-size="13" fill="#262A36">'+escapeHtml(txt)+'</text>';
+        // fase >=2: rode spreidingsplots (dichtheid kans + impact)
+        if(phase>=2 && scoresData){
+          const entries = Array.isArray(scoresData[r.id]) ? scoresData[r.id] : [];
+          const kc=[0,0,0,0,0,0], ic=[0,0,0,0,0,0];
+          entries.forEach(e=>{
+            const ki=rbKansIndex(e.kans); if(ki) kc[ki-1]++;
+            const im=Number(e.impact); if(im>=1&&im<=6) ic[im-1]++;
+          });
+          s+=rbDensityStrip(ss.kansX, ss.w, cy, kc);
+          s+=rbDensityStrip(ss.impactX, ss.w, cy, ic);
+        }
+        // fase >=3: blauwe groeps-coin (bevestigde consensus) op de gekozen positie
+        if(phase>=3 && groupData){
+          const g = groupData[r.id];
+          if(g){
+            const ki=rbKansIndex(g.kans); const im=Number(g.impact);
+            if(ki>=1 && ki<=6){ s+=rbGroupCoin(rbGroupCoinX(ss.kansX, ss.w, ki-1), cy, g.kans); }
+            if(im>=1 && im<=6){ s+=rbGroupCoin(rbGroupCoinX(ss.impactX, ss.w, im-1), cy, im); }
+          }
+        }
+      });
+      if(risksArr.length>maxVisible){
+        const more=risksArr.length-maxVisible;
+        s+='<text x="'+(inv.x+40)+'" y="'+(listTop+maxVisible*rowH+18)+'" font-size="12" fill="#9A9894" font-style="italic">+'+more+'\u2026</text>';
+      }
+    }
+  }
+
+  } /* einde showLeft */
+
+  /* ══ RECHTERPANEEL: 6x6 resultaatmatrix ══ */
+  if(showRight){
+  const cellW=(mat.w - (mat.cols-1)*mat.cellGap)/mat.cols;
+  const cellH=(mat.h - (mat.rows-1)*mat.cellGap)/mat.rows;
+  // x-as = kans A..F (links->rechts), y-as = impact 1..6 (onder->boven)
+  const matrixOn = (phase>=4); // vanaf fase 4 worden de cellen ingekleurd naar zone
+  for(let ci=0; ci<mat.cols; ci++){
+    for(let ri=0; ri<mat.rows; ri++){
+      const cellX=mat.x + ci*(cellW+mat.cellGap);
+      const cellY=mat.y + (mat.rows-1-ri)*(cellH+mat.cellGap); // impact onder->boven
+      if(matrixOn){
+        // cel-gerichte zone-inkleuring (B9): vaste zone per cel uit RB_CELL_ADVICE
+        const cellKey=mat.kansLabels[ci]+mat.impactLabels[ri];
+        const adv=(typeof RB_CELL_ADVICE!=='undefined')?RB_CELL_ADVICE[cellKey]:null;
+        const zc=(adv && RB_ZONE_COLORS[adv.zone])?RB_ZONE_COLORS[adv.zone]:'#C5D93D';
+        s+='<rect x="'+cellX+'" y="'+cellY+'" width="'+cellW+'" height="'+cellH+'" rx="'+mat.rx+'" fill="'+zc+'" fill-opacity="0.30" stroke="'+zc+'" stroke-opacity="0.5" stroke-width="1"/>';
+      } else {
+        s+='<rect x="'+cellX+'" y="'+cellY+'" width="'+cellW+'" height="'+cellH+'" rx="'+mat.rx+'" fill="rgba(0,0,0,0.03)" stroke="rgba(0,0,0,0.07)"/>';
+      }
+    }
+  }
+  // fase >=4: gestippelde zonegrenzen (tussen cellen waar de zone wisselt) + genummerde coins op celpositie
+  if(matrixOn){
+    const cellLeft=ci=>mat.x + ci*(cellW+mat.cellGap);
+    const cellBottomRowY=ri=>mat.y + (mat.rows-1-ri)*(cellH+mat.cellGap);
+    const zoneAt=(ci,ri)=>{ const a=RB_CELL_ADVICE[mat.kansLabels[ci]+mat.impactLabels[ri]]; return a?a.zone:null; };
+    const zs=G.zoneStroke;
+    // verticale segmenten: grens tussen kolom ci en ci+1 op rij ri
+    for(let ci=0; ci<mat.cols-1; ci++){
+      for(let ri=0; ri<mat.rows; ri++){
+        if(zoneAt(ci,ri)!==zoneAt(ci+1,ri)){
+          const gx=cellLeft(ci+1)-mat.cellGap/2;
+          const gy=cellBottomRowY(ri);
+          s+='<line x1="'+gx.toFixed(1)+'" y1="'+gy.toFixed(1)+'" x2="'+gx.toFixed(1)+'" y2="'+(gy+cellH).toFixed(1)+'" stroke="'+zs.color+'" stroke-width="'+zs.w+'" stroke-dasharray="'+zs.dash+'" stroke-opacity="0.9"/>';
+        }
+      }
+    }
+    // horizontale segmenten: grens tussen rij ri en ri+1 op kolom ci
+    for(let ci=0; ci<mat.cols; ci++){
+      for(let ri=0; ri<mat.rows-1; ri++){
+        if(zoneAt(ci,ri)!==zoneAt(ci,ri+1)){
+          const gy=cellBottomRowY(ri)-mat.cellGap/2; // bovenrand van rij ri (= grens naar ri+1)
+          const gx=cellLeft(ci);
+          s+='<line x1="'+gx.toFixed(1)+'" y1="'+gy.toFixed(1)+'" x2="'+(gx+cellW).toFixed(1)+'" y2="'+gy.toFixed(1)+'" stroke="'+zs.color+'" stroke-width="'+zs.w+'" stroke-dasharray="'+zs.dash+'" stroke-opacity="0.9"/>';
+        }
+      }
+    }
+    // genummerde risico-coins op celpositie (gestapeld bij gelijke cel)
+    if(matrixData){
+      const byCell={};
+      risksArr.forEach(r=>{
+        const md=matrixData[r.id]; if(!md) return;
+        const ki=rbKansIndex(md.kans); const im=Number(md.impact);
+        if(!(ki>=1&&ki<=6) || !(im>=1&&im<=6)) return;
+        const key=ki+'_'+im; (byCell[key]=byCell[key]||[]).push({r, ki, im, zone:md.zone});
+      });
+      Object.keys(byCell).forEach(key=>{
+        const arr=byCell[key];
+        const ki=arr[0].ki, im=arr[0].im;
+        const ccx=mat.x + (ki-1)*(cellW+mat.cellGap) + cellW/2;
+        const ccy=mat.y + (mat.rows-im)*(cellH+mat.cellGap) + cellH/2;
+        const cr=G.coin.r;
+        arr.forEach((it,j)=>{
+          // lichte spreiding bij stapeling zodat meerdere coins in één cel zichtbaar blijven
+          const n=arr.length;
+          const off=(n>1)? (j-(n-1)/2) : 0;
+          const dx=off*13, dy=(n>3? (j%2?6:-6):0);
+          const zc=RB_ZONE_COLORS[it.zone]||'#FCC429';
+          s+='<circle cx="'+(ccx+dx).toFixed(1)+'" cy="'+(ccy+dy).toFixed(1)+'" r="'+cr+'" fill="'+zc+'" stroke="#FFFFFF" stroke-width="1.8"/>';
+          s+='<text x="'+(ccx+dx).toFixed(1)+'" y="'+(ccy+dy+G.coin.numFont*0.34).toFixed(1)+'" font-size="'+G.coin.numFont+'" font-weight="700" fill="#262A36" text-anchor="middle">'+it.r.id+'</text>';
+          // fase >=5: groene vink-badge op coins met een ingevulde maatregel
+          if(phase>=5 && measuresData){
+            const mm=measuresData[it.r.id];
+            if(mm && mm.action && String(mm.action).trim()){
+              const bx=ccx+dx+cr*0.78, by=ccy+dy-cr*0.78;
+              s+='<circle cx="'+bx.toFixed(1)+'" cy="'+by.toFixed(1)+'" r="5.6" fill="#BDD24D" stroke="#FFFFFF" stroke-width="1.4"/>';
+              s+='<path d="M'+(bx-2.6).toFixed(1)+' '+by.toFixed(1)+'l1.9 1.9 3-3.5" fill="none" stroke="#3D5210" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>';
+            }
+          }
+        });
+      });
+    }
+  }
+  // as-labels
+  for(let ci=0; ci<mat.cols; ci++){
+    const lx=mat.x + ci*(cellW+mat.cellGap) + cellW/2;
+    s+='<text x="'+lx+'" y="'+(mat.y+mat.h+22)+'" font-size="13" font-weight="600" fill="#5A5956" text-anchor="middle">'+mat.kansLabels[ci]+'</text>';
+  }
+  for(let ri=0; ri<mat.rows; ri++){
+    const ly=mat.y + (mat.rows-1-ri)*(cellH+mat.cellGap) + cellH/2 + 4;
+    s+='<text x="'+(mat.x-14)+'" y="'+ly+'" font-size="13" font-weight="600" fill="#5A5956" text-anchor="middle">'+mat.impactLabels[ri]+'</text>';
+  }
+  // as-titels (serif)
+  s+='<text x="'+(mat.x+mat.w/2)+'" y="'+(mat.y-2)+'" font-family="Fraunces, Georgia, serif" font-size="15" fill="#262A36" text-anchor="middle">'+escapeHtml(t.canvKans||'kans')+'</text>';
+  s+='<text x="'+(mat.x-40)+'" y="'+(mat.y+mat.h/2)+'" font-family="Fraunces, Georgia, serif" font-size="15" fill="#262A36" text-anchor="middle" transform="rotate(-90 '+(mat.x-40)+' '+(mat.y+mat.h/2)+')">'+escapeHtml(t.canvImpact||'impact')+'</text>';
+  } /* einde showRight */
+
+  s+='</svg>';
+  return s;
+}
+/* ══════════ END RB SHARED CANVAS BUILDER ══════════ */
+
+/* ══════════ RB SHARED RESET ══════════ */
+function resetDemoData(){
+  if(window.__RB_PROD) return;
+  const t=T[lang];
+  if(!confirm(t.resetConfirm)) return;
+  const keys=['rb_session','rb_session_started','rb_consequence','rb_risks',
+    'rb_phase1_live_subs','rb_phase1_submissions','rb_individual_scores','rb_phase2_live_subs',
+    'rb_central_scores','rb_group_scores','rb_matrix_result','rb_measures',
+    'rb_phase1_stage','rb_phase2_stage','rb_phase3_stage','rb_phase4_stage','rb_phase5_stage',
+    'rb_phase1_state','rb_phase2_state','rb_phase3_state','rb_phase4_state','rb_phase5_state'];
+  keys.forEach(k=>{ try{ localStorage.removeItem(k); }catch(e){} });
+  alert(t.resetDone);
+  location.reload();
+}
+
+/* ══════════ SESSIE LEZEN ══════════ */
+function readSession(){
+  try{ const raw=localStorage.getItem('rb_session'); return raw?JSON.parse(raw):null; }catch(e){ return null; }
+}
+function readConsequence(){
+  try{
+    const raw=localStorage.getItem('rb_consequence');
+    if(raw==null) return '';
+    if(raw.length && raw[0]==='{'){ try{ const o=JSON.parse(raw); return (o&&o.text)?o.text:''; }catch(e){ return raw; } }
+    return raw;
+  }catch(e){ return ''; }
+}
+
+function toggleSessPanel(){
+  const tog=document.getElementById('sessToggle');
+  const pan=document.getElementById('sessPanel');
+  const open=!pan.classList.contains('open');
+  pan.classList.toggle('open', open);
+  tog.classList.toggle('open', open);
+  tog.setAttribute('aria-expanded', open?'true':'false');
+  document.body.classList.toggle('sess-open', open);
+}
+function renderSessPanel(){
+  const bar=document.getElementById('sessBar');
+  const grid=document.getElementById('sessGrid');
+  const mini=document.getElementById('sessMini');
+  if(!bar||!grid) return;
+  const s=readSession();
+  if(!s){ bar.style.display='none'; return; }
+  bar.style.display='block';
+  const t=T[lang];
+  const org=s.orgName||'\u2014';
+  const name=s.sessionName||t.unnamedSession;
+  const cons=readConsequence();
+  if(mini) mini.textContent=t.sessMiniTpl.replace('{org}',org).replace('{name}',name);
+  const items=[
+    {k:t.sessOrg, v:org},
+    {k:t.sessName, v:name},
+    {k:t.sessFac, v:s.facilitator||'\u2014'},
+    {k:t.sessType, v:(t.anaTypeLbl&&t.anaTypeLbl[s.analysisType])||'\u2014'},
+    {k:t.sessDomain, v:(t.domainLbl&&t.domainLbl[s.domain])||'\u2014'},
+    {k:t.sessScope, v:(t.scopeLbl&&t.scopeLbl[s.scope])||'\u2014'},
+  ];
+  let html=items.map(it=>'<div class="sess-item"><span class="sess-k">'+escapeHtml(it.k)+'</span><span class="sess-v" title="'+escapeHtml(String(it.v))+'">'+escapeHtml(String(it.v))+'</span></div>').join('');
+  html+='<div class="sess-item cons-item"><span class="sess-k">'+escapeHtml(t.sessCons)+'</span><span class="sess-v">'+escapeHtml(cons||'\u2014')+'</span></div>';
+  grid.innerHTML=html;
+}
+
+/* ══════════ ONGEWENST GEVOLG (anker) ══════════ */
+function renderConsequenceAnchors(){
+  const cons=readConsequence()||T[lang].noConsequence;
+  ['consAnchorText','consAnchorText2','pConsText'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=cons; });
+}
+
+/* ══════════ INTRO GRID ══════════ */
+function iconSvg(kind){
+  if(kind==='coin') return '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M10 6.5v7M8 8h2.2a1.5 1.5 0 0 1 0 3H8"/></svg>';
+  if(kind==='person') return '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="6.5" r="2.6"/><path d="M4.5 16c0-2.8 2.4-4.6 5.5-4.6s5.5 1.8 5.5 4.6"/></svg>';
+  if(kind==='grid') return '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M3 8h14M3 12.5h14M8 3v14M12.5 3v14"/></svg>';
+  if(kind==='zone') return '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14L8 6l3.5 5 2.5-3.5L17 14z"/><path d="M3 17h14"/></svg>';
+  if(kind==='ai') return '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5l1.9 4.4 4.6 1-3.7 2.9 1 4.7L10 13.1 6.2 15.5l1-4.7L3.5 7.9l4.6-1z"/></svg>';
+  return '';
+}
+function buildIntroGrid(){
+  const g=document.getElementById('introGrid'); if(!g) return;
+  const t=T[lang];
+  g.innerHTML=(t.introItems||[]).map(item=>'<div class="intro-item"><div class="intro-icon" style="background:var(--blue-light);color:#3F6FA8">'+iconSvg(item.icon)+'</div><div><div class="intro-item-title">'+escapeHtml(item.title)+'</div><div class="intro-item-sub">'+escapeHtml(item.sub)+'</div></div></div>').join('');
+}
+
+/* ══════════ SCREEN SWITCH ══════════ */
+function showScreen(id){
+  ['sIntro','sCollect','sFinal'].forEach(s=>{
+    const el=document.getElementById(s); if(el) el.classList.toggle('open', s===id);
+  });
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ══════════ RISICO'S + GROEPSSCORES LADEN ══════════ */
+function loadRisks(){
+  try{
+    const raw=localStorage.getItem('rb_risks');
+    if(raw && raw[0]==='['){ const arr=JSON.parse(raw); if(Array.isArray(arr)){ risks=arr.map(r=>({id:r.id, text:String(r.text||''), author:r.author||''})); } }
+  }catch(e){}
+}
+/* leest rb_group_scores ({ "<id>":{kans:'A'..'F', impact:1..6} }) — bron uit fase 3 (blauwe coin) */
+function loadGroupScores(){
+  const out={};
+  try{
+    const raw=localStorage.getItem('rb_group_scores');
+    if(raw && raw[0]==='{'){
+      const obj=JSON.parse(raw);
+      Object.keys(obj||{}).forEach(rid=>{
+        const g=obj[rid]; if(!g) return;
+        const k=String(g.kans||'').toUpperCase(); const im=Number(g.impact);
+        if(/^[A-F]$/.test(k) && im>=1 && im<=6){ out[rid]={kans:k, impact:im}; }
+      });
+    }
+  }catch(e){}
+  groupScores=out;
+}
+/* welke risico's hebben een geldige groepsscore */
+function risksWithGroup(){ return risks.filter(r=>groupScores[r.id]); }
+function hasAnyGroup(){ return risksWithGroup().length>0; }
+
+/* ══════════ MATRIXRESULTAAT AFLEIDEN (cel → zone → actie → cel-advies) ══════════ */
+/* Niets opslaan als bron: zone/actie/score worden hier herberekend uit RB_CELL_ADVICE (B9, één bron van waarheid). */
+function computeMatrix(){
+  const out={};
+  risks.forEach(r=>{
+    const g=groupScores[r.id]; if(!g) return;
+    const adv=rbAdvice(g.kans, g.impact); if(!adv) return;
+    const score=rbScore(g.kans, g.impact);
+    const generic = (lang==='en') ? adv.en : adv.nl;
+    out[r.id]={
+      kans:g.kans, impact:g.impact, score:score,
+      zone:adv.zone, actie:(T[lang].zoneAction[adv.zone]||adv.zone),
+      isoResponse:adv.isoResponse, isoEn:adv.isoEn,
+      celAdvies:generic,
+      refined: (refinedAdvice[r.id]!=null)
+    };
+  });
+  matrixByRisk=out;
+}
+
+/* beheersprioriteiten: zone-ernst aflopend, daarbinnen score aflopend (B9: score rangschikt binnen zone) */
+function prioritizedRisks(){
+  const rank={}; RB_ZONE_ORDER.forEach((z,i)=>{ rank[z]=i; });
+  return risks.filter(r=>matrixByRisk[r.id]).slice().sort((a,b)=>{
+    const ma=matrixByRisk[a.id], mb=matrixByRisk[b.id];
+    const za=rank[ma.zone]??99, zb=rank[mb.zone]??99;
+    if(za!==zb) return za-zb;
+    if((mb.score||0)!==(ma.score||0)) return (mb.score||0)-(ma.score||0);
+    return a.id-b.id;
+  });
+}
+
+/* ══════════ STAGE: INTERPRET (matrix tonen) ══════════ */
+function startInterpret(){   // opent de matrix-/interpretatie-stage
+  if(!hasAnyGroup()) return;
+  publishStage('score');     // deelnemers tonen "matrix wordt ingevuld" (passief)
+  computeMatrix();
+  renderInterpret();
+  renderCanvasAll();
+  updateCollectBotInfo();
+  showScreen('sCollect');
+}
+
+/* ══════════ ZONE-LEGENDA ══════════ */
+function renderZoneLegend(){
+  const t=T[lang];
+  const html=RB_ZONE_ORDER.map(z=>{
+    const col=RB_ZONE_COLORS[z];
+    return '<span class="zl-item"><span class="zl-swatch" style="background:'+col+'"></span>'
+      +'<span class="zl-name">'+escapeHtml(t.zoneLabel[z])+'</span> '
+      +'<span class="zl-act">\u00b7 '+escapeHtml(t.zoneAction[z])+'</span></span>';
+  }).join('');
+  ['zoneLegend','zoneLegendFinal'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML=html; });
+}
+
+/* ══════════ RENDER: BEHEERSPRIORITEITEN + INTERPRETATIE PER RISICO ══════════ */
+function arrowSvg(){ return '<span class="intp-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8h9M9 4l4 4-4 4"/></svg></span>'; }
+
+function renderPrioList(){
+  const wrap=document.getElementById('prioList'); if(!wrap) return;
+  const t=T[lang];
+  const list=prioritizedRisks();
+  if(list.length===0){ wrap.innerHTML='<div class="cons-nodata">'+escapeHtml(t.noData)+'</div>'; return; }
+  wrap.innerHTML=list.map((r,i)=>{
+    const m=matrixByRisk[r.id];
+    const zc=RB_ZONE_COLORS[m.zone];
+    return '<div class="prio-row" style="border-left-color:'+zc+'">'
+      +'<span class="prio-rank">'+(i+1)+'</span>'
+      +'<span class="prio-coin" style="background:'+zc+'">'+r.id+'</span>'
+      +'<span class="prio-text" title="'+escapeHtml(r.text)+'">'+escapeHtml(r.text)+'</span>'
+      +'<span class="prio-meta">'
+        +'<span class="prio-zone" style="background:'+zc+'">'+escapeHtml(t.zoneLabel[m.zone])+'</span>'
+        +'<span class="prio-score" title="'+escapeHtml(m.kans+''+m.impact)+'">'+escapeHtml(t.intpScoreLabel)+' '+m.score+'</span>'
+      +'</span>'
+    +'</div>';
+  }).join('');
+}
+
+function renderIntpList(){
+  const wrap=document.getElementById('intpList'); if(!wrap) return;
+  const t=T[lang];
+  const list=prioritizedRisks();
+  if(list.length===0){ wrap.innerHTML='<div class="cons-nodata">'+escapeHtml(t.noData)+'</div>'; return; }
+  wrap.innerHTML=list.map(r=>{
+    const m=matrixByRisk[r.id];
+    const zc=RB_ZONE_COLORS[m.zone];
+    const cell=m.kans+''+m.impact;
+    const isoLabel=t.isoLabel[m.isoResponse]||m.isoResponse;
+    const refined=refinedAdvice[r.id];
+    const adviceText = refined!=null ? refined : m.celAdvies;
+    const aiTag = aiRefined[r.id] ? '<span class="ai-tag"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.5l1.6 3.7L13.5 6l-3.1 2.4.9 4.1L8 10.7 4.7 12.5l.9-4.1L2.5 6l3.9-.8L8 1.5z"/></svg>'+escapeHtml(t.intpAiTag)+'</span>' : '';
+    return '<div class="intp-card" style="border-left-color:'+zc+'" data-rid="'+r.id+'">'
+      +'<div class="intp-head">'
+        +'<span class="intp-coin" style="background:'+zc+'">'+r.id+'</span>'
+        +'<span class="intp-risk-text">'+escapeHtml(r.text)+'</span>'
+        +'<span class="intp-cellbadge">'+escapeHtml(t.intpCellLabel)+' '+escapeHtml(cell)+'</span>'
+      +'</div>'
+      +'<div class="intp-chain">'
+        +'<span class="intp-chip zone" style="background:'+zc+'">'+escapeHtml(t.zoneLabel[m.zone])+' \u00b7 '+escapeHtml(t.zoneAction[m.zone])+'</span>'
+        +arrowSvg()
+        +'<span class="intp-chip iso">'+escapeHtml(isoLabel)+'</span>'
+        +arrowSvg()
+        +'<span class="intp-chip score">'+escapeHtml(t.intpScoreLabel)+' '+m.score+'</span>'
+      +'</div>'
+      +'<div class="intp-action-label">'+escapeHtml(t.intpActionLabel)+' <span class="intp-edit-hint">'+escapeHtml(t.intpEditHint)+'</span></div>'
+      +'<div class="intp-ai-tag-row" id="aitag-'+r.id+'">'+aiTag+'</div>'
+      +'<textarea class="intp-advice-edit'+(aiRefined[r.id]?' refined':'')+'" id="advice-'+r.id+'" rows="3" oninput="onAdviceEdit('+r.id+', this.value)">'+escapeHtml(adviceText)+'</textarea>'
+      +'<div class="intp-refine-row" data-env="dev-only">'
+        +'<button type="button" class="btn btn-purple intp-refine-btn" id="refineBtn-'+r.id+'" onclick="refineAdvice('+r.id+')">'
+          +'<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.5l1.6 3.7L13.5 6l-3.1 2.4.9 4.1L8 10.7 4.7 12.5l.9-4.1L2.5 6l3.9-.8L8 1.5z"/></svg>'
+          +'<span>'+escapeHtml(t.intpRefineBtn)+'</span>'
+        +'</button>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+  if(window.__RB_PROD){ wrap.querySelectorAll('[data-env="dev-only"]').forEach(el=>{ el.style.display='none'; }); }
+}
+
+function renderInterpret(){
+  renderZoneLegend();
+  renderPrioList();
+  renderIntpList();
+}
+
+/* ══════════ AI-VERFIJNING (btn-purple) — live laag bovenop de kennisbank ══════════ */
+function buildRefineData(r, m){
+  // Gestructureerde data voor de proxy; de prompt (vergelijking met COSO ERM / ISO 31000 / ALARP,
+  // zo nodig met web search) wordt SERVER-SIDE opgebouwd (baseline 3.1 - geen prompt-as-a-service).
+  var t=T[lang];
+  return {
+    risk: r.text,
+    kans: m.kans, impact: Number(m.impact), cell: m.kans+''+m.impact,
+    zone: m.zone, zoneLabel: t.zoneLabel[m.zone], zoneAction: t.zoneAction[m.zone],
+    iso: m.isoResponse, celAdvies: m.celAdvies
+  };
+}
+function cleanAdvice(text){
+  return String(text||'').replace(/^["'\u201c\u2018\s]+|["'\u201d\u2019\s]+$/g,'').trim();
+}
+function onAdviceEdit(rid, val){
+  refinedAdvice[rid]=val;          // handmatige tekst = override (2e manier, naast AI-verfijning)
+  aiRefined[rid]=false;            // handmatige edit telt niet als AI-verfijning
+  var tag=document.getElementById('aitag-'+rid); if(tag) tag.innerHTML='';
+  var ta=document.getElementById('advice-'+rid); if(ta) ta.classList.remove('refined');
+}
+function setRefineBusy(rid, busy){
+  const btn=document.getElementById('refineBtn-'+rid); if(!btn) return;
+  const t=T[lang];
+  if(busy){
+    btn.classList.add('busy');
+    btn.innerHTML='<svg class="intp-spin" width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M8 1.5a6.5 6.5 0 1 0 6.5 6.5"/></svg><span>'+escapeHtml(t.intpRefineBusy)+'</span>';
+  } else {
+    btn.classList.remove('busy');
+    btn.innerHTML='<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.5l1.6 3.7L13.5 6l-3.1 2.4.9 4.1L8 10.7 4.7 12.5l.9-4.1L2.5 6l3.9-.8L8 1.5z"/></svg><span>'+escapeHtml(t.intpRefineBtn)+'</span>';
+  }
+}
+async function refineAdvice(rid){
+  const r=risks.find(x=>x.id===rid); const m=matrixByRisk[rid];
+  if(!r||!m) return;
+  setRefineBusy(rid, true);
+  try{
+    const text=await vkCallAI('verfijn_advies', buildRefineData(r, m), {lang:lang});
+    refinedAdvice[rid]=cleanAdvice(text); aiRefined[rid]=true;
+    computeMatrix();
+    renderIntpList();
+    showBanner(T[lang].bannerRefinedOne.replace('{n}', rid));
+  }catch(e){
+    setRefineBusy(rid, false);
+    showBanner(T[lang].aiError);
+  }
+}
+async function refineAllAdvice(){
+  const list=prioritizedRisks();
+  const btn=document.getElementById('t-refineAllBtn');
+  const lbl=document.getElementById('t-refineAllLabel');
+  if(btn) btn.classList.add('busy'); if(lbl) lbl.textContent=T[lang].refineAllBusy;
+  let ok=0;
+  for(const r of list){
+    const m=matrixByRisk[r.id]; if(!m) continue;
+    try{ const text=await vkCallAI('verfijn_advies', buildRefineData(r, m), {lang:lang}); refinedAdvice[r.id]=cleanAdvice(text); aiRefined[r.id]=true; ok++; }
+    catch(e){ /* sla over; generiek advies blijft */ }
+  }
+  computeMatrix();
+  renderIntpList();
+  if(btn) btn.classList.remove('busy'); if(lbl) lbl.textContent=T[lang].refineAllLabel;
+  showBanner(ok>0 ? T[lang].bannerRefined : T[lang].aiError);
+}
+
+/* ══════════ COLLECT BOT-INFO ══════════ */
+function updateCollectBotInfo(){
+  const t=T[lang];
+  const n=risksWithGroup().length;
+  const info=document.getElementById('t-collectBotInfo');
+  if(info) info.textContent = t.collectBotInfo;
+  const btn=document.getElementById('t-toFinal'); if(btn) btn.disabled = !(n>0);
+}
+function updateIntroReady(){
+  const t=T[lang];
+  const info=document.getElementById('t-introBotInfo');
+  const btn=document.getElementById('t-introStart');
+  const has=hasAnyGroup();
+  if(info) info.textContent = has ? t.introBotInfo : t.introBotInfoNoData;
+  if(btn) btn.disabled=!has;
+}
+
+/* ══════════ CANVAS RENDER ══════════ */
+function renderCanvasAll(){
+  const base={risks:risks, group:groupScores, matrix:matrixByRisk};
+  const c1=document.getElementById('rbCanvas'); if(c1) c1.innerHTML=rbBuildCanvas(base, 4, {panel:'right'});   // werkscherm: 6x6 groot, geen inventarisatie
+  const c2=document.getElementById('rbCanvasFinal'); if(c2) c2.innerHTML=rbBuildCanvas(base, 4, {panel:'both'}); // eindscherm: volledig tweeluik
+}
+function rinvScale(labels, chosen){
+  return labels.map(function(v){ var sel=(String(v)===String(chosen)); return '<span class="rinv-cell'+(sel?' on':'')+'">'+v+'</span>'; }).join('');
+}
+function renderRinvList(){
+  const el=document.getElementById('rinvList'); if(!el) return;
+  const t=T[lang];
+  const list=prioritizedRisks();
+  if(list.length===0){ el.innerHTML='<div class="cons-nodata">'+escapeHtml(t.noData)+'</div>'; return; }
+  const KL=['A','B','C','D','E','F'], IL=[1,2,3,4,5,6];
+  el.innerHTML=list.map(function(r){
+    const m=matrixByRisk[r.id]; const zc=RB_ZONE_COLORS[m.zone];
+    return '<div class="rinv-row">'
+      +'<span class="rinv-coin" style="background:'+zc+'">'+r.id+'</span>'
+      +'<div class="rinv-main"><div class="rinv-text">'+escapeHtml(r.text)+'</div>'
+        +'<div class="rinv-axis"><span class="rinv-axis-lbl">'+escapeHtml(t.rinvKans)+'</span><span class="rinv-cells">'+rinvScale(KL, m.kans)+'</span></div>'
+        +'<div class="rinv-axis"><span class="rinv-axis-lbl">'+escapeHtml(t.rinvImpact)+'</span><span class="rinv-cells">'+rinvScale(IL, m.impact)+'</span></div>'
+      +'</div></div>';
+  }).join('');
+}
+function switchView(view){
+  const btns=document.querySelectorAll('#sFinal .vt-btn'); btns.forEach(function(b){ b.classList.remove('on'); });
+  const u=document.getElementById('fvUitkomsten'), c=document.getElementById('fvCanvas');
+  if(view==='visueel'){ if(btns[1]) btns[1].classList.add('on'); if(u)u.style.display='none'; if(c)c.style.display='block'; renderCanvasAll(); renderZoneLegend(); }
+  else { if(btns[0]) btns[0].classList.add('on'); if(u)u.style.display='block'; if(c)c.style.display='none'; renderRinvList(); }
+}
+
+/* ══════════ STAGE: FINAL — matrixresultaat vastleggen ══════════ */
+function confirmMatrix(){
+  const list=prioritizedRisks();
+  if(list.length===0) return;
+  // rb_matrix_result: array gesorteerd op zone-ernst, dan score aflopend (= beheersprioriteiten)
+  const result=list.map(r=>{
+    const m=matrixByRisk[r.id];
+    const adv = (refinedAdvice[r.id]!=null && String(refinedAdvice[r.id]).trim()) ? refinedAdvice[r.id] : m.celAdvies;
+    return {
+      riskId:r.id, kans:m.kans, impact:m.impact, score:m.score,
+      zone:m.zone, actie:m.actie, isoResponse:m.isoResponse, celAdvies:adv
+    };
+  });
+  try{ localStorage.setItem('rb_matrix_result', JSON.stringify(result)); }catch(e){}
+  try{ localStorage.setItem('rb_phase4_state','confirmed'); }catch(e){}
+
+  const note=document.getElementById('finalNoteText');
+  if(note) note.textContent=T[lang].finalNote.replace('{n}', result.length);
+  renderRinvList(); renderCanvasAll();
+  renderZoneLegend();
+  switchView('uitkomsten');
+  publishStage('final', {risks:result.length});
+  alert(T[lang].confirmAlert.replace('{n}', result.length));
+  showScreen('sFinal');
+}
+function backToCollect(){
+  publishStage('score');
+  renderInterpret(); renderCanvasAll(); updateCollectBotInfo();
+  showScreen('sCollect');
+}
+
+/* ══════════ NAVIGATIE ══════════ */
+function goPrevPhase(){
+  if(confirm(T[lang].goPrevConfirm)){ window.location.href='risicobeheersing_fase3.html'; }
+}
+function goToNextPhase(){
+  publishStage('done');
+  window.location.href='risicobeheersing_fase5.html';
+}
+
+/* ══════════ BANNER ══════════ */
+function showBanner(msg){
+  const b=document.getElementById('topBanner'); const m=document.getElementById('topBannerMsg');
+  if(!b||!m) return;
+  m.textContent=msg; b.classList.add('show');
+  clearTimeout(window.__bannerTo); window.__bannerTo=setTimeout(()=>b.classList.remove('show'),3500);
+}
+
+/* ══════════ PARTICIPANT VIEW (passief — kijkt mee) ══════════ */
+function showPView(){
+  facView=false;
+  document.getElementById('facilitatorView').style.display='none';
+  document.getElementById('pView').classList.add('open');
+  applyStageToPView();
+}
+function hidePView(){
+  facView=true;
+  document.getElementById('pView').classList.remove('open');
+  document.getElementById('facilitatorView').style.display='';
+}
+function showPStage(stage){
+  const map={ preWait:'pPreWait', score:'pScore', done:'pDone' };
+  ['pPreWait','pScore','pDone'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display=(id===map[stage]?'block':'none'); });
+}
+function applyStageToPView(){
+  if(facView) return;
+  renderConsequenceAnchors();
+  updatePSummary();
+  const st=readStage();
+  if(!st || !st.stage || st.stage==='idle'){ showPStage('preWait'); return; }
+  if(st.stage==='score'){ renderPGroupLive(); showPStage('score'); return; }
+  if(st.stage==='final' || st.stage==='done'){ renderPDoneMine(); showPStage('done'); return; }
+  showPStage('preWait');
+}
+
+/* read-only overzicht tijdens 'matrix wordt ingevuld' — toont de groepsscores die in de matrix komen */
+function renderPGroupLive(){
+  const wrap=document.getElementById('pMineWrap'); const list=document.getElementById('pMineList'); if(!wrap||!list) return;
+  const rows=risks.filter(r=>groupScores[r.id]);
+  if(rows.length===0){ wrap.style.display='none'; return; }
+  wrap.style.display='block';
+  list.innerHTML=rows.map(r=>{
+    const g=groupScores[r.id];
+    const adv=rbAdvice(g.kans,g.impact);
+    const zc=(adv && RB_ZONE_COLORS[adv.zone])?RB_ZONE_COLORS[adv.zone]:'var(--coin-blauw)';
+    return '<div class="p-mine-item"><span class="cons-coin" style="width:22px;height:22px;font-size:11px;background:'+zc+';color:#fff">'+r.id+'</span><span style="flex:1;min-width:0">'+escapeHtml(r.text)+'</span><span class="p-mine-score" style="background:'+zc+'">'+escapeHtml(String(g.kans))+escapeHtml(String(g.impact))+'</span></div>';
+  }).join('');
+}
+/* na vastleggen: lees het matrixresultaat uit localStorage en toon read-only (zone + cel) */
+function renderPDoneMine(){
+  const wrap=document.getElementById('pDoneMineWrap'); const list=document.getElementById('pDoneMineList'); if(!wrap||!list) return;
+  let result=[];
+  try{ const raw=localStorage.getItem('rb_matrix_result'); if(raw && raw[0]==='[') result=JSON.parse(raw)||[]; }catch(e){}
+  if(!Array.isArray(result) || result.length===0){ wrap.style.display='none'; return; }
+  const t=T[lang];
+  const byId={}; risks.forEach(r=>{ byId[r.id]=r; });
+  wrap.style.display='block';
+  list.innerHTML=result.map(m=>{
+    const r=byId[m.riskId]; const txt=r?r.text:('#'+m.riskId);
+    const zc=RB_ZONE_COLORS[m.zone]||'var(--coin-blauw)';
+    const zlabel=(t.zoneLabel[m.zone]||m.zone);
+    return '<div class="p-mine-item"><span class="cons-coin" style="width:22px;height:22px;font-size:11px;background:'+zc+';color:#fff">'+m.riskId+'</span><span style="flex:1;min-width:0">'+escapeHtml(txt)+'</span><span class="p-mine-score" style="background:'+zc+'">'+escapeHtml(zlabel)+'</span></div>';
+  }).join('');
+}
+function updatePSummary(){
+  const block=document.getElementById('pSummaryBlock'); const txtEl=document.getElementById('pSummaryText'); if(!block||!txtEl) return;
+  const s=readSession(); const cons=readConsequence();
+  if(!s){ block.style.display='none'; return; }
+  const t=T[lang];
+  const type=(t.summaryTypeLbl&&t.summaryTypeLbl[s.analysisType])||t.summaryTypeLbl.preventief;
+  const name=s.sessionName||'';
+  const tpl=name?t.summaryTpl:t.summaryTplNoName;
+  let str=(name?tpl.replace('{name}',name):tpl).replace('{type}',type).replace('{cons}',cons||'\u2014');
+  txtEl.textContent=str; block.style.display='block';
+}
+
+/* ══════════ DEMO-DATA LADEN (dev) ══════════ */
+function seedDemoIfEmpty(){
+  if(window.__RB_PROD) return;
+  // alleen seeden als er nog geen sessie bestaat (zodat een echte doorloop intact blijft)
+  if(readSession()) return;
+  const demoSession={ orgName:'Gemeente Leiden', sector:'overheid', sessionName:'Risico-analyse ICT-continu\u00efteit', date:new Date().toISOString().split('T')[0], facilitator:'Demo Facilitator', analysisType:'preventief', domain:'it', scope:'organisatie', participants:[], sessionId:'demo123', startedAt:new Date().toISOString() };
+  try{ localStorage.setItem('rb_session', JSON.stringify(demoSession)); }catch(e){}
+  try{ localStorage.setItem('rb_consequence', 'Langdurige uitval van ICT-systemen met verstoring van de dienstverlening'); }catch(e){}
+  try{ localStorage.setItem('rb_session_started', JSON.stringify({lang, at:Date.now()})); }catch(e){}
+  // seed een genummerde risicolijst (alsof fase 1 is vastgelegd)
+  const demoRisks=[
+    {id:1, text:'Verouderde back-upsystemen'},
+    {id:2, text:'Onvoldoende patchbeheer op servers'},
+    {id:3, text:'Te weinig bewustzijn bij medewerkers (phishing)'},
+    {id:4, text:'Afhankelijkheid van \u00e9\u00e9n leverancier'},
+    {id:5, text:'Geen geteste uitwijkprocedure'},
+    {id:6, text:'Stroomuitval in het datacenter'},
+    {id:7, text:'Menselijke fouten bij configuratie'},
+  ];
+  if(!localStorage.getItem('rb_risks')){
+    try{ localStorage.setItem('rb_risks', JSON.stringify(demoRisks)); }catch(e){}
+  }
+  // seed vastgestelde groepsscores (alsof fase 3 is vastgelegd) — gespreid over de zones
+  if(!localStorage.getItem('rb_group_scores')){
+    const grp={
+      1:{kans:'B', impact:6},   // B6 -> beperkt
+      2:{kans:'E', impact:5},   // E5 -> urgent
+      3:{kans:'D', impact:4},   // D4 -> midden
+      4:{kans:'C', impact:6},   // C6 -> midden
+      5:{kans:'D', impact:5},   // D5 -> hoog
+      6:{kans:'B', impact:3},   // B3 -> laag
+      7:{kans:'C', impact:2},   // C2 -> laag
+    };
+    try{ localStorage.setItem('rb_group_scores', JSON.stringify(grp)); }catch(e){}
+  }
+}
+
+/* ══════════ INIT ══════════ */
+
+/* ══════════ FACILITATOR STAGE-HERSTEL (refresh / pay-resume) ══════════ */
+function restoreFacilitatorScreen(){
+  const st=readStage(); const stage=st&&st.stage;
+  window.__rbNoPublish=true;
+  try{
+    if(stage==='score'){ startInterpret(); }
+  }catch(e){}
+  finally{ window.__rbNoPublish=false; }
+  if(!document.querySelector('.screen.open')) showScreen('sIntro');
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  rbApplyEnvironmentRules();
+  seedDemoIfEmpty();   // alleen dev + lege state
+  initLang();
+  applyT();
+  buildIntroGrid();
+  renderSessPanel();
+  renderConsequenceAnchors();
+  loadRisks();
+  loadGroupScores();   // leest rb_group_scores (bron uit fase 3)
+  computeMatrix();     // leidt cel -> zone -> actie -> cel-advies af
+  renderInterpret();
+  renderCanvasAll();
+  updateIntroReady();
+  updateCollectBotInfo();
+  updatePSummary();
+  // Herstel de lopende facilitator-werkstage na refresh/pay-resume (standaard §11A/§11B);
+  // zonder lopende stage start de facilitator op intro. GEEN idle-stage publiceren bij init.
+  restoreFacilitatorScreen();
+});
+</script>
+<script>
+/* ══════════ RB SHARED ROBUSTHEID (standaard §11B; gedeeld blok, identiek in alle fasen) ══════════ */
+(function(){
+  'use strict';
+  /* pageshow-reset (bfcache/terug-knop na platform-redirect): transiënte UI herstellen —
+     open modals sluiten, bewapende twee-staps-knoppen ontwapenen, fase-eigen reset-hook. */
+  window.addEventListener('pageshow', function(){
+    try{ if(typeof rbCloseTip==='function') rbCloseTip(); }catch(e){}
+    try{
+      document.querySelectorAll('[data-two-step].armed').forEach(function(btn){
+        btn.classList.remove('armed');
+        btn.setAttribute('aria-pressed','false');
+      });
+    }catch(e){}
+    try{ if(typeof window.rbPageshowReset==='function') window.rbPageshowReset(); }catch(e){}
+  });
+  /* Klembord met fallback (non-secure context / oudere browser); belofte geeft succes terug
+     zodat de aanroeper de "gekopieerd"-bevestiging alléén bij succes toont. */
+  function fallbackCopy(text){
+    try{
+      var ta=document.createElement('textarea');
+      ta.value=text; ta.setAttribute('readonly','');
+      ta.style.cssText='position:fixed;left:-9999px;top:0;';
+      document.body.appendChild(ta); ta.select();
+      var ok=document.execCommand('copy');
+      ta.remove(); return !!ok;
+    }catch(e){ return false; }
+  }
+  window.rbCopyText=function(text){
+    return new Promise(function(resolve){
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(function(){ resolve(true); }, function(){ resolve(fallbackCopy(text)); });
+      } else { resolve(fallbackCopy(text)); }
+    });
+  };
+})();
+/* ══════════ END RB SHARED ROBUSTHEID ══════════ */
+</script>
+<!-- ═══════════════ RB PLATFORM / FIREBASE / CINAB (gedeeld blok, byte-identiek in alle fasen + rapport) ═══════════════ -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script type="module">
+  // De ONGEWIJZIGDE module-client (CINAB-APP-STANDAARD §9); we bridgen alleen zijn publieke API naar window.
+  import { startCinabSession, createCinabClient, CinabError } from './cinab-tool-client.js';
+  window.__cinabLib = { startCinabSession, createCinabClient, CinabError };
+  window.dispatchEvent(new Event('cinab-lib-ready'));
+</script>
+<script>
+/* ══════════ RB SHARED FIREBASE GLUE (rbFb) ══════════ */
+/* Standaard §11A: localStorage bereikt nooit een ander apparaat; RTDB is de bron van waarheid
+   voor facilitator ↔ deelnemer. Config is nog [INVULLEN] (geen RB-Firebaseproject): elke helper
+   reject dan netjes en de fases draaien op de bestaande localStorage/demo-flow. Beveiliging
+   zit in database.rules.json, niet in deze config (geen secret). EU-regio verplicht (§16). */
+(function (global) {
+  'use strict';
+
+  // [INVULLEN] zodra het Firebaseproject voor risicobeheersing bestaat (europe-west1):
+  var RB_FB_STAGING = null; // bv. { apiKey:"…", authDomain:"…", databaseURL:"https://…-rtdb.europe-west1.firebasedatabase.app", projectId:"…", appId:"…" }
+  var RB_FB_PROD    = null; // idem, schoon productieproject (CINAB-account)
+
+  function rbFbEnv() {
+    var h = (global.location && global.location.hostname) || '';
+    var staging = (h === 'localhost' || h.indexOf('127.') === 0 || h.indexOf('192.168.') === 0 ||
+                   h.indexOf('.local') !== -1 || h.indexOf('.web.app') !== -1 ||
+                   h.indexOf('.firebaseapp.com') !== -1 || h.indexOf('staging.') === 0);
+    return staging ? 'staging' : 'production';
+  }
+  function rbFbConfig() { return rbFbEnv() === 'production' ? RB_FB_PROD : RB_FB_STAGING; }
+
+  var _readyPromise = null;
+  function rbFbInit() {
+    if (_readyPromise) return _readyPromise;
+    _readyPromise = new Promise(function (resolve, reject) {
+      try {
+        if (typeof global.firebase === 'undefined' || !global.firebase.initializeApp) {
+          return reject(new Error('firebase_sdk_missing'));
+        }
+        var cfg = rbFbConfig();
+        if (!cfg || !cfg.databaseURL) return reject(new Error('firebase_config_missing'));
+        if (!global.firebase.apps || !global.firebase.apps.length) global.firebase.initializeApp(cfg);
+        global.firebase.auth().signInAnonymously()
+          .then(function () { resolve(global.firebase); })
+          .catch(reject);
+      } catch (e) { reject(e); }
+    });
+    return _readyPromise;
+  }
+
+  function db() { return global.firebase.database(); }
+  function sessRef(code, sub) { return db().ref('sessions/' + code + (sub ? '/' + sub : '')); }
+  function nowUTC() { return Date.now(); }
+
+  /* ── Sessie-state (server-side; t.b.v. pay-resume en data_ref) ── */
+  function stateSave(code, payload) {
+    return rbFbInit().then(function () {
+      return sessRef(code, 'state').set({ updatedAt: nowUTC(), payload: payload });
+    });
+  }
+  function stateLoad(code) {
+    return rbFbInit().then(function () {
+      return sessRef(code, 'state').once('value').then(function (s) {
+        var v = s.val(); return v ? v.payload : null;
+      });
+    });
+  }
+  function stateClear(code) {
+    return rbFbInit().then(function () { return sessRef(code, 'state').remove(); });
+  }
+
+  /* ── Globale stage (facilitator schrijft, deelnemers luisteren; JSON-string, §11A) ── */
+  function stageSet(code, stage) {
+    return rbFbInit().then(function () { return sessRef(code, 'stage').set(String(stage)); });
+  }
+  function stageListen(code, cb) {
+    return rbFbInit().then(function () {
+      var ref = sessRef(code, 'stage');
+      ref.on('value', function (s) { cb(s.val()); });
+      return function off() { ref.off(); };
+    });
+  }
+
+  /* ── Live inzendingen: listener (facilitator) + append (deelnemer) ── */
+  function liveListen(code, sub, cb) {
+    return rbFbInit().then(function () {
+      var ref = sessRef(code, sub);
+      ref.on('value', function (snap) {
+        var arr = []; snap.forEach(function (ch) { var v = ch.val(); if (v) arr.push(v); });
+        cb(arr);
+      });
+      return function off() { ref.off(); };
+    });
+  }
+  function push(code, sub, obj) {
+    return rbFbInit().then(function () {
+      obj = obj || {}; if (typeof obj.at === 'undefined') obj.at = nowUTC();
+      return sessRef(code, sub).push(obj);
+    });
+  }
+
+  /* ── Facilitator: sessie aanmaken / content publiceren / hele tak wissen ── */
+  function ensureSession(code, lang) {
+    return rbFbInit().then(function (fb) {
+      var uid = fb.auth().currentUser.uid;
+      return sessRef(code, 'meta').transaction(function (cur) {
+        if (cur) return cur;
+        return { createdAt: nowUTC(), lang: lang || 'nl', facilitatorUid: uid };
+      }).then(function () { return uid; });
+    });
+  }
+  function contentSet(code, content) {
+    return rbFbInit().then(function () { return sessRef(code, 'content').set(content); });
+  }
+  function contentListen(code, cb) {
+    return rbFbInit().then(function () {
+      var ref = sessRef(code, 'content');
+      ref.on('value', function (s) { cb(s.val()); });
+      return function off() { ref.off(); };
+    });
+  }
+  function sessionClear(code) {
+    return rbFbInit().then(function () { return sessRef(code).remove(); });
+  }
+
+  global.rbFb = {
+    env: rbFbEnv, config: rbFbConfig, init: rbFbInit,
+    stateSave: stateSave, stateLoad: stateLoad, stateClear: stateClear,
+    stageSet: stageSet, stageListen: stageListen,
+    liveListen: liveListen, push: push,
+    ensureSession: ensureSession, contentSet: contentSet, contentListen: contentListen,
+    sessionClear: sessionClear
+  };
+})(window);
+
+/* ══════════ RB SHARED CINAB GLUE (RB_CINAB) ══════════ */
+/* Glue tussen de ONGEWIJZIGDE module-client (cinab-tool-client.js) en de inline fase-scripts.
+   Bootstrap-vs-restore-discipline (standaard §9): het token komt ÉÉN keer binnen op de entry-fase
+   (fase 0, bootstrap) en leeft daarna in sessionStorage ('rb_cinab'); alle volgende fasen herstellen
+   met restore(). betaalVanafFase en credits komen uitsluitend uit de start-tool-call. Alles draait
+   alleen met platformcontext; ontbreekt die, dan geeft elke functie null/true terug en draait de
+   tool zelfstandig verder (demo/lokaal). */
+(function (global) {
+  'use strict';
+
+  var SS_KEY = 'rb_cinab';   // sessionStorage: token (capability) + poortconfig — NIET in URL/localStorage-at-rest
+
+  function libReady() {
+    return new Promise(function (resolve) {
+      if (global.__cinabLib) return resolve(global.__cinabLib);
+      var done = false;
+      global.addEventListener('cinab-lib-ready', function () { if (!done) { done = true; resolve(global.__cinabLib); } }, { once: true });
+      setTimeout(function () { if (!done) { done = true; resolve(global.__cinabLib || null); } }, 8000);
+    });
+  }
+
+  function saveCtx(ctx) { try { sessionStorage.setItem(SS_KEY, JSON.stringify(ctx)); } catch (e) {} }
+  function loadCtx()    { try { return JSON.parse(sessionStorage.getItem(SS_KEY) || 'null'); } catch (e) { return null; } }
+  function clearCtx()   { try { sessionStorage.removeItem(SS_KEY); } catch (e) {} }
+  function urlParam(n)  { try { return new URLSearchParams(global.location.search).get(n); } catch (e) { return null; } }
+
+  /* ── Fase 0 (entry): verse start (launch→token) of resume → client + context bewaren ── */
+  async function bootstrap() {
+    var lib = await libReady();
+    if (!lib) return null;
+    try {
+      var client = await lib.startCinabSession();           // leest ?launch/?token/?cinab/?action; wist ze uit de URL
+      saveCtx({
+        apiBase: client.apiBase, token: client.token,
+        betaalVanafFase: client.betaalVanafFase, credits: client.credits,
+        parentRapportId: client.parentRapportId || null
+      });
+      try { global.__VK_TOKEN = client.token || ''; } catch (e) {}
+      try { client.notifyLoaded(); } catch (e) {}
+      return client;
+    } catch (e) { return null; }                            // geen platform-context → tool draait zelfstandig
+  }
+
+  /* ── Fase 1–5 + rapport: client herstellen uit sessionStorage (token reist niet in de URL) ── */
+  async function restore() {
+    var lib = await libReady(); if (!lib) return null;
+    var ctx = loadCtx(); if (!ctx || !ctx.token || !ctx.apiBase) return null;
+    try {
+      var client = lib.createCinabClient({
+        apiBase: ctx.apiBase, token: ctx.token,
+        betaalVanafFase: ctx.betaalVanafFase, credits: ctx.credits,
+        parentRapportId: ctx.parentRapportId, action: urlParam('action')
+      });
+      try { global.__VK_TOKEN = client.token || ''; } catch (e) {}
+      return client;
+    } catch (e) { return null; }
+  }
+
+  /* ── Betaalpoort bij de start van faseNr (standaard §10). resolve(true)=door; false=stop/redirect. ── */
+  async function gate(client, faseNr, opts) {
+    opts = opts || {};
+    if (!client || client.betaalVanafFase == null || faseNr < client.betaalVanafFase) return true;
+
+    // Terugkeer na betaling: idempotente retry (al betaald → no-op → door)
+    if (client.isResume) {
+      try { await client.settleSession(); return true; } catch (e) { /* val door naar de poort */ }
+    }
+
+    try { await client.getSaldo(); } catch (e) {}           // advisory, alleen UX
+
+    var credits = (client.credits != null) ? client.credits : null;
+    var en = (typeof global.lang !== 'undefined' && global.lang === 'en');
+    var vraag = opts.confirmText || (en
+      ? ('Continue to this phase? ' + (credits != null ? (credits + ' credits will be charged.') : 'Credits will be charged.'))
+      : ('Verder naar deze fase? ' + (credits != null ? ('Er worden ' + credits + ' credits afgeschreven.') : 'Er wordt saldo afgeschreven.')));
+    if (!global.confirm(vraag)) return false;               // gebruiker stopt → niets afgeschreven, sessie blijft (TTL)
+
+    try {
+      await client.settleSession();                         // bindend: atomisch + idempotent
+      return true;
+    } catch (e) {
+      if (e && e.isPaymentRequired) {
+        if (opts.beforePay) { try { await opts.beforePay(); } catch (_) {} }   // state persistent zetten vóór de redirect
+        try { global.RB_CINAB.__paying = true; } catch (_) {}
+        client.goToPayment(e, { returnUrl: opts.returnUrl || global.location.href });
+        return false;                                       // navigeert weg naar de shop (window.top.location)
+      }
+      throw e;
+    }
+  }
+
+  /* ── Poort-overlay: geen betaalde inhoud tonen vóór server-side bevestiging (standaard §10). ── */
+  function gateOverlay() {
+    var en = (typeof global.lang !== 'undefined' && global.lang === 'en');
+    var ov = document.createElement('div');
+    ov.id = 'rbGateOverlay';
+    ov.setAttribute('role', 'dialog');
+    ov.setAttribute('aria-modal', 'true');
+    ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:var(--cinab-offwhite,#FAFAF8);display:flex;align-items:center;justify-content:center;padding:24px;';
+    ov.innerHTML =
+      '<div style="max-width:420px;width:100%;background:var(--cinab-card,#FFFFFF);border:1px solid var(--cinab-line,#E5E3DB);border-radius:12px;padding:28px;text-align:center;">' +
+      '<h2 style="font-family:var(--font-heading);font-weight:600;font-size:20px;margin-bottom:10px;">' + (en ? 'Checking access' : 'Toegang controleren') + '</h2>' +
+      '<p id="rbGateMsg" style="color:var(--text-2,#5A5956);font-size:14px;">' + (en ? 'One moment — verifying this phase with the platform…' : 'Moment — deze fase wordt geverifieerd bij het platform…') + '</p>' +
+      '<div id="rbGateActions" style="margin-top:18px;"></div>' +
+      '</div>';
+    document.body.appendChild(ov);
+    return ov;
+  }
+  function gateOverlayBlocked(ov) {
+    var en = (typeof global.lang !== 'undefined' && global.lang === 'en');
+    var msg = ov.querySelector('#rbGateMsg');
+    var act = ov.querySelector('#rbGateActions');
+    if (global.RB_CINAB && global.RB_CINAB.__paying) {
+      if (msg) msg.textContent = en ? 'Redirecting to payment…' : 'Doorsturen naar betaling…';
+      return;
+    }
+    if (msg) msg.textContent = en ? 'This phase has not been settled yet.' : 'Deze fase is nog niet afgerekend.';
+    if (act) act.innerHTML = '<button type="button" style="min-height:44px;padding:10px 20px;border:0;border-radius:8px;background:var(--cinab-amber,#EF9F27);color:var(--cinab-ink,#1C1C1A);font-weight:700;cursor:pointer;" onclick="location.href=\'risicobeheersing_fase0.html\'">' + (en ? 'Back to start' : 'Terug naar start') + '</button>';
+  }
+  function gateOverlayRemove(ov) { try { ov.remove(); } catch (e) {} }
+
+  /* ── enforceGate: restore + poort met overlay. Geeft client terug (door) of null (geblokkeerd). ── */
+  async function enforceGateClient(client, faseNr) {
+    if (!client || client.betaalVanafFase == null || faseNr < client.betaalVanafFase) return client;
+    var ov = gateOverlay();
+    try {
+      var ok = await gate(client, faseNr, { returnUrl: global.location.href });
+      if (ok) { gateOverlayRemove(ov); return client; }
+      gateOverlayBlocked(ov);
+      return null;
+    } catch (e) { gateOverlayBlocked(ov); return null; }
+  }
+  async function enforceGate(faseNr) {
+    var client = await restore();
+    if (!client) return null;                                // geen platformcontext → zelfstandig verder (geen poort)
+    return enforceGateClient(client, faseNr);
+  }
+
+  /* ── Rapport opslaan (consumeert het token) + WordPress laten doorschakelen ── */
+  async function saveReport(client, wrapper) {
+    var out = await client.saveReport(wrapper);             // → { rapport_id, rapport_url }
+    if (out && out.rapport_url) { try { client.notifyCompleted(out.rapport_url); } catch (e) {} }
+    return out;
+  }
+
+  /* ── Wrapper (D1-B): zes zone-dimensies = aandeel risico's per zone, 0–100 (_wrapper_schema.json) ── */
+  var RB_ZONE_ORDER = ['aanvaardbaar', 'laag', 'beperkt', 'midden', 'hoog', 'urgent'];
+
+  function zoneRows() {
+    // Primair: rb_matrix_result (bevestigde beheersprioriteit). Terugval: afleiden uit
+    // rb_group_scores via RB_CELL_ADVICE (aanwezig op fase 1–5 + rapport).
+    try { var mr = JSON.parse(localStorage.getItem('rb_matrix_result') || 'null'); if (Array.isArray(mr) && mr.length) return mr; } catch (e) {}
+    try {
+      var grp = JSON.parse(localStorage.getItem('rb_group_scores') || '{}');
+      if (typeof global.RB_CELL_ADVICE !== 'undefined') {
+        return Object.keys(grp).map(function (rid) {
+          var g = grp[rid]; var adv = global.RB_CELL_ADVICE[String(g.kans).toUpperCase() + g.impact];
+          return { riskId: rid, kans: g.kans, impact: g.impact, zone: adv ? adv.zone : null };
+        }).filter(function (r) { return r.zone; });
+      }
+    } catch (e) {}
+    return [];
+  }
+
+  function collectExport() {
+    var keys = ['rb_session', 'rb_session_started', 'rb_consequence', 'rb_risks',
+      'rb_individual_scores', 'rb_central_scores', 'rb_group_scores', 'rb_matrix_result', 'rb_measures'];
+    var out = {};
+    keys.forEach(function (k) {
+      try { var v = localStorage.getItem(k); if (v != null) { out[k] = (v[0] === '{' || v[0] === '[') ? JSON.parse(v) : v; } } catch (e) {}
+    });
+    // Wrapper e-mailvrij (standaard §16): alleen deelnemersnamen mee, geen e-mailadressen.
+    if (out.rb_session && Array.isArray(out.rb_session.participants)) {
+      out.rb_session.participants = out.rb_session.participants.map(function (p) {
+        return (p && typeof p === 'object') ? { name: p.name || '' } : p;
+      });
+    }
+    return out;
+  }
+
+  function buildWrapper(opts) {
+    opts = opts || {};
+    var rows = zoneRows();
+    var counts = { aanvaardbaar: 0, laag: 0, beperkt: 0, midden: 0, hoog: 0, urgent: 0 };
+    rows.forEach(function (r) { if (counts[r.zone] != null) counts[r.zone]++; });
+    var tot = rows.length;
+    var scores = {};
+    RB_ZONE_ORDER.forEach(function (z) { scores['zone_' + z] = tot ? Math.round(counts[z] * 100 / tot) : 0; });
+
+    var sess = {}; try { sess = JSON.parse(localStorage.getItem('rb_session') || '{}'); } catch (e) {}
+    var meta = {
+      organisatie: sess.orgName || '',
+      datum: new Date().toISOString().slice(0, 10),
+      deelnemers: Array.isArray(sess.participants) ? sess.participants.length : 0,
+      facilitator: sess.facilitator || ''
+    };
+    if (sess.sector) meta.sector = sess.sector;
+
+    return {
+      template_id: 'risicobeheersing',
+      schema_version: '1.0',
+      scores: scores,
+      meta: meta,
+      data: { export: collectExport() },                     // opaak; platform leest dit niet
+      parent_rapport_id: null                                // _cinab_is_vergelijkbaar: nog niet
+    };
+  }
+
+  global.RB_CINAB = {
+    libReady: libReady, bootstrap: bootstrap, restore: restore,
+    gate: gate, enforceGate: enforceGate, enforceGateClient: enforceGateClient,
+    saveReport: saveReport, buildWrapper: buildWrapper, collectExport: collectExport,
+    loadCtx: loadCtx, clearCtx: clearCtx
+  };
+})(window);
+
+/* ══════════ RB SHARED STAGE SYNC (RB_SYNC) ══════════ */
+/* Dual-write/dual-listen-brug tussen de bestaande per-fase localStorage-stage en de globale
+   RTDB-stage (standaard §11A). Zonder Firebase-config zijn alle calls no-ops en blijft de
+   huidige zelfde-browser-flow exact zoals hij was. Eén bron van waarheid per kanaal:
+   facilitator publiceert (mirror), deelnemer-views luisteren. */
+(function (global) {
+  'use strict';
+  function code() {
+    try { var s = JSON.parse(localStorage.getItem('rb_session') || 'null'); return (s && s.sessionId) ? String(s.sessionId) : null; } catch (e) { return null; }
+  }
+  function stageMirror(phase) {
+    var c = code(); if (!c || !global.rbFb) return;
+    var raw = null; try { raw = localStorage.getItem('rb_phase' + phase + '_stage'); } catch (e) {}
+    if (raw == null) return;
+    var obj = null; try { obj = JSON.parse(raw); } catch (e) { return; }
+    obj.phase = Number(phase);
+    global.rbFb.stageSet(c, JSON.stringify(obj)).catch(function () {});
+  }
+  function stageListen(phase, cb) {
+    var c = code(); if (!c || !global.rbFb) return Promise.resolve(null);
+    return global.rbFb.stageListen(c, function (v) {
+      if (v == null) return;
+      var obj = null; try { obj = JSON.parse(String(v)); } catch (e) { return; }
+      if (Number(obj.phase) !== Number(phase)) return;
+      try { localStorage.setItem('rb_phase' + phase + '_stage', JSON.stringify(obj)); } catch (e) {}
+      if (cb) { try { cb(obj); } catch (e) {} }
+    }).catch(function () { return null; });
+  }
+  global.RB_SYNC = { code: code, stageMirror: stageMirror, stageListen: stageListen };
+})(window);
+</script>
+<!-- ═══════════════ END RB PLATFORM / FIREBASE / CINAB ═══════════════ -->
+
+<script>
+/* ═══════════════ RB PLATFORM WIRING — fase 4 (enige fase-specifieke deel) ═══════════════ */
+(function(){
+  var N=4;
+  /* Stage dual-write: facilitator-publish spiegelt naar de globale RTDB-stage (no-op zonder config). */
+  if(typeof publishStage==='function' && window.RB_SYNC){
+    var _ps=publishStage;
+    publishStage=function(s,p){ _ps(s,p); try{ RB_SYNC.stageMirror(N); }catch(e){} };
+  }
+  /* Stage dual-listen: deelnemer-view volgt de globale stage (naast het bestaande storage-event). */
+  if(window.RB_SYNC){
+    try{ RB_SYNC.stageListen(N, function(){ try{ if(typeof applyStageToPView==='function' && typeof facView!=='undefined' && !facView) applyStageToPView(); }catch(e){} }); }catch(e){}
+  }
+  /* Platform: context herstellen + betaalpoort op de start van deze fase (standaard §9-§10). */
+  if(window.RB_CINAB && window.VK_LIVE){ RB_CINAB.enforceGate(N); }
+})();
+</script>
+</body>
+</html>

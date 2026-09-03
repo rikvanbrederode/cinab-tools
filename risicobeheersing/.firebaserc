@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "PROJECT-ID-INVULLEN-BIJ-AANMAAK",
+    "staging": "PROJECT-ID-INVULLEN-BIJ-AANMAAK",
+    "production": "PROJECT-ID-INVULLEN-BIJ-AANMAAK"
+  }
+}
