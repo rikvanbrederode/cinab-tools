@@ -7,7 +7,7 @@
 | Database-URL | `https://risicobeheersing-e174f-default-rtdb.europe-west1.firebasedatabase.app` |
 | Regels deployt | Rik, vanuit deze map |
 | Anonymous sign-in | aan sinds 3 september 2026, met auto clean-up na 30 dagen |
-| Subdomein | `risicobeheersing.cinab.nl` (besluit 3 september 2026; uitzondering op het patroon, varianten lopen via `?doel=`) |
+| Subdomein | `risicobeheersing.cinab.nl`, live sinds 3 september 2026 (uitzondering op het patroon, varianten lopen via `?doel=`) |
 | Tool-client | `public/cinab-tool-client.js`, versie in de header |
 | AI-proxy | `server/risicobeheersing-ai-proxy.php`, draait op SiteGround, niet op Firebase Hosting |
 | Fasen | 0 tot en met 5, plus rapport (poortindex rapport = 6) |
@@ -61,21 +61,26 @@ zonder commit; de commitmessage is de changelog-regel.
 
 ## Open punten voor livegang
 
-1. DNS aanmaken voor `risicobeheersing.cinab.nl`: CNAME naar het Firebase-project, plus het A-record voor `www.`.
-2. Realtime Database aanmaken in `europe-west1` en anonymous sign-in aanzetten. Project en `.firebaserc` zijn klaar.
-3. Waar draait de AI-proxy en op welke origin. De tool staat op Firebase Hosting en kan
-   zelf geen PHP draaien, dus de proxy komt op SiteGround en de app praat cross-origin.
-4. `ANTHROPIC_MODEL`, de sleutel als omgevingsvariabele, `CINAB_REQUIRE_TOKEN = true` en de
-   productie-validate-url. De sleutel is van CINAB, niet van de tooldeveloper.
-5. Meta-velden in WordPress: credits, betaal-vanaf-fase, token-TTL, deellink-TTL en
-   `_cinab_render_url_pattern`. Zie het toolpaspoort.
-6. Renderroute voor het gedeelde rapport. `risicobeheersing_rapport.html` is nu de laatste
+Klaar: subdomein en DNS, Firebase-project met anonymous sign-in, de vier huisstijlfonts,
+de QR-generator self-hosted, en de sessie als concept op staging.
+
+1. Meta-velden in WordPress omzetten van de `.web.app`-url naar
+   `https://risicobeheersing.cinab.nl` voor zowel `_cinab_embed_url` als `_cinab_origin`.
+   Die twee moeten altijd naar dezelfde plek wijzen, anders blokkeert CORS elke API-call.
+2. Credits, betaal-vanaf-fase, token-TTL en de bewaartermijn voor persoonsgegevens vaststellen.
+   Let op: de tool telt vanaf nul, fase 0 tot en met 5 en het rapport is 6.
+3. AI-proxy: waar hij draait (SiteGround, niet Firebase), het model, de sleutel als
+   omgevingsvariabele, `CINAB_REQUIRE_TOKEN = true` en de productie-validate-url. De sleutel
+   is van CINAB, niet van de tooldeveloper.
+4. Renderroute voor het gedeelde rapport. `risicobeheersing_rapport.html` is nu de laatste
    fase van de sessie en leest geen opgeslagen rapport terug via `rapport-data/{rapport_id}`.
-   Zolang dat er niet is, kan een deellink geen rapport tonen.
-7. Firebase-SDK komt nog van `gstatic.com` (drie scripts in elke fase, versie 8.10.1). De
-   QR-generator is op 3 september self-hosted gemaakt in `public/vendor/`; de Firebase-SDK
-   is bewust nog niet omgezet, want die haalt Google zelf en dat raakt de hele app.
-8. Bewaartermijn persoonsgegevens vastleggen en het moment waarop de sessie-state wordt gewist.
+   Zolang dat er niet is blijft `_cinab_render_url_pattern` leeg en rendert het platform zelf.
+5. `risicobeheersing_join.html` bouwen, daarna de rewrite `/join/**` terugzetten in
+   `firebase.json`.
+6. De vangnetregel `$phase/$collection/$pushId` in `database.rules.json` begrenzen voordat
+   deelnemers op eigen apparaat meedoen. Nu controleert hij alleen of er een veld `at` in zit.
+7. Volledige testronde: starten via de etalage, launch-code inwisselen, betaalpoort,
+   rapport opslaan en openen.
 
 ## Wijzigingen van CINAB in de aanlevering van de tooldeveloper
 
