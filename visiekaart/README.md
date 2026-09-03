@@ -75,15 +75,12 @@ Bij een volgende set moeten deze opnieuw, anders komen ze er zo weer uit.
 
 ## Open punten
 
-1. De vier woff2-bestanden in `public/fonts/` plaatsen. `fonts.css` staat er wel, de fonts niet,
-   dus de bladen vallen terug op systeemletters. Nodig: `DMSans-Variable.woff2`,
-   `DMSans-Italic.woff2`, `DMSerifDisplay-Regular.woff2`, `DMSerifDisplay-Italic.woff2`.
-2. Drie of vier `cinab_tool`-posts aanmaken met de embed-URL's uit de varianttabel hierboven.
-3. Productieproject aanmaken in `europe-west1` en `VK_FB_PROD` invullen; zolang dat op `null`
+1. Drie of vier `cinab_tool`-posts aanmaken met de embed-URL's uit de varianttabel hierboven.
+2. Productieproject aanmaken in `europe-west1` en `VK_FB_PROD` invullen; zolang dat op `null`
    staat is er op de productiehost geen verbinding tussen apparaten.
-4. Beslissen wat er met de vermeldingen van adviesborden.nl in het rapport gebeurt.
-5. `?demo=1` ontbreekt, terwijl risicobeheersing dat wel heeft.
-6. 42 visuele metingen uit het testrapport staan nog open, vooral knopkleuren en tabellen die
+3. Beslissen wat er met de vermeldingen van adviesborden.nl in het rapport gebeurt.
+4. `?demo=1` ontbreekt, terwijl risicobeheersing dat wel heeft.
+5. 42 visuele metingen uit het testrapport staan nog open, vooral knopkleuren en tabellen die
    binnen een kader scrollen.
 
 ## Productieproject aanmaken (nog te doen)
