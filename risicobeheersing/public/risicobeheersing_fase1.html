@@ -983,9 +983,26 @@ function rbApplyEnvironmentRules(){
    Token via window.__VK_TOKEN. Rejectt bij ELKE fout (offline, geen token, 4xx/5xx, onparsebaar,
    timeout) zodat de aanroeper zijn eigen lokale terugval gebruikt. Tot proxy+token live staan vuurt
    AI niet en draait alles lokaal — correct gedrag, geen bug (baseline §3.4). */
+/* s87: het endpoint staat op het PLATFORM, niet op de tool-host. Firebase Hosting is statisch
+   en draait geen PHP, dus het oude pad /risicobeheersing-ai-proxy.php bestond nooit: elke call
+   kwam nergens aan en de tool viel stil terug op lokaal. De host komt uit de platformcontext
+   van deze sessie, zodat staging en productie zonder omzetten werken. Alleen cinab.nl wordt
+   geaccepteerd; geen host = geen call = eerlijke lokale terugval. Het token gaat in de body,
+   nooit als header: de CORS-whitelist staat sinds audit M9 alleen Content-Type toe. */
 function rbAiProxyUrl(){
   if (typeof window.__RB_AI_PROXY_URL === 'string' && window.__RB_AI_PROXY_URL) return window.__RB_AI_PROXY_URL;
-  return '/risicobeheersing-ai-proxy.php'; // zelfde origin als de tool (proxy op het tool-subdomein)
+  var basis = '';
+  try { var a = document.documentElement.getAttribute('data-cinab-api'); if (a) basis = a.replace(/\/+$/, ''); } catch(e){}
+  if (!basis) {
+    try {
+      var ctx = JSON.parse(sessionStorage.getItem('rb_cinab') || 'null');
+      if (ctx && ctx.apiBase) {
+        var u = new URL(ctx.apiBase);
+        if (u.protocol === 'https:' && /(^|\.)cinab\.nl$/.test(u.hostname)) basis = u.origin;
+      }
+    } catch(e){}
+  }
+  return basis ? basis + '/wp-json/cinab/v1/ai' : '';
 }
 function vkCallAI(task, data, opts){
   opts = opts || {};
@@ -995,7 +1012,10 @@ function vkCallAI(task, data, opts){
   if (isProductionMode() && !window.__VK_TOKEN) return Promise.reject(new Error('no-token'));
   var ctrl = (typeof AbortController!=='undefined') ? new AbortController() : null;
   var timer = setTimeout(function(){ if(ctrl) ctrl.abort(); }, timeoutMs);
-  return fetch(rbAiProxyUrl(), {
+  var rbUrl = rbAiProxyUrl();
+  if (!rbUrl) { clearTimeout(timer); return Promise.reject(new Error('no-platform')); }
+  return fetch(rbUrl, {
+    credentials:'omit',
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body: JSON.stringify({ task:task, data:data||{}, lang: opts.lang || (typeof lang!=='undefined'?lang:'nl'), token: window.__VK_TOKEN || '' }),

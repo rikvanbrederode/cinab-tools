@@ -851,7 +851,8 @@ const T = {
     summaryTplNoName:'Vandaag analyseren we {type}. Het centrale gevolg dat we willen voorkomen: {cons}.',
     summaryTypeLbl:{ preventief:'preventief risico\u2019s', incident:'de oorzaken van een incident', project:'projectrisico\u2019s', periodiek:'het risicobeeld' },
     unnamedSession:'Naamloze sessie',
-    bannerRefined:'Alle adviezen verfijnd met AI.',
+    bannerRefined:'Alle {t} adviezen verfijnd met AI. Controleer en pas aan waar nodig.',
+    bannerRefinedDeels:'{n} van de {t} adviezen verfijnd met AI. De overige {r} houden het generieke celadvies. Vul ze aan of probeer opnieuw.',
     bannerRefinedOne:'Advies verfijnd voor risico {n}.',
     resetConfirm:'Alle sessiedata wissen (risico\u2019s, scores, matrix, maatregelen)?\n\nDe taalvoorkeur blijft behouden.',
     resetDone:'Sessiedata gewist. Pagina wordt herladen.',
@@ -950,7 +951,8 @@ const T = {
     summaryTplNoName:'Today we analyse {type}. The central consequence we want to prevent: {cons}.',
     summaryTypeLbl:{ preventief:'preventive risks', incident:'the causes of an incident', project:'project risks', periodiek:'the risk picture' },
     unnamedSession:'Unnamed session',
-    bannerRefined:'All advice refined with AI.',
+    bannerRefined:'All {t} pieces of advice refined by AI. Review and adjust where needed.',
+    bannerRefinedDeels:'{n} of {t} pieces of advice refined by AI. The remaining {r} keep the generic cell advice. Add to them or try again.',
     bannerRefinedOne:'Advice refined for risk {n}.',
     resetConfirm:'Clear all session data (risks, scores, matrix, measures)?\n\nThe language preference is kept.',
     resetDone:'Session data cleared. Page will reload.',
@@ -995,9 +997,26 @@ function rbApplyEnvironmentRules(){
    Token via window.__VK_TOKEN. Rejectt bij ELKE fout (offline, geen token, 4xx/5xx, onparsebaar,
    timeout) zodat de aanroeper zijn eigen lokale terugval gebruikt. Tot proxy+token live staan vuurt
    AI niet en draait alles lokaal — correct gedrag, geen bug (baseline §3.4). */
+/* s87: het endpoint staat op het PLATFORM, niet op de tool-host. Firebase Hosting is statisch
+   en draait geen PHP, dus het oude pad /risicobeheersing-ai-proxy.php bestond nooit: elke call
+   kwam nergens aan en de tool viel stil terug op lokaal. De host komt uit de platformcontext
+   van deze sessie, zodat staging en productie zonder omzetten werken. Alleen cinab.nl wordt
+   geaccepteerd; geen host = geen call = eerlijke lokale terugval. Het token gaat in de body,
+   nooit als header: de CORS-whitelist staat sinds audit M9 alleen Content-Type toe. */
 function rbAiProxyUrl(){
   if (typeof window.__RB_AI_PROXY_URL === 'string' && window.__RB_AI_PROXY_URL) return window.__RB_AI_PROXY_URL;
-  return '/risicobeheersing-ai-proxy.php'; // zelfde origin als de tool (proxy op het tool-subdomein)
+  var basis = '';
+  try { var a = document.documentElement.getAttribute('data-cinab-api'); if (a) basis = a.replace(/\/+$/, ''); } catch(e){}
+  if (!basis) {
+    try {
+      var ctx = JSON.parse(sessionStorage.getItem('rb_cinab') || 'null');
+      if (ctx && ctx.apiBase) {
+        var u = new URL(ctx.apiBase);
+        if (u.protocol === 'https:' && /(^|\.)cinab\.nl$/.test(u.hostname)) basis = u.origin;
+      }
+    } catch(e){}
+  }
+  return basis ? basis + '/wp-json/cinab/v1/ai' : '';
 }
 function vkCallAI(task, data, opts){
   opts = opts || {};
@@ -1007,7 +1026,10 @@ function vkCallAI(task, data, opts){
   if (isProductionMode() && !window.__VK_TOKEN) return Promise.reject(new Error('no-token'));
   var ctrl = (typeof AbortController!=='undefined') ? new AbortController() : null;
   var timer = setTimeout(function(){ if(ctrl) ctrl.abort(); }, timeoutMs);
-  return fetch(rbAiProxyUrl(), {
+  var rbUrl = rbAiProxyUrl();
+  if (!rbUrl) { clearTimeout(timer); return Promise.reject(new Error('no-platform')); }
+  return fetch(rbUrl, {
+    credentials:'omit',
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body: JSON.stringify({ task:task, data:data||{}, lang: opts.lang || (typeof lang!=='undefined'?lang:'nl'), token: window.__VK_TOKEN || '' }),
@@ -1773,7 +1795,20 @@ async function refineAllAdvice(){
   computeMatrix();
   renderIntpList();
   if(btn) btn.classList.remove('busy'); if(lbl) lbl.textContent=T[lang].refineAllLabel;
-  showBanner(ok>0 ? T[lang].bannerRefined : T[lang].aiError);
+  /* s87: hier stond showBanner(ok>0 ? bannerRefined : aiError). Bij twee geslaagde
+     aanroepen op achttien risico's meldde de tool "Alle adviezen verfijnd met AI",
+     terwijl zestien stil het generieke celadvies hielden. Dat verschil was in het
+     rapport niet te zien. De banner noemt nu het aantal, en meldt alleen succes als
+     alles is gelukt. */
+  const totaal = list.length;
+  if(ok === 0){
+    showBanner(T[lang].aiError);
+  } else if(ok === totaal){
+    showBanner(T[lang].bannerRefined.replace('{t}', totaal));
+  } else {
+    showBanner(T[lang].bannerRefinedDeels
+      .replace('{n}', ok).replace('{t}', totaal).replace('{r}', totaal - ok));
+  }
 }
 
 /* ══════════ COLLECT BOT-INFO ══════════ */

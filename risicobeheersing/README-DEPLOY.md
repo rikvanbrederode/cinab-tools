@@ -14,26 +14,35 @@ Alles wat nodig is om de werksessie op de website te laten draaien, in de volgor
 Embed-url voor het platform (`_cinab_embed_url`): `https://risicobeheersing.cinab.nl/risicobeheersing_fase0.html`
 Origin (`_cinab_origin`): `https://risicobeheersing.cinab.nl`
 
-## 2. AI-proxy: server-side instellen (checklist §9)
+## 2. AI: het endpoint staat op het platform
 
-In `risicobeheersing-ai-proxy.php`:
-1. `ANTHROPIC_MODEL` invullen (gelicentieerd model) — **[INVULLEN]**.
-2. Sleutel **nooit** in het bestand: env-var `ANTHROPIC_API_KEY`, of `../cinab-secrets.php` boven de webroot
-   met `<?php return ['anthropic_key' => 'sk-ant-…'];`.
-3. Productie-schakelaars (het bestand staat op staging-defaults):
-   - `CINAB_REQUIRE_TOKEN = true`
-   - `CINAB_VALIDATE_URL = 'https://cinab.nl/wp-json/cinab/v1/validate-token'`
-4. Vereist: PHP met cURL; schrijfrechten op `/tmp/cinab_ai_rate` (rate-limiting).
+De proxy hoort **niet** op de tool-host. Firebase Hosting is statisch en draait geen PHP, dus het
+oude pad `/risicobeheersing-ai-proxy.php` bestond daar nooit: elke aanroep kwam nergens aan en de
+tool viel stil terug op de lokale berekening.
 
-**Echte AI-test op staging** (met `CINAB_REQUIRE_TOKEN = false` tijdelijk):
-```bash
-curl -s -X POST https://staging.risicobeheersing.cinab.nl/risicobeheersing-ai-proxy.php \
-  -H 'Content-Type: application/json' -H 'Origin: https://staging.risicobeheersing.cinab.nl' \
-  -d '{"task":"cluster","lang":"nl","data":{"maxClusters":3,"items":[{"idx":0,"text":"Onduidelijke overdracht bij dienstwissel"},{"idx":1,"text":"Verouderd medicatiesysteem"},{"idx":2,"text":"Geen dubbele controle"}]}}'
-```
-Verwacht: `{"task":"cluster","text":"{\"clusters\":[…]}"}`. Daarna in de tool: fase 1 → "Clusteren met AI" →
-de banner meldt **"AI heeft de inzendingen in n clusters geordend"**. Meldt hij "AI niet bereikbaar", dan
-is de proxy/sleutel/origin niet goed — de tool verhult dat nooit meer als AI-resultaat.
+Sinds s87 loopt AI via het platform:
+
+* Endpoint: **`POST https://cinab.nl/wp-json/cinab/v1/ai`**. Fase 1 en fase 4 leiden die host zelf
+  af uit de platformcontext van de sessie (`sessionStorage.rb_cinab`); alleen `cinab.nl` wordt
+  geaccepteerd, een expliciete `<html data-cinab-api="...">` wint.
+* Verzoek `{ token, task, lang, data }`, token in de body en niet als header. Antwoord
+  `{ task, text }`, ongewijzigd.
+* Taken voor deze tool: `cluster` (fase 1) en `verfijn_advies` (fase 4). De prompts staan
+  server-side in de plugin, onder `includes/ai/taken-risicobeheersing.php`.
+* Aan tool-zijde valt er niets in te vullen. Sleutel, model, origins, tokenvalidatie,
+  rate-limiting en het plafond per sessie staan in de plugin.
+
+**Aanzetten** gebeurt op het platform: `CINAB_AI_KEY` en `CINAB_AI_MODEL` in `wp-config.php`, en
+bij de sessie het blok **AI** met takenset `risicobeheersing`. Staat het vinkje uit, dan geeft het
+endpoint 403 en draait de tool lokaal.
+
+**Controle na aanzetten.** In de tool: fase 1 → "Clusteren met AI" → de banner meldt dat AI de
+inzendingen heeft geordend. Meldt hij "AI niet bereikbaar", dan is er iets mis met de sleutel, het
+model of het vinkje; de tool verhult dat nooit als AI-resultaat. Op het platform:
+`/beheer/ai/` toont de aanroepen en hoeveel er op terugval eindigden.
+
+`server/risicobeheersing-ai-proxy.php` blijft in de repo als bron van de prompttekst. Het bestand
+wordt niet meer gedeployd.
 
 ## 3. Demo op de website
 

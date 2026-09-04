@@ -9,7 +9,7 @@
 | Anonymous sign-in | aan sinds 3 september 2026, met auto clean-up na 30 dagen |
 | Subdomein | `risicobeheersing.cinab.nl`, live sinds 3 september 2026 (uitzondering op het patroon, varianten lopen via `?doel=`) |
 | Tool-client | `public/cinab-tool-client.js`, versie in de header |
-| AI-proxy | `server/risicobeheersing-ai-proxy.php`, draait op SiteGround, niet op Firebase Hosting |
+| AI | Endpoint van het platform: `POST https://cinab.nl/wp-json/cinab/v1/ai` (s87). `server/risicobeheersing-ai-proxy.php` is bron van de prompttekst en wordt niet meer gedeployd |
 | Fasen | 0 tot en met 5, plus rapport (poortindex rapport = 6) |
 | Datacontract | `template_id` risicobeheersing, `schema_version` 1.0, zes zone-dimensies |
 
@@ -21,7 +21,7 @@ risicobeheersing/
   firebase.json        hosting-config en verwijzing naar de regels
   database.rules.json  RTDB-securityregels
   public/              alles wat naar Firebase Hosting gaat
-  server/              PHP-proxy, hoort op SiteGround, nooit in public
+  server/              oude PHP-proxy, bron van de prompttekst, niet meer gedeployd, nooit in public
   fonts/               bouwscript voor de vier woff2-bestanden
   qa/                  testscripts van de tooldeveloper
 ```
@@ -69,7 +69,7 @@ de QR-generator self-hosted, en de sessie als concept op staging.
    Die twee moeten altijd naar dezelfde plek wijzen, anders blokkeert CORS elke API-call.
 2. Credits, betaal-vanaf-fase, token-TTL en de bewaartermijn voor persoonsgegevens vaststellen.
    Let op: de tool telt vanaf nul, fase 0 tot en met 5 en het rapport is 6.
-3. AI-proxy: waar hij draait (SiteGround, niet Firebase), het model, de sleutel als
+3. AI: het endpoint van het platform (s87), niet meer een eigen proxy. Model en sleutel als
    omgevingsvariabele, `CINAB_REQUIRE_TOKEN = true` en de productie-validate-url. De sleutel
    is van CINAB, niet van de tooldeveloper.
 4. Renderroute voor het gedeelde rapport. `risicobeheersing_rapport.html` is nu de laatste

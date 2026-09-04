@@ -18,21 +18,31 @@ meer nodig. Wil je toch een korte link (`/join/<code>`), maak dan een **302-redi
 `visiekaart_fase0.html?join=$1` — nooit een interne rewrite die de URL op `/join/…` laat staan,
 want dan breken de relatieve fase-navigaties op het deelnemer-apparaat.
 
-## 2. AI-proxy
+## 2. AI: het endpoint staat op het platform
 
-* Bestand: `cinab-ai-proxy_template.php` → plaats als **`/vk-ai-proxy.php` op de site-root** van de
-  tool-host (de bladen roepen `VK_AI_ENDPOINT = '/vk-ai-proxy.php'` aan). Staat de tool onder een
-  ander pad of domein, pas dan `VK_AI_ENDPOINT` in de vier AI-bladen (fase 1, 2, 3, 5) aan — het staat
-  in het gedeelde AI-helper-blok; wijzig het in alle vier tegelijk.
-* Invullen: `ANTHROPIC_API_KEY` (server-omgeving), `ANTHROPIC_MODEL`, `$ALLOWED_ORIGINS`,
-  `CINAB_VALIDATE_URL` (productie-URL), `CINAB_REQUIRE_TOKEN = true` in productie.
-* Nieuw in deze versie: taak **`roadmap`** (B-23). Zonder die taak kreeg fase 5 altijd 422.
-* Tokenpad (B-24): het platform-token uit `startCinabSession()` staat nu op `window.__VK_TOKEN` en
-  gaat mee in `{token}` én header `X-CINAB-Token`.
-* Zonder token (staging zonder platform): zet in een klein inline script vóór de bladen
-  `window.__VK_AI_OPEN = true` — anders doet de tool in productie-modus **geen** AI-call en meldt
-  hij eerlijk "AI niet bereikbaar — voorlopige lokale clustering". In demo-modus (localhost/LAN)
-  wordt nooit gecalld.
+De AI-proxy hoort **niet** op de tool-host. Firebase Hosting is statisch en draait geen PHP, dus
+het oude pad `/vk-ai-proxy.php` bestond daar nooit: elke aanroep kwam nergens aan en de tool viel
+stil terug op de lokale berekening. Zo heeft het maandenlang gestaan.
+
+Sinds s87 loopt AI via het platform:
+
+* Endpoint: **`POST https://cinab.nl/wp-json/cinab/v1/ai`**. De bladen leiden die host zelf af uit
+  de platformcontext van de sessie (`sessionStorage.vk_cinab`), dus staging en productie werken
+  zonder omzetten. Alleen `cinab.nl` wordt geaccepteerd. Een expliciete
+  `<html data-cinab-api="...">` wint.
+* Verzoek: `{ token, task, lang, data }`. Het token gaat **in de body**, nooit als header. De
+  CORS-whitelist van het platform staat sinds audit M9 alleen `Content-Type` toe, dus een eigen
+  header laat de preflight stranden.
+* Antwoord: `{ task, text }`, ongewijzigd. Elke niet-200 betekent voor de tool hetzelfde:
+  terugvallen op lokaal en dat eerlijk melden.
+* Er is niets meer in te vullen aan tool-zijde. Sleutel, model, origins, tokenvalidatie,
+  rate-limiting en het plafond per sessie staan in de plugin.
+
+Aanzetten gebeurt op het platform: bij de sessie in WordPress het blok **AI**, met takenset
+`visiekaart`. Staat dat vinkje uit, dan geeft het endpoint 403 en draait de tool lokaal.
+
+`server/cinab-ai-proxy_template.php` blijft in de repo als bron van de prompttekst. Het bestand
+wordt niet meer gedeployd.
 
 ## 3. Fonts (B-13)
 

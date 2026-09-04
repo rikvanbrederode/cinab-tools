@@ -1,5 +1,13 @@
 <?php
 /**
+ * ACHTERHAALD SINDS s87 (4 september 2026). NIET MEER DEPLOYEN.
+ *
+ * Dit bestand is nooit ergens gedraaid: het stond voorgeschreven op de tool-host, en Firebase
+ * Hosting is statisch en draait geen PHP. AI loopt nu via het platform, als endpoint in de
+ * plugin: POST https://cinab.nl/wp-json/cinab/v1/ai (includes/ai.php). De prompttekst hieronder
+ * is daarheen overgenomen; dit bestand blijft alleen als bron en als geschiedenis staan.
+ */
+/**
  * cinab-ai-proxy.template.php — generiek server-side AI-proxy-template voor CINAB methodiek-apps.
  *
  * Doel: de Anthropic-sleutel blijft server-side. De browser stuurt ALLEEN gestructureerde sessiedata

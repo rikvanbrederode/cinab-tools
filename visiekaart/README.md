@@ -91,30 +91,29 @@ firebase deploy --only hosting,database
 Alleen hosting als de regels niet wijzigen: `firebase deploy --only hosting`.
 Geen deploy zonder commit; de commitmessage is de changelog-regel.
 
-## AI staat uit, en dat is bewust
+## AI loopt sinds s87 via het platform
 
-`VK_AI_ENDPOINT` staat op `/vk-ai-proxy.php`, relatief aan de tool-host. Die host is Firebase
-Hosting en draait geen PHP, dus die call komt nergens aan. Op 3 september is vastgesteld dat er
-ook nergens anders een `vk-ai-proxy.php` draait, niet op `cinab.nl` en niet op `staging2.cinab.nl`.
+`VK_AI_ENDPOINT` stond op `/vk-ai-proxy.php`, relatief aan de tool-host. Die host is Firebase
+Hosting en draait geen PHP, dus die call kwam nergens aan. Op 3 september is vastgesteld dat er
+ook nergens anders een `vk-ai-proxy.php` draaide, niet op `cinab.nl` en niet op `staging2.cinab.nl`.
 De AI in deze tool heeft dus nooit gewerkt; tot versie 13 meldde fase 1 wel altijd dat AI had
 geclusterd. Sinds versie 13 zegt de tool eerlijk "AI niet bereikbaar, voorlopige lokale
 clustering" en werkt de rest gewoon.
 
-Wil je AI aanzetten, dan is dit de volgorde:
+Sinds s87 is er wel een werkend endpoint, en niet als los PHP-bestand maar in de plugin:
+`POST https://cinab.nl/wp-json/cinab/v1/ai`. De vier AI-bladen (fase 1, 2, 3 en 5) leiden die host
+af uit de platformcontext van de sessie, dus er valt aan tool-zijde niets meer om te zetten tussen
+staging en productie.
 
-1. `server/cinab-ai-proxy_template.php` invullen en als `vk-ai-proxy.php` op SiteGround plaatsen,
-   in de root van `cinab.nl`. Niet op de tool-host.
-2. `ANTHROPIC_API_KEY` als omgevingsvariabele of in een bestand boven de webroot, nooit in het
-   PHP-bestand. Dit moet een CINAB-sleutel zijn, niet die van de tooldeveloper.
-3. `ANTHROPIC_MODEL` invullen, `CINAB_VALIDATE_URL` op de productie-URL, `CINAB_REQUIRE_TOKEN`
-   op `true`.
-4. `$ALLOWED_ORIGINS` op `https://visiekaart.cinab.nl` en `https://visiekaart.web.app`. Het
-   sjabloon noemt een `staging.<tool>.cinab.nl`; die gebruiken wij niet, staging is de web.app-URL.
-5. `VK_AI_ENDPOINT` in fase 1, 2, 3 en 5 omzetten naar `https://cinab.nl/vk-ai-proxy.php`. Het
-   staat in het gedeelde AI-helper-blok, dus in alle vier tegelijk.
+Wat er nog moet gebeuren om AI hier daadwerkelijk aan te zetten, gebeurt allemaal op het platform:
 
-De proxy zelf is cross-origin klaar: hij echoot de origin, staat `X-CINAB-Token` toe en
-beantwoordt de preflight met een 204.
+1. `CINAB_AI_KEY` en `CINAB_AI_MODEL` in `wp-config.php`. Dit moet een CINAB-sleutel zijn, niet die
+   van de tooldeveloper.
+2. Bij de sessie in WordPress het blok **AI**: vinkje aan, takenset `visiekaart`, plafond per sessie.
+3. Controleren op `/beheer/ai/` of de aanroepen binnenkomen en hoeveel er op terugval eindigen.
+
+De taken die deze tool mag aanroepen zijn `cluster` (fase 1, 2 en 3) en `roadmap` (fase 5). De
+prompts staan server-side in de plugin, onder `includes/ai/taken-visiekaart.php`.
 
 ## Wijzigingen van CINAB in de aanlevering van de tooldeveloper
 

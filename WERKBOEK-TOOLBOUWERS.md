@@ -1,6 +1,6 @@
 # CINAB — Werkboek voor tool-bouwers
 
-**Uitgave 3.5 · 4 september 2026**
+**Uitgave 3.6 · 4 september 2026**
 Alles wat je nodig hebt om een CINAB-tool te bouwen en te koppelen aan het platform: het
 datacontract, de koppeling, de betaalpoort, deelname op een eigen apparaat, het rapport en de
 testen die de tool moet doorstaan voordat hij live gaat.
@@ -16,6 +16,20 @@ een verwijzing over en weer klopt; daarom ontbreken die nummers hieronder.
 > ze laten zien hoe iets eruit kán zien, niet welke bestanden een tool moet hebben. Een levering
 > bevat dus geen voorbeeldbestanden, en geen configuratie die verwijst naar een bestand dat niet
 > in de levering zit. Wie hier een sjabloon van maakt, bouwt de vorige tool na in plaats van deze.
+
+> **Wijzigingen v3.5 → v3.6** (4 september 2026 — AI rechtgezet na s87)
+> - **§7.3 herschreven en §7.3a nieuw.** De AI-proxy stond voorgeschreven op de tool-host. Statische
+>   hosting draait geen PHP, dus die aanroep kwam nergens aan: AI heeft in geen enkele tool ooit
+>   gewerkt. AI loopt nu via het platform, `POST /wp-json/cinab/v1/ai`, met de sleutel, het model en
+>   het plafond aan platformzijde. Een tool levert geen proxy en geen sleutel meer.
+> - **Token in de body, geen eigen header.** De CORS-whitelist staat alleen `Content-Type` toe;
+>   `X-CINAB-Token` liet de preflight stranden.
+> - **Eerlijkheidsregels als afvinkregels.** AI is een overlay en nooit een afhankelijkheid, één
+>   herkomstbron per taak met vier standen, geen animatie of banner die vooruitloopt op het antwoord,
+>   ongeldige JSON is een terugval, en de herkomst gaat mee in de export.
+> - **Appendix A, B en C aangevuld** met het endpoint, de plaats van de sleutel en de drie
+>   meta-velden `_cinab_ai_aan`, `_cinab_ai_set` en `_cinab_ai_plafond`.
+> - **Valkuilen 22 en 23** toegevoegd.
 
 > **Wat er in 3.5 is veranderd (4 september 2026).** Deelname op een eigen apparaat is herzien na
 > de bouw bij risicobeheersing: geen apart joinblad en geen hosting-rewrite meer, maar het
@@ -36,7 +50,7 @@ een verwijzing over en weer klopt; daarom ontbreken die nummers hieronder.
 | Auth (browser-POST) | sessietoken is de auth (route 2) | idem; token blijft primair |
 | Token uit URL | direct uit de start-URL | via **launch-code → token-uitwisseling** |
 | Sessie-state | mag in geheugen | **persistent server-side** (Redis/RTDB); nodig voor pay-resume én hervatten na "stop na fase X" |
-| Secrets | geen credential in de bundle | AI-/API-sleutels server-side (proxy); RTDB dicht; EU-hosting |
+| Secrets | geen credential in de bundle | AI-sleutel op het platform, nooit in de tool; RTDB dicht; EU-hosting |
 | Publiek rapport | basis | meta-sanitisatie + strikte output-escaping verplicht |
 
 > **Voor deze tool:** we testen mét echte klantdata, dus we starten direct op Niveau B. Alles in
@@ -110,7 +124,8 @@ firebase.json  database.rules.json  .firebaserc
 
 > **Statische hosting draait geen PHP.** Een AI-proxy, of welk server-side stuk dan ook, kan dus
 > niet op de tool-host staan; een pad als `/[tool]-ai-proxy.php` bestaat daar nooit. Zo'n proxy
-> hoort op SiteGround, en de app praat er cross-origin mee met een absolute URL.
+> AI loopt daarom via het platform: `POST /wp-json/cinab/v1/ai` (§7.3a). De tool bouwt zelf geen
+> proxy en heeft geen sleutel nodig.
 
 - [ ] Tool leest het **token** (bij voorkeur via launch-code-uitwisseling, 3.4) en eventueel
       `parent_rapport_id` / `action=resume` uit de start-URL.
@@ -127,7 +142,7 @@ firebase.json  database.rules.json  .firebaserc
 - [ ] Tool start **full-screen** (ADR 0005); iframe alleen voor het **rapport** (render-route).
 - [ ] Tijden: opslaan in **UTC**, "nu" in code uitrekenen (UTC), nooit tegen MySQL `NOW()`.
 - [ ] **Geen credentials in de browser-bundle.** Sessietoken mag; AI-/API-sleutel (Anthropic) niet
-      → server-side proxy (zie §7.3).
+      → het AI-endpoint van het platform (§7.3a).
 - [ ] Bij afronden: **`session/clear`** — de tool houdt daarna **geen data** meer (stateless-at-rest).
 
 ---
@@ -354,11 +369,59 @@ CORS beschermt dat **niet**. De bescherming komt uit de maatregelen hieronder.
 
 ### 7.3 Token & credential
 - [ ] **Token = capability** (single-use, kortlevend) — mag in de browser.
-- [ ] **Credential** (AI-/API-sleutel) — **nooit** in de bundle; altijd achter een server-side
-      proxy. **Die proxy staat op SiteGround, niet op de tool-host**: statische
-      hosting draait geen PHP, dus een pad als `/[tool]-ai-proxy.php` op het tool-subdomein bestaat
-      nooit. De app spreekt de proxy cross-origin aan met een absolute URL, en de origin-whitelist
-      van de proxy bevat het tool-subdomein.
+- [ ] **Credential** (AI-/API-sleutel) — **nooit** in de bundle, en ook niet in een eigen proxy van
+      de tool. AI loopt via het platform: `POST /wp-json/cinab/v1/ai`. De sleutel, het model en het
+      plafond staan aan platformzijde. Een tool levert geen proxybestand mee en heeft geen eigen
+      sleutel nodig.
+
+#### 7.3a AI in de tool (bindend voor elke tool die AI gebruikt)
+
+Tot september 2026 stond hier dat de proxy op de tool-host hoorde. Dat kon niet werken: statische
+hosting draait geen PHP, dus een pad als `/[tool]-ai-proxy.php` bestond daar nooit. Elke aanroep
+kwam nergens aan en de tools vielen stil terug op hun eigen berekening, in één geval terwijl het
+scherm meldde dat AI had geclusterd. Sinds s87 is AI een endpoint van het platform.
+
+**De aanroep**
+
+- [ ] **`POST /wp-json/cinab/v1/ai`, met een absolute URL.** De host wordt afgeleid uit de
+      platformcontext van de sessie, met alleen `cinab.nl` als toegestane host; een expliciet
+      attribuut op de pagina mag daarvan winnen. Zo werken staging en productie zonder omzetten.
+      Geen host betekent geen aanroep, en dus de eerlijke terugval.
+- [ ] **Body `{ token, task, lang, data }`. Het token gaat in de body, nooit als eigen header.**
+      De CORS-whitelist van het platform staat alleen `Content-Type` toe; een eigen header laat de
+      preflight stranden en de aanroep komt niet aan.
+- [ ] Er zit **geen tool-veld** in de body. Het platform leidt de tool af uit het token, zodat een
+      taak van een andere tool niet aan te roepen is.
+- [ ] Antwoord `{ task, text }`. Elke niet-200 betekent voor de tool hetzelfde: terugvallen op de
+      eigen berekening en dat eerlijk melden.
+- [ ] **De origin waar de tool draait staat in `_cinab_origin` van die sessie.** Test je vanaf een
+      ander adres dan het productiesubdomein, bijvoorbeeld de `web.app`-URL op staging, zet dan op
+      díé omgeving `_cinab_origin` op dat adres. Anders blokkeert de browser de aanroep voordat er
+      iets bij het platform aankomt, en zie je alleen de terugval zonder reden.
+
+**Wat de tool nooit doet**
+
+- [ ] Geen eigen proxybestand, geen sleutel, geen modelkeuze en geen prompt in de bundle. De prompt
+      wordt server-side opgebouwd; anders is de tool een prompt-as-a-service voor wie het token heeft.
+- [ ] **Taken lever je aan als specificatie, niet als code:** naam, invoercontract, prompttekst,
+      uitvoercontract en een plafond per aanroep. Het platform bouwt de taak in.
+
+**Eerlijk zijn over wat er is gebeurd**
+
+- [ ] **AI is een overlay, nooit een afhankelijkheid.** Elke fase loopt volledig door zonder AI. Een
+      fase die wacht op een antwoord dat niet komt, loopt vast bij de eerste deelnemer met een
+      slechte verbinding.
+- [ ] **Eén herkomstbron per AI-taak, zichtbaar in het scherm**, met vier standen: bezig, AI, lokaal
+      en demo. Een lokale uitkomst wordt nooit als AI-resultaat gepresenteerd.
+- [ ] Dat geldt ook voor wat eromheen staat. **Een animatie of banner die vooruitloopt op het
+      antwoord is dezelfde fout in een andere vorm.** Een voortgangslijst op een vaste timer die
+      afloopt voordat er antwoord is, en een melding "alle adviezen verfijnd" na één geslaagde van
+      de achttien, zijn allebei onwaar.
+- [ ] **Een AI-resultaat telt alleen bij een geldig contract.** Ongeldige of lege JSON is een
+      terugval, geen resultaat.
+- [ ] **Geen AI-aanroep zonder platformtoken, en niet in demo.**
+- [ ] **De herkomst per taak gaat mee in de export van het rapport.** Zonder dat is een half
+      AI-rapport achteraf niet te onderscheiden van een heel AI-rapport.
 
 ### 7.4 Tool-store / RTDB
 - [ ] **Regels dicht vóór de eerste echte sessie:** anonieme aanmelding aan, en de sessie gescoped
@@ -495,6 +558,10 @@ de facilitator, en lengtegrenzen op alles wat een deelnemer stuurt.
       dezelfde code, (3) staan alle gebruikte paden in de RTDB-regels, (4) zijn die regels opnieuw
       gedeployd (`firebase deploy --only database`). Niets zien zonder foutmelding is bijna altijd
       een stille weigering, niet een bug in de tool.
+- [ ] **AI (§7.3a):** een taak in een echte sessie geeft een AI-resultaat, met de herkomstmelding
+      erbij. Zet daarna `_cinab_ai_aan` uit en herhaal: de tool loopt gewoon door, de melding zegt
+      lokaal, en nergens op het scherm staat of beweegt iets dat AI suggereert. Controleer ook het
+      opgeslagen rapport: de herkomst per taak staat erin.
 - [ ] **Herlaad het startscherm** nadat de uitnodiging is gedeeld: de code moet dezelfde blijven.
 - [ ] **Aantal deelnemers:** iemand die pas ná de start binnenkomt telt mee in het rapport.
 - [ ] **Rapport terughalen:** open het opgeslagen rapport vanuit de werkruimte, in een **andere**
@@ -549,6 +616,11 @@ deelnemerslijst bijgehouden tijdens de sessie; getest met twee echte apparaten.
 in render-modus niets opslaan en geen demovulling; alles wat het rapport toont zit in de export;
 getest in een andere browser dan die van de facilitator.
 
+**AI (§7.3a)** — absolute URL naar `/wp-json/cinab/v1/ai`, token in de body, geen eigen headers;
+`_cinab_origin` klopt met de origin waar de tool werkelijk draait; `_cinab_ai_aan`, `_cinab_ai_set`
+en `_cinab_ai_plafond` gezet; elke fase loopt door zonder AI; herkomstmelding in vier standen en de
+herkomst mee in de export.
+
 **Levering compleet** — geen voorbeeldbestanden; elk pad in `firebase.json` en in de bladen bestaat
 echt; fonts en bibliotheken zelf gehost, geen externe CDN.
 
@@ -601,6 +673,13 @@ renderpagina; `_cinab_origin` op het eigen subdomein; AVG-plan per tool (§7.7).
     er gemeten is. Laat zo'n dimensie weg uit `scores` in plaats van hem te vullen.
 21. **(v3.5) Een eigen sessiecode verzinnen** terwijl het platform er een meegeeft. De herstart van
     een meerdaagse sessie wijst dan naar een sessie die niet bestaat (§3.4).
+22. **(v3.6) Een server-side stuk op een statische host zetten.** De AI-proxy stond hier jarenlang
+    voorgeschreven op de tool-host. Firebase Hosting draait geen PHP, dus die aanroep kwam nooit
+    ergens aan. Symptoom: alles werkt, AI doet alleen nooit iets, en in het ergste geval meldt het
+    scherm wel dat AI het gedaan heeft.
+23. **(v3.6) Een eigen header meesturen naar het platform.** De CORS-whitelist staat alleen
+    `Content-Type` toe. Een header als `X-CINAB-Token` laat de preflight stranden en de aanroep
+    komt niet aan. Het token hoort in de body.
 
 ---
 
@@ -612,6 +691,7 @@ renderpagina; `_cinab_origin` op het eigen subdomein; AVG-plan per tool (§7.7).
 | `/cinab/v1/herstart-sessie` | POST | **token** | hervat een lopende, meerdaagse sessie; geeft de bewaarde `session_code` terug waarmee de tool opnieuw start (`?session=<code>`) |
 | `/cinab/v1/stuur-uitnodigingen` | POST | **token** (non-consuming) | verstuurt uitnodigingen aan beoordelaars; body `{ token, raters, meta? }`; één ronde per sessietoken, maximaal 50 adressen. Het platform **bewaart de adressen niet**, ze blijven tool-zijdige sessiedata (§7.7) |
 | `/cinab/v1/validate-token` | POST | token | token checken, **non-consuming** |
+| `/cinab/v1/ai` | POST | **token** (non-consuming) | AI-taak uitvoeren; body `{ token, task, lang, data }`, antwoord `{ task, text }`. De prompt wordt **server-side** opgebouwd en de tool volgt uit het token, dus er zit geen tool-veld in de body. Token in de **body**, geen eigen header. 403 als AI uit staat of de taak niet bij deze tool hoort, 429 bij het sessieplafond, 502 als het model niet antwoordt, 503 als het platform geen sleutel of model heeft (§7.3a) |
 | `/cinab/v1/saldo` | GET · **POST** | **token** (vanuit de tool) | saldo tonen (advisory check op de poort). **Tools: POST met `{ token }` in de body** (token niet in URL/historie/logs, ADR 0006). GET is voor ingelogde portaal-gebruikers |
 | `/cinab/v1/sessie-afrekenen` | POST | **token** | atomisch + idempotent afschrijven; zet `betaald`; 402 bij te weinig |
 | `/cinab/v1/rapport-data/laatste` | GET | **token** | *(vergelijken — contract-only, nog niet gebouwd)* laatste eigen rapport voor `template_id`; account-gescoped; non-consuming |
@@ -632,7 +712,8 @@ vallen) · 413 payload te groot · 422 validatiefout · 429 rate-limited.
 ## Appendix B — Omgevingsvariabelen
 
 **Statische tool (route 2, regel):** geen server-side secrets. Token komt uit de launch-URL.
-**Nooit in de browser-bundle:** AI-sleutels (Anthropic) → server-side proxy.
+**Nooit in de browser-bundle:** AI-sleutels (Anthropic). AI loopt via `POST /wp-json/cinab/v1/ai`;
+sleutel, model en plafond staan aan platformzijde (§7.3a).
 **Alleen backend-tools (optioneel):** `CINAB_WP_URL`, `CINAB_API_KEY`, `CINAB_SIGNING_SECRET`.
 
 ## Appendix C — WordPress meta-velden per tool
@@ -649,6 +730,9 @@ vallen) · 413 payload te groot · 422 validatiefout · 429 rate-limited.
 | `_cinab_deel_geldig_dagen` | 30 |
 | `_cinab_render_url_pattern` | `https://[naam].cinab.nl/[tool]_rapport.html?rapport_id={rapport_id}` (statische hosting; leeg = geen renderroute, en dan toont het platform het rapport niet) |
 | `_cinab_token_geldig_uren` | 1–72 — zo kort als de sessie toelaat |
+| `_cinab_ai_aan` | true/false — AI toestaan voor deze sessie. **Standaard uit** |
+| `_cinab_ai_set` | takenset, bijvoorbeeld `visiekaart` of `risicobeheersing` (leeg = geen taken) |
+| `_cinab_ai_plafond` | maximaal aantal geslaagde AI-aanroepen per sessie (leeg = 40, 0 = geen plafond) |
 | `_cinab_rapport_schema` | optioneel (alleen tool-zijdige validatie) |
 
 Subdomein: `[naam].cinab.nl`. Zie `SUBDOMAIN-NAMING.md` voor de naamgeving en de DNS-stappen; het
@@ -684,6 +768,10 @@ Token-TTL (uur):      ____ (kort)   Deellink-TTL (dgn): 30
 Backend?:             ja / nee
 Persoonsdata:         __________________   Bewaartermijn: __________________
 Credentials server-side?: ja  (AI-sleutel mag NIET in de bundle)
+AI gebruiken?:        ja / nee  -> _cinab_ai_aan; takenset: __________  plafond/sessie: ____
+  Taken:              __________________ (naam, invoer, prompttekst, uitvoer, max_tokens)
+  Terugval per taak:  __________________ (wat de tool doet zonder AI)
+  Herkomst in export? ja
 
 Deelnemers op eigen apparaat?: ja / nee
   Entreepunt:         [tool]_faseN.html?join=<code>, link uit location.origin

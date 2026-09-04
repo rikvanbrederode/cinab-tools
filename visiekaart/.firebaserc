@@ -2,6 +2,6 @@
   "projects": {
     "default": "visiekaart",
     "staging": "visiekaart",
-    "production": "PROJECT-ID-INVULLEN-BIJ-AANMAAK"
+    "production": "visiekaart"
   }
 }

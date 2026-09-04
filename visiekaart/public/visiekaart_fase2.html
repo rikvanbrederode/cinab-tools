@@ -1967,13 +1967,29 @@ function vkSerializeClusters(){
 }
 
 /* ══════════ VK AI-HELPER (Cluster A) — ingebouwde vk-ai.js ══════════
-   Roept de server-side proxy (/vk-ai-proxy.php) aan met timeout en NETTE TERUGVAL:
+   Roept het AI-endpoint van het platform aan (/wp-json/cinab/v1/ai) met timeout en
    bij elke fout (offline, geen token, parse-fout) reject → de aanroeper gebruikt de
    bestaande lokale berekening, zodat een sessie nooit vastloopt. De Anthropic-sleutel
    zit NOOIT hier (werkboek §2/§7.3); de prompt wordt server-side opgebouwd. */
 (function (global) {
   'use strict';
-  var VK_AI_ENDPOINT = '/vk-ai-proxy.php';
+  /* s87: het endpoint staat op het PLATFORM, niet op de tool-host. Firebase Hosting is
+     statisch en draait geen PHP, dus het oude pad /vk-ai-proxy.php bestond nooit: elke call
+     kwam nergens aan en de tool viel stil terug op lokaal. De host komt uit de
+     platformcontext van deze sessie, zodat staging en productie zonder omzetten werken.
+     Alleen cinab.nl wordt geaccepteerd; geen host = geen call = eerlijke lokale terugval. */
+  var VK_AI_PAD = '/wp-json/cinab/v1/ai';
+  function vkAiBasis() {
+    try { var a = document.documentElement.getAttribute('data-cinab-api'); if (a) return a.replace(/\/+$/, ''); } catch (e) {}
+    try {
+      var ctx = JSON.parse(sessionStorage.getItem('vk_cinab') || 'null');
+      if (ctx && ctx.apiBase) {
+        var u = new URL(ctx.apiBase);
+        if (u.protocol === 'https:' && /(^|\.)cinab\.nl$/.test(u.hostname)) return u.origin;
+      }
+    } catch (e) {}
+    return '';
+  }
   var VK_AI_TIMEOUT_MS = 30000;
   function vkSessionToken() {
     try { return global.__VK_TOKEN || ''; } catch (e) { return ''; }
@@ -1983,9 +1999,14 @@ function vkSerializeClusters(){
     var lang = opts.lang || (global.lang) || 'nl';
     var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
     var timer = setTimeout(function () { if (controller) controller.abort(); }, opts.timeout || VK_AI_TIMEOUT_MS);
-    return fetch(VK_AI_ENDPOINT, {
+    var basis = vkAiBasis();
+    if (!basis) { clearTimeout(timer); return Promise.reject(mkErr(0, { error: 'ai_geen_platform' })); }
+    /* Token in de BODY, nooit als header: de CORS-whitelist van het platform staat sinds
+       audit M9 alleen Content-Type toe, dus een eigen header laat de preflight stranden. */
+    return fetch(basis + VK_AI_PAD, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-CINAB-Token': vkSessionToken() },
+      credentials: 'omit',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ task: task, lang: lang, token: vkSessionToken(), data: data }),
       signal: controller ? controller.signal : undefined
     }).then(function (res) {
