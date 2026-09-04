@@ -1537,10 +1537,31 @@ document.addEventListener('DOMContentLoaded', ()=>{
   function leesJson(sleutel) {
     try { var r = localStorage.getItem(sleutel); return r ? JSON.parse(r) : null; } catch (e) { return null; }
   }
+  /* rb_consequence staat als rauwe string in localStorage (fase 0 schrijft hem bewust zo weg).
+     leesJson liep daarop stuk, waardoor het ongewenste gevolg nooit meereisde naar een
+     deelnemerapparaat: op de pc van de facilitator stond het al in dezelfde localStorage,
+     op een telefoon niet. (CINAB, 4 september 2026 — bugregister B-03.) */
+  function leesRuweTekst(sleutel) {
+    try {
+      var r = localStorage.getItem(sleutel);
+      if (r == null) return '';
+      if (r.length && r[0] === '{') { try { var o = JSON.parse(r); return (o && o.text) ? String(o.text) : ''; } catch (e) { return r; } }
+      if (r.length > 1 && r[0] === '"' && r[r.length - 1] === '"') { try { return String(JSON.parse(r)); } catch (e) { return r; } }
+      return r;
+    } catch (e) { return ''; }
+  }
   function bouwContext() {
     var ctx = {};
     var risks = leesJson('rb_risks'); if (Array.isArray(risks)) ctx.risks = risks;
-    var cons = leesJson('rb_consequence'); if (cons) ctx.consequence = cons;
+    var cons = leesRuweTekst('rb_consequence'); if (cons) ctx.consequence = cons;
+    /* Uitkomsten van de facilitator reizen mee (afsprakenblad §7, uitbreiding 4-9-2026 — B-04).
+       Zonder dit bleven de meekijk-overzichten en de matrix in de deelnemer-view van fase 3,
+       4 en 5 leeg op een eigen apparaat. Deelnemer-eigen data (rb_individual_scores) gaat
+       bewust niet mee: die loopt via de feed omhoog, niet via de stage omlaag. */
+    var grp = leesJson('rb_group_scores'); if (grp) ctx.group = grp;
+    var cen = leesJson('rb_central_scores'); if (cen) ctx.central = cen;
+    var mat = leesJson('rb_matrix_result'); if (mat) ctx.matrix = mat;
+    var mea = leesJson('rb_measures'); if (mea) ctx.measures = mea;
     var s = leesJson('rb_session');
     if (s) {
       ctx.session = { sessionId: s.sessionId, orgName: s.orgName || '', facilitator: s.facilitator || '' };
@@ -1554,7 +1575,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
   function pakContextUit(ctx) {
     if (!ctx || !isParticipant()) return;
     try { if (Array.isArray(ctx.risks)) localStorage.setItem('rb_risks', JSON.stringify(ctx.risks)); } catch (e) {}
-    try { if (ctx.consequence) localStorage.setItem('rb_consequence', JSON.stringify(ctx.consequence)); } catch (e) {}
+    try { if (ctx.consequence) localStorage.setItem('rb_consequence', String(ctx.consequence)); } catch (e) {}   /* rauwe string, zelfde contract als fase 0 */
+    try { if (ctx.group) localStorage.setItem('rb_group_scores', JSON.stringify(ctx.group)); } catch (e) {}
+    try { if (ctx.central) localStorage.setItem('rb_central_scores', JSON.stringify(ctx.central)); } catch (e) {}
+    try { if (ctx.matrix) localStorage.setItem('rb_matrix_result', JSON.stringify(ctx.matrix)); } catch (e) {}
+    try { if (ctx.measures) localStorage.setItem('rb_measures', JSON.stringify(ctx.measures)); } catch (e) {}
     try {
       if (ctx.session) {
         var eigen = leesJson('rb_session') || {};

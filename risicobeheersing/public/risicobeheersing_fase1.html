@@ -261,6 +261,14 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); mi
 .p-cons .ca-dot { width:8px; height:8px; border-radius:50%; background:var(--coral); margin-top:5px; flex-shrink:0; }
 .p-cons .ca-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--coral); margin-bottom:2px; }
 .p-cons .ca-text { font-size:14px; font-weight:600; color:var(--text); line-height:1.35; }
+/* schrijfhulp risico's (item 3, 4-9-2026): korte toelichting boven de invulvelden, deelnemer + facilitator */
+.rb-schrijfhulp { background:var(--bg); border:1px solid var(--border-md); border-left:4px solid var(--fase-accent); border-radius:var(--r); padding:12px 14px 10px; margin-bottom:14px; }
+.rb-schrijfhulp-kop { display:flex; align-items:center; gap:7px; font-size:12.5px; font-weight:700; color:var(--text); margin-bottom:6px; }
+.rb-schrijfhulp ul { margin:0; padding-left:18px; font-size:13px; color:var(--text-2); line-height:1.55; }
+.rb-schrijfhulp li { margin-bottom:3px; }
+.rb-schrijfhulp li b { color:var(--text); font-weight:600; }
+.rb-schrijfhulp .rb-hulpzin { margin-top:8px; font-size:12.5px; color:var(--text); background:var(--surface); border:1px dashed var(--border-strong); border-radius:var(--r-sm); padding:7px 10px; line-height:1.5; }
+.rb-schrijfhulp .rb-hulpzin i { color:var(--orange-hover); font-style:normal; font-weight:600; }
 .p-field { margin-bottom:14px; }
 .p-field label { display:block; font-size:13px; font-weight:600; margin-bottom:6px; }
 .p-input { width:100%; padding:11px 13px; border:1px solid var(--border-strong); border-radius:var(--r-sm); font-size:14px; font-family:var(--font-body); color:var(--text); background:var(--surface); }
@@ -486,6 +494,10 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); mi
 
       <div class="bot-bar">
         <div class="bot-left">
+          <button class="btn btn-ghost rb-back-edit-btn rb-terug-btn" type="button" onclick="rbTerug()" aria-label="Terug">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            <span>Terug</span>
+          </button>
           <div class="bot-info" id="t-introBotInfo">Deelnemers zijn aangemeld en gereed</div>
         </div>
         <button class="btn btn-orange btn-lg" onclick="startCollect()" id="t-introStart">
@@ -519,11 +531,25 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); mi
           </div>
           <span class="count-chip" id="feedCount">0</span>
         </div>
+      <div class="rb-schrijfhulp" role="note">
+        <div class="rb-schrijfhulp-kop"><span id="t-fHulpKop">Zo beschrijf je een risico</span>
+          <span class="info-icon" onclick="event.stopPropagation();rbInfoOpenLg('infoSchrijfhulp')" aria-label="Meer uitleg en voorbeelden" role="button" tabindex="0">i</span></div>
+        <ul>
+          <li id="t-fHulp1">Het gevolg staat al vast (zie hierboven). Beschrijf wat er kan gebeuren waardoor we daar terechtkomen: de oorzaak, niet nog een gevolg.</li>
+          <li id="t-fHulp2">Eén risico per inzending, concreet en herkenbaar. Niet &ldquo;ICT-risico&rdquo;, wel &ldquo;back-ups worden nooit getest&rdquo;.</li>
+          <li id="t-fHulp3">Geen oplossing opschrijven. &ldquo;We moeten back-ups testen&rdquo; is een maatregel; die komt in fase 5.</li>
+        </ul>
+        <div class="rb-hulpzin" id="t-fHulpZin">Hulpzin: doordat [oorzaak] kan [dit gebeuren], waardoor [het gevolg] ontstaat. Je stuurt alleen het eerste deel in.</div>
+      </div>
         <div class="feed-list" id="feedList"></div>
       </div>
 
       <div class="bot-bar">
         <div class="bot-left">
+          <button class="btn btn-ghost rb-back-edit-btn rb-terug-btn" type="button" onclick="rbTerug()" aria-label="Terug">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            <span>Terug</span>
+          </button>
           <button class="btn" data-env="dev-only" onclick="simulateSubmission()" id="t-simBtn">+ Simuleer inzending</button>
           <div class="bot-info" id="t-collectBotInfo">Wachten op inzendingen…</div>
         </div>
@@ -672,6 +698,16 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); mi
         <div class="p-title" style="font-size:18px" id="t-pInputTitle">Welke oorzaken of risico's zie jij?</div>
         <p class="p-sub" id="t-pInputSub">Stuur alles in wat tot dit gevolg kan leiden. Volledigheid gaat boven volgorde — één risico per inzending.</p>
       </div>
+      <div class="rb-schrijfhulp" role="note">
+        <div class="rb-schrijfhulp-kop"><span id="t-pHulpKop">Zo beschrijf je een risico</span>
+          <span class="info-icon" onclick="event.stopPropagation();rbInfoOpenLg('infoSchrijfhulp')" aria-label="Meer uitleg en voorbeelden" role="button" tabindex="0">i</span></div>
+        <ul>
+          <li id="t-pHulp1">Het gevolg staat al vast (zie hierboven). Beschrijf wat er kan gebeuren waardoor we daar terechtkomen: de oorzaak, niet nog een gevolg.</li>
+          <li id="t-pHulp2">Eén risico per inzending, concreet en herkenbaar. Niet &ldquo;ICT-risico&rdquo;, wel &ldquo;back-ups worden nooit getest&rdquo;.</li>
+          <li id="t-pHulp3">Geen oplossing opschrijven. &ldquo;We moeten back-ups testen&rdquo; is een maatregel; die komt in fase 5.</li>
+        </ul>
+        <div class="rb-hulpzin" id="t-pHulpZin">Hulpzin: doordat [oorzaak] kan [dit gebeuren], waardoor [het gevolg] ontstaat. Je stuurt alleen het eerste deel in.</div>
+      </div>
       <div class="p-field">
         <label for="pRiskInput" id="t-pRiskLabel">Risico of oorzaak</label>
         <input type="text" class="p-input" id="pRiskInput" data-t-placeholder="pRiskPh" placeholder="Bijv. verouderde back-upsystemen" onkeydown="if(event.key==='Enter'){pSubmitRisk();}">
@@ -744,6 +780,7 @@ const T = {
     phaseTitle:"Risico's inventariseren",
     phaseSub:"Breng samen met het team alle oorzaken en risico's in beeld die tot het ongewenste gevolg kunnen leiden.",
     theoryBtn:'Onderbouwing',
+    rbTerug:'Terug', rbTerugTitle:'E\u00e9n scherm terug; op het introscherm naar de vorige fase',
     sessTitle:'Sessie-info',
     consAnchorLabel:'Punt A \u2014 centraal analysepunt',
     consAnchorLabel2:'Punt A \u2014 centraal analysepunt',
@@ -795,6 +832,7 @@ const T = {
     canvResTitle:'resultaat',
     canvKans:'kans',
     canvImpact:'impact',
+    canvLow:'laag', canvHigh:'hoog',
     canvGroupScore:'groepsscore',
     canvEmptyInv:'nog geen risico\u2019s',
     /* participant */
@@ -805,6 +843,23 @@ const T = {
     pPreWaiting:'Wachten op de facilitator\u2026',
     pConsLabel:'Ongewenst gevolg',
     pInputTitle:"Welke oorzaken of risico's zie jij?",
+    /* schrijfhulp risico's (item 3) — CEC-format (oorzaak → gebeurtenis → gevolg), ISO 31000 / COSO ERM */
+    pHulpKop:'Zo beschrijf je een risico',
+    pHulp1:'Het gevolg staat al vast (zie hierboven). Beschrijf wat er kan gebeuren waardoor we daar terechtkomen: de oorzaak, niet nog een gevolg.',
+    pHulp2:'E\u00e9n risico per inzending, concreet en herkenbaar. Niet \u201cICT-risico\u201d, wel \u201cback-ups worden nooit getest\u201d.',
+    pHulp3:'Geen oplossing opschrijven. \u201cWe moeten back-ups testen\u201d is een maatregel; die komt in fase 5.',
+    pHulpZin:'Hulpzin: doordat [oorzaak] kan [dit gebeuren], waardoor [het gevolg] ontstaat. Je stuurt alleen het eerste deel in.',
+    fHulpKop:'Zo beschrijf je een risico',
+    fHulp1:'Het gevolg staat al vast (zie hierboven). Beschrijf wat er kan gebeuren waardoor we daar terechtkomen: de oorzaak, niet nog een gevolg.',
+    fHulp2:'E\u00e9n risico per inzending, concreet en herkenbaar. Niet \u201cICT-risico\u201d, wel \u201cback-ups worden nooit getest\u201d.',
+    fHulp3:'Geen oplossing opschrijven. \u201cWe moeten back-ups testen\u201d is een maatregel; die komt in fase 5.',
+    fHulpZin:'Hulpzin: doordat [oorzaak] kan [dit gebeuren], waardoor [het gevolg] ontstaat. Je stuurt alleen het eerste deel in.',
+    infoSchrijfhulp:{ title:'Een risico goed beschrijven', sub:'Oorzaak \u2192 gebeurtenis \u2192 gevolg (ISO 31000 / COSO ERM)', body:[
+      {h:'Waar zit je in de keten?', p:'Een risico heeft drie schakels: een oorzaak, een gebeurtenis die daardoor kan optreden, en een gevolg. In deze sessie is het gevolg al vastgelegd als punt A. Jij beschrijft dus de schakel d\u00e1\u00e1rvoor: wat kan er gebeuren waardoor punt A werkelijkheid wordt?'},
+      {h:'Goed', p:'\u201cBack-ups worden nooit getest\u201d \u00b7 \u201cE\u00e9n medewerker kent het systeem\u201d \u00b7 \u201cLeverancier levert vaak te laat\u201d \u00b7 \u201cMedewerkers herkennen phishing niet\u201d. Kort, concreet, en iemand anders snapt meteen wat je bedoelt.'},
+      {h:'Niet zo', p:'\u201cICT-risico\u201d of \u201cpersoneel\u201d (te vaag: waar gaat het precies over?) \u00b7 \u201cDienstverlening valt uit\u201d (dat is het gevolg, dat hebben we al) \u00b7 \u201cWe moeten een tweede leverancier zoeken\u201d (dat is een maatregel, die komt in fase 5) \u00b7 \u201cHet systeem is nu al kapot\u201d (dat is geen risico maar een probleem dat al speelt).'},
+      {h:'Vuistregels', p:'E\u00e9n risico per inzending. Schrijf op wat k\u00e1n gebeuren, niet wat zeker gebeurt of al gebeurd is. Twijfel je of iets een oorzaak of een gevolg is? Vraag jezelf: leidt dit t\u00f3t punt A? Dan hoort het hier. Dubbelingen zijn geen probleem; de facilitator voegt straks samen.'}
+    ]},
     pInputSub:'Stuur alles in wat tot dit gevolg kan leiden. Volledigheid gaat boven volgorde \u2014 \u00e9\u00e9n risico per inzending.',
     pRiskLabel:'Risico of oorzaak',
     pRiskPh:'Bijv. verouderde back-upsystemen',
@@ -853,6 +908,7 @@ const T = {
     phaseTitle:'Inventory the risks',
     phaseSub:'Together with the team, surface all causes and risks that could lead to the undesirable consequence.',
     theoryBtn:'Background',
+    rbTerug:'Back', rbTerugTitle:'One screen back; on the intro screen to the previous phase',
     sessTitle:'Session info',
     consAnchorLabel:'Point A \u2014 central analysis point',
     consAnchorLabel2:'Point A \u2014 central analysis point',
@@ -899,6 +955,7 @@ const T = {
     canvResTitle:'result',
     canvKans:'probability',
     canvImpact:'impact',
+    canvLow:'low', canvHigh:'high',
     canvGroupScore:'group score',
     canvEmptyInv:'no risks yet',
     pBack:'\u2190 Facilitator view',
@@ -908,6 +965,23 @@ const T = {
     pPreWaiting:'Waiting for the facilitator\u2026',
     pConsLabel:'Undesirable consequence',
     pInputTitle:'Which causes or risks do you see?',
+    /* risk-writing help (item 3) — CEC format (cause → event → consequence), ISO 31000 / COSO ERM */
+    pHulpKop:'How to describe a risk',
+    pHulp1:'The consequence is already set (see above). Describe what could happen that gets us there: the cause, not another consequence.',
+    pHulp2:'One risk per submission, concrete and recognisable. Not \u201cIT risk\u201d, but \u201cbackups are never tested\u201d.',
+    pHulp3:'Do not write a solution. \u201cWe must test backups\u201d is a measure; that comes in phase 5.',
+    pHulpZin:'Helper sentence: because of [cause], [this could happen], leading to [the consequence]. You only submit the first part.',
+    fHulpKop:'How to describe a risk',
+    fHulp1:'The consequence is already set (see above). Describe what could happen that gets us there: the cause, not another consequence.',
+    fHulp2:'One risk per submission, concrete and recognisable. Not \u201cIT risk\u201d, but \u201cbackups are never tested\u201d.',
+    fHulp3:'Do not write a solution. \u201cWe must test backups\u201d is a measure; that comes in phase 5.',
+    fHulpZin:'Helper sentence: because of [cause], [this could happen], leading to [the consequence]. You only submit the first part.',
+    infoSchrijfhulp:{ title:'Describing a risk well', sub:'Cause \u2192 event \u2192 consequence (ISO 31000 / COSO ERM)', body:[
+      {h:'Where are you in the chain?', p:'A risk has three links: a cause, an event that may follow from it, and a consequence. In this session the consequence is already fixed as point A. So you describe the link before it: what could happen that makes point A real?'},
+      {h:'Good', p:'\u201cBackups are never tested\u201d \u00b7 \u201cOnly one employee knows the system\u201d \u00b7 \u201cSupplier often delivers late\u201d \u00b7 \u201cStaff do not recognise phishing\u201d. Short, concrete, and someone else understands it immediately.'},
+      {h:'Not like this', p:'\u201cIT risk\u201d or \u201cstaff\u201d (too vague) \u00b7 \u201cService goes down\u201d (that is the consequence, we already have it) \u00b7 \u201cWe need a second supplier\u201d (that is a measure, phase 5) \u00b7 \u201cThe system is already broken\u201d (not a risk but an issue that is already happening).'},
+      {h:'Rules of thumb', p:'One risk per submission. Write what could happen, not what is certain or has already happened. Unsure whether something is a cause or a consequence? Ask: does this lead to point A? Then it belongs here. Duplicates are fine; the facilitator merges later.'}
+    ]},
     pInputSub:'Submit anything that could lead to this consequence. Completeness before order \u2014 one risk per submission.',
     pRiskLabel:'Risk or cause',
     pRiskPh:'E.g. outdated backup systems',
@@ -977,61 +1051,72 @@ function rbApplyEnvironmentRules(){
   window.__RB_PROD=true;
 }
 
-/* ══════════ RB SHARED AI HELPER (proxy + lokale terugval) ══════════ */
-/* Roept de server-side AI-proxy op het tool-subdomein aan (baseline §3). De browser stuurt ALLEEN een
-   taaktype + gestructureerde data; de prompt wordt server-side opgebouwd (geen prompt-as-a-service).
-   Token via window.__VK_TOKEN. Rejectt bij ELKE fout (offline, geen token, 4xx/5xx, onparsebaar,
-   timeout) zodat de aanroeper zijn eigen lokale terugval gebruikt. Tot proxy+token live staan vuurt
-   AI niet en draait alles lokaal — correct gedrag, geen bug (baseline §3.4). */
-/* s87: het endpoint staat op het PLATFORM, niet op de tool-host. Firebase Hosting is statisch
-   en draait geen PHP, dus het oude pad /risicobeheersing-ai-proxy.php bestond nooit: elke call
-   kwam nergens aan en de tool viel stil terug op lokaal. De host komt uit de platformcontext
-   van deze sessie, zodat staging en productie zonder omzetten werken. Alleen cinab.nl wordt
-   geaccepteerd; geen host = geen call = eerlijke lokale terugval. Het token gaat in de body,
-   nooit als header: de CORS-whitelist staat sinds audit M9 alleen Content-Type toe. */
+/* ══════════ RB SHARED AI HELPER (platform-endpoint + lokale terugval) ══════════ */
+/* Roept het AI-endpoint van het PLATFORM aan: POST <apiBase>/wp-json/cinab/v1/ai. De browser stuurt
+   ALLEEN een taaktype plus gestructureerde data; de prompt wordt server-side opgebouwd en de sleutel
+   staat daar. Rejectt bij ELKE fout (offline, geen platform, geen token, 4xx/5xx, onparsebaar,
+   timeout) zodat de aanroeper zijn eigen lokale terugval gebruikt.
+
+   CINAB, 4 september 2026. De aanlevering wees naar /risicobeheersing-ai-proxy.php op de tool-host.
+   Firebase Hosting is statisch en draait geen PHP, dus dat adres bestaat daar niet: elke call kwam
+   nergens aan en alles viel stil terug op de lokale berekening. Sinds plugin 1.69.0 staat het
+   endpoint in het platform. De host komt uit de platformcontext van deze sessie (sessionStorage
+   rb_cinab), zodat staging en productie zonder omzetten werken; alleen cinab.nl wordt geaccepteerd,
+   zodat een vreemde pagina de tool geen andere host kan opdringen. Geen host betekent geen call en
+   dus de eerlijke lokale terugval.
+
+   Token in de BODY, nooit als header: de CORS-whitelist van het platform staat alleen Content-Type
+   toe, dus een eigen header laat de preflight stranden. */
+var RB_AI_PAD = '/wp-json/cinab/v1/ai';
 function rbAiProxyUrl(){
+  /* volledige URL forceren kan nog steeds, bijvoorbeeld om lokaal tegen een andere host te testen */
   if (typeof window.__RB_AI_PROXY_URL === 'string' && window.__RB_AI_PROXY_URL) return window.__RB_AI_PROXY_URL;
-  var basis = '';
-  try { var a = document.documentElement.getAttribute('data-cinab-api'); if (a) basis = a.replace(/\/+$/, ''); } catch(e){}
-  if (!basis) {
-    try {
-      var ctx = JSON.parse(sessionStorage.getItem('rb_cinab') || 'null');
-      if (ctx && ctx.apiBase) {
-        var u = new URL(ctx.apiBase);
-        if (u.protocol === 'https:' && /(^|\.)cinab\.nl$/.test(u.hostname)) basis = u.origin;
-      }
-    } catch(e){}
-  }
-  return basis ? basis + '/wp-json/cinab/v1/ai' : '';
+  try { var a = document.documentElement.getAttribute('data-cinab-api'); if (a) return a.replace(/\/+$/,'') + RB_AI_PAD; } catch(e){}
+  try {
+    var ctx = JSON.parse(sessionStorage.getItem('rb_cinab') || 'null');
+    if (ctx && ctx.apiBase) {
+      var u = new URL(ctx.apiBase);
+      if (u.protocol === 'https:' && /(^|\.)cinab\.nl$/.test(u.hostname)) return u.origin + RB_AI_PAD;
+    }
+  } catch(e){}
+  return '';
+}
+/* Fout met status en code erop, zodat de aanroeper onderscheid kan maken tussen een storing,
+   een bereikt plafond en AI die voor deze sessie uit staat. */
+function rbAiFout(status, body, val){
+  var e = new Error(val || (body && (body.code || body.error)) || 'ai_fout');
+  e.__rb = true; e.status = status || 0; e.code = (body && (body.code || body.error)) || val || '';
+  return e;
 }
 function vkCallAI(task, data, opts){
   opts = opts || {};
   var timeoutMs = opts.timeoutMs || 30000;
-  // Geen token in productie = de proxy weigert toch: reject direct zodat de lokale terugval pakt.
-  if (rbIsDemo()) return Promise.reject(new Error('demo-mode'));            // demo: nooit een echte AI-call (standaard §7)
-  if (isProductionMode() && !window.__VK_TOKEN) return Promise.reject(new Error('no-token'));
+  if (rbIsDemo()) return Promise.reject(rbAiFout(0, null, 'demo'));          // demo: nooit een echte AI-call (standaard §7)
+  if (isProductionMode() && !window.__VK_TOKEN) return Promise.reject(rbAiFout(0, null, 'geen_token'));
+  var url = rbAiProxyUrl();
+  if (!url) return Promise.reject(rbAiFout(0, null, 'geen_platform'));
   var ctrl = (typeof AbortController!=='undefined') ? new AbortController() : null;
   var timer = setTimeout(function(){ if(ctrl) ctrl.abort(); }, timeoutMs);
-  var rbUrl = rbAiProxyUrl();
-  if (!rbUrl) { clearTimeout(timer); return Promise.reject(new Error('no-platform')); }
-  return fetch(rbUrl, {
-    credentials:'omit',
+  return fetch(url, {
     method:'POST',
+    credentials:'omit',
     headers:{'Content-Type':'application/json'},
     body: JSON.stringify({ task:task, data:data||{}, lang: opts.lang || (typeof lang!=='undefined'?lang:'nl'), token: window.__VK_TOKEN || '' }),
     signal: ctrl ? ctrl.signal : undefined
   }).then(function(res){
     clearTimeout(timer);
-    if(!res.ok) throw new Error('http '+res.status);
+    if(!res.ok){
+      return res.json().catch(function(){ return {}; }).then(function(j){ throw rbAiFout(res.status, j); });
+    }
     return res.json();
   }).then(function(json){
-    // Offici\u00eble proxy-respons (cinab-ai-proxy.template.php → {tool}-ai-proxy.php): { task, text }.
-    // text = ruwe modeltekst; de aanroeper parse't JSON zelf (cluster) of gebruikt 'm als platte tekst (verfijn_advies).
-    if(!json || typeof json.text!=='string' || !json.text.trim()) throw new Error('bad-shape');
+    // Antwoord van het platform: { task, text }. text = ruwe modeltekst; de aanroeper parse't JSON
+    // zelf (cluster) of gebruikt 'm als platte tekst (verfijn_advies).
+    if(!json || typeof json.text!=='string' || !json.text.trim()) throw rbAiFout(0, null, 'lege_respons');
     return json.text;
   }).catch(function(e){
     clearTimeout(timer);
-    throw e;
+    throw (e && e.__rb) ? e : rbAiFout(0, null, 'onbereikbaar');
   });
 }
 /* ══════════ END RB SHARED AI HELPER ══════════ */
@@ -1093,6 +1178,7 @@ function rbCloseTip(){
   if(popup) popup.classList.remove('open'); if(backdrop) backdrop.classList.remove('open');
   const dan=rbTipDan; rbTipDan=null; if(dan){ try{ dan(); }catch(e){} }
 }
+function rbInfoOpenLg(key){ if(typeof T==='undefined'||!T[lang]) return; const o=T[lang][key]; if(!o) return; rbOpenTip({size:'lg', title:o.title, sub:o.sub, body:o.body, closeLabel:T[lang].tipClose}); }
 function rbInfoOpen(key, anchor){ if(typeof T==='undefined'||!T[lang]) return; const body=T[lang][key]; if(body==null) return; rbOpenTip({size:'sm', body:body, anchor:anchor}); }
 function openTheory(){
   const t=T[lang];
@@ -1151,6 +1237,7 @@ function applyT(){
     } else { el.textContent=t[k]; }
   });
   document.querySelectorAll('[data-t-placeholder]').forEach(el=>{ const key=el.dataset.tPlaceholder; if(t[key]) el.placeholder=t[key]; });
+  if(typeof rbTerugLabels==='function') rbTerugLabels();
 }
 function initLang(){
   let init=null;
@@ -1462,6 +1549,14 @@ function rbBuildCanvas(data, phase, opts){
   // as-titels (serif)
   s+='<text x="'+(mat.x+mat.w/2)+'" y="'+(mat.y-2)+'" font-family="Fraunces, Georgia, serif" font-size="15" fill="#262A36" text-anchor="middle">'+escapeHtml(t.canvKans||'kans')+'</text>';
   s+='<text x="'+(mat.x-40)+'" y="'+(mat.y+mat.h/2)+'" font-family="Fraunces, Georgia, serif" font-size="15" fill="#262A36" text-anchor="middle" transform="rotate(-90 '+(mat.x-40)+' '+(mat.y+mat.h/2)+')">'+escapeHtml(t.canvImpact||'impact')+'</text>';
+  // richting op de assen: laag <-> hoog (4-9-2026). Kans loopt A(laag) -> F(hoog) van links naar rechts,
+  // impact 1(laag) -> 6(hoog) van onder naar boven; de woorden staan aan de uiteinden, buiten de cijfer-/letterrij.
+  const lowLbl=escapeHtml(t.canvLow||'laag'), highLbl=escapeHtml(t.canvHigh||'hoog');
+  const axFont='font-size="11" font-weight="600" fill="#9A9894" letter-spacing="0.04em"';
+  s+='<text x="'+mat.x+'" y="'+(mat.y+mat.h+40)+'" '+axFont+' text-anchor="start">'+lowLbl+'</text>';
+  s+='<text x="'+(mat.x+mat.w)+'" y="'+(mat.y+mat.h+40)+'" '+axFont+' text-anchor="end">'+highLbl+'</text>';
+  s+='<text x="'+(mat.x-26)+'" y="'+(mat.y+mat.h)+'" '+axFont+' text-anchor="start" transform="rotate(-90 '+(mat.x-26)+' '+(mat.y+mat.h)+')">'+lowLbl+'</text>';
+  s+='<text x="'+(mat.x-26)+'" y="'+mat.y+'" '+axFont+' text-anchor="end" transform="rotate(-90 '+(mat.x-26)+' '+mat.y+')">'+highLbl+'</text>';
   } /* einde showRight */
 
   s+='</svg>';
@@ -1720,6 +1815,22 @@ function setAiBusy(b){
   const btn=document.getElementById('aiClusterBtn'); if(btn) btn.disabled=b;
   const lbl=document.getElementById('aiClusterLbl'); if(lbl) lbl.textContent = b?T[lang].aiClusterBusy:T[lang].aiClusterBtn;
 }
+/* De clusterprompt op het platform weegt de gestelde vraag en de sessiecontext mee, juist om te
+   voorkomen dat er op woordvorm wordt geclusterd in plaats van op betekenis. De aanlevering stuurde
+   alleen de inzendingen mee. Er gaan geen namen mee: items bevatten alleen de tekst.
+   (CINAB, 4 september 2026.) */
+function rbAiVraag(){ try{ return T[lang].phaseSub || ''; }catch(e){ return ''; } }
+function rbAiContext(){
+  var d=[], s={}, cons='';
+  try{ s=readSession()||{}; }catch(e){}
+  try{ cons=readConsequence()||''; }catch(e){}
+  var nl=(lang!=='en');
+  if(cons)      d.push((nl?'Ongewenst gevolg: ':'Undesirable consequence: ')+cons);
+  if(s.orgName) d.push((nl?'Organisatie: ':'Organisation: ')+s.orgName);
+  if(s.sector)  d.push((nl?'Sector: ':'Sector: ')+s.sector);
+  if(s.scope)   d.push((nl?'Reikwijdte: ':'Scope: ')+s.scope);
+  return d.join('\n');
+}
 async function aiCluster(){
   const flat=[]; clusters.forEach(c=>c.members.forEach(m=>flat.push({text:m.text, author:m.author||''})));
   if(flat.length<2){ showBanner(T[lang].aiClusterTooFew); return; }
@@ -1728,7 +1839,8 @@ async function aiCluster(){
   let result=localCluster(items);                       // lokale terugval staat klaar
   let source='local';
   try{
-    const text=await vkCallAI('cluster', {items:items, maxClusters:Math.max(2,Math.min(8,flat.length))}, {lang});
+    const text=await vkCallAI('cluster', {items:items, question:rbAiVraag(), context:rbAiContext(),
+                                         maxClusters:Math.max(2,Math.min(8,flat.length))}, {lang});
     const parsed=rbParseJsonLoose(text);
     if(parsed && validClusters(parsed.clusters, flat.length)){ result=parsed; source='ai'; }   // alleen bij geldig contract telt het als AI
   }catch(e){ /* AI onbereikbaar/ongeldig → lokale terugval, en dat zeggen we ook */ }
@@ -1841,6 +1953,27 @@ function backToCluster(){
   showScreen('sCluster');
 }
 
+/* ══════════ RB TERUG-KNOP (binnen de fase één scherm terug; op het introscherm naar de vorige fase) ══════════ */
+/* CINAB, 4 september 2026 (item 4). "Vorige fase" zat verstopt achter een klik op het logo en sIntro/sCollect
+   hadden geen terugweg; een vergissing betekende opnieuw opstarten. rbTerug stapt één scherm terug en publiceert
+   de bijbehorende stage, zodat deelnemerapparaten meelopen. Terug naar sIntro publiceert bewust 'idle' (dit is een
+   facilitator-handeling, geen page-init). */
+const RB_SCHERMEN=['sIntro','sCollect','sCluster','sFinal'];
+function rbHuidigScherm(){
+  for(const id of RB_SCHERMEN){ const el=document.getElementById(id); if(el && el.classList.contains('open')) return id; }
+  return RB_SCHERMEN[0];
+}
+function rbTerug(){
+  const i=RB_SCHERMEN.indexOf(rbHuidigScherm());
+  if(i<=0){ goPrevPhase(); return; }
+  const doel=RB_SCHERMEN[i-1];
+  if(doel==='sIntro'){ publishStage('idle'); showScreen('sIntro'); return; }
+  if(doel==='sCluster' && typeof backToCluster==='function'){ backToCluster(); return; }
+  if(doel==='sCollect' && typeof backToCollect==='function'){ backToCollect(); return; }
+  showScreen(doel);
+}
+function rbTerugLabels(){ const t=T[lang]; document.querySelectorAll('.rb-terug-btn').forEach(b=>{ const sp=b.querySelector('span'); if(sp) sp.textContent=t.rbTerug||'Terug'; b.setAttribute('aria-label', t.rbTerug||'Terug'); b.title=t.rbTerugTitle||''; }); }
+
 /* ══════════ NAVIGATIE ══════════ */
 function goPrevPhase(){
   if(confirm(T[lang].goPrevConfirm)){ window.location.href='risicobeheersing_fase0.html'; }
@@ -1939,6 +2072,15 @@ function loadExistingRisks(){
     const raw=localStorage.getItem('rb_phase1_live_subs');
     if(raw && raw[0]==='['){ const arr=JSON.parse(raw); if(Array.isArray(arr)){ liveSubs=arr.map(s=>({id:s.id||('s'+(++subSeq)), text:String(s.text||''), author:s.author||'', taken:!!s.taken})); } }
   }catch(e){}
+}
+
+/* ══════════ RB DEELNEMER-CONTEXT HERLADEN (na RTDB-stage; alleen deelnemerapparaten) ══════════ */
+function rbNaContext(){
+  try{ if(!(window.RB_SYNC && RB_SYNC.isParticipant())) return; }catch(e){ return; }
+  try{ renderSessPanel(); }catch(e){}
+  try{ renderConsequenceAnchors(); }catch(e){}
+  try{ loadExistingRisks(); }catch(e){}
+  try{ updatePSummary(); }catch(e){}
 }
 
 /* ══════════ INIT ══════════ */
@@ -2395,10 +2537,31 @@ document.addEventListener('DOMContentLoaded', ()=>{
   function leesJson(sleutel) {
     try { var r = localStorage.getItem(sleutel); return r ? JSON.parse(r) : null; } catch (e) { return null; }
   }
+  /* rb_consequence staat als rauwe string in localStorage (fase 0 schrijft hem bewust zo weg).
+     leesJson liep daarop stuk, waardoor het ongewenste gevolg nooit meereisde naar een
+     deelnemerapparaat: op de pc van de facilitator stond het al in dezelfde localStorage,
+     op een telefoon niet. (CINAB, 4 september 2026 — bugregister B-03.) */
+  function leesRuweTekst(sleutel) {
+    try {
+      var r = localStorage.getItem(sleutel);
+      if (r == null) return '';
+      if (r.length && r[0] === '{') { try { var o = JSON.parse(r); return (o && o.text) ? String(o.text) : ''; } catch (e) { return r; } }
+      if (r.length > 1 && r[0] === '"' && r[r.length - 1] === '"') { try { return String(JSON.parse(r)); } catch (e) { return r; } }
+      return r;
+    } catch (e) { return ''; }
+  }
   function bouwContext() {
     var ctx = {};
     var risks = leesJson('rb_risks'); if (Array.isArray(risks)) ctx.risks = risks;
-    var cons = leesJson('rb_consequence'); if (cons) ctx.consequence = cons;
+    var cons = leesRuweTekst('rb_consequence'); if (cons) ctx.consequence = cons;
+    /* Uitkomsten van de facilitator reizen mee (afsprakenblad §7, uitbreiding 4-9-2026 — B-04).
+       Zonder dit bleven de meekijk-overzichten en de matrix in de deelnemer-view van fase 3,
+       4 en 5 leeg op een eigen apparaat. Deelnemer-eigen data (rb_individual_scores) gaat
+       bewust niet mee: die loopt via de feed omhoog, niet via de stage omlaag. */
+    var grp = leesJson('rb_group_scores'); if (grp) ctx.group = grp;
+    var cen = leesJson('rb_central_scores'); if (cen) ctx.central = cen;
+    var mat = leesJson('rb_matrix_result'); if (mat) ctx.matrix = mat;
+    var mea = leesJson('rb_measures'); if (mea) ctx.measures = mea;
     var s = leesJson('rb_session');
     if (s) {
       ctx.session = { sessionId: s.sessionId, orgName: s.orgName || '', facilitator: s.facilitator || '' };
@@ -2412,7 +2575,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
   function pakContextUit(ctx) {
     if (!ctx || !isParticipant()) return;
     try { if (Array.isArray(ctx.risks)) localStorage.setItem('rb_risks', JSON.stringify(ctx.risks)); } catch (e) {}
-    try { if (ctx.consequence) localStorage.setItem('rb_consequence', JSON.stringify(ctx.consequence)); } catch (e) {}
+    try { if (ctx.consequence) localStorage.setItem('rb_consequence', String(ctx.consequence)); } catch (e) {}   /* rauwe string, zelfde contract als fase 0 */
+    try { if (ctx.group) localStorage.setItem('rb_group_scores', JSON.stringify(ctx.group)); } catch (e) {}
+    try { if (ctx.central) localStorage.setItem('rb_central_scores', JSON.stringify(ctx.central)); } catch (e) {}
+    try { if (ctx.matrix) localStorage.setItem('rb_matrix_result', JSON.stringify(ctx.matrix)); } catch (e) {}
+    try { if (ctx.measures) localStorage.setItem('rb_measures', JSON.stringify(ctx.measures)); } catch (e) {}
     try {
       if (ctx.session) {
         var eigen = leesJson('rb_session') || {};
@@ -2611,7 +2778,10 @@ document.addEventListener('DOMContentLoaded', ()=>{
   }
   /* Stage dual-listen: deelnemer-view volgt de globale stage (naast het bestaande storage-event). */
   if(window.RB_SYNC){
-    try{ RB_SYNC.stageListen(N, function(){ try{ if(typeof applyStageToPView==='function' && typeof facView!=='undefined' && !facView) applyStageToPView(); }catch(e){} }); }catch(e){}
+    /* Eerst de context herladen die met de stage meereist (risico's, groepsscores, matrix,
+       maatregelen), dán de deelnemer-view bijwerken. Zonder rbNaContext hielden de globals de
+       lege waarden van DOMContentLoaded vast als de RTDB-context later binnenkwam (B-04). */
+    try{ RB_SYNC.stageListen(N, function(){ try{ if(typeof rbNaContext==='function') rbNaContext(); }catch(e){} try{ if(typeof applyStageToPView==='function' && typeof facView!=='undefined' && !facView) applyStageToPView(); }catch(e){} }); }catch(e){}
   }
   /* ── Cross-device deelname (CINAB, 3 september 2026) ────────────────────────────────
      De deelnemer komt binnen op ?join=<code>. Zijn inzending gaat naast de lokale lijst

@@ -497,6 +497,10 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); mi
 
       <div class="bot-bar">
         <div class="bot-left">
+          <button class="btn btn-ghost rb-back-edit-btn rb-terug-btn" type="button" onclick="rbTerug()" aria-label="Terug">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            <span>Terug</span>
+          </button>
           <div class="bot-info" id="t-introBotInfo">De genummerde risicolijst is klaar om te scoren</div>
         </div>
         <button class="btn btn-orange btn-lg" onclick="startScoring()" id="t-introStart">
@@ -539,6 +543,10 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); mi
 
       <div class="bot-bar">
         <div class="bot-left">
+          <button class="btn btn-ghost rb-back-edit-btn rb-terug-btn" type="button" onclick="rbTerug()" aria-label="Terug">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            <span>Terug</span>
+          </button>
           <button class="btn" data-env="dev-only" onclick="simulateParticipant()" id="t-simBtn">+ Simuleer deelnemer</button>
           <div class="bot-info" id="t-collectBotInfo">Wachten op scores…</div>
         </div>
@@ -711,6 +719,7 @@ const T = {
     phaseTitle:"Risico's individueel scoren",
     phaseSub:'Elke deelnemer beoordeelt elk risico onafhankelijk op kans en impact.',
     theoryBtn:'Onderbouwing',
+    rbTerug:'Terug', rbTerugTitle:'E\u00e9n scherm terug; op het introscherm naar de vorige fase',
     sessTitle:'Sessie-info',
     consAnchorLabel:'Punt A \u2014 centraal analysepunt',
     consAnchorLabel2:'Punt A \u2014 centraal analysepunt',
@@ -750,6 +759,7 @@ const T = {
     canvResTitle:'resultaat',
     canvKans:'kans',
     canvImpact:'impact',
+    canvLow:'laag', canvHigh:'hoog',
     canvGroupScore:'groepsscore',
     canvEmptyInv:'nog geen risico\u2019s',
     /* participant */
@@ -814,6 +824,7 @@ const T = {
     phaseTitle:'Score the risks individually',
     phaseSub:'Each participant independently rates every risk on probability and impact.',
     theoryBtn:'Background',
+    rbTerug:'Back', rbTerugTitle:'One screen back; on the intro screen to the previous phase',
     sessTitle:'Session info',
     consAnchorLabel:'Point A \u2014 central analysis point',
     consAnchorLabel2:'Point A \u2014 central analysis point',
@@ -849,6 +860,7 @@ const T = {
     canvResTitle:'result',
     canvKans:'probability',
     canvImpact:'impact',
+    canvLow:'low', canvHigh:'high',
     canvGroupScore:'group score',
     canvEmptyInv:'no risks yet',
     pBack:'\u2190 Facilitator view',
@@ -989,6 +1001,7 @@ function rbCloseTip(){
   if(popup) popup.classList.remove('open'); if(backdrop) backdrop.classList.remove('open');
   const dan=rbTipDan; rbTipDan=null; if(dan){ try{ dan(); }catch(e){} }
 }
+function rbInfoOpenLg(key){ if(typeof T==='undefined'||!T[lang]) return; const o=T[lang][key]; if(!o) return; rbOpenTip({size:'lg', title:o.title, sub:o.sub, body:o.body, closeLabel:T[lang].tipClose}); }
 function rbInfoOpen(key, anchor){ if(typeof T==='undefined'||!T[lang]) return; const body=T[lang][key]; if(body==null) return; rbOpenTip({size:'sm', body:body, anchor:anchor}); }
 function openTheory(){
   const t=T[lang];
@@ -1042,6 +1055,7 @@ function applyT(){
     } else { el.textContent=t[k]; }
   });
   document.querySelectorAll('[data-t-placeholder]').forEach(el=>{ const key=el.dataset.tPlaceholder; if(t[key]) el.placeholder=t[key]; });
+  if(typeof rbTerugLabels==='function') rbTerugLabels();
 }
 function initLang(){
   let init=null;
@@ -1355,6 +1369,14 @@ function rbBuildCanvas(data, phase, opts){
   // as-titels (serif)
   s+='<text x="'+(mat.x+mat.w/2)+'" y="'+(mat.y-2)+'" font-family="Fraunces, Georgia, serif" font-size="15" fill="#262A36" text-anchor="middle">'+escapeHtml(t.canvKans||'kans')+'</text>';
   s+='<text x="'+(mat.x-40)+'" y="'+(mat.y+mat.h/2)+'" font-family="Fraunces, Georgia, serif" font-size="15" fill="#262A36" text-anchor="middle" transform="rotate(-90 '+(mat.x-40)+' '+(mat.y+mat.h/2)+')">'+escapeHtml(t.canvImpact||'impact')+'</text>';
+  // richting op de assen: laag <-> hoog (4-9-2026). Kans loopt A(laag) -> F(hoog) van links naar rechts,
+  // impact 1(laag) -> 6(hoog) van onder naar boven; de woorden staan aan de uiteinden, buiten de cijfer-/letterrij.
+  const lowLbl=escapeHtml(t.canvLow||'laag'), highLbl=escapeHtml(t.canvHigh||'hoog');
+  const axFont='font-size="11" font-weight="600" fill="#9A9894" letter-spacing="0.04em"';
+  s+='<text x="'+mat.x+'" y="'+(mat.y+mat.h+40)+'" '+axFont+' text-anchor="start">'+lowLbl+'</text>';
+  s+='<text x="'+(mat.x+mat.w)+'" y="'+(mat.y+mat.h+40)+'" '+axFont+' text-anchor="end">'+highLbl+'</text>';
+  s+='<text x="'+(mat.x-26)+'" y="'+(mat.y+mat.h)+'" '+axFont+' text-anchor="start" transform="rotate(-90 '+(mat.x-26)+' '+(mat.y+mat.h)+')">'+lowLbl+'</text>';
+  s+='<text x="'+(mat.x-26)+'" y="'+mat.y+'" '+axFont+' text-anchor="end" transform="rotate(-90 '+(mat.x-26)+' '+mat.y+')">'+highLbl+'</text>';
   } /* einde showRight */
 
   s+='</svg>';
@@ -1611,6 +1633,27 @@ function backToCollect(){
   showScreen('sCollect');
 }
 
+/* ══════════ RB TERUG-KNOP (binnen de fase één scherm terug; op het introscherm naar de vorige fase) ══════════ */
+/* CINAB, 4 september 2026 (item 4). "Vorige fase" zat verstopt achter een klik op het logo en sIntro/sCollect
+   hadden geen terugweg; een vergissing betekende opnieuw opstarten. rbTerug stapt één scherm terug en publiceert
+   de bijbehorende stage, zodat deelnemerapparaten meelopen. Terug naar sIntro publiceert bewust 'idle' (dit is een
+   facilitator-handeling, geen page-init). */
+const RB_SCHERMEN=['sIntro','sCollect','sFinal'];
+function rbHuidigScherm(){
+  for(const id of RB_SCHERMEN){ const el=document.getElementById(id); if(el && el.classList.contains('open')) return id; }
+  return RB_SCHERMEN[0];
+}
+function rbTerug(){
+  const i=RB_SCHERMEN.indexOf(rbHuidigScherm());
+  if(i<=0){ goPrevPhase(); return; }
+  const doel=RB_SCHERMEN[i-1];
+  if(doel==='sIntro'){ publishStage('idle'); showScreen('sIntro'); return; }
+  if(doel==='sCluster' && typeof backToCluster==='function'){ backToCluster(); return; }
+  if(doel==='sCollect' && typeof backToCollect==='function'){ backToCollect(); return; }
+  showScreen(doel);
+}
+function rbTerugLabels(){ const t=T[lang]; document.querySelectorAll('.rb-terug-btn').forEach(b=>{ const sp=b.querySelector('span'); if(sp) sp.textContent=t.rbTerug||'Terug'; b.setAttribute('aria-label', t.rbTerug||'Terug'); b.title=t.rbTerugTitle||''; }); }
+
 /* ══════════ NAVIGATIE ══════════ */
 function goPrevPhase(){
   if(confirm(T[lang].goPrevConfirm)){ window.location.href='risicobeheersing_fase1.html'; }
@@ -1760,6 +1803,15 @@ function seedDemoIfEmpty(){
     ];
     try{ localStorage.setItem('rb_risks', JSON.stringify(demoRisks)); }catch(e){}
   }
+}
+
+/* ══════════ RB DEELNEMER-CONTEXT HERLADEN (na RTDB-stage; alleen deelnemerapparaten) ══════════ */
+function rbNaContext(){
+  try{ if(!(window.RB_SYNC && RB_SYNC.isParticipant())) return; }catch(e){ return; }
+  try{ renderSessPanel(); }catch(e){}
+  try{ renderConsequenceAnchors(); }catch(e){}
+  try{ loadRisks(); }catch(e){}
+  try{ updatePSummary(); }catch(e){}
 }
 
 /* ══════════ INIT ══════════ */
@@ -2215,10 +2267,31 @@ document.addEventListener('DOMContentLoaded', ()=>{
   function leesJson(sleutel) {
     try { var r = localStorage.getItem(sleutel); return r ? JSON.parse(r) : null; } catch (e) { return null; }
   }
+  /* rb_consequence staat als rauwe string in localStorage (fase 0 schrijft hem bewust zo weg).
+     leesJson liep daarop stuk, waardoor het ongewenste gevolg nooit meereisde naar een
+     deelnemerapparaat: op de pc van de facilitator stond het al in dezelfde localStorage,
+     op een telefoon niet. (CINAB, 4 september 2026 — bugregister B-03.) */
+  function leesRuweTekst(sleutel) {
+    try {
+      var r = localStorage.getItem(sleutel);
+      if (r == null) return '';
+      if (r.length && r[0] === '{') { try { var o = JSON.parse(r); return (o && o.text) ? String(o.text) : ''; } catch (e) { return r; } }
+      if (r.length > 1 && r[0] === '"' && r[r.length - 1] === '"') { try { return String(JSON.parse(r)); } catch (e) { return r; } }
+      return r;
+    } catch (e) { return ''; }
+  }
   function bouwContext() {
     var ctx = {};
     var risks = leesJson('rb_risks'); if (Array.isArray(risks)) ctx.risks = risks;
-    var cons = leesJson('rb_consequence'); if (cons) ctx.consequence = cons;
+    var cons = leesRuweTekst('rb_consequence'); if (cons) ctx.consequence = cons;
+    /* Uitkomsten van de facilitator reizen mee (afsprakenblad §7, uitbreiding 4-9-2026 — B-04).
+       Zonder dit bleven de meekijk-overzichten en de matrix in de deelnemer-view van fase 3,
+       4 en 5 leeg op een eigen apparaat. Deelnemer-eigen data (rb_individual_scores) gaat
+       bewust niet mee: die loopt via de feed omhoog, niet via de stage omlaag. */
+    var grp = leesJson('rb_group_scores'); if (grp) ctx.group = grp;
+    var cen = leesJson('rb_central_scores'); if (cen) ctx.central = cen;
+    var mat = leesJson('rb_matrix_result'); if (mat) ctx.matrix = mat;
+    var mea = leesJson('rb_measures'); if (mea) ctx.measures = mea;
     var s = leesJson('rb_session');
     if (s) {
       ctx.session = { sessionId: s.sessionId, orgName: s.orgName || '', facilitator: s.facilitator || '' };
@@ -2232,7 +2305,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
   function pakContextUit(ctx) {
     if (!ctx || !isParticipant()) return;
     try { if (Array.isArray(ctx.risks)) localStorage.setItem('rb_risks', JSON.stringify(ctx.risks)); } catch (e) {}
-    try { if (ctx.consequence) localStorage.setItem('rb_consequence', JSON.stringify(ctx.consequence)); } catch (e) {}
+    try { if (ctx.consequence) localStorage.setItem('rb_consequence', String(ctx.consequence)); } catch (e) {}   /* rauwe string, zelfde contract als fase 0 */
+    try { if (ctx.group) localStorage.setItem('rb_group_scores', JSON.stringify(ctx.group)); } catch (e) {}
+    try { if (ctx.central) localStorage.setItem('rb_central_scores', JSON.stringify(ctx.central)); } catch (e) {}
+    try { if (ctx.matrix) localStorage.setItem('rb_matrix_result', JSON.stringify(ctx.matrix)); } catch (e) {}
+    try { if (ctx.measures) localStorage.setItem('rb_measures', JSON.stringify(ctx.measures)); } catch (e) {}
     try {
       if (ctx.session) {
         var eigen = leesJson('rb_session') || {};
@@ -2431,7 +2508,10 @@ document.addEventListener('DOMContentLoaded', ()=>{
   }
   /* Stage dual-listen: deelnemer-view volgt de globale stage (naast het bestaande storage-event). */
   if(window.RB_SYNC){
-    try{ RB_SYNC.stageListen(N, function(){ try{ if(typeof applyStageToPView==='function' && typeof facView!=='undefined' && !facView) applyStageToPView(); }catch(e){} }); }catch(e){}
+    /* Eerst de context herladen die met de stage meereist (risico's, groepsscores, matrix,
+       maatregelen), dán de deelnemer-view bijwerken. Zonder rbNaContext hielden de globals de
+       lege waarden van DOMContentLoaded vast als de RTDB-context later binnenkwam (B-04). */
+    try{ RB_SYNC.stageListen(N, function(){ try{ if(typeof rbNaContext==='function') rbNaContext(); }catch(e){} try{ if(typeof applyStageToPView==='function' && typeof facView!=='undefined' && !facView) applyStageToPView(); }catch(e){} }); }catch(e){}
   }
   /* ── Cross-device deelname (CINAB, 3 september 2026) ────────────────────────────────
      Zelfde brug als fase 1. recordSubmission is al idempotent per deelnemer, dus de

@@ -25,3 +25,8 @@ _vervallen/
 **/_vervallen/
 _fontbron/
 **/_fontbron/
+
+# Aanleveringen van de tooldeveloper die nog niet gecontroleerd zijn. Blijven
+# buiten git tot ze beoordeeld en op hun plek in public/ gezet zijn (s87).
+_inbox/
+**/_inbox/
