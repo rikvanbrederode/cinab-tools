@@ -1021,6 +1021,19 @@ function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<'
 function rbEscape(s){ return escapeHtml(s); }
 
 /* ══════════ RB SHARED TIP POPUP (LOGIC) ══════════ */
+/* ══════════ MELDINGEN IN HUISSTIJL ══════════ */
+/* CINAB, 4 september 2026. window.alert blokkeert de pagina, toont de domeinnaam van de tool
+   erboven en is niet te stijlen. rbMelding gebruikt het tip-venster dat de tool al heeft.
+   Nieuw in rbOpenTip is dan(): die draait zodra de melding sluit, ook bij Escape of bij een
+   klik naast het venster. Zo kan een melding die vroeger door een alert werd tegengehouden
+   nog steeds gevolgd worden door navigeren of herladen. */
+let rbTipDan = null;
+function rbMelding(tekst, opts){
+  opts = opts || {};
+  const regels = String(tekst==null?'':tekst).split(/\n+/).filter(r=>r.trim()!=='');
+  rbOpenTip({ size: opts.size||'sm', title: opts.title||'', body: regels,
+              closeLabel: opts.closeLabel, dan: opts.dan });
+}
 function rbOpenTip(opts){
   const popup=document.getElementById('rbTipPopup');
   const backdrop=document.getElementById('rbTipBackdrop');
@@ -1029,6 +1042,7 @@ function rbOpenTip(opts){
   const bodyEl=document.getElementById('rbTipBody');
   const closeBtn=document.getElementById('rbTipCloseBtn');
   if(!popup) return;
+  rbTipDan = (typeof opts.dan==='function') ? opts.dan : null;
   const size=opts.size==='sm'?'sm':'lg';
   popup.setAttribute('data-size',size);
   if(opts.title){ titleEl.textContent=opts.title; titleEl.style.display=''; } else { titleEl.textContent=''; titleEl.style.display='none'; }
@@ -1057,6 +1071,7 @@ function rbOpenTip(opts){
 function rbCloseTip(){
   const popup=document.getElementById('rbTipPopup'); const backdrop=document.getElementById('rbTipBackdrop');
   if(popup) popup.classList.remove('open'); if(backdrop) backdrop.classList.remove('open');
+  const dan=rbTipDan; rbTipDan=null; if(dan){ try{ dan(); }catch(e){} }
 }
 function rbInfoOpen(key, anchor){ if(typeof T==='undefined'||!T[lang]) return; const body=T[lang][key]; if(body==null) return; rbOpenTip({size:'sm', body:body, anchor:anchor}); }
 function openTheory(){
@@ -1445,8 +1460,7 @@ function resetDemoData(){
     'rb_phase1_stage','rb_phase2_stage','rb_phase3_stage','rb_phase4_stage','rb_phase5_stage',
     'rb_phase1_state','rb_phase2_state','rb_phase3_state','rb_phase4_state','rb_phase5_state'];
   keys.forEach(k=>{ try{ localStorage.removeItem(k); }catch(e){} });
-  alert(t.resetDone);
-  location.reload();
+  rbMelding(t.resetDone, { dan:function(){ location.reload(); } });
 }
 
 /* ══════════ SESSIE LEZEN ══════════ */
@@ -1798,7 +1812,7 @@ function confirmRisks(){
   const note=document.getElementById('finalNoteText'); if(note) note.textContent=T[lang].finalNote.replace('{n}', out.length);
   publishStage('final', {count:out.length});
   switchView('uitkomsten');
-  alert(T[lang].confirmAlert.replace('{n}', out.length));
+  rbMelding(T[lang].confirmAlert.replace('{n}', out.length), {size:'lg'});
   showScreen('sFinal');
 }
 function backToCluster(){
@@ -1855,7 +1869,7 @@ function applyStageToPView(){
 function pSubmitRisk(){
   const inp=document.getElementById('pRiskInput');
   const v=inp.value.trim();
-  if(!v){ alert(T[lang].pSubmitEmpty); return; }
+  if(!v){ rbMelding(T[lang].pSubmitEmpty); return; }
   // (demo) deelnemer = "Jij" / "You"
   const author = (lang==='en'?'You':'Jij');
   const sub=pushSubmission(v, author);

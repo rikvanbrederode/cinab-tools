@@ -702,6 +702,8 @@ const T = {
     scopeLbl:{ team:'teamniveau', afdeling:'afdelingsniveau', organisatie:'organisatieniveau', keten:'netwerk- of ketenniveau' },
     joinedBanner:'{name} heeft deelgenomen aan de sessie.',
     sessStartAlert:'Sessie \u2018{name}\u2019 voor {org} wordt gestart.\n\nFase 1 (Inventarisatie) begint nu.',
+    sessStartTitle:'Sessie gestart',
+    sessStartGo:'Naar fase 1',
     joinValidateMsg:'Vul je naam in.',
     resetConfirm:'Alle sessiedata wissen (risico\u2019s, scores, matrix, maatregelen)?\n\nDe taalvoorkeur blijft behouden.',
     resetDone:'Sessiedata gewist. Pagina wordt herladen.',
@@ -777,6 +779,8 @@ const T = {
     scopeLbl:{ team:'team level', afdeling:'department level', organisatie:'organisation level', keten:'network or chain level' },
     joinedBanner:'{name} has joined the session.',
     sessStartAlert:'Session \u2018{name}\u2019 for {org} is starting.\n\nPhase 1 (Inventory) begins now.',
+    sessStartTitle:'Session started',
+    sessStartGo:'Go to phase 1',
     joinValidateMsg:'Please enter your name.',
     resetConfirm:'Clear all session data (risks, scores, matrix, measures)?\n\nThe language preference is kept.',
     resetDone:'Session data cleared. Page will reload.',
@@ -819,6 +823,19 @@ function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<'
 function rbEscape(s){ return escapeHtml(s); }
 
 /* ══════════ RB SHARED TIP POPUP (LOGIC) ══════════ */
+/* ══════════ MELDINGEN IN HUISSTIJL ══════════ */
+/* CINAB, 4 september 2026. window.alert blokkeert de pagina, toont de domeinnaam van de tool
+   erboven en is niet te stijlen. rbMelding gebruikt het tip-venster dat de tool al heeft.
+   Nieuw in rbOpenTip is dan(): die draait zodra de melding sluit, ook bij Escape of bij een
+   klik naast het venster. Zo kan een melding die vroeger door een alert werd tegengehouden
+   nog steeds gevolgd worden door navigeren of herladen. */
+let rbTipDan = null;
+function rbMelding(tekst, opts){
+  opts = opts || {};
+  const regels = String(tekst==null?'':tekst).split(/\n+/).filter(r=>r.trim()!=='');
+  rbOpenTip({ size: opts.size||'sm', title: opts.title||'', body: regels,
+              closeLabel: opts.closeLabel, dan: opts.dan });
+}
 function rbOpenTip(opts){
   const popup=document.getElementById('rbTipPopup');
   const backdrop=document.getElementById('rbTipBackdrop');
@@ -827,6 +844,7 @@ function rbOpenTip(opts){
   const bodyEl=document.getElementById('rbTipBody');
   const closeBtn=document.getElementById('rbTipCloseBtn');
   if(!popup) return;
+  rbTipDan = (typeof opts.dan==='function') ? opts.dan : null;
   const size=opts.size==='sm'?'sm':'lg';
   popup.setAttribute('data-size',size);
   if(opts.title){ titleEl.textContent=opts.title; titleEl.style.display=''; } else { titleEl.textContent=''; titleEl.style.display='none'; }
@@ -855,6 +873,7 @@ function rbOpenTip(opts){
 function rbCloseTip(){
   const popup=document.getElementById('rbTipPopup'); const backdrop=document.getElementById('rbTipBackdrop');
   if(popup) popup.classList.remove('open'); if(backdrop) backdrop.classList.remove('open');
+  const dan=rbTipDan; rbTipDan=null; if(dan){ try{ dan(); }catch(e){} }
 }
 function rbInfoOpen(key, anchor){ if(typeof T==='undefined'||!T[lang]) return; const body=T[lang][key]; if(body==null) return; rbOpenTip({size:'sm', body:body, anchor:anchor}); }
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') rbCloseTip(); });
@@ -979,8 +998,7 @@ function resetDemoData(){
     'rb_phase1_stage','rb_phase2_stage','rb_phase3_stage','rb_phase4_stage','rb_phase5_stage',
     'rb_phase1_state','rb_phase2_state','rb_phase3_state','rb_phase4_state','rb_phase5_state'];
   keys.forEach(k=>{ try{ localStorage.removeItem(k); }catch(e){} });
-  alert(t.resetDone);
-  location.reload();
+  rbMelding(t.resetDone, { dan:function(){ location.reload(); } });
 }
 
 /* ══════════ START SESSION ══════════ */
@@ -1025,8 +1043,9 @@ function startSession(){
    'rb_phase1_state','rb_phase2_state','rb_phase3_state','rb_phase4_state','rb_phase5_state']
     .forEach(k=>{ try{ localStorage.removeItem(k); }catch(e){} });
   try{ localStorage.setItem('rb_session_started', JSON.stringify({lang, at:Date.now()})); }catch(e){}
-  alert(t.sessStartAlert.replace('{name}', sd.sessionName).replace('{org}', sd.orgName));
-  window.location.href='risicobeheersing_fase1.html';
+  rbMelding(t.sessStartAlert.replace('{name}', sd.sessionName).replace('{org}', sd.orgName),
+    { size:'lg', title:t.sessStartTitle, closeLabel:t.sessStartGo,
+      dan:function(){ window.location.href='risicobeheersing_fase1.html'; } });
 }
 
 /* ══════════ PARTICIPANT VIEW ══════════ */
@@ -1050,7 +1069,7 @@ function doJoin(){
   const t=T[lang];
   const name=document.getElementById('joinName').value.trim();
   const email=document.getElementById('joinEmail').value.trim();
-  if(!name){ alert(t.joinValidateMsg); return; }   // e-mail niet verplicht (AVG / baseline §8)
+  if(!name){ rbMelding(t.joinValidateMsg); return; }   // e-mail niet verplicht (AVG / baseline §8)
   addParticipant(name,email);
   try{ localStorage.setItem('rb_participant_self', name); }catch(e){}   // naam meedragen naar fase 2–5
   document.getElementById('joinName').value=''; document.getElementById('joinEmail').value='';
