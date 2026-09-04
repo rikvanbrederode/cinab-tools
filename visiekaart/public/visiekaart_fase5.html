@@ -1597,8 +1597,18 @@ function vkSerializeRoadmap(){
     });
   }
   function stripFences(s) { return String(s).replace(/```json/gi, '').replace(/```/g, '').trim(); }
-  function mkErr(status, j) { var e = new Error((j && j.error) || 'ai_error'); e.__vk = true; e.status = status; e.body = j; return e; }
+  function mkErr(status, j) { var e = new Error((j && (j.code || j.error)) || 'ai_error'); e.__vk = true; e.status = status; e.body = j; return e; }
   global.vkCallAI = vkCallAI;
+
+  /* s87: onderscheid tussen "AI is onbereikbaar" en "hier viel niets te clusteren".
+     Het platform geeft 422 te_weinig_items als een vraag maar één inzending heeft.
+     Dat is geen storing en hoort dus geen alarmmelding op te leveren op een scherm
+     waar niets aan de hand is. */
+  function vkAiReden(err) {
+    var code = (err && err.body && (err.body.code || err.body.error)) || '';
+    return (code === 'te_weinig_items' || code === 'te_veel_items') ? 'stil' : 'local';
+  }
+  global.vkAiReden = vkAiReden;
 
   /* ── B-03 AI-HERKOMST (testprotocol stap 4) ──
      Eén bronvariabele per taak: vkAiSource[task] ∈ 'pending' | 'ai' | 'local' | 'demo'.
@@ -1608,14 +1618,22 @@ function vkSerializeRoadmap(){
   var VK_AI_TXT = {
     nl: { pending:'AI clustert de inzendingen…', ai:'AI-resultaat: geclusterd door AI. Controleer en pas aan waar nodig.',
           local:'AI niet bereikbaar — voorlopige lokale clustering op woordovereenkomst. Controleer handmatig.',
+          geen_sessie:'Deze sessie draait zonder platformkoppeling, dus AI staat uit. Clustering op woordovereenkomst.',
+          stil:'',
           demo:'Demo: AI staat uit — voorbeeldclustering.',
           r_pending:'AI prioriteert de acties…', r_ai:'AI-resultaat: prioritering en onderbouwing door AI. Controleer en pas aan waar nodig.',
-          r_local:'AI niet bereikbaar — voorlopige lokale prioritering op regels. Controleer handmatig.', r_demo:'Demo: AI staat uit — voorbeeldprioritering.' },
+          r_local:'AI niet bereikbaar — voorlopige lokale prioritering op regels. Controleer handmatig.',
+          r_geen_sessie:'Deze sessie draait zonder platformkoppeling, dus AI staat uit. Prioritering op regels.',
+          r_stil:'', r_demo:'Demo: AI staat uit — voorbeeldprioritering.' },
     en: { pending:'AI is clustering the submissions…', ai:'AI result: clustered by AI. Review and adjust where needed.',
           local:'AI unavailable — provisional local clustering by word overlap. Please check manually.',
+          geen_sessie:'This session runs without a platform connection, so AI is off. Clustering by word overlap.',
+          stil:'',
           demo:'Demo: AI is off — sample clustering.',
           r_pending:'AI is prioritising the actions…', r_ai:'AI result: prioritisation and rationale by AI. Review and adjust where needed.',
-          r_local:'AI unavailable — provisional rule-based local prioritisation. Please check manually.', r_demo:'Demo: AI is off — sample prioritisation.' }
+          r_local:'AI unavailable — provisional rule-based local prioritisation. Please check manually.',
+          r_geen_sessie:'This session runs without a platform connection, so AI is off. Rule-based prioritisation.',
+          r_stil:'', r_demo:'Demo: AI is off — sample prioritisation.' }
   };
   global.vkAiSource = global.vkAiSource || {};
   function vkAiAllowed(){
@@ -2742,7 +2760,7 @@ function generateRoadmap(){
   });
   setTimeout(async ()=>{
     computeActions();                       // structuur + tijdlijn + terugval (blijft leidend)
-    let roadmapSource = VK_LIVE ? (vkAiAllowed() ? 'pending' : 'local') : 'demo';   // B-03: één bronvariabele
+    let roadmapSource = VK_LIVE ? (vkAiAllowed() ? 'pending' : 'geen_sessie') : 'demo';   // B-03: één bronvariabele
     /* s87: de stappenlijst loopt op een vaste timer van ~2,3 seconde af, terwijl de
        AI-aanroep daarna nog seconden kan duren. Zonder deze regel staart de deelnemer
        naar een afgeronde lijst zonder te zien dat er nog iets loopt, en verschijnt de
@@ -2775,7 +2793,7 @@ function generateRoadmap(){
         roadmapActions.forEach((a,i)=>a.rank=i+1);
         roadmapSource = 'ai';
       } else { roadmapSource = 'local'; }
-    } catch(e){ if (roadmapSource === 'pending') roadmapSource = 'local'; /* AI onbereikbaar/geen token → lokale berekening staat al klaar */ }
+    } catch(e){ if (roadmapSource === 'pending') roadmapSource = vkAiReden(e); /* AI onbereikbaar/geen token → lokale berekening staat al klaar */ }
     buildRoadmapUI();
     goScreen('sRoadmap');
     vkAiSetSource('roadmap', roadmapSource, '#sRoadmap');

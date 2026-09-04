@@ -2124,8 +2124,18 @@ let _clusterArmed = false;   // twee-staps: clusteren ondanks onvolledige respon
     });
   }
   function stripFences(s) { return String(s).replace(/```json/gi, '').replace(/```/g, '').trim(); }
-  function mkErr(status, j) { var e = new Error((j && j.error) || 'ai_error'); e.__vk = true; e.status = status; e.body = j; return e; }
+  function mkErr(status, j) { var e = new Error((j && (j.code || j.error)) || 'ai_error'); e.__vk = true; e.status = status; e.body = j; return e; }
   global.vkCallAI = vkCallAI;
+
+  /* s87: onderscheid tussen "AI is onbereikbaar" en "hier viel niets te clusteren".
+     Het platform geeft 422 te_weinig_items als een vraag maar één inzending heeft.
+     Dat is geen storing en hoort dus geen alarmmelding op te leveren op een scherm
+     waar niets aan de hand is. */
+  function vkAiReden(err) {
+    var code = (err && err.body && (err.body.code || err.body.error)) || '';
+    return (code === 'te_weinig_items' || code === 'te_veel_items') ? 'stil' : 'local';
+  }
+  global.vkAiReden = vkAiReden;
 
   /* ── B-03 AI-HERKOMST (testprotocol stap 4) ──
      Eén bronvariabele per taak: vkAiSource[task] ∈ 'pending' | 'ai' | 'local' | 'demo'.
@@ -2135,14 +2145,22 @@ let _clusterArmed = false;   // twee-staps: clusteren ondanks onvolledige respon
   var VK_AI_TXT = {
     nl: { pending:'AI clustert de inzendingen…', ai:'AI-resultaat: geclusterd door AI. Controleer en pas aan waar nodig.',
           local:'AI niet bereikbaar — voorlopige lokale clustering op woordovereenkomst. Controleer handmatig.',
+          geen_sessie:'Deze sessie draait zonder platformkoppeling, dus AI staat uit. Clustering op woordovereenkomst.',
+          stil:'',
           demo:'Demo: AI staat uit — voorbeeldclustering.',
           r_pending:'AI prioriteert de acties…', r_ai:'AI-resultaat: prioritering en onderbouwing door AI. Controleer en pas aan waar nodig.',
-          r_local:'AI niet bereikbaar — voorlopige lokale prioritering op regels. Controleer handmatig.', r_demo:'Demo: AI staat uit — voorbeeldprioritering.' },
+          r_local:'AI niet bereikbaar — voorlopige lokale prioritering op regels. Controleer handmatig.',
+          r_geen_sessie:'Deze sessie draait zonder platformkoppeling, dus AI staat uit. Prioritering op regels.',
+          r_stil:'', r_demo:'Demo: AI staat uit — voorbeeldprioritering.' },
     en: { pending:'AI is clustering the submissions…', ai:'AI result: clustered by AI. Review and adjust where needed.',
           local:'AI unavailable — provisional local clustering by word overlap. Please check manually.',
+          geen_sessie:'This session runs without a platform connection, so AI is off. Clustering by word overlap.',
+          stil:'',
           demo:'Demo: AI is off — sample clustering.',
           r_pending:'AI is prioritising the actions…', r_ai:'AI result: prioritisation and rationale by AI. Review and adjust where needed.',
-          r_local:'AI unavailable — provisional rule-based local prioritisation. Please check manually.', r_demo:'Demo: AI is off — sample prioritisation.' }
+          r_local:'AI unavailable — provisional rule-based local prioritisation. Please check manually.',
+          r_geen_sessie:'This session runs without a platform connection, so AI is off. Rule-based prioritisation.',
+          r_stil:'', r_demo:'Demo: AI is off — sample prioritisation.' }
   };
   global.vkAiSource = global.vkAiSource || {};
   function vkAiAllowed(){
@@ -2867,7 +2885,7 @@ function showCluster(){
 
   // Live: probeer AI-clustering en verfijn; faalt het (offline/geen token) → lokale terugval blijft staan
   if (!live){ vkAiSetSource('cluster', 'demo', '#t-aiNote'); }
-  else if (!vkAiAllowed()){ vkAiSetSource('cluster', 'local', '#t-aiNote'); }   // productie zonder token: geen call, eerlijk lokaal
+  else if (!vkAiAllowed()){ vkAiSetSource('cluster', 'geen_sessie', '#t-aiNote'); }   // productie zonder token: geen call, eerlijk lokaal
   if (live && vkAiAllowed()){
     vkAiSetSource('cluster', 'pending', '#t-aiNote');
     // Context meesturen: zonder de vraag en de fase-intentie clustert de AI op
@@ -2888,7 +2906,7 @@ function showCluster(){
           vkAiSetSource('cluster', 'local', '#t-aiNote');   // leeg/ongeldig contract → verworpen, eerlijk lokaal
         }
       })
-      .catch(()=>{ vkAiSetSource('cluster', 'local', '#t-aiNote'); /* lokale clustering blijft leidend */ });
+      .catch(err=>{ vkAiSetSource('cluster', vkAiReden(err), '#t-aiNote'); /* lokale clustering blijft leidend */ });
   }
 }
 
