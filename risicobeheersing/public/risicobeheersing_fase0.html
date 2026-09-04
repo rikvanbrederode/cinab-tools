@@ -1701,24 +1701,41 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
 <script>
 /* ═══════════════ RB PLATFORM WIRING — fase 0 (enige fase-specifieke deel) ═══════════════ */
-/* ── Wachtkamer live (CINAB, 3 september 2026) ──────────────────────────────────────────
-   Deelnemers schrijven zich bij het aanmelden naar sessions/<code>/participants. Fase 0 heeft
-   de wachtkamer al met addParticipant, renderParticipants en de banner; er luisterde alleen
-   niets. De facilitator legt eerst meta aan, want de regels laten hem participants pas lezen
-   als sessions/<code>/meta/facilitatorUid van hem is. */
+/* ── Wachtkamer live (CINAB, 3 september 2026, herzien 4 september) ─────────────────
+   Deelnemers schrijven zich bij het aanmelden naar sessions/<code>/participants. Fase 0 heeft de
+   wachtkamer al met addParticipant, renderParticipants en de banner; er luisterde alleen niets.
+
+   Let op de sessiecode. Fase 0 werkt met de variabele sessionCode en zet die pas in rb_session
+   op het moment dat de sessie start, en dan verlaat de facilitator dit scherm meteen. RB_SYNC.code()
+   leest juist rb_session en gaf hier dus niets terug, waardoor de luisteraar nooit werd aangesloten.
+   De wachtkamer gebruikt daarom sessionCode zelf. Die wordt ook in sessionStorage bewaard, zodat een
+   herlaad van dit scherm niet stilletjes een nieuwe code maakt terwijl de uitnodiging al rondgaat.
+
+   Volgorde is bindend: eerst meta aanleggen, dan pas lezen. De regels laten de facilitator
+   participants pas lezen als sessions/<code>/meta/facilitatorUid van hem is. */
 (function () {
   if (!window.RB_SYNC) return;
-  try { RB_SYNC.joinBoot(); } catch (e) {}
   var deelnemer = false; try { deelnemer = RB_SYNC.isParticipant(); } catch (e) {}
   if (deelnemer) return;                      // op een deelnemerapparaat is fase 0 niet aan de orde
-  document.addEventListener('DOMContentLoaded', function () {
-    try { RB_SYNC.ensureSession(); } catch (e) {}
+
+  /* Code vasthouden binnen dit tabblad. Nieuw tabblad of nieuwe browsersessie geeft een nieuwe code. */
+  try {
+    var bewaard = sessionStorage.getItem('rb_fac_code');
+    if (bewaard) { sessionCode = bewaard; }
+    else { sessionStorage.setItem('rb_fac_code', sessionCode); }
+  } catch (e) {}
+
+  function aansluiten() {
+    var c = sessionCode;
+    if (!c || !window.rbFb) return;
     var gezien = Object.create(null);
-    try { (typeof participants !== 'undefined' ? participants : []).forEach(function (p) { gezien[String(p.name || '').toLowerCase()] = 1; }); } catch (e) {}
     try {
-      var c = RB_SYNC.code();
-      if (!c || !window.rbFb) return;
-      window.rbFb.liveListen(c, 'participants', function (arr) {
+      (typeof participants !== 'undefined' ? participants : []).forEach(function (p) {
+        gezien[String((p && p.name) || '').toLowerCase()] = 1;
+      });
+    } catch (e) {}
+    window.rbFb.ensureSession(c, 'nl').then(function () {
+      return window.rbFb.liveListen(c, 'participants', function (arr) {
         (arr || []).forEach(function (p) {
           if (!p || !p.name) return;
           var k = String(p.name).toLowerCase();
@@ -1726,9 +1743,13 @@ document.addEventListener('DOMContentLoaded', ()=>{
           gezien[k] = 1;
           try { if (typeof addParticipant === 'function') addParticipant(p.name, p.email || ''); } catch (e) {}
         });
-      }).catch(function () {});
-    } catch (e) {}
-  });
+      });
+    }).catch(function (e) {
+      try { console.warn('[RB] wachtkamer niet verbonden:', (e && e.message) || e); } catch (x) {}
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', aansluiten);
+  else aansluiten();
 })();
 
 (function(){
