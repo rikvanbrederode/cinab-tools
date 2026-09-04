@@ -1839,9 +1839,20 @@ document.addEventListener('DOMContentLoaded', ()=>{
 (function (global) {
   'use strict';
 
-  // [INVULLEN] zodra het Firebaseproject voor risicobeheersing bestaat (europe-west1):
-  var RB_FB_STAGING = null; // bv. { apiKey:"…", authDomain:"…", databaseURL:"https://…-rtdb.europe-west1.firebasedatabase.app", projectId:"…", appId:"…" }
-  var RB_FB_PROD    = null; // idem, schoon productieproject (CINAB-account)
+  /* Ingevuld door CINAB op 3 september 2026. Project risicobeheersing-e174f, database in
+     europe-west1, anonymous sign-in aan. Staging en productie wijzen naar hetzelfde project,
+     net als bij de vaardigheidsmeter en de visiekaart. De apiKey is publiek van opzet en hoort
+     in de browser; de beveiliging zit in database.rules.json. */
+  var RB_FB_STAGING = {
+    apiKey: "AIzaSyB5fpBg_jmPT1pacDjuX_rZ7LA_DdWi5wQ",
+    authDomain: "risicobeheersing-e174f.firebaseapp.com",
+    databaseURL: "https://risicobeheersing-e174f-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "risicobeheersing-e174f",
+    storageBucket: "risicobeheersing-e174f.firebasestorage.app",
+    messagingSenderId: "254623665118",
+    appId: "1:254623665118:web:79607b597daf0deb3eab4f"
+  };
+  var RB_FB_PROD = RB_FB_STAGING;
 
   function rbFbEnv() {
     var h = (global.location && global.location.hostname) || '';
@@ -2182,12 +2193,48 @@ document.addEventListener('DOMContentLoaded', ()=>{
   function code() {
     try { var s = JSON.parse(localStorage.getItem('rb_session') || 'null'); return (s && s.sessionId) ? String(s.sessionId) : null; } catch (e) { return null; }
   }
+  /* Context die met de stage meereist naar de deelnemerapparaten (CINAB, 3-9-2026).
+     Zonder dit ziet een deelnemer in fase 2 een lege risicolijst, want rb_risks staat
+     alleen in de localStorage van de facilitator. Deelnemersnamen en e-mailadressen
+     gaan bewust niet mee: uit rb_session reist alleen wat op het scherm getoond wordt. */
+  function leesJson(sleutel) {
+    try { var r = localStorage.getItem(sleutel); return r ? JSON.parse(r) : null; } catch (e) { return null; }
+  }
+  function bouwContext() {
+    var ctx = {};
+    var risks = leesJson('rb_risks'); if (Array.isArray(risks)) ctx.risks = risks;
+    var cons = leesJson('rb_consequence'); if (cons) ctx.consequence = cons;
+    var s = leesJson('rb_session');
+    if (s) {
+      ctx.session = { sessionId: s.sessionId, orgName: s.orgName || '', facilitator: s.facilitator || '' };
+      if (s.sector) ctx.session.sector = s.sector;
+      if (s.analysisType) ctx.session.analysisType = s.analysisType;
+      if (s.sessionName) ctx.session.sessionName = s.sessionName;
+      if (s.date) ctx.session.date = s.date;
+    }
+    return ctx;
+  }
+  function pakContextUit(ctx) {
+    if (!ctx || !isParticipant()) return;
+    try { if (Array.isArray(ctx.risks)) localStorage.setItem('rb_risks', JSON.stringify(ctx.risks)); } catch (e) {}
+    try { if (ctx.consequence) localStorage.setItem('rb_consequence', JSON.stringify(ctx.consequence)); } catch (e) {}
+    try {
+      if (ctx.session) {
+        var eigen = leesJson('rb_session') || {};
+        var samen = JSON.parse(JSON.stringify(ctx.session));
+        samen.sessionId = eigen.sessionId || samen.sessionId;
+        samen.participants = [];
+        localStorage.setItem('rb_session', JSON.stringify(samen));
+      }
+    } catch (e) {}
+  }
   function stageMirror(phase) {
     var c = code(); if (!c || !global.rbFb) return;
     var raw = null; try { raw = localStorage.getItem('rb_phase' + phase + '_stage'); } catch (e) {}
     if (raw == null) return;
     var obj = null; try { obj = JSON.parse(raw); } catch (e) { return; }
     obj.phase = Number(phase);
+    try { obj.ctx = bouwContext(); } catch (e) {}
     global.rbFb.stageSet(c, JSON.stringify(obj)).catch(function () {});
   }
   function stageListen(phase, cb) {
@@ -2195,12 +2242,83 @@ document.addEventListener('DOMContentLoaded', ()=>{
     return global.rbFb.stageListen(c, function (v) {
       if (v == null) return;
       var obj = null; try { obj = JSON.parse(String(v)); } catch (e) { return; }
+      try { pakContextUit(obj.ctx); } catch (e) {}
       if (Number(obj.phase) !== Number(phase)) return;
       try { localStorage.setItem('rb_phase' + phase + '_stage', JSON.stringify(obj)); } catch (e) {}
       if (cb) { try { cb(obj); } catch (e) {} }
     }).catch(function () { return null; });
   }
-  global.RB_SYNC = { code: code, stageMirror: stageMirror, stageListen: stageListen };
+  /* ── Join en deelnemer-modus (CINAB, 3 september 2026) ──────────────────────────────
+     Toegevoegd omdat de brug voor de stage er al lag maar de inzendingen nooit waren
+     aangesloten: rbFb.push en rbFb.liveListen bestonden al ongebruikt. Deelnemen op een
+     eigen apparaat gaat nu langs dezelfde weg als de stage.
+
+     Een deelnemer komt binnen op <fasebestand>?join=<code>. joinBoot zet de sessiecode in
+     localStorage zodat RB_SYNC.code() hem vindt, en markeert dit apparaat als deelnemer.
+     followStage laat de deelnemer meelopen met de fase van de facilitator: schakelt die
+     naar een andere fase, dan navigeert het deelnemerapparaat mee, met ?join= erbij.
+
+     RTDB-paden volgen database.rules.json: de facilitator leest sessions/<code>/phaseN/
+     answers, de deelnemer mag daar alleen toevoegen en het item moet een veld at hebben.
+     Dat veld zet rbFb.push zelf. */
+  function urlJoinCode() {
+    try { return global.location ? new URLSearchParams(global.location.search).get('join') : null; } catch (e) { return null; }
+  }
+  function isParticipant() {
+    try { if (sessionStorage.getItem('rb_participant') === '1') return true; } catch (e) {}
+    return !!urlJoinCode();
+  }
+  function joinBoot() {
+    var c = urlJoinCode();
+    if (!c) return null;
+    c = String(c).trim();
+    try { sessionStorage.setItem('rb_participant', '1'); } catch (e) {}
+    var s = null; try { s = JSON.parse(localStorage.getItem('rb_session') || 'null'); } catch (e) {}
+    if (!s || String(s.sessionId) !== c) {
+      try { localStorage.setItem('rb_session', JSON.stringify({ sessionId: c, orgName: '', facilitator: '', participants: [] })); } catch (e) {}
+    }
+    return c;
+  }
+  function followStage(currentPhase) {
+    if (!isParticipant()) return;
+    var c = code(); if (!c || !global.rbFb) return;
+    global.rbFb.stageListen(c, function (v) {
+      if (v == null) return;
+      var obj = null; try { obj = JSON.parse(String(v)); } catch (e) { return; }
+      try { pakContextUit(obj.ctx); } catch (e) {}
+      var n = Number(obj.phase);
+      if (!n || n === Number(currentPhase)) return;
+      try { global.location.href = 'risicobeheersing_fase' + n + '.html?join=' + encodeURIComponent(c); } catch (e) {}
+    }).catch(function () {});
+  }
+  /* Deelnemer voegt een inzending toe aan de feed van deze fase. */
+  function feedPush(phase, obj) {
+    var c = code(); if (!c || !global.rbFb) return Promise.resolve(null);
+    return global.rbFb.push(c, 'phase' + phase + '/answers', obj || {}).catch(function () { return null; });
+  }
+  /* De facilitator legt eenmalig sessions/<code>/meta aan met zijn eigen uid. Zonder die
+     meta weigeren de databaseregels het schrijven van de stage en het lezen van de feed.
+     rbFb.ensureSession bestond al maar werd nergens aangeroepen (CINAB, 3-9-2026).
+     De transactie schrijft alleen als meta nog niet bestaat, dus dit mag per fase. */
+  function ensureSession() {
+    var c = code(); if (!c || !global.rbFb || isParticipant()) return Promise.resolve(null);
+    try { return global.rbFb.ensureSession(c, 'nl').catch(function () { return null; }); }
+    catch (e) { return Promise.resolve(null); }
+  }
+  /* Facilitator luistert op de feed van deze fase; cb krijgt de volledige lijst. */
+  function feedListen(phase, cb) {
+    var c = code(); if (!c || !global.rbFb) return Promise.resolve(null);
+    return global.rbFb.liveListen(c, 'phase' + phase + '/answers', function (arr) {
+      if (cb) { try { cb(Array.isArray(arr) ? arr : []); } catch (e) {} }
+    }).catch(function () { return null; });
+  }
+
+  global.RB_SYNC = {
+    code: code, stageMirror: stageMirror, stageListen: stageListen,
+    urlJoinCode: urlJoinCode, isParticipant: isParticipant, joinBoot: joinBoot,
+    followStage: followStage, feedPush: feedPush, feedListen: feedListen,
+    ensureSession: ensureSession
+  };
 })(window);
 </script>
 <!-- ═══════════════ END RB PLATFORM / FIREBASE / CINAB ═══════════════ -->
@@ -2218,8 +2336,50 @@ document.addEventListener('DOMContentLoaded', ()=>{
   if(window.RB_SYNC){
     try{ RB_SYNC.stageListen(N, function(){ try{ if(typeof applyStageToPView==='function' && typeof facView!=='undefined' && !facView) applyStageToPView(); }catch(e){} }); }catch(e){}
   }
+  /* ── Cross-device deelname (CINAB, 3 september 2026) ────────────────────────────────
+     Zelfde brug als fase 1. recordSubmission is al idempotent per deelnemer, dus de
+     facilitator kan elke binnenkomende inzending er gewoon doorheen halen; een tweede
+     inzending van dezelfde naam vervangt de eerste. De risico's waarop gescoord wordt
+     komen mee in de context van de stage (RB_SYNC), want die staan anders alleen in de
+     localStorage van de facilitator. */
+  if (window.RB_SYNC) {
+    try { RB_SYNC.joinBoot(); } catch (e) {}
+    var rbDeelnemer = false;
+    try { rbDeelnemer = RB_SYNC.isParticipant(); } catch (e) {}
+    if (!rbDeelnemer) { try { RB_SYNC.ensureSession(); } catch (e) {} }
+
+    if (rbDeelnemer) {
+      if (typeof recordSubmission === 'function') {
+        var _rbRec = recordSubmission;
+        window.recordSubmission = function (participant, scoresObj) {
+          var rec = _rbRec(participant, scoresObj);
+          if (rec) { try { RB_SYNC.feedPush(N, { participant: rec.participant, scores: rec.scores }); } catch (e) {} }
+          return rec;
+        };
+      }
+      try { RB_SYNC.followStage(N); } catch (e) {}
+      document.addEventListener('DOMContentLoaded', function () {
+        try { if (typeof showPView === 'function') showPView(); } catch (e) {}
+      });
+    } else {
+      document.addEventListener('DOMContentLoaded', function () {
+        try {
+          RB_SYNC.feedListen(N, function (arr) {
+            arr.forEach(function (it) {
+              if (!it || !it.participant || !it.scores) return;
+              try { if (typeof recordSubmission === 'function') recordSubmission(it.participant, it.scores); } catch (e) {}
+            });
+          });
+        } catch (e) {}
+      });
+    }
+  }
+
   /* Platform: context herstellen + betaalpoort op de start van deze fase (standaard §9-§10). */
-  if(window.RB_CINAB && window.VK_LIVE){ RB_CINAB.enforceGate(N); }
+  /* De betaalpoort geldt de facilitator, niet de deelnemers: die hebben geen token en
+     horen nooit in de credit-shop te belanden (CINAB, 3-9-2026). */
+  var rbIsDeeln = false; try { rbIsDeeln = !!(window.RB_SYNC && RB_SYNC.isParticipant()); } catch (e) {}
+  if(window.RB_CINAB && window.VK_LIVE && !rbIsDeeln){ RB_CINAB.enforceGate(N); }
 })();
 </script>
 </body>
