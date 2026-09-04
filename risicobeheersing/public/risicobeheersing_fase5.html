@@ -2493,7 +2493,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
   function collectExport() {
     var keys = ['rb_session', 'rb_session_started', 'rb_consequence', 'rb_risks',
-      'rb_individual_scores', 'rb_central_scores', 'rb_group_scores', 'rb_matrix_result', 'rb_measures'];
+      'rb_individual_scores', 'rb_central_scores', 'rb_group_scores', 'rb_matrix_result', 'rb_measures',
+      'rb_phase1_submissions'];   // s86: stond er niet in, waardoor bijlage A leeg bleef in een opgeslagen rapport
     var out = {};
     keys.forEach(function (k) {
       try { var v = localStorage.getItem(k); if (v != null) { out[k] = (v[0] === '{' || v[0] === '[') ? JSON.parse(v) : v; } } catch (e) {}

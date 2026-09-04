@@ -1130,16 +1130,67 @@ let individual = {};   // {<id>:[{participant,kans,impact}]}
 let central = {};      // {<id>:{kans:{mean,median,mode},impact:{...}}}
 let submissions = [];  // ruwe fase1-inzendingen
 
+/* ══════════ BRON: PLATFORM OF LOKAAL ══════════ */
+/* CINAB, 4 september 2026. Het platform toont een opgeslagen rapport in een iframe met alleen
+   ?rapport_id= in de URL. Zonder deze route las het rapport altijd localStorage, dus zag iedereen
+   behalve de facilitator zelf een leeg rapport, en was het rapport weg zodra de browser werd
+   opgeschoond. Nu wordt de opgeslagen wrapper bij het platform opgehaald en dient de opake
+   tool-payload (data.export) als bron. Dat is exact de vorm die collectExport wegschrijft en die
+   loadData verwacht, dus alle leesfuncties werken ongewijzigd verder.
+   data_ref in de wrapper is een verwijzing, geen leesopdracht. De RTDB-sessie is na afronden
+   gewist (stateless-at-rest, ADR 0004); alles wat het rapport toont staat in de snapshot zelf. */
+let RB_SRC = null;                     // niet-null: rapport komt van het platform (recall-modus)
+function rbRecall(){ return !!RB_SRC; }
+function rbRapportId(){ try{ return new URLSearchParams(location.search).get('rapport_id'); }catch(e){ return null; } }
+function rbRapportApiBase(){
+  /* 1. expliciet gezet via <html data-cinab-api="https://cinab.nl">, wint altijd */
+  try{ const a=document.documentElement.getAttribute('data-cinab-api'); if(a) return a.replace(/\/+$/,''); }catch(e){}
+  /* 2. meegegeven in de render-URL van de tool-koppeling */
+  try{ const q=new URLSearchParams(location.search).get('cinab'); if(q) return q.replace(/\/+$/,''); }catch(e){}
+  /* 3. afgeleid uit de platformpagina die dit rapport in een iframe toont. Zo werkt staging
+        en productie zonder dat er per omgeving iets omgezet hoeft te worden. Alleen cinab.nl
+        wordt geaccepteerd, zodat een vreemde pagina de tool geen andere host kan opdringen. */
+  try{
+    if(document.referrer){
+      const u=new URL(document.referrer);
+      if(u.protocol==='https:' && /(^|\.)cinab\.nl$/.test(u.hostname)) return u.origin;
+    }
+  }catch(e){}
+  return 'https://staging2.cinab.nl';
+}
+async function rbLaadBron(){
+  const rid=rbRapportId(); if(!rid) return null;
+  try{
+    const res=await fetch(rbRapportApiBase()+'/wp-json/cinab/v1/rapport-data/'+encodeURIComponent(rid), {method:'GET', credentials:'omit'});
+    if(!res.ok) return null;
+    const json=await res.json();
+    if(json && json.data && typeof json.data==='object'){
+      if(json.data.export && typeof json.data.export==='object') return json.data.export;
+      return json.data;
+    }
+  }catch(e){}
+  return null;
+}
+/* Eén leespunt voor alle rapportgegevens: platform-snapshot in recall-modus, anders localStorage. */
+function rbLees(key){
+  if(RB_SRC){
+    if(!(key in RB_SRC)) return null;
+    const v=RB_SRC[key];
+    return (typeof v==='string') ? v : JSON.stringify(v);
+  }
+  try{ return localStorage.getItem(key); }catch(e){ return null; }
+}
+
 /* ══════════ READ HELPERS ══════════ */
 function readRawString(key){
-  try{ const raw=localStorage.getItem(key); if(raw==null) return '';
+  try{ const raw=rbLees(key); if(raw==null) return '';
     if(raw.length && raw[0]==='{'){ try{ const o=JSON.parse(raw); return (o&&o.text)?o.text:''; }catch(e){ return raw; } }
     return raw;
   }catch(e){ return ''; }
 }
-function readSession(){ try{ const raw=localStorage.getItem('rb_session'); return raw?JSON.parse(raw):null; }catch(e){ return null; } }
+function readSession(){ try{ const raw=rbLees('rb_session'); return raw?JSON.parse(raw):null; }catch(e){ return null; } }
 function readConsequence(){ return readRawString('rb_consequence'); }
-function getJSON(key, fallback){ try{ const raw=localStorage.getItem(key); if(raw && (raw[0]==='{'||raw[0]==='[')){ return JSON.parse(raw); } }catch(e){} return fallback; }
+function getJSON(key, fallback){ try{ const raw=rbLees(key); if(raw && (raw[0]==='{'||raw[0]==='[')){ return JSON.parse(raw); } }catch(e){} return fallback; }
 
 function loadData(){
   D = {};
@@ -1493,7 +1544,7 @@ function setLang(l){
 }
 function initLang(){
   let init=null;
-  try{ const stored=localStorage.getItem('rb_lang'); if(stored==='nl'||stored==='en') init=stored;
+  try{ const stored=rbRecall()?null:localStorage.getItem('rb_lang'); if(stored==='nl'||stored==='en') init=stored;
     if(!init){ const ss=getJSON('rb_session_started',null); if(ss&&(ss.lang==='nl'||ss.lang==='en')) init=ss.lang; }
   }catch(e){}
   if(init) lang=init;
@@ -1569,9 +1620,10 @@ function seedDemoIfEmpty(){
 }
 
 /* ══════════ INIT ══════════ */
-document.addEventListener('DOMContentLoaded', ()=>{
+document.addEventListener('DOMContentLoaded', async ()=>{
   rbApplyEnvironmentRules();
-  seedDemoIfEmpty();
+  RB_SRC = await rbLaadBron();        // recall vanaf het platform, of null voor de lokale route
+  if(!rbRecall()) seedDemoIfEmpty();  // demovulling nooit over een opgeslagen rapport heen
   initLang();
   loadData();
   applyT();
@@ -1930,7 +1982,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
   function collectExport() {
     var keys = ['rb_session', 'rb_session_started', 'rb_consequence', 'rb_risks',
-      'rb_individual_scores', 'rb_central_scores', 'rb_group_scores', 'rb_matrix_result', 'rb_measures'];
+      'rb_individual_scores', 'rb_central_scores', 'rb_group_scores', 'rb_matrix_result', 'rb_measures',
+      'rb_phase1_submissions'];   // s86: stond er niet in, waardoor bijlage A leeg bleef in een opgeslagen rapport
     var out = {};
     keys.forEach(function (k) {
       try { var v = localStorage.getItem(k); if (v != null) { out[k] = (v[0] === '{' || v[0] === '[') ? JSON.parse(v) : v; } } catch (e) {}
@@ -2184,6 +2237,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 (function(){
   /* Rapport (poortindex 6): restore + poort + eenmalig wrapper opslaan op het platform. */
   if(!window.RB_CINAB || !window.VK_LIVE) return;
+  if(rbRapportId()) return;                                      // recall-modus: tonen, niet opnieuw opslaan
   var run=function(){
     RB_CINAB.enforceGate(6).then(function(client){
       if(!client) return;                                          // geen context of poort geblokkeerd
