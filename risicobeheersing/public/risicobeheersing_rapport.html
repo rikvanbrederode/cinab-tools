@@ -2155,6 +2155,29 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     try { return global.rbFb.ensureSession(c, 'nl').catch(function () { return null; }); }
     catch (e) { return Promise.resolve(null); }
   }
+  /* De facilitator houdt de deelnemerslijst bij in rb_session (CINAB, 4 september 2026).
+     Fase 0 schreef die lijst één keer weg op het moment van starten. Wie daarna vanaf zijn
+     eigen apparaat binnenkwam stond er dus nooit in, en daardoor bleef het aantal deelnemers
+     in het rapport en op de rapportkaart in de werkruimte op nul staan. Namen die de
+     facilitator zelf had toegevoegd blijven behouden, dubbele namen tellen één keer. */
+  function volgDeelnemers() {
+    var c = code(); if (!c || !global.rbFb || isParticipant()) return Promise.resolve(null);
+    return global.rbFb.liveListen(c, 'participants', function (arr) {
+      var s = leesJson('rb_session'); if (!s) return;
+      var uit = [], gezien = Object.create(null);
+      function voegToe(p) {
+        var n = (p && p.name) ? String(p.name).trim() : '';
+        if (!n) return;
+        var k = n.toLowerCase(); if (gezien[k]) return;
+        gezien[k] = 1; uit.push(p);
+      }
+      (Array.isArray(s.participants) ? s.participants : []).forEach(voegToe);
+      (arr || []).forEach(function (p) { voegToe(p && p.name ? { name: String(p.name).trim() } : null); });
+      if (uit.length === (Array.isArray(s.participants) ? s.participants.length : 0)) return;
+      s.participants = uit;
+      try { localStorage.setItem('rb_session', JSON.stringify(s)); } catch (e) {}
+    }).catch(function () { return null; });
+  }
   /* Facilitator luistert op de feed van deze fase; cb krijgt de volledige lijst. */
   function feedListen(phase, cb) {
     var c = code(); if (!c || !global.rbFb) return Promise.resolve(null);
@@ -2226,7 +2249,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     zelfNaam: zelfNaam, joinGate: joinGate,
     urlJoinCode: urlJoinCode, isParticipant: isParticipant, joinBoot: joinBoot,
     followStage: followStage, feedPush: feedPush, feedListen: feedListen,
-    ensureSession: ensureSession
+    ensureSession: ensureSession, volgDeelnemers: volgDeelnemers
   };
 })(window);
 </script>
