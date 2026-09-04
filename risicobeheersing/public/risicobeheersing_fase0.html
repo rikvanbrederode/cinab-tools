@@ -1701,6 +1701,36 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
 <script>
 /* ═══════════════ RB PLATFORM WIRING — fase 0 (enige fase-specifieke deel) ═══════════════ */
+/* ── Wachtkamer live (CINAB, 3 september 2026) ──────────────────────────────────────────
+   Deelnemers schrijven zich bij het aanmelden naar sessions/<code>/participants. Fase 0 heeft
+   de wachtkamer al met addParticipant, renderParticipants en de banner; er luisterde alleen
+   niets. De facilitator legt eerst meta aan, want de regels laten hem participants pas lezen
+   als sessions/<code>/meta/facilitatorUid van hem is. */
+(function () {
+  if (!window.RB_SYNC) return;
+  try { RB_SYNC.joinBoot(); } catch (e) {}
+  var deelnemer = false; try { deelnemer = RB_SYNC.isParticipant(); } catch (e) {}
+  if (deelnemer) return;                      // op een deelnemerapparaat is fase 0 niet aan de orde
+  document.addEventListener('DOMContentLoaded', function () {
+    try { RB_SYNC.ensureSession(); } catch (e) {}
+    var gezien = Object.create(null);
+    try { (typeof participants !== 'undefined' ? participants : []).forEach(function (p) { gezien[String(p.name || '').toLowerCase()] = 1; }); } catch (e) {}
+    try {
+      var c = RB_SYNC.code();
+      if (!c || !window.rbFb) return;
+      window.rbFb.liveListen(c, 'participants', function (arr) {
+        (arr || []).forEach(function (p) {
+          if (!p || !p.name) return;
+          var k = String(p.name).toLowerCase();
+          if (gezien[k]) return;
+          gezien[k] = 1;
+          try { if (typeof addParticipant === 'function') addParticipant(p.name, p.email || ''); } catch (e) {}
+        });
+      }).catch(function () {});
+    } catch (e) {}
+  });
+})();
+
 (function(){
   /* Entry-fase: bootstrap (launch→token, context naar sessionStorage) + poort als betaalVanafFase=0. */
   if(!window.RB_CINAB || !window.VK_LIVE) return;
