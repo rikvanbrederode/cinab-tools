@@ -1630,8 +1630,67 @@ document.addEventListener('DOMContentLoaded', ()=>{
     }).catch(function () { return null; });
   }
 
+  /* ── Aanmelden als deelnemer (CINAB, 3 september 2026) ──────────────────────────────
+     De deelnemer komt met ?join= rechtstreeks in een fase terecht. Zonder naam zou hij
+     als "Deelnemer" inzenden en zou de facilitator niet zien wie er meedoet. De visiekaart
+     lost dit op met een aanmeldscherm dat naam en e-mail naar participants schrijft; dit is
+     dezelfde stap, opgebouwd vanuit script zodat de bladen zelf ongewijzigd blijven.
+     E-mail is optioneel en gaat alleen naar de RTDB van de tool, niet naar het platform. */
+  function zelfNaam() {
+    try { var v = localStorage.getItem('rb_participant_self'); if (v && v[0] !== '{') return v; } catch (e) {}
+    return '';
+  }
+  function toonAanmelding(klaar) {
+    var wrap = document.createElement('div');
+    wrap.id = 'rbJoinGate';
+    wrap.setAttribute('style', 'position:fixed;inset:0;z-index:9999;background:var(--cinab-offwhite,#FAFAF8);display:flex;align-items:center;justify-content:center;padding:20px');
+    wrap.innerHTML =
+      '<div style="width:100%;max-width:380px;background:var(--cinab-card,#fff);border:1px solid var(--cinab-line,#E5E3DB);border-radius:14px;padding:28px 24px;box-shadow:0 1px 3px rgba(0,0,0,.07),0 4px 12px rgba(0,0,0,.05)">' +
+        '<div style="font-size:20px;font-weight:700;color:var(--cinab-ink,#1C1C1A);margin-bottom:6px">Welkom bij de sessie</div>' +
+        '<div style="font-size:13px;color:var(--text-2,#5A5956);margin-bottom:20px">Vul je naam in, dan weet de facilitator wie er meedoet.</div>' +
+        '<label for="rbJoinNaam" style="display:block;font-size:13px;font-weight:600;color:var(--cinab-ink,#1C1C1A);margin-bottom:6px">Jouw naam</label>' +
+        '<input id="rbJoinNaam" type="text" autocomplete="name" placeholder="Voornaam Achternaam" style="width:100%;box-sizing:border-box;padding:11px 12px;font-size:15px;font-family:inherit;border:1px solid var(--cinab-line,#E5E3DB);border-radius:9px;margin-bottom:14px">' +
+        '<label for="rbJoinMail" style="display:block;font-size:13px;font-weight:600;color:var(--cinab-ink,#1C1C1A);margin-bottom:6px">E-mailadres <span style="font-weight:400;color:var(--text-3,#9A9894)">(niet verplicht)</span></label>' +
+        '<input id="rbJoinMail" type="email" autocomplete="email" placeholder="naam@organisatie.nl" style="width:100%;box-sizing:border-box;padding:11px 12px;font-size:15px;font-family:inherit;border:1px solid var(--cinab-line,#E5E3DB);border-radius:9px;margin-bottom:8px">' +
+        '<div id="rbJoinFout" style="display:none;font-size:13px;color:var(--tool-red,#E8423F);margin-bottom:10px">Vul je naam in om mee te doen.</div>' +
+        '<button id="rbJoinOk" type="button" style="width:100%;margin-top:10px;padding:12px;font-size:15px;font-weight:600;font-family:inherit;color:#fff;background:var(--cinab-amber,#EF9F27);border:0;border-radius:9px;cursor:pointer">Deelnemen</button>' +
+        '<div style="font-size:11px;color:var(--text-3,#9A9894);margin-top:12px;text-align:center">Je gegevens worden alleen voor deze sessie gebruikt.</div>' +
+      '</div>';
+    document.body.appendChild(wrap);
+    var inp = wrap.querySelector('#rbJoinNaam');
+    var mail = wrap.querySelector('#rbJoinMail');
+    var fout = wrap.querySelector('#rbJoinFout');
+    function bevestig() {
+      var naam = String(inp.value || '').trim();
+      if (naam.length < 2) { fout.style.display = 'block'; inp.focus(); return; }
+      var email = String(mail.value || '').trim();
+      try { localStorage.setItem('rb_participant_self', naam); } catch (e) {}
+      var c = code();
+      if (c && global.rbFb) {
+        var rec = { name: naam.slice(0, 120) };
+        if (email) rec.email = email.slice(0, 200);
+        try { global.rbFb.push(c, 'participants', rec).catch(function () {}); } catch (e) {}
+      }
+      try { wrap.parentNode.removeChild(wrap); } catch (e) {}
+      if (klaar) { try { klaar(naam); } catch (e) {} }
+    }
+    wrap.querySelector('#rbJoinOk').addEventListener('click', bevestig);
+    inp.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') bevestig(); });
+    mail.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') bevestig(); });
+    setTimeout(function () { try { inp.focus(); } catch (e) {} }, 60);
+  }
+  /* Roept klaar() aan zodra de deelnemer bekend is; toont eerst het aanmeldscherm als dat nodig is. */
+  function joinGate(klaar) {
+    if (!isParticipant()) { if (klaar) klaar(''); return; }
+    var n = zelfNaam();
+    if (n) { if (klaar) klaar(n); return; }
+    if (document.getElementById('rbJoinGate')) return;
+    toonAanmelding(klaar);
+  }
+
   global.RB_SYNC = {
     code: code, stageMirror: stageMirror, stageListen: stageListen,
+    zelfNaam: zelfNaam, joinGate: joinGate,
     urlJoinCode: urlJoinCode, isParticipant: isParticipant, joinBoot: joinBoot,
     followStage: followStage, feedPush: feedPush, feedListen: feedListen,
     ensureSession: ensureSession
