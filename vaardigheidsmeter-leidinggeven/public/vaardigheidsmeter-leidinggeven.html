@@ -411,7 +411,28 @@ var Platform=(function(){
     /* betaalVanafFase/credits komen alléén uit start-tool; bij restore/resume nooit overschrijven met null */
     if(client&&client.betaalVanafFase!=null) s.betaalVanafFase=client.betaalVanafFase;
     if(client&&client.credits!=null) s.credits=client.credits;
-    s.persp=state.persp; s.variant=state.variant; s.answers=state.answers; s.raters=state.raters; s.screen=state.screen; s.lang=LANG; saveState(s); }
+    s.persp=state.persp; s.variant=state.variant; s.answers=state.answers; s.raters=state.raters; s.screen=state.screen; s.lang=LANG; saveState(s);
+
+    /* CINAB 23-9-2026: dezelfde stand ook naar de database.
+       sessionStorage is geheugen per tabblad, dus wie de sessie later hervat
+       kwam op het startscherm terecht: de code klopte wel, maar de app wist
+       niet meer waar je was. De tak 'state' bestaat in database.rules.json al
+       voor dit doel, met lees- en schrijfrecht alleen voor de begeleider.
+       Bewust géén e-mailadressen: voor het hervatten is de naam genoeg. */
+    if(sync && fb && db && code){
+      try{
+        fb.set(fb.ref(db,'sessions/'+code+'/state'),{
+          persp:state.persp||null,
+          variant:state.variant||null,
+          answers:state.answers||{},
+          raters:(state.raters||[]).map(function(r){ return {name:(r&&r.name)||''}; }),
+          screen:state.screen||null,
+          settled:!!s.settled,
+          at:fb.serverTimestamp()
+        }).catch(function(){ /* stil: opslaan in het tabblad is al gelukt */ });
+      }catch(e){}
+    }
+  }
   function genCode(){ var s="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",o=""; for(var i=0;i<6;i++)o+=s[Math.floor(Math.random()*s.length)]; return o; }
   return {
     isLive:function(){return live;},
@@ -452,11 +473,44 @@ var Platform=(function(){
           code=prev.code;
         } else if(p.get("session")||p.get("code")){                   // platform-relaunch (§3.7a, dashboard)
           code=p.get("session")||p.get("code");
-        } else {                                                      // verse start: nieuwe sessie aanmaken
-          code=genCode();
+        } else {                                                      // verse start: de code van het PLATFORM is leidend
+          /* CINAB 23-9-2026: was genCode(), een eigen code van zes tekens. Het
+             platform maakt bij start-tool al een session_code aan en geeft die
+             mee (F2-21); tokens.php noemt hem letterlijk de RTDB-sessiecode, en
+             de client zet hem klaar als .sessionCode. Die werd hier nooit
+             gebruikt, dus hingen de antwoorden onder een code die het platform
+             niet kende. Bij hervatten stuurt het platform zijn eigen code mee,
+             keek de app in een lege tak en bleef het teambeeld leeg zonder dat
+             er ergens een fout verscheen. genCode blijft de terugval voor de
+             demo, waar geen platform is. */
+          code=(client && client.sessionCode) ? client.sessionCode : genCode();
           await fb.set(fb.ref(db,'sessions/'+code+'/meta'),{createdAt:fb.serverTimestamp(),lang:LANG,facilitatorUid:uid,tool:'vaardigheidsmeter_leidinggeven'});
         }
         sync=true;
+
+        /* CINAB 23-9-2026: hervatten. Weet dit tabblad niets (nieuw tabblad,
+           gesloten browser), dan halen we de stand uit de database en zetten
+           hem in het tabbladgeheugen, zodat de rest van de app verder werkt
+           zoals altijd. restored op true zetten is wat de opstartcode hierna
+           laat herkennen dat dit een hervatte sessie is en niet een verse. */
+        if(!prev || !prev.persp){
+          try{
+            var snapState=await fb.get(fb.ref(db,'sessions/'+code+'/state'));
+            var uitDb=(snapState && snapState.val) ? snapState.val() : null;
+            if(uitDb && uitDb.persp){
+              var herstel=loadState()||{};
+              herstel.persp=uitDb.persp;
+              herstel.variant=uitDb.variant||null;
+              herstel.answers=uitDb.answers||{};
+              herstel.raters=uitDb.raters||[];
+              herstel.screen=uitDb.screen||null;
+              herstel.settled=!!uitDb.settled;
+              herstel.apiBase=apiBase; herstel.code=code; herstel.token=client&&client.token;
+              saveState(herstel);
+              restored=true;
+            }
+          }catch(e){ console.warn('[VLM] voortgang uit de database lezen mislukt:',e); }
+        }
       }catch(e){ console.warn('[VLM] RTDB niet beschikbaar; sessie blijft live, teamverzameling uit:',e); sync=false; this.syncFailed=true; }
 
       /* eigen antwoorden/keuzes herstellen — onafhankelijk van RTDB */
