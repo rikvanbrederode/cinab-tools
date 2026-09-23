@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="stylesheet" href="fonts/fonts.css"><!-- CINAB 3-9-2026: zelfgehoste huisstijlfonts, zie fonts/fonts.css -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vaardigheidsmeter Leidinggeven</title>
+<title data-i18n="docTitle">Vaardigheidsmeter Leidinggeven</title>
 <!--
   v0.5 — GRATIS variant + 360/TEAMANALYSE; live-adapter (cinab-tool-client + Firebase RTDB) met demo-terugval.
   Testprotocol 2026-09-03: B-01..B-15 opgelost (zie WERKBOEK).
@@ -48,7 +48,9 @@ button,a,input,select,textarea{font:inherit}
 .app-header__row{display:flex;align-items:center;gap:12px;padding:14px 0}
 .app-logo{width:34px;height:34px;flex:none}
 .app-title-sm{font-family:var(--font-heading);font-weight:600;font-size:17px}
-.demo-ribbon{margin-left:auto;font-size:12px;font-weight:700;color:var(--tool-secondary-13);border:1px solid var(--cinab-line);border-radius:var(--radius-pill);padding:3px 11px}
+.lang-btn{margin-left:auto;font-size:12px;font-weight:700;color:var(--cinab-ink);background:var(--cinab-card);border:1px solid var(--cinab-line);border-radius:var(--radius-pill);padding:4px 12px;cursor:pointer;min-height:32px}
+.lang-btn:hover{background:var(--cinab-offwhite)}
+.demo-ribbon{margin-left:10px;font-size:12px;font-weight:700;color:var(--tool-secondary-13);border:1px solid var(--cinab-line);border-radius:var(--radius-pill);padding:3px 11px}
 main{padding:28px 0 64px;position:relative}
 .screen[hidden]{display:none}
 .page-head{position:relative;margin-bottom:8px}
@@ -187,34 +189,36 @@ main{padding:28px 0 64px;position:relative}
         <path class="fil2 str0" d="M3296.39 1667.14l6.77 2886.05c0.53,225.18 44.93,223.19 131.76,299.11 64.53,56.42 712.98,613.44 1067.73,922.39m279.67 498.36c-3.85,335.14 -17.51,1600.45 -22.09,2025.82m-1460.38 -5160.51l785.98 4.94m3662.81 274.39l-6.72 591.26 -710.88 10.16 0 978.81m-1557.05 3300.95c-5.59,-19.68 -10.23,-41.55 -13.66,-65.97 -40.62,-289.42 -55.5,-1603.06 -55.5,-1603.06m0 0l-12.4 -1458.25c0,0 -44.42,-161.55 137.32,-169.63 181.74,-8.08 658.3,-4.04 658.3,-4.04l-3.77 -1608.68m459.06 3230.04l-615.21 -562.61m1311.37 -167.26l-1179.41 -4.13m-1388.18 1333.84l1210.17 -1126.72c0,0 173.66,-113.07 201.93,-286.74 28.27,-173.67 4.04,-807.74 4.04,-807.74l1579.11 0c0,0 10.18,8.09 137.31,-44.42 53.21,-21.98 127.68,-100.56 196.29,-184.51m-4091.56 3529.88c18.68,-34.96 33.6,-74 38.36,-114.44 16.15,-137.31 24.23,-1514.5 24.23,-1514.5 0,0 -4.03,-137.32 -72.69,-185.78 -68.66,-48.46 -665.89,-556.18 -665.89,-556.18m-467.07 653.4l469.73 -451.59c0,0 69.04,-77 -2.66,-201.81m-1213.8 -2.13l1213.8 2.13 -29.21 -897.55 -563.22 -1.72m-1022.85 -1671.85l3.28 541.68c0,0 -10.23,140.69 117.67,140.69 127.9,0 600.9,26.88 600.9,26.88l-1 659.21m-302.89 299.12l-178.2 -1.97c0,0 -220.41,18.58 -300.07,-21.25 -41.28,-20.64 -175.23,-151.79 -294.75,-273.38m1035.23 -2176.98l5.68 516.43 895.89 -2.1m2.16 920.01l2255.42 21.86m-1471.05 -1258.2l-0.37 394.45 -2.13 2268.51m2268.36 -3395.11c-121.47,117.05 -302.96,241.2 -548.07,278.79m-1062.71 -1009.16l-14.83 1611m313.94 307.52l452.12 4 9.35 -663.77m8.52 -604.84l5.09 -361.34m1408.26 1081.76l-2065.77 2035.4c-50.75,50 -106.04,79.05 -108.71,151.99 -1.64,44.93 10.93,491.27 20.85,827.53m-1774.69 2623.29l879.79 0 134 0 720.63 0 30.4 0 713.76 0 217.25 0 802.66 0 0 323.39 -3498.49 0 0 -323.39zm4646.55 -2710.87c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -167.05,0 -302.47,-135.42 -302.47,-302.47l0.01 -1.06 0 -0.03c0.59,-166.54 135.77,-301.38 302.46,-301.38zm-4993.86 900.52c73.14,0 140.21,25.95 192.51,69.16 8.96,7.4 17.48,15.32 25.53,23.69 52.28,54.37 84.43,128.24 84.43,209.62 0,167.05 -135.42,302.47 -302.47,302.47 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm4491.08 -4342.61c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -64.31,0 -123.92,-20.09 -172.94,-54.31 -15.25,-10.65 -29.49,-22.67 -42.51,-35.88 -53.81,-54.61 -87.02,-129.56 -87.02,-212.28 0,-167.05 135.42,-302.47 302.47,-302.47zm-2395.12 -1464.48c167.05,0 302.47,135.42 302.47,302.47 0,165.17 -132.38,299.39 -296.83,302.4l-5.64 0.07 -2.78 -0.04c-165.76,-1.5 -299.69,-136.31 -299.69,-302.43 0,-167.05 135.42,-302.47 302.47,-302.47zm762.06 1258.76l4.26 0.05c150.23,2.08 273.95,113.65 295.02,258.52 2.08,14.34 3.19,28.99 3.19,43.9 0,18.02 -1.58,35.68 -4.6,52.83 -24.99,141.86 -148.84,249.64 -297.87,249.64l-4.26 -0.05c-93.14,-1.29 -176.09,-44.66 -230.72,-111.98 -42.19,-51.99 -67.49,-118.26 -67.49,-190.44 0,-132.48 85.19,-245.05 203.76,-285.98 30.94,-10.67 64.14,-16.49 98.71,-16.49zm13.61 -966.18c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47l-4.26 -0.05c-23.15,-0.32 -45.66,-3.25 -67.28,-8.49 -132.52,-32.14 -230.93,-151.53 -230.93,-293.93 0,-167.05 135.42,-302.47 302.47,-302.47zm1020.61 503.5c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -71.19,0 -136.62,-24.6 -188.28,-65.75 -33.47,-26.66 -61.16,-60.25 -80.89,-98.62 -21.28,-41.4 -33.3,-88.35 -33.3,-138.1 0,-167.05 135.42,-302.47 302.47,-302.47zm1211.74 1335.28c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47l-3.44 -0.04c-34.1,-0.38 -66.83,-6.4 -97.33,-17.17 -117.5,-41.5 -201.7,-153.55 -201.7,-285.26 0,-167.05 135.42,-302.47 302.47,-302.47zm527.99 1410.14c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -67.13,0 -129.13,-21.88 -179.31,-58.88 -22.76,-16.78 -43.08,-36.67 -60.34,-59.05 -39.39,-51.06 -62.82,-115.06 -62.82,-184.54 0,-167.05 135.42,-302.47 302.47,-302.47zm-1413.53 2298c167.05,0 302.47,135.42 302.47,302.47 0,167.05 -135.42,302.47 -302.47,302.47 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-78.67 30.04,-150.32 79.27,-204.12l3.35 -3.6c55.14,-58.34 133.24,-94.75 219.85,-94.75zm-2137.51 -848.14c13.94,0 27.64,0.96 41.07,2.79 75.93,10.31 142.9,48.79 190.05,104.58 44.51,52.66 71.35,120.75 71.35,195.1 0,148.87 -107.54,272.61 -249.18,297.79 -17.3,3.08 -35.11,4.68 -53.29,4.68 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-76.96 28.76,-147.19 76.09,-200.57 55.41,-62.5 136.29,-101.9 226.38,-101.9zm8.96 -2775.7c167.05,0 302.47,135.42 302.47,302.47l-0.07 5.29c-2.82,164.61 -137.12,297.18 -302.4,297.18 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-163.19 129.23,-296.17 290.93,-302.23 3.83,-0.15 7.68,-0.24 11.54,-0.24zm-651.5 -753.18c167.05,0 302.47,135.42 302.47,302.47 0,164.14 -130.75,297.74 -293.77,302.34 -2.89,0.08 -5.79,0.13 -8.7,0.13l-0.29 0c-166.92,-0.16 -302.18,-135.52 -302.18,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm-790.81 -1081.7c167.05,0 302.47,135.42 302.47,302.47 0,142.36 -98.36,261.74 -230.82,293.91 -22.75,5.53 -46.5,8.49 -70.94,8.55l-0.71 0.01c-167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm-900.9 883.74c167.05,0 302.47,135.42 302.47,302.47 0,76.14 -28.14,145.7 -74.58,198.87 -54.77,62.7 -135,102.6 -224.57,103.56l-3.32 0.04c-167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm-678.68 805.98c167.05,0 302.47,135.42 302.47,302.47 0,121.65 -71.83,226.52 -175.38,274.53 -38.12,17.68 -80.54,27.66 -125.26,27.92l-1.83 0.02c-167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm722.22 1973.37l0.46 0.01c166.84,0.25 302.01,135.56 302.01,302.46l-0.01 0.93c-0.5,166.62 -135.72,301.54 -302.46,301.54 -34.45,0 -67.56,-5.77 -98.41,-16.38 -118.74,-40.84 -204.06,-153.49 -204.06,-286.09l0.04 -3.34c1.79,-165.5 136.5,-299.13 302.43,-299.13zm-1285.24 -517.82c39.12,0 76.51,7.43 110.83,20.95 112.22,44.21 191.64,153.59 191.64,281.52 0,85.58 -35.55,162.85 -92.68,217.88 -54.39,52.37 -128.32,84.59 -209.79,84.59 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47zm663.87 1415.36c66.12,0 127.28,21.24 177.05,57.23 75.98,54.95 125.42,144.31 125.42,245.24l-0.01 0.53c-0.29,166.81 -135.59,301.94 -302.46,301.94 -167.05,0 -302.47,-135.42 -302.47,-302.47 0,-167.05 135.42,-302.47 302.47,-302.47z"/>
         <rect class="fil3" x="2995.41" y="8298.87" width="3395.02" height="332.88"/>
       </svg>
-      <span class="app-title-sm">Vaardigheidsmeter Leidinggeven</span>
-      <span class="demo-ribbon" id="demo-ribbon" hidden>demo</span>
+      <span class="app-title-sm" data-i18n="appTitle">Vaardigheidsmeter Leidinggeven</span>
+      <button class="lang-btn" id="lang-btn" type="button" aria-label="Switch to English">EN</button>
+      <span class="demo-ribbon" id="demo-ribbon" data-i18n="demoRibbon" hidden>demo</span>
     </div>
   </header>
-  <div class="cinab-wrap"><div class="msg" id="live-err" role="alert" hidden>De koppeling met je account is niet gelukt. Je ziet nu de oefenversie: er wordt niets opgeslagen, verstuurd of afgeschreven. Start de tool opnieuw vanuit je account of neem contact op met CINAB.</div></div>
+  <div class="cinab-wrap"><div class="msg" id="live-err" role="alert" data-i18n="liveErr" hidden>De koppeling met je account is niet gelukt. Je ziet nu de oefenversie: er wordt niets opgeslagen, verstuurd of afgeschreven. Start de tool opnieuw vanuit je account of neem contact op met CINAB.</div></div>
+  <div class="cinab-wrap"><div class="msg" id="sync-err" role="alert" hidden></div></div>
 
   <main class="cinab-wrap">
     <!-- KEUZE -->
     <section class="screen" id="screen-start">
       <div class="page-head"><div class="page-glyph" aria-hidden="true">0</div>
-        <span class="fasepill">Start</span>
-        <h1 class="page-title">Hoe goed geef jij leiding?</h1><div class="accent-streak"></div>
-        <p class="lead">Breng leiderschapsvaardigheden in beeld op twintig competenties, verdeeld over vier domeinen. Begin met je invalshoek.</p>
+        <span class="fasepill" data-i18n="pillStart">Start</span>
+        <h1 class="page-title" data-i18n="startTitle">Hoe goed geef jij leiding?</h1><div class="accent-streak"></div>
+        <p class="lead" data-i18n="startLead">Breng leiderschapsvaardigheden in beeld op twintig competenties, verdeeld over vier domeinen. Begin met je invalshoek.</p>
       </div>
-      <div class="step-label">1 · Kies je invalshoek</div>
-      <div class="choice-grid" role="group" aria-label="Invalshoek">
+      <div class="step-label" data-i18n="step1">1 · Kies je invalshoek</div>
+      <div class="choice-grid" role="group" data-i18n-aria="ariaPersp" aria-label="Invalshoek">
         <button class="choice" id="p-lead" aria-pressed="false">
           <svg class="choice__ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="m16 11 2 2 4-4"/></svg>
-          <span><span class="choice__t">Ik ben leidinggevende</span><span class="choice__d">Ik wil inzicht in mijn eigen leiderschap.</span></span>
+          <span><span class="choice__t" data-i18n="perspLeadT">Ik ben leidinggevende</span><span class="choice__d" data-i18n="perspLeadD">Ik wil inzicht in mijn eigen leiderschap.</span></span>
         </button>
         <button class="choice" id="p-emp" aria-pressed="false">
           <svg class="choice__ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="10" cy="7" r="4"/><path d="M2 21v-2a4 4 0 0 1 4-4h6"/><circle cx="18" cy="16" r="3"/><path d="m22 20-1.5-1.5"/></svg>
-          <span><span class="choice__t">Ik ben medewerker</span><span class="choice__d">Ik wil mijn leidinggevende beoordelen.</span></span>
+          <span><span class="choice__t" data-i18n="perspEmpT">Ik ben medewerker</span><span class="choice__d" data-i18n="perspEmpD">Ik wil mijn leidinggevende beoordelen.</span></span>
         </button>
       </div>
       <div id="step2" hidden>
-        <div class="step-label">2 · Kies je variant</div>
-        <div class="choice-grid" role="group" aria-label="Variant">
+        <div class="step-label" data-i18n="step2">2 · Kies je variant</div>
+        <div class="choice-grid" role="group" data-i18n-aria="ariaVariant" aria-label="Variant">
           <button class="choice" id="v-free" aria-pressed="false">
             <svg class="choice__ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v18"/><path d="M5 10l7-7 7 7"/></svg>
             <span><span class="choice__t" id="v-free-t">Gratis zelftest</span><span class="choice__d" id="v-free-d"></span></span>
@@ -224,71 +228,71 @@ main{padding:28px 0 64px;position:relative}
             <span><span class="choice__t" id="v-paid-t"></span><span class="choice__d" id="v-paid-d"></span></span>
           </button>
         </div>
-        <div class="actions"><button class="cinab-button cinab-button--primary" id="btn-start" disabled>Volgende</button></div>
+        <div class="actions"><button class="cinab-button cinab-button--primary" id="btn-start" data-i18n="btnNext" disabled>Volgende</button></div>
       </div>
     </section>
 
     <!-- VRAGENLIJST -->
     <section class="screen" id="screen-quiz" hidden>
       <div class="page-head"><div class="page-glyph" aria-hidden="true">?</div>
-        <span class="fasepill" style="--fase-accent:var(--tool-blue)">Vragenlijst</span>
+        <span class="fasepill" style="--fase-accent:var(--tool-blue)" data-i18n="pillQuiz">Vragenlijst</span>
         <h1 class="page-title" id="quiz-title">Beoordeel de vaardigheden</h1><div class="accent-streak" style="background:var(--tool-blue)"></div>
         <p class="lead" id="quiz-intro"></p>
-        <div class="scale-legend"><span>1 · nog in ontwikkeling</span><span>3 · voldoende</span><span>5 · zeer vaardig</span></div>
+        <div class="scale-legend"><span data-i18n="scale1">1 · nog in ontwikkeling</span><span data-i18n="scale3">3 · voldoende</span><span data-i18n="scale5">5 · zeer vaardig</span></div>
       </div>
       <div id="quiz-body"></div>
       <div class="progress-bar-track">
         <div class="progress-bar"><span id="pbar"></span></div>
         <span class="progress-num" id="pnum">0 / 20</span>
-        <button class="cinab-button cinab-button--primary" id="btn-result" disabled>Bekijk mijn resultaat</button>
+        <button class="cinab-button cinab-button--primary" id="btn-result" data-i18n="btnResult" disabled>Bekijk mijn resultaat</button>
       </div>
     </section>
 
     <!-- UITNODIGEN (betaald) -->
     <section class="screen" id="screen-invite" hidden>
       <div class="page-head"><div class="page-glyph" aria-hidden="true">@</div>
-        <span class="fasepill" style="--fase-accent:var(--tool-green)">Uitnodigen</span>
-        <h1 class="page-title">Nodig collega's uit</h1><div class="accent-streak" style="background:var(--tool-green)"></div>
+        <span class="fasepill" style="--fase-accent:var(--tool-green)" data-i18n="pillInvite">Uitnodigen</span>
+        <h1 class="page-title" data-i18n="inviteTitle">Nodig collega's uit</h1><div class="accent-streak" style="background:var(--tool-green)"></div>
         <p class="lead" id="invite-intro"></p>
       </div>
       <div class="cinab-card">
-        <div class="field"><label class="label" for="r-name">Naam</label><input class="input" id="r-name" maxlength="120" autocomplete="off" placeholder="Naam van de collega"></div>
-        <div class="field"><label class="label" for="r-email">E-mailadres</label><input class="input" id="r-email" type="email" maxlength="200" autocomplete="off" placeholder="naam@organisatie.nl"></div>
-        <button class="cinab-button cinab-button--outline" id="btn-add-rater">Toevoegen</button>
+        <div class="field"><label class="label" for="r-name" data-i18n="lblName">Naam</label><input class="input" id="r-name" maxlength="120" autocomplete="off" data-i18n-ph="phName" placeholder="Naam van de collega"></div>
+        <div class="field"><label class="label" for="r-email" data-i18n="lblEmail">E-mailadres</label><input class="input" id="r-email" type="email" maxlength="200" autocomplete="off" data-i18n-ph="phEmail" placeholder="naam@organisatie.nl"></div>
+        <button class="cinab-button cinab-button--outline" id="btn-add-rater" data-i18n="btnAdd">Toevoegen</button>
         <div class="msg" id="invite-msg" role="alert" hidden></div>
       </div>
       <div id="rater-list" style="margin-top:16px"></div>
       <div class="note-box" id="invite-count"></div>
       <div class="actions">
-        <button class="cinab-button cinab-button--ghost" id="btn-invite-back">Terug</button>
-        <button class="cinab-button cinab-button--primary" id="btn-send" aria-pressed="false" disabled>Verstuur uitnodigingen</button>
+        <button class="cinab-button cinab-button--ghost" id="btn-invite-back" data-i18n="btnBack">Terug</button>
+        <button class="cinab-button cinab-button--primary" id="btn-send" aria-pressed="false" data-i18n="btnSend" disabled>Verstuur uitnodigingen</button>
       </div>
     </section>
 
     <!-- VERZAMELEN (betaald) -->
     <section class="screen" id="screen-wait" hidden>
       <div class="page-head"><div class="page-glyph" aria-hidden="true">&#8230;</div>
-        <span class="fasepill" style="--fase-accent:var(--tool-yellow)">Verzamelen</span>
-        <h1 class="page-title">Reacties verzamelen</h1><div class="accent-streak" style="background:var(--tool-yellow)"></div>
-        <p class="lead">De uitnodigingen zijn verstuurd. Zodra minimaal 3 collega's hebben gereageerd, wordt het teambeeld zichtbaar. Je kunt deze pagina later opnieuw openen vanuit je account.</p>
+        <span class="fasepill" style="--fase-accent:var(--tool-yellow)" data-i18n="pillCollect">Verzamelen</span>
+        <h1 class="page-title" data-i18n="waitTitle">Reacties verzamelen</h1><div class="accent-streak" style="background:var(--tool-yellow)"></div>
+        <p class="lead" data-i18n="waitLead">De uitnodigingen zijn verstuurd. Zodra minimaal 3 collega's hebben gereageerd, wordt het teambeeld zichtbaar. Je kunt deze pagina later opnieuw openen vanuit je account.</p>
       </div>
       <div id="wait-list"></div>
       <div class="note-box" id="wait-count"></div>
       <div class="democtl" id="wait-demo">
-        <b>Demo:</b> in productie komen reacties binnen via de uitnodigingslinks. Voor deze demo kun je reacties simuleren.
+        <span data-i18n-html="demoCtl"><b>Demo:</b> in productie komen reacties binnen via de uitnodigingslinks. Voor deze demo kun je reacties simuleren.</span>
         <div class="actions" style="margin-top:10px">
-          <button class="cinab-button cinab-button--outline" id="btn-sim">Simuleer reacties</button>
+          <button class="cinab-button cinab-button--outline" id="btn-sim" data-i18n="btnSim">Simuleer reacties</button>
         </div>
       </div>
       <div class="actions">
-        <button class="cinab-button cinab-button--primary" id="btn-to-result" disabled>Bekijk teambeeld</button>
+        <button class="cinab-button cinab-button--primary" id="btn-to-result" data-i18n="btnTeam" disabled>Bekijk teambeeld</button>
       </div>
     </section>
 
     <!-- RESULTAAT -->
     <section class="screen" id="screen-result" hidden>
       <div class="page-head"><div class="page-glyph" aria-hidden="true">&#10003;</div>
-        <span class="fasepill" style="--fase-accent:var(--tool-black);color:var(--cinab-card)">Resultaat</span>
+        <span class="fasepill" style="--fase-accent:var(--tool-black);color:var(--cinab-card)" data-i18n="pillResult">Resultaat</span>
         <h1 class="page-title" id="result-title">Jouw leiderschapsprofiel</h1><div class="accent-streak" style="background:var(--tool-black)"></div>
         <p class="lead" id="result-note"></p>
       </div>
@@ -296,45 +300,45 @@ main{padding:28px 0 64px;position:relative}
       <div class="cards" id="result-cards"></div>
       <div class="toolbar">
         <div class="legendrow" id="result-legend"></div>
-        <div class="seg" id="sortseg" hidden><button id="s-model" aria-pressed="true">Model</button><button id="s-gap" aria-pressed="false">Grootste verschil</button></div>
+        <div class="seg" id="sortseg" hidden><button id="s-model" aria-pressed="true" data-i18n="sortModel">Model</button><button id="s-gap" aria-pressed="false" data-i18n="sortGap">Grootste verschil</button></div>
       </div>
-      <div class="axis"><span></span><div class="axis__zones"><span style="position:absolute;left:2%">in ontwikkeling</span><span style="position:absolute;left:48%;transform:translateX(-50%)">voldoende</span><span style="position:absolute;right:2%">zeer vaardig</span></div><span></span></div>
+      <div class="axis"><span></span><div class="axis__zones"><span style="position:absolute;left:2%" data-i18n="axLow">in ontwikkeling</span><span style="position:absolute;left:48%;transform:translateX(-50%)" data-i18n="axMid">voldoende</span><span style="position:absolute;right:2%" data-i18n="axHigh">zeer vaardig</span></div><span></span></div>
       <div class="profile-wrap">
         <div id="result-profile"></div>
         <div class="teaser" id="teaser">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
-            <strong style="font-family:var(--font-heading);font-size:18px">Zo ziet je profiel eruit mét feedback van collega's</strong>
+            <strong style="font-family:var(--font-heading);font-size:18px" data-i18n="teaserH">Zo ziet je profiel eruit mét feedback van collega's</strong>
             <button class="teaser__close" id="teaser-close" aria-label="Sluiten">&times;</button>
           </div>
-          <p style="color:var(--cinab-grey);font-size:14px;margin:0">In de 360-meting zie je per competentie het gemiddelde van collega's (cirkel), de spreiding (band) en het verschil met je eigen beeld (de lijn). Daar zitten je blinde vlekken.</p>
-          <span style="font-size:11px;color:var(--cinab-grey)">voorbeeld</span>
+          <p style="color:var(--cinab-grey);font-size:14px;margin:0" data-i18n="teaserP">In de 360-meting zie je per competentie het gemiddelde van collega's (cirkel), de spreiding (band) en het verschil met je eigen beeld (de lijn). Daar zitten je blinde vlekken.</p>
+          <span style="font-size:11px;color:var(--cinab-grey)" data-i18n="teaserEx">voorbeeld</span>
           <div id="teaser-demo"></div>
           <div class="actions" style="margin-top:4px">
-            <button class="cinab-button cinab-button--primary" id="teaser-go">Start de 360-meting</button>
-            <button class="cinab-button cinab-button--ghost" id="teaser-dismiss">Bekijk mijn resultaat</button>
+            <button class="cinab-button cinab-button--primary" id="teaser-go" data-i18n="teaserGo">Start de 360-meting</button>
+            <button class="cinab-button cinab-button--ghost" id="teaser-dismiss" data-i18n="btnResult">Bekijk mijn resultaat</button>
           </div>
         </div>
       </div>
       <div id="insight" class="insight" hidden></div>
       <div id="beschouwing"></div>
-      <button class="ob-toggle" id="ob-toggle" aria-expanded="false"><span>Onderbouwing &amp; legenda</span><span id="ob-chev">&#9662;</span></button>
+      <button class="ob-toggle" id="ob-toggle" aria-expanded="false"><span data-i18n="obToggle">Onderbouwing &amp; legenda</span><span id="ob-chev">&#9662;</span></button>
       <div class="cinab-card ob-panel" id="ob-panel" hidden>
-        <h3>Waarop is deze test gebaseerd?</h3>
-        <p>De Vaardigheidsmeter bouwt voort op de oorspronkelijke 360-graden-methodiek met vier domeinen en is geactualiseerd naar de huidige organisatiekunde: een verschuiving van sturend "command-and-control" naar wendbaar, inclusief en mensgericht leiderschap. De competenties zijn aangescherpt op basis van actueel onderzoek (o.a. Korn Ferry, Harvard Business Impact, EY) en gevestigde concepten als psychologische veiligheid (Edmondson), emotionele intelligentie (Goleman), coachend leiderschap en zelfreflectie.</p>
-        <h3>Werkwijze</h3>
-        <p>20 competenties over 4 domeinen, elk gemeten met twee gedragsstellingen op een 5-puntsschaal. De scores worden samengevat per competentie en per domein op een schaal van 0–100. In de 360- of teamvariant worden meerdere beoordelaars uitgenodigd; hun antwoorden worden samengevat tot een gemiddelde met spreiding.</p>
-        <h3>Legenda</h3>
+        <h3 data-i18n="obH1">Waarop is deze test gebaseerd?</h3>
+        <p data-i18n="obP1">De Vaardigheidsmeter bouwt voort op de oorspronkelijke 360-graden-methodiek met vier domeinen en is geactualiseerd naar de huidige organisatiekunde: een verschuiving van sturend "command-and-control" naar wendbaar, inclusief en mensgericht leiderschap. De competenties zijn aangescherpt op basis van actueel onderzoek (o.a. Korn Ferry, Harvard Business Impact, EY) en gevestigde concepten als psychologische veiligheid (Edmondson), emotionele intelligentie (Goleman), coachend leiderschap en zelfreflectie.</p>
+        <h3 data-i18n="obH2">Werkwijze</h3>
+        <p data-i18n="obP2">20 competenties over 4 domeinen, elk gemeten met twee gedragsstellingen op een 5-puntsschaal. De scores worden samengevat per competentie en per domein op een schaal van 0–100. In de 360- of teamvariant worden meerdere beoordelaars uitgenodigd; hun antwoorden worden samengevat tot een gemiddelde met spreiding.</p>
+        <h3 data-i18n="obH3">Legenda</h3>
         <div class="ob-leg">
-          <span><span style="width:18px;text-align:center"><span class="tri" style="display:inline-block"></span></span>Driehoek: het eigen beeld — jouw zelfbeoordeling, of jouw beoordeling van de leidinggevende.</span>
-          <span><span style="width:18px;text-align:center"><span class="cir" style="display:inline-block"></span></span>Cirkel: het gemiddelde beeld van anderen of van het team.</span>
-          <span><span style="width:18px;text-align:center"><span class="bnd" style="display:inline-block"></span></span>Band: de spreiding — laagste tot hoogste score van de beoordelaars.</span>
+          <span><span style="width:18px;text-align:center"><span class="tri" style="display:inline-block"></span></span><span data-i18n="obLeg1">Driehoek: het eigen beeld — jouw zelfbeoordeling, of jouw beoordeling van de leidinggevende.</span></span>
+          <span><span style="width:18px;text-align:center"><span class="cir" style="display:inline-block"></span></span><span data-i18n="obLeg2">Cirkel: het gemiddelde beeld van anderen of van het team.</span></span>
+          <span><span style="width:18px;text-align:center"><span class="bnd" style="display:inline-block"></span></span><span data-i18n="obLeg3">Band: de spreiding — laagste tot hoogste score van de beoordelaars.</span></span>
         </div>
-        <h3>Periodiek meten</h3>
-        <p>Dit is een ontwikkelinstrument. Leiderschap groeit door oefening en feedback. Het is zinvol om de meting periodiek te herhalen en de voortgang te vergelijken met je vorige meting.</p>
-        <h3>Privacy en AVG</h3>
-        <p>In de gratis variant wordt niets opgeslagen. In de betaalde variant worden antwoorden van beoordelaars standaard anoniem en samengevat weergegeven; individuele antwoorden worden alleen met naam getoond als élke beoordelaar daar expliciet mee instemt. Persoonsgegevens worden uiterlijk 30 dagen na afronding verwijderd; voor het vergelijken bewaren we alleen geaggregeerde scores in je account. De gegevens worden binnen de EU verwerkt.</p>
-        <h3>Belangrijk</h3>
-        <p>Dit is een ontwikkelinstrument, geen officiële beoordeling of psychologische diagnose. De uitkomsten zijn een startpunt voor gesprek en gerichte ontwikkeling.</p>
+        <h3 data-i18n="obH4">Periodiek meten</h3>
+        <p data-i18n="obP4">Dit is een ontwikkelinstrument. Leiderschap groeit door oefening en feedback. Het is zinvol om de meting periodiek te herhalen en de voortgang te vergelijken met je vorige meting.</p>
+        <h3 data-i18n="obH5">Privacy en AVG</h3>
+        <p data-i18n="obP5">In de gratis variant wordt niets opgeslagen. In de betaalde variant worden antwoorden van beoordelaars standaard anoniem en samengevat weergegeven; individuele antwoorden worden alleen met naam getoond als élke beoordelaar daar expliciet mee instemt. Persoonsgegevens worden uiterlijk 30 dagen na afronding verwijderd; voor het vergelijken bewaren we alleen geaggregeerde scores in je account. De gegevens worden binnen de EU verwerkt.</p>
+        <h3 data-i18n="obH6">Belangrijk</h3>
+        <p data-i18n="obP6">Dit is een ontwikkelinstrument, geen officiële beoordeling of psychologische diagnose. De uitkomsten zijn een startpunt voor gesprek en gerichte ontwikkeling.</p>
       </div>
       <div class="msg" id="result-msg" role="status" hidden></div>
       <div class="actions" id="result-actions"></div>
@@ -345,7 +349,7 @@ main{padding:28px 0 64px;position:relative}
 <!-- POPUP -->
 <div class="overlay" id="overlay" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-t">
   <h2 id="modal-t"></h2><div id="modal-body"></div>
-  <div class="actions"><button class="cinab-button cinab-button--ghost" id="modal-cancel">Annuleren</button><button class="cinab-button cinab-button--primary" id="modal-ok"></button></div>
+  <div class="actions"><button class="cinab-button cinab-button--ghost" id="modal-cancel" data-i18n="btnCancel">Annuleren</button><button class="cinab-button cinab-button--primary" id="modal-ok"></button></div>
 </div></div>
 
 <script type="module">
@@ -366,11 +370,11 @@ main{padding:28px 0 64px;position:relative}
    apiKey en appId zijn publieke client-waarden uit de Firebase-console (geen secrets). ── */
 /* ═══ VLM SHARED: FB_CONFIG (gedeeld blok) ═══ */
 var FB_CONFIG={
-  apiKey:"[INVULLEN: Firebase Web API-key uit de console]",
-  authDomain:"cinab-vaardigheidsmeter-leidinggeven.firebaseapp.com",
-  databaseURL:"https://cinab-vaardigheidsmeter-leidinggeven-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId:"cinab-vaardigheidsmeter-leidinggeven",
-  appId:"[INVULLEN: Firebase Web App-ID uit de console]"
+  apiKey:"AIzaSyAZ64lIntEtquSEQCzxMTba9ye3pvZFgC0",
+  authDomain:"vaardigheidsmeter-leidin-f82f7.firebaseapp.com",
+  databaseURL:"https://vaardigheidsmeter-leidin-f82f7-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"vaardigheidsmeter-leidin-f82f7",
+  appId:"1:294654912465:web:4d835a8c3e135ea5dbe2f0"
 };
 /* ═══ /VLM SHARED: FB_CONFIG ═══ */
 /* ====================== PLATFORM ADAPTER ==================================
@@ -397,7 +401,7 @@ function libReady(){
 }
 /* ═══ /VLM SHARED: LIBREADY ═══ */
 var Platform=(function(){
-  var live=false, demoResponses=[], cb=null;
+  var live=false, sync=false, demoResponses=[], cb=null;
   var client=null, fb=null, db=null, auth=null, uid=null, code=null, apiBase=null, returnUrl=null, restored=false;
   var SKEY="vlm_cinab";
   function loadState(){ try{return JSON.parse(sessionStorage.getItem(SKEY)||"null");}catch(e){return null;} }
@@ -407,10 +411,12 @@ var Platform=(function(){
     /* betaalVanafFase/credits komen alléén uit start-tool; bij restore/resume nooit overschrijven met null */
     if(client&&client.betaalVanafFase!=null) s.betaalVanafFase=client.betaalVanafFase;
     if(client&&client.credits!=null) s.credits=client.credits;
-    s.persp=state.persp; s.variant=state.variant; s.answers=state.answers; s.raters=state.raters; s.screen=state.screen; saveState(s); }
+    s.persp=state.persp; s.variant=state.variant; s.answers=state.answers; s.raters=state.raters; s.screen=state.screen; s.lang=LANG; saveState(s); }
   function genCode(){ var s="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",o=""; for(var i=0;i<6;i++)o+=s[Math.floor(Math.random()*s.length)]; return o; }
   return {
     isLive:function(){return live;},
+    isSync:function(){return sync;},                                  // RTDB beschikbaar (nodig voor 360-verzameling)
+    syncFailed:false,
     getCode:function(){return code;},
     save:persist,
     isResume:function(){return !!(live&&client&&client.isResume);},
@@ -423,7 +429,7 @@ var Platform=(function(){
       if(!urlStart&&!stored) return false;                            // geen token -> demo/standalone
       var lib=await libReady();
       if(!lib){ live=false; this.initFailed=true; return false; }
-      fb=lib.fb;
+      /* ── 1. PLATFORMSESSIE — bepaalt live/demo. Staat los van Firebase. ── */
       try{
         if(urlStart){
           client=await lib.cinab.startCinabSession();                 // bootstrap: launch->token, wist URL-params
@@ -432,19 +438,33 @@ var Platform=(function(){
             betaalVanafFase:prev.betaalVanafFase==null?null:prev.betaalVanafFase, credits:prev.credits==null?null:prev.credits});
         }
         apiBase=client.apiBase; returnUrl=location.origin+location.pathname+(p.get("cinab")?("?cinab="+encodeURIComponent(p.get("cinab"))):"");
+        restored=!urlStart;
+        live=true;                                                    // token staat: dit is een echte sessie, geen demo
+      }catch(e){ console.warn('[VLM] platformsessie mislukt, val terug op demo:',e); live=false; this.initFailed=true; return false; }
+
+      /* ── 2. FIREBASE/RTDB — alleen nodig om 360-reacties te verzamelen.
+             Mislukt dit, dan blijft de sessie live; de teamverzameling meldt dat zelf. ── */
+      try{
+        fb=lib.fb;
         var app=fb.initializeApp(FB_CONFIG); auth=fb.getAuth(app); db=fb.getDatabase(app);
-        var cred=await fb.signInAnonymously(auth); uid=cred.user.uid; restored=!urlStart;
+        var cred=await fb.signInAnonymously(auth); uid=cred.user.uid;
         if(prev && prev.code && (client.isResume || !urlStart)){       // terugkeer na betaling of refresh: zelfde sessie
-          code=prev.code; state.persp=prev.persp||null; state.variant=prev.variant||null; state.answers=prev.answers||{};
-          state.raters=prev.raters||[]; state.screen=prev.screen||null;
+          code=prev.code;
         } else if(p.get("session")||p.get("code")){                   // platform-relaunch (§3.7a, dashboard)
           code=p.get("session")||p.get("code");
         } else {                                                      // verse start: nieuwe sessie aanmaken
-          code = client.sessionCode || genCode();                   // F2-21: platform-code, fallback naar lokaal (demo). Hersteld door CINAB op 3-9-2026; zonder deze regel breekt de herstart van een lopende sessie vanuit /account/.
-          await fb.set(fb.ref(db,'sessions/'+code+'/meta'),{createdAt:fb.serverTimestamp(),lang:'nl',facilitatorUid:uid,tool:'vaardigheidsmeter_leidinggeven'});
+          code=genCode();
+          await fb.set(fb.ref(db,'sessions/'+code+'/meta'),{createdAt:fb.serverTimestamp(),lang:LANG,facilitatorUid:uid,tool:'vaardigheidsmeter_leidinggeven'});
         }
-        live=true; persist(); return true;
-      }catch(e){ console.warn('[VLM] live-init mislukt, val terug op demo:',e); live=false; this.initFailed=true; return false; }
+        sync=true;
+      }catch(e){ console.warn('[VLM] RTDB niet beschikbaar; sessie blijft live, teamverzameling uit:',e); sync=false; this.syncFailed=true; }
+
+      /* eigen antwoorden/keuzes herstellen — onafhankelijk van RTDB */
+      if(prev && (client.isResume || !urlStart)){
+        state.persp=prev.persp||null; state.variant=prev.variant||null; state.answers=prev.answers||{};
+        state.raters=prev.raters||[]; state.screen=prev.screen||null;
+      }
+      persist(); return true;
     },
     initFailed:false,
     isSettled:function(){ var s=loadState(); return !!(s&&s.settled); },
@@ -462,11 +482,12 @@ var Platform=(function(){
     },
     async sendInvites(raters, meta){
       if(!live){ return {sent:raters.length, demo:true}; }
+      if(!sync) throw new Error('rtdb_unavailable');                  // zonder RTDB kunnen reacties niet binnenkomen: niet doen alsof
       // 1) sessie-inhoud publiceren zodat beoordelaars de join-pagina kunnen renderen
       await fb.set(fb.ref(db,'sessions/'+code+'/content'),{
         tool_naam:'Vaardigheidsmeter Leidinggeven', organisatie:(meta&&meta.organisatie)||'',
-        initiatiefnemer:(meta&&meta.initiatiefnemer)||'', subject:(meta&&meta.subject)||'je leidinggevende',
-        persp:state.persp, lang:'nl', createdAt:fb.serverTimestamp()
+        initiatiefnemer:(meta&&meta.initiatiefnemer)||'', subject:(meta&&meta.subject)||(LANG==='en'?'your manager':'je leidinggevende'),
+        persp:state.persp, lang:LANG, createdAt:fb.serverTimestamp()   /* CINAB 23-9-2026: was 'nl' vast; de join-pagina volgt dit veld */
       });
       // 2) join-links bouwen en het platform de mails laten versturen (Route 1; geen adressen in WP)
       var payload=raters.map(function(r){return {name:r.name, email:r.email, join_url:location.origin+'/join/'+code};});
@@ -479,7 +500,7 @@ var Platform=(function(){
       return {sent:raters.length};
     },
     subscribeResponses(callback){ cb=callback;
-      if(!live) return;
+      if(!live||!sync) return;
       fb.onValue(fb.ref(db,'sessions/'+code+'/answers'), function(snap){
         var list=[]; snap.forEach(function(ch){ var v=ch.val()||{};
           list.push({name:v.name||'', email:v.email||'', naamZichtbaar:!!v.naamZichtbaar, vals:v.vals||{}}); });
@@ -499,63 +520,319 @@ var Platform=(function(){
       return out||{rapport_url:""};
     },
     notifyLoaded(){ if(live&&client) client.notifyLoaded(); },
-    notifyCompleted(url){ if(live&&client) client.notifyCompleted(url); }
+    notifyCompleted(url){ if(live&&client) client.notifyCompleted(url); },
+    /* AI via het PLATFORM, niet via een PHP-bestand naast de app.
+       CINAB 23-9-2026: de tool-host is Firebase Hosting en die is statisch, dus een
+       proxy op location.origin wordt nooit uitgevoerd. Het endpoint staat in de
+       plugin (includes/ai.php, sinds s87) en neemt exact dezelfde body aan en geeft
+       exact hetzelfde antwoord terug, dus alleen het adres verandert. Het token gaat
+       in de body en niet als header: de CORS-whitelist laat alleen Content-Type door.
+       Alleen data + taaktype de deur uit; prompt en model staan server-side.
+       Gooit bij elke fout -> de app valt terug op de lokale beschouwing. */
+    async ai(task, data){
+      var tok=(live&&client&&client.token)?client.token:null;
+      var basis=apiBase||(client&&client.apiBase)||((loadState()||{}).apiBase||'');
+      if(!basis) throw new Error('ai_geen_platform');
+      var res=await fetch(basis+'/wp-json/cinab/v1/ai',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({token:tok, task:task, lang:LANG, data:data})
+      });
+      if(!res.ok) throw new Error('ai_http_'+res.status);
+      var j=await res.json();
+      if(!j||typeof j.text!=='string'||!j.text) throw new Error('ai_empty');
+      return j.text;
+    }
   };
 })();
 
 /* ====================== DATA ====================== */
-/* ═══ VLM SHARED: DOMAINS (gedeeld blok — 20 competenties / 40 stellingen; contract) ═══ */
-var DOMAINS=[
- {id:"richting_visie",name:"Richting & Visie",color:"#70A2D7",comps:[
-  {n:"LV1",label:"Visie & betekenis geven",a:"Maakt de richting van de organisatie concreet en verbindt het werk van het team aan een groter doel.",b:"Helpt teamleden de zin en bijdrage van hun eigen werk te zien."},
-  {n:"LV2",label:"Verwachtingen & kaders verhelderen",a:"Maakt duidelijk welke resultaten en welk gedrag van het team worden verwacht.",b:"Stelt samen met medewerkers heldere, haalbare doelen en kaders."},
-  {n:"LV3",label:"Inspireren & motiveren",a:"Genereert energie en betrokkenheid voor gezamenlijke doelen.",b:"Sluit aan bij wat individuele teamleden drijft en geeft hen ruimte en autonomie."},
-  {n:"LV4",label:"Voorbeeldgedrag & integriteit",a:"Handelt zelf naar de waarden en afspraken die van anderen worden gevraagd.",b:"Neemt verantwoordelijkheid voor eigen gedrag, fouten en ontwikkeling."},
-  {n:"LV5",label:"Stakeholders & omgeving",a:"Behartigt de belangen van het team bij anderen en haalt benodigde steun en ruimte op.",b:"Bouwt en onderhoudt goede relaties met relevante partijen binnen en buiten de organisatie."}]},
- {id:"uitvoering_wendbaarheid",name:"Uitvoering & Wendbaarheid",color:"#BDD24D",comps:[
-  {n:"LV6",label:"Plannen & prioriteren",a:"Vertaalt doelen naar realistische plannen, prioriteiten en heldere afspraken.",b:"Organiseert het werk zo dat het ook op afstand of hybride soepel en transparant verloopt."},
-  {n:"LV7",label:"Besluitvorming & participatie",a:"Betrekt de juiste mensen en informatie bij belangrijke besluiten.",b:"Toont respect voor verschillende inzichten en durft tijdig een knoop door te hakken."},
-  {n:"LV8",label:"Probleemoplossing & analyse",a:"Doorgrondt een probleem en de onderliggende oorzaken voordat er gehandeld wordt.",b:"Genereert opties, weegt de gevolgen af en kiest een passende aanpak."},
-  {n:"LV9",label:"Eerlijkheid & rechtvaardigheid",a:"Hanteert dezelfde, transparante spelregels voor iedereen, inclusief zichzelf.",b:"Herkent ongelijke behandeling of vooroordeel en corrigeert dat."},
-  {n:"LV10",label:"Resultaat- & impactgerichtheid",a:"Stuurt op heldere, meetbare resultaten en houdt de voortgang zichtbaar.",b:"Houdt de waarde voor klant of eindgebruiker en de bedoeling centraal."}]},
- {id:"mensen_ontwikkeling",name:"Mensen & Ontwikkeling",color:"#2A9791",comps:[
-  {n:"LV11",label:"Coachen & ontwikkelen",a:"Brengt ontwikkelbehoeften van individu en team scherp in beeld.",b:"Coacht met vragen en ruimte, in plaats van vooral voor te schrijven."},
-  {n:"LV12",label:"Delegeren & eigenaarschap",a:"Geeft taken én de bijbehorende verantwoordelijkheid aan de juiste mensen.",b:"Geeft vertrouwen en duidelijke kaders, zodat mensen zelf eigenaar worden."},
-  {n:"LV13",label:"Feedback & ontwikkelgesprekken",a:"Geeft regelmatig en tijdig waarderende én opbouwende feedback.",b:"Voert echte ontwikkelgesprekken en staat zelf open voor de dialoog."},
-  {n:"LV14",label:"Loopbaan & gelijke groeikansen",a:"Helpt teamleden een realistisch beeld te vormen van groei- en loopbaankansen.",b:"Zorgt dat iedereen gelijke kansen krijgt om te leren en door te groeien."},
-  {n:"LV15",label:"Samenwerking & psychologische veiligheid",a:"Bevordert samenwerking en goede onderlinge verhoudingen in het team.",b:"Creëert een veilige sfeer waarin mensen fouten, twijfels en ideeën durven delen."}]},
- {id:"verandering_innovatie",name:"Verandering & Innovatie",color:"#F05736",comps:[
-  {n:"LV16",label:"Kansen & innovatie zien",a:"Spot actief kansen om het werk of de resultaten te verbeteren.",b:"Moedigt anderen aan creatief te denken en met ideeën te komen."},
-  {n:"LV17",label:"Experimenteren & leren van fouten",a:"Durft nieuwe werkwijzen uit te proberen, ook als de uitkomst onzeker is.",b:"Leert van wat misgaat en past de aanpak zichtbaar aan."},
-  {n:"LV18",label:"Communiceren over verandering",a:"Communiceert tijdig en open over veranderingen en het waarom ervan.",b:"Houdt rekening met wat verandering met mensen doet."},
-  {n:"LV19",label:"Openstaan voor feedback & reflectie",a:"Vraagt actief om feedback op het eigen functioneren.",b:"Reflecteert op die feedback en doet er zichtbaar iets mee."},
-  {n:"LV20",label:"Betrokkenheid bij verandering verwerven",a:"Benoemt en begrijpt oorzaken van weerstand tegen verandering.",b:"Neemt weerstand weg en weet mensen mee te krijgen."}]}
-];
-/* ═══ /VLM SHARED: DOMAINS ═══ */
-var COMPS=[];DOMAINS.forEach(function(d){d.comps.forEach(function(c){c._d=d;COMPS.push(c);});});
-
-var TEKST={
- lead:{vFree:["Gratis zelftest","1 persoon · geen account · resultaat op het scherm"],
-  vPaid:["360-meting","collega's uitnodigen · account + 1 credit · download/print"],
-  quizTitle:"Beoordeel jezelf", quizIntro:"Beoordeel jezelf op elke vaardigheid. Wees eerlijk — juist je ontwikkelpunten zijn waardevol.",
-  inviteIntro:"Nodig collega's uit om jou te beoordelen op dezelfde twintig competenties. Het teambeeld wordt zichtbaar vanaf 3 reacties.",
-  resultNoteFree:"Dit is je eigen beeld van je leiderschap. Wil je weten hoe collega's je zien? Dat kan met de 360-meting.",
-  resultNote360:"Jouw beeld naast het gemiddelde van je collega's. Klik op een competentie voor de duiding van het verschil.",
-  selLeg:"jouw eigen beeld", othLeg:"gemiddelde van collega's", othCard:"anderen",
-  popupTitle:"Je kiest de 360-meting",
-  popupBody:"Hiervoor wordt <b>1 credit</b> afgeschreven. Deze analyse is pas zinvol als minimaal 3 mensen je uitnodiging beantwoorden. Nodig daarom voldoende collega's uit van wie je weet dat ze willen meewerken. Bij minder dan 3 reacties zie je wel je eigen resultaat, maar nog geen teambeeld.",
-  popupOk:"Akkoord (1 credit)"},
- emp:{vFree:["Gratis beoordeling","1 persoon · geen account · resultaat op het scherm"],
-  vPaid:["Teamanalyse","collega's uitnodigen · account + 1 credit · download/print"],
-  quizTitle:"Beoordeel je leidinggevende", quizIntro:"Beoordeel je leidinggevende op elke vaardigheid. Wees zo eerlijk en objectief mogelijk.",
-  inviteIntro:"Nodig collega's uit om jullie leidinggevende te beoordelen op dezelfde twintig competenties. Het teambeeld wordt zichtbaar vanaf 3 reacties.",
-  resultNoteFree:"Dit is jouw beeld van je leidinggevende. Wil je dit afzetten tegen het beeld van het hele team? Dat kan met de teamanalyse.",
-  resultNote360:"Jouw beeld van de leidinggevende naast het teamgemiddelde. Klik op een competentie voor de duiding.",
-  selLeg:"jouw beoordeling", othLeg:"gemiddelde van het team", othCard:"team",
-  popupTitle:"Je start een teamanalyse van je leidinggevende",
-  popupBody:"De uitkomst is een gezamenlijk beeld van het team. Nodig je je leidinggevende zelf ook uit, dan tellen zijn/haar antwoorden mee als die van een gelijkwaardig teamlid — er is geen aparte zelfbeoordeling.<br><br>Hiervoor wordt <b>1 credit</b> afgeschreven; de analyse is pas zinvol vanaf 3 reacties.",
-  popupOk:"Akkoord (1 credit)"}
+/* ═══ VLM SHARED: MODEL (gedeeld blok — structuur + NL/EN teksten; contract) ═══ */
+var MODEL={
+ struct:[
+  {id:"richting_visie",color:"#70A2D7",comps:["LV1","LV2","LV3","LV4","LV5"]},
+  {id:"uitvoering_wendbaarheid",color:"#BDD24D",comps:["LV6","LV7","LV8","LV9","LV10"]},
+  {id:"mensen_ontwikkeling",color:"#2A9791",comps:["LV11","LV12","LV13","LV14","LV15"]},
+  {id:"verandering_innovatie",color:"#F05736",comps:["LV16","LV17","LV18","LV19","LV20"]}
+ ],
+ nl:{
+  dom:{richting_visie:"Richting & Visie",uitvoering_wendbaarheid:"Uitvoering & Wendbaarheid",mensen_ontwikkeling:"Mensen & Ontwikkeling",verandering_innovatie:"Verandering & Innovatie"},
+  comp:{
+   LV1:{label:"Visie & betekenis geven",a:"Maakt de richting van de organisatie concreet en verbindt het werk van het team aan een groter doel.",b:"Helpt teamleden de zin en bijdrage van hun eigen werk te zien."},
+   LV2:{label:"Verwachtingen & kaders verhelderen",a:"Maakt duidelijk welke resultaten en welk gedrag van het team worden verwacht.",b:"Stelt samen met medewerkers heldere, haalbare doelen en kaders."},
+   LV3:{label:"Inspireren & motiveren",a:"Genereert energie en betrokkenheid voor gezamenlijke doelen.",b:"Sluit aan bij wat individuele teamleden drijft en geeft hen ruimte en autonomie."},
+   LV4:{label:"Voorbeeldgedrag & integriteit",a:"Handelt zelf naar de waarden en afspraken die van anderen worden gevraagd.",b:"Neemt verantwoordelijkheid voor eigen gedrag, fouten en ontwikkeling."},
+   LV5:{label:"Stakeholders & omgeving",a:"Behartigt de belangen van het team bij anderen en haalt benodigde steun en ruimte op.",b:"Bouwt en onderhoudt goede relaties met relevante partijen binnen en buiten de organisatie."},
+   LV6:{label:"Plannen & prioriteren",a:"Vertaalt doelen naar realistische plannen, prioriteiten en heldere afspraken.",b:"Organiseert het werk zo dat het ook op afstand of hybride soepel en transparant verloopt."},
+   LV7:{label:"Besluitvorming & participatie",a:"Betrekt de juiste mensen en informatie bij belangrijke besluiten.",b:"Toont respect voor verschillende inzichten en durft tijdig een knoop door te hakken."},
+   LV8:{label:"Probleemoplossing & analyse",a:"Doorgrondt een probleem en de onderliggende oorzaken voordat er gehandeld wordt.",b:"Genereert opties, weegt de gevolgen af en kiest een passende aanpak."},
+   LV9:{label:"Eerlijkheid & rechtvaardigheid",a:"Hanteert dezelfde, transparante spelregels voor iedereen, inclusief zichzelf.",b:"Herkent ongelijke behandeling of vooroordeel en corrigeert dat."},
+   LV10:{label:"Resultaat- & impactgerichtheid",a:"Stuurt op heldere, meetbare resultaten en houdt de voortgang zichtbaar.",b:"Houdt de waarde voor klant of eindgebruiker en de bedoeling centraal."},
+   LV11:{label:"Coachen & ontwikkelen",a:"Brengt ontwikkelbehoeften van individu en team scherp in beeld.",b:"Coacht met vragen en ruimte, in plaats van vooral voor te schrijven."},
+   LV12:{label:"Delegeren & eigenaarschap",a:"Geeft taken én de bijbehorende verantwoordelijkheid aan de juiste mensen.",b:"Geeft vertrouwen en duidelijke kaders, zodat mensen zelf eigenaar worden."},
+   LV13:{label:"Feedback & ontwikkelgesprekken",a:"Geeft regelmatig en tijdig waarderende én opbouwende feedback.",b:"Voert echte ontwikkelgesprekken en staat zelf open voor de dialoog."},
+   LV14:{label:"Loopbaan & gelijke groeikansen",a:"Helpt teamleden een realistisch beeld te vormen van groei- en loopbaankansen.",b:"Zorgt dat iedereen gelijke kansen krijgt om te leren en door te groeien."},
+   LV15:{label:"Samenwerking & psychologische veiligheid",a:"Bevordert samenwerking en goede onderlinge verhoudingen in het team.",b:"Creëert een veilige sfeer waarin mensen fouten, twijfels en ideeën durven delen."},
+   LV16:{label:"Kansen & innovatie zien",a:"Spot actief kansen om het werk of de resultaten te verbeteren.",b:"Moedigt anderen aan creatief te denken en met ideeën te komen."},
+   LV17:{label:"Experimenteren & leren van fouten",a:"Durft nieuwe werkwijzen uit te proberen, ook als de uitkomst onzeker is.",b:"Leert van wat misgaat en past de aanpak zichtbaar aan."},
+   LV18:{label:"Communiceren over verandering",a:"Communiceert tijdig en open over veranderingen en het waarom ervan.",b:"Houdt rekening met wat verandering met mensen doet."},
+   LV19:{label:"Openstaan voor feedback & reflectie",a:"Vraagt actief om feedback op het eigen functioneren.",b:"Reflecteert op die feedback en doet er zichtbaar iets mee."},
+   LV20:{label:"Betrokkenheid bij verandering verwerven",a:"Benoemt en begrijpt oorzaken van weerstand tegen verandering.",b:"Neemt weerstand weg en weet mensen mee te krijgen."}
+  }
+ },
+ en:{
+  dom:{richting_visie:"Direction & Vision",uitvoering_wendbaarheid:"Execution & Agility",mensen_ontwikkeling:"People & Development",verandering_innovatie:"Change & Innovation"},
+  comp:{
+   LV1:{label:"Vision & sense of purpose",a:"Makes the organisation's direction concrete and connects the team's work to a larger purpose.",b:"Helps team members see the point and the contribution of their own work."},
+   LV2:{label:"Clarifying expectations & boundaries",a:"Makes clear which results and which behaviour are expected of the team.",b:"Sets clear, achievable goals and boundaries together with staff."},
+   LV3:{label:"Inspiring & motivating",a:"Generates energy and commitment for shared goals.",b:"Connects with what drives individual team members and gives them room and autonomy."},
+   LV4:{label:"Leading by example & integrity",a:"Acts in line with the values and agreements asked of others.",b:"Takes responsibility for their own behaviour, mistakes and development."},
+   LV5:{label:"Stakeholders & wider environment",a:"Represents the team's interests with others and secures the support and room it needs.",b:"Builds and maintains good relationships with relevant parties inside and outside the organisation."},
+   LV6:{label:"Planning & prioritising",a:"Translates goals into realistic plans, priorities and clear agreements.",b:"Organises the work so that it also runs smoothly and transparently when remote or hybrid."},
+   LV7:{label:"Decision-making & participation",a:"Involves the right people and the right information in important decisions.",b:"Respects differing views and dares to make the call in good time."},
+   LV8:{label:"Problem-solving & analysis",a:"Gets to the bottom of a problem and its underlying causes before acting.",b:"Generates options, weighs up the consequences and chooses a fitting approach."},
+   LV9:{label:"Fairness & even-handedness",a:"Applies the same transparent rules to everyone, including themselves.",b:"Recognises unequal treatment or bias and corrects it."},
+   LV10:{label:"Focus on results & impact",a:"Steers on clear, measurable results and keeps progress visible.",b:"Keeps the value for the customer or end user, and the underlying purpose, central."},
+   LV11:{label:"Coaching & developing",a:"Brings the development needs of individuals and of the team into sharp focus.",b:"Coaches with questions and room to think, rather than mainly prescribing."},
+   LV12:{label:"Delegating & ownership",a:"Hands tasks and the matching responsibility to the right people.",b:"Gives trust and clear boundaries, so that people become owners themselves."},
+   LV13:{label:"Feedback & development conversations",a:"Gives appreciative as well as constructive feedback regularly and in good time.",b:"Holds real development conversations and is open to dialogue in return."},
+   LV14:{label:"Careers & equal chances to grow",a:"Helps team members form a realistic picture of growth and career opportunities.",b:"Makes sure everyone gets an equal chance to learn and move forward."},
+   LV15:{label:"Collaboration & psychological safety",a:"Promotes collaboration and good working relationships within the team.",b:"Creates a safe climate in which people dare to share mistakes, doubts and ideas."},
+   LV16:{label:"Spotting opportunities & innovation",a:"Actively spots opportunities to improve the work or the results.",b:"Encourages others to think creatively and to come forward with ideas."},
+   LV17:{label:"Experimenting & learning from mistakes",a:"Dares to try out new ways of working, even when the outcome is uncertain.",b:"Learns from what goes wrong and visibly adjusts the approach."},
+   LV18:{label:"Communicating about change",a:"Communicates openly and in good time about changes and the reasons behind them.",b:"Takes account of what change does to people."},
+   LV19:{label:"Openness to feedback & reflection",a:"Actively asks for feedback on their own performance.",b:"Reflects on that feedback and visibly acts on it."},
+   LV20:{label:"Winning commitment to change",a:"Names and understands the causes of resistance to change.",b:"Takes resistance away and gets people on board."}
+  }
+ }
 };
+function buildModel(lang){
+ var L=MODEL[lang]||MODEL.nl;
+ return MODEL.struct.map(function(d){
+  return {id:d.id,color:d.color,name:L.dom[d.id],
+   comps:d.comps.map(function(n){return {n:n,label:L.comp[n].label,a:L.comp[n].a,b:L.comp[n].b};})};
+ });
+}
+/* ═══ /VLM SHARED: MODEL ═══ */
+/* Taal: 'nl' of 'en'. DOMAINS/COMPS worden hieruit afgeleid en bij een taalwissel opnieuw gebouwd. */
+var LANG="nl", DOMAINS=[], COMPS=[];
+function rebuildModel(){ DOMAINS=buildModel(LANG); COMPS=[]; DOMAINS.forEach(function(d){d.comps.forEach(function(c){c._d=d;COMPS.push(c);});}); }
+rebuildModel();
+
+/* ══════════════ I18N — UI-vertaalset (NL/EN) ══════════════ */
+var UI={
+ nl:{
+  docTitle:"Vaardigheidsmeter Leidinggeven", appTitle:"Vaardigheidsmeter Leidinggeven", demoRibbon:"demo",
+  langBtn:"EN", langAria:"Switch to English",
+  liveErr:"De koppeling met je account is niet gelukt. Je ziet nu de oefenversie: er wordt niets opgeslagen, verstuurd of afgeschreven. Start de tool opnieuw vanuit je account of neem contact op met CINAB.",
+  syncErr:"Je sessie is actief, maar de verbinding voor het verzamelen van reacties is niet beschikbaar. Je eigen vragenlijst en resultaat werken gewoon; collega's uitnodigen kan nu niet. Probeer het later opnieuw of neem contact op met CINAB.",
+  pillStart:"Start", startTitle:"Hoe goed geef jij leiding?",
+  startLead:"Breng leiderschapsvaardigheden in beeld op twintig competenties, verdeeld over vier domeinen. Begin met je invalshoek.",
+  step1:"1 · Kies je invalshoek", step2:"2 · Kies je variant", ariaPersp:"Invalshoek", ariaVariant:"Variant",
+  perspLeadT:"Ik ben leidinggevende", perspLeadD:"Ik wil inzicht in mijn eigen leiderschap.",
+  perspEmpT:"Ik ben medewerker", perspEmpD:"Ik wil mijn leidinggevende beoordelen.",
+  btnNext:"Volgende", pillQuiz:"Vragenlijst",
+  scale1:"1 · nog in ontwikkeling", scale3:"3 · voldoende", scale5:"5 · zeer vaardig",
+  btnResult:"Bekijk mijn resultaat", btnToInvite:"Naar uitnodigen",
+  sendArm:"Klik nogmaals om {n} uitnodiging(en) definitief te versturen", sendArmNote:"Controleer de namen en e-mailadressen. Na versturen kun je de lijst niet meer wijzigen.",
+  pillInvite:"Uitnodigen", inviteTitle:"Nodig collega's uit",
+  lblName:"Naam", phName:"Naam van de collega", lblEmail:"E-mailadres", phEmail:"naam@organisatie.nl",
+  btnAdd:"Toevoegen", btnBack:"Terug", btnSend:"Verstuur uitnodigingen",
+  pillCollect:"Verzamelen", waitTitle:"Reacties verzamelen",
+  waitLead:"De uitnodigingen zijn verstuurd. Zodra minimaal 3 collega's hebben gereageerd, wordt het teambeeld zichtbaar. Je kunt deze pagina later opnieuw openen vanuit je account.",
+  demoCtl:"<b>Demo:</b> in productie komen reacties binnen via de uitnodigingslinks. Voor deze demo kun je reacties simuleren.",
+  btnSim:"Simuleer reacties", btnTeam:"Bekijk teambeeld", pillResult:"Resultaat",
+  sortModel:"Model", sortGap:"Grootste verschil",
+  axLow:"in ontwikkeling", axMid:"voldoende", axHigh:"zeer vaardig",
+  teaserH:"Zo ziet je profiel eruit mét feedback van collega's",
+  teaserP:"In de 360-meting zie je per competentie het gemiddelde van collega's (cirkel), de spreiding (band) en het verschil met je eigen beeld (de lijn). Daar zitten je blinde vlekken.",
+  teaserEx:"voorbeeld", teaserGo:"Start de 360-meting", obToggle:"Onderbouwing & legenda", btnCancel:"Annuleren",
+  obH1:"Waarop is deze test gebaseerd?",
+  obP1:"De Vaardigheidsmeter bouwt voort op de oorspronkelijke 360-graden-methodiek met vier domeinen en is geactualiseerd naar de huidige organisatiekunde: een verschuiving van sturend \"command-and-control\" naar wendbaar, inclusief en mensgericht leiderschap. De competenties zijn aangescherpt op basis van actueel onderzoek (o.a. Korn Ferry, Harvard Business Impact, EY) en gevestigde concepten als psychologische veiligheid (Edmondson), emotionele intelligentie (Goleman), coachend leiderschap en zelfreflectie.",
+  obH2:"Werkwijze",
+  obP2:"20 competenties over 4 domeinen, elk gemeten met twee gedragsstellingen op een 5-puntsschaal. De scores worden samengevat per competentie en per domein op een schaal van 0–100. In de 360- of teamvariant worden meerdere beoordelaars uitgenodigd; hun antwoorden worden samengevat tot een gemiddelde met spreiding.",
+  obH3:"Legenda",
+  obLeg1:"Driehoek: het eigen beeld — jouw zelfbeoordeling, of jouw beoordeling van de leidinggevende.",
+  obLeg2:"Cirkel: het gemiddelde beeld van anderen of van het team.",
+  obLeg3:"Band: de spreiding — laagste tot hoogste score van de beoordelaars.",
+  obH4:"Periodiek meten",
+  obP4:"Dit is een ontwikkelinstrument. Leiderschap groeit door oefening en feedback. Het is zinvol om de meting periodiek te herhalen en de voortgang te vergelijken met je vorige meting.",
+  obH5:"Privacy en AVG",
+  obP5:"In de gratis variant wordt niets opgeslagen. In de betaalde variant worden antwoorden van beoordelaars standaard anoniem en samengevat weergegeven; individuele antwoorden worden alleen met naam getoond als élke beoordelaar daar expliciet mee instemt. Persoonsgegevens worden uiterlijk 30 dagen na afronding verwijderd; voor het vergelijken bewaren we alleen geaggregeerde scores in je account. De gegevens worden binnen de EU verwerkt.",
+  obH6:"Belangrijk",
+  obP6:"Dit is een ontwikkelinstrument, geen officiële beoordeling of psychologische diagnose. De uitkomsten zijn een startpunt voor gesprek en gerichte ontwikkeling.",
+  /* runtime */
+  na:"Niet van toepassing voor deze functie", progress:"{done} / 20",
+  raterEmpty:"Nog geen collega's toegevoegd.", raterRemove:"Verwijderen",
+  inviteCount:"{n} collega('s) toegevoegd. Vanaf 3 reacties wordt het teambeeld zichtbaar.",
+  errName:"Vul een naam in.", errEmail:"Vul een geldig e-mailadres in.", errDup:"Dit e-mailadres staat al in de lijst.",
+  waitCount:"{n} van {t} collega('s) hebben gereageerd.",
+  statusOpen:"nog niet gereageerd", statusDone:"gereageerd",
+  anonUnder:"Er hebben {n} collega('s) gereageerd. Het teambeeld verschijnt vanaf 3 reacties; hieronder zie je voorlopig je eigen beeld.",
+  anonNamed:"Alle {n} beoordelaars tonen hun naam — individuele antwoorden zijn herleidbaar.",
+  anonAgg:"Gebaseerd op {n} beoordelaars. Resultaten worden anoniem getoond (gemiddelde + spreiding); namen verschijnen alleen als élke beoordelaar daarmee instemt.",
+  spreadLeg:"spreiding",
+  actPrint:"Download als PDF / Printen", actCompare:"Toon verschil met vorige meting", actBackWait:"Terug naar reacties", actRestart:"Opnieuw",
+  msgDemoReport:"Demo: het rapport wordt niet opgeslagen in een account.",
+  msgSaved:"Rapport opgeslagen in je account.", msgUpdated:"Rapport in je account bijgewerkt.",
+  msgSaveFail:"Het rapport kon niet worden opgeslagen in je account ({e}). Printen werkt wel; probeer opslaan later opnieuw.",
+  msgCompareLive:"Vergelijken met je vorige meting komt beschikbaar zodra er een eerdere meting in je account staat.",
+  msgCompareDemo:"Demo: in de oefenversie is er geen eerdere meting om mee te vergelijken.",
+  msgSendFail:"De uitnodigingen konden niet worden verstuurd. Probeer het zo opnieuw. ({e})",
+  msgSendNoSync:"De uitnodigingen kunnen nu niet worden verstuurd: de verbinding voor het verzamelen van reacties is niet beschikbaar. Probeer het later opnieuw.",
+  popupDemoNote:"<b>Demo:</b> er wordt geen echte betaling gedaan.",
+  aiBusy:"Verdiepende analyse wordt opgesteld…",
+  aiLead:"Verdiepende analyse — automatisch opgesteld op basis van je meetresultaten en het CINAB-model. Elke observatie is te herleiden tot de cijfers in dit rapport; het blijft een hulpmiddel voor reflectie en gesprek, geen eindoordeel.",
+  aiGround:"Onderbouwing: "
+ },
+ en:{
+  docTitle:"Leadership Skills Meter", appTitle:"Leadership Skills Meter", demoRibbon:"practice mode",
+  langBtn:"NL", langAria:"Schakel over naar Nederlands",
+  liveErr:"We could not connect to your account. You are seeing the practice version: nothing is saved, sent or charged. Start the session again from your account, or contact CINAB.",
+  syncErr:"Your session is active, but the connection used to collect responses is unavailable. Your own questionnaire and result work as normal; inviting colleagues is not possible right now. Please try again later or contact CINAB.",
+  pillStart:"Start", startTitle:"How well do you lead?",
+  startLead:"Map leadership skills across twenty competencies in four domains. Start by choosing your point of view.",
+  step1:"1 · Choose your point of view", step2:"2 · Choose your version", ariaPersp:"Point of view", ariaVariant:"Version",
+  perspLeadT:"I am a manager", perspLeadD:"I want insight into my own leadership.",
+  perspEmpT:"I am a team member", perspEmpD:"I want to assess my manager.",
+  btnNext:"Continue", pillQuiz:"Questionnaire",
+  scale1:"1 · still developing", scale3:"3 · adequate", scale5:"5 · highly skilled",
+  btnResult:"View my result", btnToInvite:"Continue to invitations",
+  sendArm:"Click again to send {n} invitation(s) for good", sendArmNote:"Check the names and email addresses. Once sent, the list can no longer be changed.",
+  pillInvite:"Invite", inviteTitle:"Invite colleagues",
+  lblName:"Name", phName:"Colleague's name", lblEmail:"Email address", phEmail:"name@organisation.com",
+  btnAdd:"Add", btnBack:"Back", btnSend:"Send invitations",
+  pillCollect:"Collecting", waitTitle:"Collecting responses",
+  waitLead:"The invitations have been sent. Once at least 3 colleagues have responded, the team picture becomes visible. You can reopen this page later from your account.",
+  demoCtl:"<b>Practice mode:</b> in production, responses arrive through the invitation links. For this practice run you can simulate responses.",
+  btnSim:"Simulate responses", btnTeam:"View team picture", pillResult:"Result",
+  sortModel:"Model order", sortGap:"Largest difference",
+  axLow:"still developing", axMid:"adequate", axHigh:"highly skilled",
+  teaserH:"This is what your profile looks like with colleague feedback",
+  teaserP:"In the 360 measurement you see, per competency, the colleagues' average (circle), the spread (band) and the difference from your own view (the line). That is where your blind spots sit.",
+  teaserEx:"example", teaserGo:"Start the 360 measurement", obToggle:"Rationale & legend", btnCancel:"Cancel",
+  obH1:"What is this assessment based on?",
+  obP1:"The Skills Meter builds on the original 360-degree method with four domains and has been brought up to date with current organisational science: a shift from directive \"command-and-control\" towards agile, inclusive and people-oriented leadership. The competencies have been sharpened using current research (including Korn Ferry, Harvard Business Impact, EY) and established concepts such as psychological safety (Edmondson), emotional intelligence (Goleman), coaching leadership and self-reflection.",
+  obH2:"How it works",
+  obP2:"20 competencies across 4 domains, each measured with two behavioural statements on a 5-point scale. Scores are summarised per competency and per domain on a 0–100 scale. In the 360 or team version several assessors are invited; their answers are summarised into an average with spread.",
+  obH3:"Legend",
+  obLeg1:"Triangle: the individual view — your self-assessment, or your assessment of the manager.",
+  obLeg2:"Circle: the average view of others or of the team.",
+  obLeg3:"Band: the spread — lowest to highest score among the assessors.",
+  obH4:"Measuring over time",
+  obP4:"This is a development instrument. Leadership grows through practice and feedback. It is worth repeating the measurement periodically and comparing progress with your previous one.",
+  obH5:"Privacy and GDPR",
+  obP5:"In the free version nothing is stored. In the paid version, assessors' answers are shown anonymously and in summary by default; individual answers are shown by name only if every assessor explicitly agrees. Personal data is deleted no later than 30 days after completion; for comparison we keep only aggregated scores in your account. Data is processed within the EU.",
+  obH6:"Important",
+  obP6:"This is a development instrument, not a formal appraisal or psychological diagnosis. The outcomes are a starting point for conversation and focused development.",
+  /* runtime */
+  na:"Not applicable to this role", progress:"{done} / 20",
+  raterEmpty:"No colleagues added yet.", raterRemove:"Remove",
+  inviteCount:"{n} colleague(s) added. From 3 responses onwards the team picture becomes visible.",
+  errName:"Please enter a name.", errEmail:"Please enter a valid email address.", errDup:"This email address is already on the list.",
+  waitCount:"{n} of {t} colleague(s) have responded.",
+  statusOpen:"no response yet", statusDone:"responded",
+  anonUnder:"{n} colleague(s) have responded. The team picture appears from 3 responses onwards; below you see your own view for now.",
+  anonNamed:"All {n} assessors are showing their names — individual answers can be traced.",
+  anonAgg:"Based on {n} assessors. Results are shown anonymously (average + spread); names appear only if every assessor agrees to it.",
+  spreadLeg:"spread",
+  actPrint:"Download as PDF / Print", actCompare:"Show difference with previous measurement", actBackWait:"Back to responses", actRestart:"Start over",
+  msgDemoReport:"Practice mode: the report is not saved to an account.",
+  msgSaved:"Report saved to your account.", msgUpdated:"Report updated in your account.",
+  msgSaveFail:"The report could not be saved to your account ({e}). Printing still works; try saving again later.",
+  msgCompareLive:"Comparing with your previous measurement becomes available once an earlier measurement is in your account.",
+  msgCompareDemo:"Practice mode: there is no earlier measurement to compare with.",
+  msgSendFail:"The invitations could not be sent. Please try again shortly. ({e})",
+  msgSendNoSync:"The invitations cannot be sent right now: the connection used to collect responses is unavailable. Please try again later.",
+  popupDemoNote:"<b>Practice mode:</b> no actual payment is made.",
+  aiBusy:"Preparing the in-depth analysis…",
+  aiLead:"In-depth analysis — generated automatically from your measurement results and the CINAB model. Every observation can be traced back to the figures in this report; it remains an aid to reflection and conversation, not a final verdict.",
+  aiGround:"Basis: "
+ }
+};
+
+var TEKST_ALL={
+ nl:{
+  lead:{vFree:["Gratis zelftest","1 persoon · geen account · resultaat op het scherm"],
+   vPaid:["360-meting","collega's uitnodigen · account + 1 credit · download/print"],
+   quizTitle:"Beoordeel jezelf", quizIntro:"Beoordeel jezelf op elke vaardigheid. Wees eerlijk — juist je ontwikkelpunten zijn waardevol.",
+   inviteIntro:"Nodig collega's uit om jou te beoordelen op dezelfde twintig competenties. Het teambeeld wordt zichtbaar vanaf 3 reacties.",
+   resultTitle:"Jouw leiderschapsprofiel",
+   resultNoteFree:"Dit is je eigen beeld van je leiderschap. Wil je weten hoe collega's je zien? Dat kan met de 360-meting.",
+   resultNote360:"Jouw beeld naast het gemiddelde van je collega's. Klik op een competentie voor de duiding van het verschil.",
+   selLeg:"jouw eigen beeld", othLeg:"gemiddelde van collega's", othCard:"anderen",
+   popupTitle:"Je kiest de 360-meting",
+   popupBody:"Hiervoor wordt <b>1 credit</b> afgeschreven. Deze analyse is pas zinvol als minimaal 3 mensen je uitnodiging beantwoorden. Nodig daarom voldoende collega's uit van wie je weet dat ze willen meewerken. Bij minder dan 3 reacties zie je wel je eigen resultaat, maar nog geen teambeeld.",
+   popupOk:"Akkoord (1 credit)"},
+  emp:{vFree:["Gratis beoordeling","1 persoon · geen account · resultaat op het scherm"],
+   vPaid:["Teamanalyse","collega's uitnodigen · account + 1 credit · download/print"],
+   quizTitle:"Beoordeel je leidinggevende", quizIntro:"Beoordeel je leidinggevende op elke vaardigheid. Wees zo eerlijk en objectief mogelijk.",
+   inviteIntro:"Nodig collega's uit om jullie leidinggevende te beoordelen op dezelfde twintig competenties. Het teambeeld wordt zichtbaar vanaf 3 reacties.",
+   resultTitle:"Profiel van je leidinggevende",
+   resultNoteFree:"Dit is jouw beeld van je leidinggevende. Wil je dit afzetten tegen het beeld van het hele team? Dat kan met de teamanalyse.",
+   resultNote360:"Jouw beeld van de leidinggevende naast het teamgemiddelde. Klik op een competentie voor de duiding.",
+   selLeg:"jouw beoordeling", othLeg:"gemiddelde van het team", othCard:"team",
+   popupTitle:"Je start een teamanalyse van je leidinggevende",
+   popupBody:"De uitkomst is een gezamenlijk beeld van het team. Nodig je je leidinggevende zelf ook uit, dan tellen zijn/haar antwoorden mee als die van een gelijkwaardig teamlid — er is geen aparte zelfbeoordeling.<br><br>Hiervoor wordt <b>1 credit</b> afgeschreven; de analyse is pas zinvol vanaf 3 reacties.",
+   popupOk:"Akkoord (1 credit)"}
+ },
+ en:{
+  lead:{vFree:["Free self-assessment","1 person · no account · result on screen"],
+   vPaid:["360 measurement","invite colleagues · account + 1 credit · download/print"],
+   quizTitle:"Assess yourself", quizIntro:"Assess yourself on each skill. Be honest — your development points are the valuable part.",
+   inviteIntro:"Invite colleagues to assess you on the same twenty competencies. The team picture becomes visible from 3 responses onwards.",
+   resultTitle:"Your leadership profile",
+   resultNoteFree:"This is your own view of your leadership. Want to know how colleagues see you? The 360 measurement shows that.",
+   resultNote360:"Your view alongside the average of your colleagues. Click a competency for an interpretation of the difference.",
+   selLeg:"your own view", othLeg:"average of colleagues", othCard:"others",
+   popupTitle:"You are choosing the 360 measurement",
+   popupBody:"This costs <b>1 credit</b>. The analysis only becomes meaningful once at least 3 people answer your invitation. So invite enough colleagues who you know are willing to take part. With fewer than 3 responses you still see your own result, but no team picture yet.",
+   popupOk:"Agree (1 credit)"},
+  emp:{vFree:["Free assessment","1 person · no account · result on screen"],
+   vPaid:["Team analysis","invite colleagues · account + 1 credit · download/print"],
+   quizTitle:"Assess your manager", quizIntro:"Assess your manager on each skill. Be as honest and objective as you can.",
+   inviteIntro:"Invite colleagues to assess your manager on the same twenty competencies. The team picture becomes visible from 3 responses onwards.",
+   resultTitle:"Your manager's profile",
+   resultNoteFree:"This is your view of your manager. Want to set it against the view of the whole team? The team analysis does that.",
+   resultNote360:"Your view of the manager alongside the team average. Click a competency for an interpretation.",
+   selLeg:"your assessment", othLeg:"team average", othCard:"team",
+   popupTitle:"You are starting a team analysis of your manager",
+   popupBody:"The outcome is a shared picture from the team. If you invite your manager as well, their answers count as those of an equal team member — there is no separate self-assessment.<br><br>This costs <b>1 credit</b>; the analysis only becomes meaningful from 3 responses onwards.",
+   popupOk:"Agree (1 credit)"}
+ }
+};
+var TEKST=TEKST_ALL.nl;
+
+/* Taal wisselen. Behoudt alle ingevoerde antwoorden en de huidige stap;
+   bouwt model + teksten opnieuw en her-rendert wat JS heeft getekend (standaard §17.7). */
+function setLang(l){
+ if(l!=="nl"&&l!=="en") l="nl";
+ LANG=l; TEKST=TEKST_ALL[LANG]; rebuildModel();
+ try{ localStorage.setItem("vlm_lang",LANG); }catch(e){}
+ if(Platform.isLive()) Platform.save();
+ applyI18n();
+ buildQuiz();                                             // tekent de stellingen opnieuw; restoreAnswers() zet de invoer terug
+ if(state.persp){ setPersp(state.persp); if(state.variant) setVariant(state.variant);
+  var t=TEKST[state.persp]; $("quiz-title").textContent=t.quizTitle; $("quiz-intro").textContent=t.quizIntro; }
+ if(state.screen==="invite") buildInvite();
+ if(state.screen==="wait") buildWait();
+ if(state.screen==="result") renderResult();
+}
+
+/* T('key') of T('key',{n:3}) — vertaalde string met eenvoudige {placeholder}-substitutie */
+function T(k,vars){
+ var s=(UI[LANG]&&UI[LANG][k]!=null)?UI[LANG][k]:(UI.nl[k]!=null?UI.nl[k]:k);
+ if(vars) Object.keys(vars).forEach(function(v){ s=s.split("{"+v+"}").join(vars[v]); });
+ return s;
+}
+/* Zet alle statisch aangehaakte teksten in de actieve taal. */
+function applyI18n(){
+ document.documentElement.lang=LANG;
+ document.querySelectorAll("[data-i18n]").forEach(function(el){ el.textContent=T(el.getAttribute("data-i18n")); });
+ document.querySelectorAll("[data-i18n-html]").forEach(function(el){ el.innerHTML=T(el.getAttribute("data-i18n-html")); });
+ document.querySelectorAll("[data-i18n-ph]").forEach(function(el){ el.setAttribute("placeholder",T(el.getAttribute("data-i18n-ph"))); });
+ document.querySelectorAll("[data-i18n-aria]").forEach(function(el){ el.setAttribute("aria-label",T(el.getAttribute("data-i18n-aria"))); });
+ var lb=$("lang-btn"); if(lb){ lb.textContent=T("langBtn"); lb.setAttribute("aria-label",T("langAria")); }
+}
 
 /* ====================== STATE & NAV ====================== */
 var state={persp:null,variant:null,answers:{},raters:[],responses:[],sort:"model",sel:null,demoNames:false,screen:null};
@@ -580,7 +857,7 @@ $("btn-start").onclick=function(){ if(!(state.persp&&state.variant)) return; if(
 /* ====================== BETAALPOORT (popup) ====================== */
 function openPaywall(){
  var t=TEKST[state.persp];
- $("modal-t").textContent=t.popupTitle; $("modal-body").innerHTML="<p>"+t.popupBody+"</p>"+(Platform.isLive()?"":"<p style='color:var(--cinab-grey);font-size:13px'><b>Demo:</b> er wordt geen echte betaling gedaan.</p>");
+ $("modal-t").textContent=t.popupTitle; $("modal-body").innerHTML="<p>"+t.popupBody+"</p>"+(Platform.isLive()?"":"<p style='color:var(--cinab-grey);font-size:13px'>"+T("popupDemoNote")+"</p>");
  $("modal-ok").textContent=t.popupOk; $("overlay").hidden=false;
  $("modal-ok").disabled=false; $("modal-ok").focus();
  $("modal-ok").onclick=async function(){
@@ -608,7 +885,7 @@ window.addEventListener("pageshow",function(){ closeModal(); $("modal-ok").disab
 function scaleHTML(name,label){var h='<div class="scale" role="radiogroup" aria-label="'+esc(label||"")+'">';for(var i=1;i<=5;i++){h+='<input type="radio" id="'+name+'_'+i+'" name="'+name+'" value="'+i+'"><label for="'+name+'_'+i+'">'+i+'</label>';}return h+'</div>';}
 function startQuiz(){
  var t=TEKST[state.persp];$("quiz-title").textContent=t.quizTitle;$("quiz-intro").textContent=t.quizIntro;
- $("btn-result").textContent=(state.variant==="paid")?"Naar uitnodigen":"Bekijk mijn resultaat";
+ $("btn-result").textContent=(state.variant==="paid")?T("btnToInvite"):T("btnResult");
  buildQuiz();show("screen-quiz");
 }
 var quizBuilt=false;
@@ -622,7 +899,7 @@ function buildQuiz(){
    el.innerHTML='<p class="comp__title"><span class="coin" style="background:'+d.color+'"></span>'+c.n+' · '+c.label+'</p>'+
     '<div class="stmt"><p class="stmt__txt">'+c.a+'</p>'+scaleHTML(c.n+"_a",c.a)+'</div>'+
     '<div class="stmt"><p class="stmt__txt">'+c.b+'</p>'+scaleHTML(c.n+"_b",c.b)+'</div>'+
-    '<label class="na-row"><input type="checkbox" id="na-'+c.n+'"> Niet van toepassing voor deze functie</label>';
+    '<label class="na-row"><input type="checkbox" id="na-'+c.n+'"> '+T("na")+'</label>';
    blk.appendChild(el);
   });
   body.appendChild(blk);
@@ -645,7 +922,7 @@ function onAnswer(e){var t=e.target;
  updateProgress();
 }
 function resolved(c){var a=state.answers[c.n];return a&&(a.na===true||(a.a&&a.b));}
-function updateProgress(){var done=COMPS.filter(resolved).length;$("pbar").style.width=(done/20*100)+"%";$("pnum").textContent=done+" / 20";$("btn-result").disabled=(done<20);}
+function updateProgress(){var done=COMPS.filter(resolved).length;$("pbar").style.width=(done/20*100)+"%";$("pnum").textContent=T("progress",{done:done});$("btn-result").disabled=(done<20);}
 $("btn-result").onclick=function(){ if(COMPS.filter(resolved).length<20) return;            // voorwaarde ook bij directe aanroep
  if(state.variant==="paid"){ buildInvite(); show("screen-invite"); } else { renderResult(); show("screen-result"); } };
 
@@ -656,33 +933,33 @@ function renderRaters(){
  state.raters.forEach(function(r,i){
   var el=document.createElement("div");el.className="rater";
   el.innerHTML='<div class="rater__meta"><div class="rater__name">'+esc(r.name)+'</div><div class="rater__sub">'+esc(r.email)+'</div></div>'+
-   '<span class="badge badge--wait">toegevoegd</span><button class="iconbtn" data-i="'+i+'" aria-label="Verwijderen">&times;</button>';
+   '<span class="badge badge--wait">'+T("statusOpen")+'</span><button class="iconbtn" data-i="'+i+'" aria-label="'+T("raterRemove")+'">&times;</button>';
   box.appendChild(el);
  });
  box.querySelectorAll(".iconbtn").forEach(function(b){b.onclick=function(){state.raters.splice(+b.dataset.i,1);renderRaters();if(Platform.isLive())Platform.save();};});
- $("invite-count").textContent=state.raters.length+" collega('s) toegevoegd. Advies: nodig er ruim voldoende uit, want het teambeeld verschijnt vanaf 3 reacties.";
+ $("invite-count").textContent=T("inviteCount",{n:state.raters.length});
  disarmSend(); $("btn-send").disabled=state.raters.length<1;
 }
 /* §11B twee-staps-knop: versturen is onomkeerbaar */
 var sendArmed=false;
-function disarmSend(){sendArmed=false;var b=$("btn-send");b.setAttribute("aria-pressed","false");b.textContent="Verstuur uitnodigingen";}
+function disarmSend(){sendArmed=false;var b=$("btn-send");b.setAttribute("aria-pressed","false");b.textContent=T("btnSend");}
 $("btn-add-rater").onclick=function(){
  var name=$("r-name").value.trim(),email=$("r-email").value.trim().toLowerCase();
- if(!name||!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){msg("invite-msg","Vul een naam en een geldig e-mailadres in.");return;}
- if(state.raters.some(function(r){return r.email.toLowerCase()===email;})){msg("invite-msg","Dit e-mailadres staat al in de lijst.");return;}
+ if(!name||!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){msg("invite-msg",T("errEmail"));return;}
+ if(state.raters.some(function(r){return r.email.toLowerCase()===email;})){msg("invite-msg",T("errDup"));return;}
  msg("invite-msg","");
  state.raters.push({name:name,email:email});$("r-name").value="";$("r-email").value="";renderRaters();
  if(Platform.isLive())Platform.save();
 };
 $("btn-invite-back").onclick=function(){show("screen-quiz");};
 $("btn-send").onclick=async function(){
- if(!sendArmed){ sendArmed=true; $("btn-send").setAttribute("aria-pressed","true"); $("btn-send").textContent="Klik nogmaals om "+state.raters.length+" uitnodiging(en) definitief te versturen"; msg("invite-msg","Controleer de namen en e-mailadressen. Na versturen kun je de lijst niet meer wijzigen."); return; }
+ if(!sendArmed){ sendArmed=true; $("btn-send").setAttribute("aria-pressed","true"); $("btn-send").textContent=T("sendArm",{n:state.raters.length}); msg("invite-msg",T("sendArmNote")); return; }
  var qp=new URLSearchParams(location.search);
  var meta={persp:state.persp,template_id:"vaardigheidsmeter_leidinggeven",
-  organisatie:qp.get("org")||"", initiatiefnemer:qp.get("initiator")||"", subject:qp.get("subject")||"je leidinggevende"};
+  organisatie:qp.get("org")||"", initiatiefnemer:qp.get("initiator")||"", subject:qp.get("subject")||(LANG==="en"?"your manager":"je leidinggevende")};
  $("btn-send").disabled=true;
  try{ await Platform.sendInvites(state.raters,meta); msg("invite-msg",""); buildWait();show("screen-wait"); }
- catch(e){ msg("invite-msg","De uitnodigingen konden niet worden verstuurd. Probeer het zo opnieuw. ("+((e&&e.message)||"")+")"); disarmSend(); $("btn-send").disabled=false; }
+ catch(e){ msg("invite-msg",(e&&e.message==="rtdb_unavailable")?T("msgSendNoSync"):T("msgSendFail",{e:((e&&e.message)||"")})); disarmSend(); $("btn-send").disabled=false; }
 };
 
 /* ====================== VERZAMELEN ====================== */
@@ -697,11 +974,11 @@ function renderWait(){
  state.raters.forEach(function(r){
   var done=state.responses.some(function(x){return (x.email&&norm(x.email)===norm(r.email))||(!x.email&&x.name&&norm(x.name)===norm(r.name));});
   var el=document.createElement("div");el.className="rater";
-  el.innerHTML='<div class="rater__meta"><div class="rater__name">'+esc(r.name)+'</div></div><span class="badge '+(done?"badge--done":"badge--wait")+'">'+(done?"gereageerd":"wacht")+'</span>';
+  el.innerHTML='<div class="rater__meta"><div class="rater__name">'+esc(r.name)+'</div></div><span class="badge '+(done?"badge--done":"badge--wait")+'">'+(done?T("statusDone"):T("statusOpen"))+'</span>';
   box.appendChild(el);
  });
  var c=state.responses.length;
- $("wait-count").textContent=c+" van "+state.raters.length+" hebben gereageerd."+(c<3?(" Nog "+(3-c)+" nodig voordat het teambeeld zichtbaar wordt."):" Het teambeeld is beschikbaar.");
+ $("wait-count").textContent=T("waitCount",{n:c,t:state.raters.length});
  $("btn-to-result").disabled=c<1;
 }
 $("btn-sim").onclick=function(){
@@ -725,51 +1002,256 @@ function domainTeam(d){var v=d.comps.map(teamAgg).filter(function(x){return x;})
    Rijke, niet-herhalende analyse: combineert veel afgeleide signalen met de echte
    competentienamen/scores, een per-competentie adviesbibliotheek, benoemde patronen
    en deterministische zinsvariatie (seed uit het profiel). */
-var BE={
- FACET:{
-  LV1:["richting concreet maken","betekenis geven aan het werk"],LV2:["verwachtingen helder maken","samen haalbare doelen stellen"],
-  LV3:["energie voor gezamenlijke doelen","aansluiten bij wat mensen drijft"],LV4:["voorbeeldgedrag","verantwoordelijkheid voor eigen ontwikkeling"],
-  LV5:["belangen van het team behartigen","relaties onderhouden"],LV6:["plannen en prioriteren","hybride en transparant organiseren"],
-  LV7:["de juiste mensen betrekken","tijdig knopen doorhakken"],LV8:["het probleem doorgronden","opties afwegen en kiezen"],
-  LV9:["gelijke spelregels hanteren","vooroordeel herkennen en corrigeren"],LV10:["sturen op resultaat","waarde voor de klant centraal houden"],
-  LV11:["ontwikkelbehoeften in beeld brengen","coachen met vragen en ruimte"],LV12:["taken en verantwoordelijkheid geven","vertrouwen en kaders geven"],
-  LV13:["waarderende feedback","opbouwende feedback"],LV14:["zicht op groei- en loopbaankansen","gelijke kansen om te groeien"],
-  LV15:["samenwerking bevorderen","psychologische veiligheid creëren"],LV16:["kansen zien","anderen aanmoedigen tot ideeën"],
-  LV17:["nieuwe werkwijzen uitproberen","leren van wat misgaat"],LV18:["tijdig communiceren over verandering","rekening houden met wat het met mensen doet"],
-  LV19:["actief om feedback vragen","er zichtbaar iets mee doen"],LV20:["oorzaken van weerstand benoemen","mensen meekrijgen"]
+/* ══════════════ BESCHOUWING — taalpakket (NL/EN) + engine ══════════════
+   De logica staat in de engine; álle tekst komt uit BETXT[LANG] (testprotocol §6b). */
+var BETXT={
+ nl:{
+  FACET:{
+   LV1:["richting concreet maken","betekenis geven aan het werk"],LV2:["verwachtingen helder maken","samen haalbare doelen stellen"],
+   LV3:["energie voor gezamenlijke doelen","aansluiten bij wat mensen drijft"],LV4:["voorbeeldgedrag","verantwoordelijkheid voor eigen ontwikkeling"],
+   LV5:["belangen van het team behartigen","relaties onderhouden"],LV6:["plannen en prioriteren","hybride en transparant organiseren"],
+   LV7:["de juiste mensen betrekken","tijdig knopen doorhakken"],LV8:["het probleem doorgronden","opties afwegen en kiezen"],
+   LV9:["gelijke spelregels hanteren","vooroordeel herkennen en corrigeren"],LV10:["sturen op resultaat","waarde voor de klant centraal houden"],
+   LV11:["ontwikkelbehoeften in beeld brengen","coachen met vragen en ruimte"],LV12:["taken en verantwoordelijkheid geven","vertrouwen en kaders geven"],
+   LV13:["waarderende feedback","opbouwende feedback"],LV14:["zicht op groei- en loopbaankansen","gelijke kansen om te groeien"],
+   LV15:["samenwerking bevorderen","psychologische veiligheid creëren"],LV16:["kansen zien","anderen aanmoedigen tot ideeën"],
+   LV17:["nieuwe werkwijzen uitproberen","leren van wat misgaat"],LV18:["tijdig communiceren over verandering","rekening houden met wat het met mensen doet"],
+   LV19:["actief om feedback vragen","er zichtbaar iets mee doen"],LV20:["oorzaken van weerstand benoemen","mensen meekrijgen"]
+  },
+  ADVICE:{
+   LV1:"Vertaal de organisatiekoers elk kwartaal expliciet naar wat die voor het team betekent, en toets of mensen die rode draad herkennen.",
+   LV2:"Maak verwachtingen meetbaar: leg per teamlid een paar concrete doelen en kaders vast en bespreek die regelmatig.",
+   LV3:"Voer korte motivatiegesprekken: vraag wat mensen energie geeft en geef ze daar meer ruimte en autonomie in.",
+   LV4:"Vraag een vertrouwde collega te wijzen op momenten waarop gedrag en boodschap uiteenlopen.",
+   LV5:"Breng de belangrijkste stakeholders in kaart en plan bewust contactmomenten om steun en ruimte voor het team op te halen.",
+   LV6:"Werk met een zichtbare prioriteitenlijst en heldere afspraken over wie wat wanneer doet — ook voor wie op afstand werkt.",
+   LV7:"Maak vooraf expliciet wie bij een besluit wordt betrokken en waarom, en zet een einddatum zodat besluiten niet blijven hangen.",
+   LV8:"Besteed bij een lastig vraagstuk eerst tijd aan de probleemdefinitie en de oorzaken, vóór het zoeken naar oplossingen.",
+   LV9:"Toets besluiten op consistentie: wordt dezelfde maatstaf op iedereen toegepast, inclusief op jezelf?",
+   LV10:"Maak per doel zichtbaar wat het oplevert voor de klant of eindgebruiker, en houd de voortgang voor iedereen inzichtelijk.",
+   LV11:"Vervang in coachgesprekken een deel van de adviezen door open vragen, zodat mensen zelf tot oplossingen komen.",
+   LV12:"Delegeer bewust een taak inclusief verantwoordelijkheid en mandaat, en weersta de neiging om bij te sturen.",
+   LV13:"Plan vaste, korte feedbackmomenten en zorg dat zowel waardering als opbouwende punten aan bod komen.",
+   LV14:"Voer met elk teamlid minstens jaarlijks een loopbaangesprek en let erop dat iedereen gelijke kansen krijgt.",
+   LV15:"Maak het bespreken van fouten normaal: deel eerst een eigen misser en bedank wie kritiek of twijfel durft te uiten.",
+   LV16:"Reserveer expliciet tijd om met het team naar verbeterkansen te kijken en honoreer ideeën zichtbaar.",
+   LV17:"Kies een kleinschalig experiment met onzekere uitkomst en evalueer hardop wat het oplevert.",
+   LV18:"Communiceer bij veranderingen eerder en vaker dan vanzelf gebeurt, en benoem ook wat het voor mensen betekent.",
+   LV19:"Vraag concreet om feedback ('wat zou ik anders kunnen doen?') en laat zichtbaar zien wat ermee gebeurt.",
+   LV20:"Ga bij weerstand in gesprek over de oorzaak in plaats van die te willen wegnemen, en betrek twijfelaars vroeg."
+  },
+  BAND:[["pril","beperkt","kwetsbaar"],["wisselend","gemengd","ongelijk"],["solide","degelijk","behoorlijk"],["sterk","stevig","krachtig"],["uitmuntend","zeer sterk","uitgesproken"]],
+  and:" en ",
+  h2:"Beschouwing",
+  sect:{beeld:"Het beeld in het kort",sterk:"Sterke punten",ontw:"Ontwikkelpunten",samen:"Samenhang & patronen",advies:"Advies voor ontwikkeling",vervolg:"Vervolg"},
+  subj:function(lead){return lead?"je leiderschap":"het leiderschap van je leidinggevende";},
+  subjShort:function(lead){return lead?"je":"je leidinggevende";},
+  intro:function(){return[
+   "Automatisch opgesteld uit de gegeven antwoorden — bedoeld als hulpmiddel voor reflectie en gesprek, niet als oordeel.",
+   "Onderstaande analyse is afgeleid uit de scores en dient als startpunt voor het gesprek, niet als eindoordeel.",
+   "Deze beschouwing vat de antwoorden samen ter ondersteuning van reflectie; het blijft een momentopname."];},
+  opener:function(bw,mean,topD,botD,V,subj){return[
+   beCap(bw)+" totaalbeeld: gemiddeld "+mean+" op 100. Het stevigst is "+topD.name+" ("+V[topD.id]+"); "+botD.name+" ("+V[botD.id]+") vraagt de meeste aandacht.",
+   "Over de twintig competenties komt "+subj+" uit op gemiddeld "+mean+" (op 100) — "+bw+". De pieken liggen bij "+topD.name+", het dal bij "+botD.name+".",
+   "Gemiddeld "+mean+" van de 100, een "+bw+" beeld. "+topD.name+" draagt het profiel ("+V[topD.id]+"), terwijl "+botD.name+" achterblijft ("+V[botD.id]+").",
+   "Het profiel oogt "+bw+" (gemiddeld "+mean+"), met "+topD.name+" als sterkste en "+botD.name+" als zwakste domein."];},
+  openerSingle:function(subj,bw,mean){return "Over de ingevulde competenties ligt "+subj+" op een "+bw+" niveau (gemiddeld "+mean+" op 100).";},
+  gapOver:function(lead,g){return lead
+   ?["Over de hele linie schat je jezelf iets gunstiger in dan je collega’s ("+g+" punten gemiddeld) — goed om alert op te blijven.","Gemiddeld ligt je zelfbeeld "+g+" punten boven dat van je collega’s; dat patroon keert op meerdere competenties terug."]
+   :["Jij beoordeelt je leidinggevende gemiddeld "+g+" punten hoger dan het team.","Jouw beeld ligt gemiddeld "+g+" punten boven dat van het team."];},
+  gapUnder:function(lead,g){return lead
+   ?["Opvallend: gemiddeld beoordeel je jezelf "+g+" punten lager dan je collega’s — eerder te streng dan te mild.","Je bent gemiddeld strenger voor jezelf dan je omgeving; collega’s waarderen je "+g+" punten hoger."]
+   :["Jij beoordeelt je leidinggevende gemiddeld "+g+" punten lager dan het team.","Jouw beeld ligt gemiddeld "+g+" punten onder dat van het team."];},
+  archBalanced:function(V,hi){return[
+   "De vier domeinen liggen dicht bij elkaar (rond "+V[hi]+") — een opvallend evenwichtig profiel zonder uitgesproken pieken of dalen.",
+   "Wat opvalt is de balans: de domeinen ontlopen elkaar nauwelijks (rond "+V[hi]+"). Dat geeft een stabiele basis om gericht één of twee punten aan te scherpen.",
+   "Het profiel is gelijkmatig over de vier domeinen verdeeld (rond "+V[hi]+"); geen domein domineert het beeld of trekt het scheef."];},
+  archRvMo:function(V,N){return[
+   "Richting geven ("+N("richting_visie")+", "+V.richting_visie+") gaat duidelijk beter dan het ontwikkelen van mensen ("+N("mensen_ontwikkeling")+", "+V.mensen_ontwikkeling+") — het beeld van een sturende, koersvaste stijl. De groei zit erin datzelfde eigenaarschap ook bij mensen te leggen.",
+   "Sterk in koers en kaders ("+N("richting_visie")+", "+V.richting_visie+"), lichter in het laten groeien van mensen ("+V.mensen_ontwikkeling+"). Een richtinggevende stijl die wint aan kracht zodra coachen en ruimte geven meer aandacht krijgen.",
+   "Het profiel leunt op richting en visie, terwijl het mensgerichte deel achterblijft ("+V.mensen_ontwikkeling+" tegenover "+V.richting_visie+") — typerend voor wie graag vooroploopt en de ontwikkeling van het team nog meer naar zich toe kan trekken."];},
+  archUwVi:function(V,N){return[
+   "De uitvoering is sterk ("+N("uitvoering_wendbaarheid")+", "+V.uitvoering_wendbaarheid+"), vernieuwen gebeurt voorzichtiger ("+N("verandering_innovatie")+", "+V.verandering_innovatie+"). Een betrouwbare, resultaatgerichte stijl; de uitdaging is meer ruimte maken voor experimenteren.",
+   "Betrouwbaar in de executie ("+V.uitvoering_wendbaarheid+"), terughoudender met vernieuwing ("+V.verandering_innovatie+"). Het profiel levert en borgt, maar mag wat vaker buiten gebaande paden durven.",
+   "Plannen, organiseren en resultaat zitten goed ("+V.uitvoering_wendbaarheid+"); experimenteren en veranderen blijven achter ("+V.verandering_innovatie+"). Een stabiele uitvoerder met ruimte om wendbaarder te worden."];},
+  archMoRv:function(V,N){return[
+   "Het ontwikkelen van mensen ("+N("mensen_ontwikkeling")+", "+V.mensen_ontwikkeling+") gaat beter dan het neerzetten van richting ("+N("richting_visie")+", "+V.richting_visie+"). Een mensgerichte stijl die aan kracht wint door scherper te zijn op visie, kaders en verwachtingen.",
+   "Verbindend en mensgericht ("+V.mensen_ontwikkeling+"), terwijl expliciete richting en kaders lichter zijn ("+V.richting_visie+"). De groei zit in het duidelijker maken van koers en verwachtingen.",
+   "De kracht ligt bij mensen ("+V.mensen_ontwikkeling+"); de heldere stip op de horizon ("+V.richting_visie+") mag steviger — dan landt de aandacht voor mensen in een duidelijker verhaal."];},
+  archViUw:function(V,N){return[
+   "Er is een duidelijke drang tot vernieuwen ("+N("verandering_innovatie")+", "+V.verandering_innovatie+"), terwijl de uitvoering achterblijft ("+N("uitvoering_wendbaarheid")+", "+V.uitvoering_wendbaarheid+"). Bewaak dat plannen en afspraken de ideeën blijven dragen.",
+   "Vernieuwend en kansgericht ("+V.verandering_innovatie+"), wat losser in de borging ("+V.uitvoering_wendbaarheid+"). Een ideeënrijke stijl die wint zodra de executie de vernieuwing bijhoudt.",
+   "Veel beweging en ideeën ("+V.verandering_innovatie+"), maar de uitvoering ("+V.uitvoering_wendbaarheid+") houdt het tempo niet altijd bij — daar is de winst te halen."];},
+  archFallback:function(V,N,hi,lo,range){return[
+   "Het beeld is wisselend: "+N(hi)+" springt eruit ("+V[hi]+"), terwijl "+N(lo)+" achterblijft ("+V[lo]+"). Daar ligt de duidelijkste richting voor ontwikkeling.",
+   N(hi)+" is het sterkste domein ("+V[hi]+") en "+N(lo)+" het zwakste ("+V[lo]+"); de afstand daartussen ("+range+" punten) markeert de ontwikkelruimte.",
+   "Tussen "+N(hi)+" ("+V[hi]+") en "+N(lo)+" ("+V[lo]+") zit een verschil van "+range+" punten — het profiel is duidelijk ongelijk verdeeld."];},
+  strongLead:function(){return["De duidelijkste sterktes zijn ","Het meest vaardig komt naar voren: ","De kracht zit vooral in ","Bovenaan staan ","Wat eruit springt: "];},
+  strongTail:function(subjShort){return["Dit zijn de punten waarop "+subjShort+" kan bouwen.","Hier ligt een natuurlijk vertrekpunt om anderen mee te nemen.","Deze kwaliteiten geven het profiel zijn fundament.","Het loont om deze sterktes bewust in te zetten bij de ontwikkelpunten hieronder."];},
+  hidden:function(lead,names){return[
+   (lead?"Je collega’s waarderen je zelfs hoger dan jij jezelf op ":"Het team waardeert hoger dan jij op ")+names+" — mogelijk onderschatte krachten.",
+   "Hoger dan "+(lead?"je zelfbeeld":"jouw beeld")+" scoort "+(lead?"de omgeving":"het team")+" op "+names+": daar zien anderen meer dan in het eigen oordeel."];},
+  weakLead:function(){return["De meeste ontwikkelruimte zit bij ","De grootste winst valt te halen op ","Het laagst scoren ","Aandacht vraagt vooral ","Ruimte voor groei ligt bij "];},
+  blind:function(lead,names){return[
+   (lead?"Let in het bijzonder op je blinde vlekken — waar je jezelf duidelijk hoger inschat dan je collega’s: ":"Let op de blinde vlekken, waar jij hoger oordeelt dan het team: ")+names+".",
+   "Het grootste verschil tussen "+(lead?"zelfbeeld en omgeving":"jouw beeld en het team")+" zit bij "+names+" — juist daar is winst te boeken."];},
+  outlier:function(domName,label,score,domAvg){return[
+   "Binnen "+domName+" is het beeld niet gelijkmatig: "+label+" ("+score+") wijkt sterk af van de rest van het domein (gemiddeld "+domAvg+").",
+   "Het domein "+domName+" hangt scheef: "+label+" ("+score+") trekt het beeld, terwijl de overige competenties dichter bij "+domAvg+" liggen.",
+   "Opvallend binnen "+domName+": "+label+" ("+score+") springt eruit ten opzichte van de andere competenties in hetzelfde domein."];},
+  facet:function(label,hf,lf){return[
+   "Binnen "+label+" lopen de twee gedragingen uiteen: “"+hf+"” gaat beter dan “"+lf+"”.",
+   "Bij "+label+" zit een interne spanning — “"+hf+"” is sterker ontwikkeld dan “"+lf+"”.",
+   label+" is geen eenheid: “"+hf+"” en “"+lf+"” verschillen merkbaar."];},
+  divided:function(label,spread){return[
+   "De collega’s zijn het duidelijk oneens over "+label+" (spreiding "+spread+") — het beeld hangt sterk af van wie je het vraagt.",
+   "Over "+label+" lopen de meningen ver uiteen; dat verschil tussen beoordelaars is op zichzelf het bespreken waard."];},
+  consensus:function(label){return[
+   "Over "+label+" is het team het juist opvallend eens — een betrouwbaar signaal.",
+   "Bij "+label+" zijn de beoordelaars eensgezind; dat maakt dat deel van het beeld stevig."];},
+  adviceLead:function(lead){return lead
+   ?["Waar je mee kunt beginnen:","Een paar concrete vervolgstappen:","Suggesties om mee aan de slag te gaan:","Gericht aan de slag:"]
+   :["Mogelijke ontwikkelpunten om met je leidinggevende te bespreken:","Bespreekpunten voor het gesprek met je leidinggevende:"];},
+  combo:function(lead){return lead
+   ?["Let op de samenhang: enkele blinde vlekken gaan samen met een lage score op actief feedback vragen (LV19). Die twee versterken elkaar — juist door gerichter om feedback te vragen verklein je de blinde vlekken.","Eén rode draad verdient aandacht: blinde vlekken én weinig om feedback vragen (LV19) horen bij elkaar. Meer feedback ophalen is de hefboom die de rest in beweging zet."]
+   :["De combinatie van blinde vlekken en een lage score op feedback vragen (LV19) houdt zichzelf in stand — een goed startpunt voor het gesprek.","Blinde vlekken en weinig feedback vragen (LV19) hangen samen; daar feedback op organiseren raakt meerdere punten tegelijk."];},
+  closing:function(lead){return lead
+   ?["Bespreek deze punten met je manager, een collega of een coach — hun voorbeelden maken de feedback concreet.","Kies er één uit om de komende periode echt op te oefenen; één punt goed verankeren werkt beter dan alles tegelijk."]
+   :["Bespreek deze punten samen met je leidinggevende; concrete voorbeelden maken het bruikbaar.","Deel deze punten als ontwikkelsignaal, niet als oordeel — de waarde zit in het gesprek erover."];},
+  vervolgOpen:function(){return["Leiderschap groeit door oefening en feedback.","Ontwikkeling is een kwestie van herhaling en reflectie.","Vaardigheden verschuiven langzaam — meten over tijd maakt groei zichtbaar."];},
+  vervolgTail:function(is360,lead){return is360
+   ?(lead?"Bespreek dit teambeeld na en herhaal de meting na verloop van tijd om je voortgang te volgen.":"Deel en bespreek dit teambeeld en herhaal de meting periodiek om de ontwikkeling te volgen.")
+   :(lead?"Wil je een vollediger beeld, nodig dan collega’s uit voor de 360-meting; herhaal de meting daarnaast periodiek.":"Wil je dit afzetten tegen het hele team, start dan de teamanalyse; herhaal de meting periodiek om de voortgang te volgen.");}
  },
- ADVICE:{
-  LV1:"Vertaal de organisatiekoers elk kwartaal expliciet naar wat die voor het team betekent, en toets of mensen die rode draad herkennen.",
-  LV2:"Maak verwachtingen meetbaar: leg per teamlid een paar concrete doelen en kaders vast en bespreek die regelmatig.",
-  LV3:"Voer korte motivatiegesprekken: vraag wat mensen energie geeft en geef ze daar meer ruimte en autonomie in.",
-  LV4:"Vraag een vertrouwde collega te wijzen op momenten waarop gedrag en boodschap uiteenlopen.",
-  LV5:"Breng de belangrijkste stakeholders in kaart en plan bewust contactmomenten om steun en ruimte voor het team op te halen.",
-  LV6:"Werk met een zichtbare prioriteitenlijst en heldere afspraken over wie wat wanneer doet — ook voor wie op afstand werkt.",
-  LV7:"Maak vooraf expliciet wie bij een besluit wordt betrokken en waarom, en zet een einddatum zodat besluiten niet blijven hangen.",
-  LV8:"Besteed bij een lastig vraagstuk eerst tijd aan de probleemdefinitie en de oorzaken, vóór het zoeken naar oplossingen.",
-  LV9:"Toets besluiten op consistentie: wordt dezelfde maatstaf op iedereen toegepast, inclusief op jezelf?",
-  LV10:"Maak per doel zichtbaar wat het oplevert voor de klant of eindgebruiker, en houd de voortgang voor iedereen inzichtelijk.",
-  LV11:"Vervang in coachgesprekken een deel van de adviezen door open vragen, zodat mensen zelf tot oplossingen komen.",
-  LV12:"Delegeer bewust een taak inclusief verantwoordelijkheid en mandaat, en weersta de neiging om bij te sturen.",
-  LV13:"Plan vaste, korte feedbackmomenten en zorg dat zowel waardering als opbouwende punten aan bod komen.",
-  LV14:"Voer met elk teamlid minstens jaarlijks een loopbaangesprek en let erop dat iedereen gelijke kansen krijgt.",
-  LV15:"Maak het bespreken van fouten normaal: deel eerst een eigen misser en bedank wie kritiek of twijfel durft te uiten.",
-  LV16:"Reserveer expliciet tijd om met het team naar verbeterkansen te kijken en honoreer ideeën zichtbaar.",
-  LV17:"Kies een kleinschalig experiment met onzekere uitkomst en evalueer hardop wat het oplevert.",
-  LV18:"Communiceer bij veranderingen eerder en vaker dan vanzelf gebeurt, en benoem ook wat het voor mensen betekent.",
-  LV19:"Vraag concreet om feedback ('wat zou ik anders kunnen doen?') en laat zichtbaar zien wat ermee gebeurt.",
-  LV20:"Ga bij weerstand in gesprek over de oorzaak in plaats van die te willen wegnemen, en betrek twijfelaars vroeg."
+ en:{
+  FACET:{
+   LV1:["making the direction concrete","giving meaning to the work"],LV2:["making expectations clear","setting achievable goals together"],
+   LV3:["energy for shared goals","connecting with what drives people"],LV4:["leading by example","taking responsibility for own development"],
+   LV5:["representing the team's interests","maintaining relationships"],LV6:["planning and prioritising","organising hybrid work transparently"],
+   LV7:["involving the right people","making the call in good time"],LV8:["getting to the bottom of the problem","weighing options and choosing"],
+   LV9:["applying the same rules to all","recognising and correcting bias"],LV10:["steering on results","keeping customer value central"],
+   LV11:["mapping development needs","coaching with questions and room"],LV12:["handing over tasks and responsibility","giving trust and clear boundaries"],
+   LV13:["appreciative feedback","constructive feedback"],LV14:["clarity on growth and career paths","equal chances to grow"],
+   LV15:["promoting collaboration","creating psychological safety"],LV16:["spotting opportunities","encouraging others to bring ideas"],
+   LV17:["trying out new ways of working","learning from what goes wrong"],LV18:["communicating about change in time","allowing for the human impact"],
+   LV19:["actively asking for feedback","visibly acting on it"],LV20:["naming the causes of resistance","getting people on board"]
+  },
+  ADVICE:{
+   LV1:"Translate the organisation's course into what it means for the team every quarter, and check whether people recognise that thread.",
+   LV2:"Make expectations measurable: set a few concrete goals and boundaries per team member and revisit them regularly.",
+   LV3:"Hold short motivation conversations: ask what gives people energy and give them more room and autonomy there.",
+   LV4:"Ask a trusted colleague to point out moments where your behaviour and your message drift apart.",
+   LV5:"Map the key stakeholders and deliberately plan contact moments to secure support and room for the team.",
+   LV6:"Work with a visible priority list and clear agreements on who does what and when — including for people working remotely.",
+   LV7:"State upfront who is involved in a decision and why, and set a deadline so decisions do not linger.",
+   LV8:"On a difficult issue, spend time on defining the problem and its causes before looking for solutions.",
+   LV9:"Test decisions for consistency: is the same standard applied to everyone, including yourself?",
+   LV10:"Make visible per goal what it delivers for the customer or end user, and keep progress transparent for everyone.",
+   LV11:"In coaching conversations, replace part of your advice with open questions so people reach their own solutions.",
+   LV12:"Deliberately delegate a task including responsibility and mandate, and resist the urge to step back in.",
+   LV13:"Schedule short, regular feedback moments and make sure both appreciation and constructive points come up.",
+   LV14:"Hold a career conversation with every team member at least once a year and watch that everyone gets equal chances.",
+   LV15:"Make discussing mistakes normal: share one of your own first and thank those who voice criticism or doubt.",
+   LV16:"Explicitly set aside time to look at improvement opportunities with the team, and reward ideas visibly.",
+   LV17:"Pick one small-scale experiment with an uncertain outcome and evaluate out loud what it delivers.",
+   LV18:"When things change, communicate earlier and more often than comes naturally, and name what it means for people.",
+   LV19:"Ask for feedback concretely ('what could I do differently?') and show visibly what you do with it.",
+   LV20:"When you meet resistance, discuss its cause rather than trying to remove it, and involve the doubters early.",
+  },
+  BAND:[["early-stage","limited","fragile"],["mixed","uneven","variable"],["solid","sound","respectable"],["strong","robust","powerful"],["outstanding","very strong","pronounced"]],
+  and:" and ",
+  h2:"Analysis",
+  sect:{beeld:"The picture in brief",sterk:"Strengths",ontw:"Development points",samen:"Patterns & coherence",advies:"Advice for development",vervolg:"Next steps"},
+  subj:function(lead){return lead?"your leadership":"your manager's leadership";},
+  subjShort:function(lead){return lead?"you":"your manager";},
+  intro:function(){return[
+   "Generated automatically from the answers given — intended as an aid to reflection and conversation, not as a verdict.",
+   "The analysis below is derived from the scores and serves as a starting point for the conversation, not as a final judgement.",
+   "This analysis summarises the answers to support reflection; it remains a snapshot in time."];},
+  opener:function(bw,mean,topD,botD,V,subj){return[
+   beCap(bw)+" overall picture: an average of "+mean+" out of 100. Firmest is "+topD.name+" ("+V[topD.id]+"); "+botD.name+" ("+V[botD.id]+") needs the most attention.",
+   "Across the twenty competencies, "+subj+" comes out at an average of "+mean+" (out of 100) — "+bw+". The peaks sit at "+topD.name+", the low point at "+botD.name+".",
+   "An average of "+mean+" out of 100, a "+bw+" picture. "+topD.name+" carries the profile ("+V[topD.id]+"), while "+botD.name+" lags behind ("+V[botD.id]+").",
+   "The profile looks "+bw+" (averaging "+mean+"), with "+topD.name+" as the strongest and "+botD.name+" as the weakest domain."];},
+  openerSingle:function(subj,bw,mean){return "Across the competencies completed, "+subj+" sits at a "+bw+" level (averaging "+mean+" out of 100).";},
+  gapOver:function(lead,g){return lead
+   ?["Across the board you rate yourself somewhat more favourably than your colleagues do ("+g+" points on average) — worth staying alert to.","On average your self-image sits "+g+" points above that of your colleagues; the pattern recurs across several competencies."]
+   :["You rate your manager "+g+" points higher than the team does, on average.","Your view sits "+g+" points above that of the team, on average."];},
+  gapUnder:function(lead,g){return lead
+   ?["Notably, you rate yourself "+g+" points lower than your colleagues do on average — harder on yourself than others are.","On average you are stricter with yourself than the people around you; colleagues rate you "+g+" points higher."]
+   :["You rate your manager "+g+" points lower than the team does, on average.","Your view sits "+g+" points below that of the team, on average."];},
+  archBalanced:function(V,hi){return[
+   "The four domains sit close together (around "+V[hi]+") — a notably balanced profile with no pronounced peaks or troughs.",
+   "What stands out is the balance: the domains barely differ (around "+V[hi]+"). That gives a stable base from which to sharpen one or two points.",
+   "The profile is evenly spread across the four domains (around "+V[hi]+"); no single domain dominates or skews the picture."];},
+  archRvMo:function(V,N){return[
+   "Setting direction ("+N("richting_visie")+", "+V.richting_visie+") clearly goes better than developing people ("+N("mensen_ontwikkeling")+", "+V.mensen_ontwikkeling+") — the picture of a directive, course-steady style. The growth lies in placing that same ownership with people.",
+   "Strong on course and boundaries ("+N("richting_visie")+", "+V.richting_visie+"), lighter on letting people grow ("+V.mensen_ontwikkeling+"). A directive style that gains power once coaching and giving room get more attention.",
+   "The profile leans on direction and vision, while the people-oriented side lags ("+V.mensen_ontwikkeling+" against "+V.richting_visie+") — typical of someone who likes to lead from the front and could draw the team's development closer."];},
+  archUwVi:function(V,N){return[
+   "Execution is strong ("+N("uitvoering_wendbaarheid")+", "+V.uitvoering_wendbaarheid+"), while innovation happens more cautiously ("+N("verandering_innovatie")+", "+V.verandering_innovatie+"). A reliable, results-driven style; the challenge is making more room to experiment.",
+   "Reliable in execution ("+V.uitvoering_wendbaarheid+"), more reticent about renewal ("+V.verandering_innovatie+"). The profile delivers and secures, but could venture off the beaten track more often.",
+   "Planning, organising and results are in good shape ("+V.uitvoering_wendbaarheid+"); experimenting and changing lag behind ("+V.verandering_innovatie+"). A steady deliverer with room to become more agile."];},
+  archMoRv:function(V,N){return[
+   "Developing people ("+N("mensen_ontwikkeling")+", "+V.mensen_ontwikkeling+") goes better than setting direction ("+N("richting_visie")+", "+V.richting_visie+"). A people-oriented style that gains power from being sharper on vision, boundaries and expectations.",
+   "Connecting and people-oriented ("+V.mensen_ontwikkeling+"), while explicit direction and boundaries are lighter ("+V.richting_visie+"). The growth lies in making the course and expectations clearer.",
+   "The strength sits with people ("+V.mensen_ontwikkeling+"); the clear point on the horizon ("+V.richting_visie+") could be firmer — then the attention to people lands within a clearer story."];},
+  archViUw:function(V,N){return[
+   "There is a clear drive to innovate ("+N("verandering_innovatie")+", "+V.verandering_innovatie+"), while execution lags ("+N("uitvoering_wendbaarheid")+", "+V.uitvoering_wendbaarheid+"). Make sure plans and agreements keep carrying the ideas.",
+   "Innovative and opportunity-driven ("+V.verandering_innovatie+"), somewhat looser on securing delivery ("+V.uitvoering_wendbaarheid+"). An idea-rich style that gains once execution keeps pace with renewal.",
+   "Plenty of movement and ideas ("+V.verandering_innovatie+"), but execution ("+V.uitvoering_wendbaarheid+") does not always keep up — that is where the gain sits."];},
+  archFallback:function(V,N,hi,lo,range){return[
+   "The picture is mixed: "+N(hi)+" stands out ("+V[hi]+"), while "+N(lo)+" lags behind ("+V[lo]+"). That is the clearest direction for development.",
+   N(hi)+" is the strongest domain ("+V[hi]+") and "+N(lo)+" the weakest ("+V[lo]+"); the distance between them ("+range+" points) marks the room to develop.",
+   "Between "+N(hi)+" ("+V[hi]+") and "+N(lo)+" ("+V[lo]+") sits a difference of "+range+" points — the profile is clearly unevenly spread."];},
+  strongLead:function(){return["The clearest strengths are ","Most skilled are ","The strength sits mainly in ","At the top sit ","What stands out: "];},
+  strongTail:function(subjShort){return["These are the points "+subjShort+" can build on.","This is a natural starting point for taking others along.","These qualities give the profile its foundation.","It pays to use these strengths deliberately on the development points below."];},
+  hidden:function(lead,names){return[
+   (lead?"Your colleagues rate you even higher than you rate yourself on ":"The team rates higher than you do on ")+names+" — possibly underestimated strengths.",
+   "Higher than "+(lead?"your self-image":"your view")+", "+(lead?"the people around you":"the team")+" score "+names+": others see more there than the individual judgement does."];},
+  weakLead:function(){return["The most room to develop sits at ","The largest gain is to be had on ","Scoring lowest are ","Attention is needed mainly on ","Room to grow sits at "];},
+  blind:function(lead,names){return[
+   (lead?"Pay particular attention to your blind spots — where you rate yourself clearly higher than your colleagues do: ":"Watch the blind spots, where you rate higher than the team does: ")+names+".",
+   "The largest difference between "+(lead?"self-image and the wider view":"your view and the team")+" sits at "+names+" — that is exactly where the gain is."];},
+  outlier:function(domName,label,score,domAvg){return[
+   "Within "+domName+" the picture is uneven: "+label+" ("+score+") differs sharply from the rest of the domain (averaging "+domAvg+").",
+   "The domain "+domName+" is skewed: "+label+" ("+score+") pulls the picture, while the other competencies sit closer to "+domAvg+".",
+   "Notable within "+domName+": "+label+" ("+score+") stands apart from the other competencies in the same domain."];},
+  facet:function(label,hf,lf){return[
+   "Within "+label+" the two behaviours diverge: “"+hf+"” goes better than “"+lf+"”.",
+   "There is an internal tension in "+label+" — “"+hf+"” is more developed than “"+lf+"”.",
+   label+" is not a single whole: “"+hf+"” and “"+lf+"” differ noticeably."];},
+  divided:function(label,spread){return[
+   "Colleagues clearly disagree about "+label+" (spread "+spread+") — the picture depends heavily on who you ask.",
+   "Opinions on "+label+" diverge widely; that difference between assessors is worth discussing in itself."];},
+  consensus:function(label){return[
+   "On "+label+", by contrast, the team is notably in agreement — a reliable signal.",
+   "The assessors are of one mind on "+label+"; that makes this part of the picture solid."];},
+  adviceLead:function(lead){return lead
+   ?["Where you could start:","A few concrete next steps:","Suggestions to get going with:","Getting to work, specifically:"]
+   :["Possible development points to discuss with your manager:","Talking points for the conversation with your manager:"];},
+  combo:function(lead){return lead
+   ?["Note the connection: several blind spots go together with a low score on actively asking for feedback (LV19). The two reinforce each other — asking for feedback more deliberately is what shrinks the blind spots.","One thread deserves attention: blind spots and rarely asking for feedback (LV19) belong together. Gathering more feedback is the lever that sets the rest in motion."]
+   :["The combination of blind spots and a low score on asking for feedback (LV19) sustains itself — a good starting point for the conversation.","Blind spots and rarely asking for feedback (LV19) are connected; organising feedback there touches several points at once."];},
+  closing:function(lead){return lead
+   ?["Discuss these points with your manager, a colleague or a coach — their examples make the feedback concrete.","Pick one to really practise in the coming period; anchoring one point well beats tackling everything at once."]
+   :["Discuss these points together with your manager; concrete examples make them usable.","Share these points as a development signal, not a verdict — the value sits in the conversation about them."];},
+  vervolgOpen:function(){return["Leadership grows through practice and feedback.","Development is a matter of repetition and reflection.","Skills shift slowly — measuring over time makes growth visible."];},
+  vervolgTail:function(is360,lead){return is360
+   ?(lead?"Discuss this team picture together and repeat the measurement after a while to track your progress.":"Share and discuss this team picture and repeat the measurement periodically to follow the development.")
+   :(lead?"For a fuller picture, invite colleagues for the 360 measurement; repeat the measurement periodically as well.":"To set this against the whole team, start the team analysis; repeat the measurement periodically to track progress.");}
  }
 };
+function BL(){return BETXT[LANG]||BETXT.nl;}
+
 var BE_RNG=Math.random, BE_USED={};
 function beSeedRng(seed){var a=(seed>>>0)||1;BE_RNG=function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};BE_USED={};}
 function bePick(pool){if(pool.length===1)return pool[0];var i,tries=0;do{i=Math.floor(BE_RNG()*pool.length);tries++;}while(BE_USED[pool[i]]&&tries<10);BE_USED[pool[i]]=1;return pool[i];}
 function beCap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
-var BE_BAND=[["pril","beperkt","kwetsbaar"],["wisselend","gemengd","ongelijk"],["solide","degelijk","behoorlijk"],["sterk","stevig","krachtig"],["uitmuntend","zeer sterk","uitgesproken"]];
 function beBandIdx(v){return v<40?0:v<55?1:v<70?2:v<83?3:4;}
 function beDomName(id){for(var i=0;i<DOMAINS.length;i++)if(DOMAINS[i].id===id)return DOMAINS[i].name;return id;}
-function beJoin(a){if(!a.length)return "";if(a.length===1)return a[0];return a.slice(0,-1).join(", ")+" en "+a[a.length-1];}
-function beBand(v){return bePick(BE_BAND[beBandIdx(v)]);}
+function beJoin(a){if(!a.length)return "";if(a.length===1)return a[0];return a.slice(0,-1).join(", ")+BL().and+a[a.length-1];}
+function beBand(v){return bePick(BL().BAND[beBandIdx(v)]);}
 function beP(s){return '<p style="margin:0 0 8px;color:var(--cinab-ink);font-size:14px;line-height:1.65">'+s+'</p>';}
 function beSectie(t,body){return '<h3 style="font-size:16px;margin:16px 0 4px">'+t+'</h3>'+body;}
 function beDiff(V,a,b){return (V[a]!=null&&V[b]!=null)?(V[a]-V[b]):-999;}
@@ -794,135 +1276,166 @@ function beMetrics(){
 function beArchetype(m){
  var ids=DOMAINS.map(function(d){return d.id;}).filter(function(id){return m.domVal[id]!=null;});
  if(ids.length<2)return null;
- var V=m.domVal,sorted=ids.slice().sort(function(a,b){return V[b]-V[a];}),hi=sorted[0],lo=sorted[sorted.length-1],range=V[hi]-V[lo],N=beDomName;
- if(range<=8)return bePick([
-  "De vier domeinen liggen dicht bij elkaar (rond "+V[hi]+") — een opvallend evenwichtig profiel zonder uitgesproken pieken of dalen.",
-  "Wat opvalt is de balans: de domeinen ontlopen elkaar nauwelijks (rond "+V[hi]+"). Dat geeft een stabiele basis om gericht één of twee punten aan te scherpen.",
-  "Het profiel is gelijkmatig over de vier domeinen verdeeld (rond "+V[hi]+"); geen domein domineert het beeld of trekt het scheef."]);
- function combo(a,b,pools){return beDiff(V,a,b)>=12?bePick(pools):null;}
+ var V=m.domVal,sorted=ids.slice().sort(function(a,b){return V[b]-V[a];}),hi=sorted[0],lo=sorted[sorted.length-1],range=V[hi]-V[lo],N=beDomName,L=BL();
+ if(range<=8)return bePick(L.archBalanced(V,hi));
+ function combo(a,b,pool){return beDiff(V,a,b)>=12?bePick(pool):null;}
  var r;
- r=combo("richting_visie","mensen_ontwikkeling",[
-  "Richting geven ("+N("richting_visie")+", "+V.richting_visie+") gaat duidelijk beter dan het ontwikkelen van mensen ("+N("mensen_ontwikkeling")+", "+V.mensen_ontwikkeling+") — het beeld van een sturende, koersvaste stijl. De groei zit erin datzelfde eigenaarschap ook bij mensen te leggen.",
-  "Sterk in koers en kaders ("+N("richting_visie")+", "+V.richting_visie+"), lichter in het laten groeien van mensen ("+V.mensen_ontwikkeling+"). Een richtinggevende stijl die wint aan kracht zodra coachen en ruimte geven meer aandacht krijgen.",
-  "Het profiel leunt op richting en visie, terwijl het mensgerichte deel achterblijft ("+V.mensen_ontwikkeling+" tegenover "+V.richting_visie+") — typerend voor wie graag vooroploopt en de ontwikkeling van het team nog meer naar zich toe kan trekken."]);if(r)return r;
- r=combo("uitvoering_wendbaarheid","verandering_innovatie",[
-  "De uitvoering is sterk ("+N("uitvoering_wendbaarheid")+", "+V.uitvoering_wendbaarheid+"), vernieuwen gebeurt voorzichtiger ("+N("verandering_innovatie")+", "+V.verandering_innovatie+"). Een betrouwbare, resultaatgerichte stijl; de uitdaging is meer ruimte maken voor experimenteren.",
-  "Betrouwbaar in de executie ("+V.uitvoering_wendbaarheid+"), terughoudender met vernieuwing ("+V.verandering_innovatie+"). Het profiel levert en borgt, maar mag wat vaker buiten gebaande paden durven.",
-  "Plannen, organiseren en resultaat zitten goed ("+V.uitvoering_wendbaarheid+"); experimenteren en veranderen blijven achter ("+V.verandering_innovatie+"). Een stabiele uitvoerder met ruimte om wendbaarder te worden."]);if(r)return r;
- r=combo("mensen_ontwikkeling","richting_visie",[
-  "Het ontwikkelen van mensen ("+N("mensen_ontwikkeling")+", "+V.mensen_ontwikkeling+") gaat beter dan het neerzetten van richting ("+N("richting_visie")+", "+V.richting_visie+"). Een mensgerichte stijl die aan kracht wint door scherper te zijn op visie, kaders en verwachtingen.",
-  "Verbindend en mensgericht ("+V.mensen_ontwikkeling+"), terwijl expliciete richting en kaders lichter zijn ("+V.richting_visie+"). De groei zit in het duidelijker maken van koers en verwachtingen.",
-  "De kracht ligt bij mensen ("+V.mensen_ontwikkeling+"); de heldere stip op de horizon ("+V.richting_visie+") mag steviger — dan landt de aandacht voor mensen in een duidelijker verhaal."]);if(r)return r;
- r=combo("verandering_innovatie","uitvoering_wendbaarheid",[
-  "Er is een duidelijke drang tot vernieuwen ("+N("verandering_innovatie")+", "+V.verandering_innovatie+"), terwijl de uitvoering achterblijft ("+N("uitvoering_wendbaarheid")+", "+V.uitvoering_wendbaarheid+"). Bewaak dat plannen en afspraken de ideeën blijven dragen.",
-  "Vernieuwend en kansgericht ("+V.verandering_innovatie+"), wat losser in de borging ("+V.uitvoering_wendbaarheid+"). Een ideeënrijke stijl die wint zodra de executie de vernieuwing bijhoudt.",
-  "Veel beweging en ideeën ("+V.verandering_innovatie+"), maar de uitvoering ("+V.uitvoering_wendbaarheid+") houdt het tempo niet altijd bij — daar is de winst te halen."]);if(r)return r;
- return bePick([
-  "Het beeld is wisselend: "+N(hi)+" springt eruit ("+V[hi]+"), terwijl "+N(lo)+" achterblijft ("+V[lo]+"). Daar ligt de duidelijkste richting voor ontwikkeling.",
-  N(hi)+" is het sterkste domein ("+V[hi]+") en "+N(lo)+" het zwakste ("+V[lo]+"); de afstand daartussen ("+range+" punten) markeert de ontwikkelruimte.",
-  "Tussen "+N(hi)+" ("+V[hi]+") en "+N(lo)+" ("+V[lo]+") zit een verschil van "+range+" punten — het profiel is duidelijk ongelijk verdeeld."]);
+ r=combo("richting_visie","mensen_ontwikkeling",L.archRvMo(V,N));if(r)return r;
+ r=combo("uitvoering_wendbaarheid","verandering_innovatie",L.archUwVi(V,N));if(r)return r;
+ r=combo("mensen_ontwikkeling","richting_visie",L.archMoRv(V,N));if(r)return r;
+ r=combo("verandering_innovatie","uitvoering_wendbaarheid",L.archViUw(V,N));if(r)return r;
+ return bePick(L.archFallback(V,N,hi,lo,range));
 }
 function renderBeschouwing(){
  var box=$("beschouwing");if(!box)return;
- var lead=state.persp==="lead",m=beMetrics();beSeedRng(m.seed);
- var subj=lead?"je leiderschap":"het leiderschap van je leidinggevende";
- var subjShort=lead?"je":"je leidinggevende";
+ var L=BL(),lead=state.persp==="lead",m=beMetrics();beSeedRng(m.seed);
+ var subj=L.subj(lead),subjShort=L.subjShort(lead);
  var prim={},pv=[];COMPS.forEach(function(c){var v=(m.view==="360"&&m.team[c.n]!=null)?m.team[c.n]:m.self[c.n];prim[c.n]=v;if(v!=null)pv.push(v);});
  var meanPrim=pv.length?R(pv.reduce(function(s,x){return s+x;},0)/pv.length):m.meanSelf;
  var withSelf=COMPS.filter(function(c){return prim[c.n]!=null;});
  if(withSelf.length<3){box.className="";box.innerHTML="";return;}
  var byHigh=withSelf.slice().sort(function(a,b){return prim[b.n]-prim[a.n];});
  var byLow=withSelf.slice().sort(function(a,b){return prim[a.n]-prim[b.n];});
- var H='<h2 style="font-size:24px;margin:0 0 4px">Beschouwing</h2>';
- H+='<p class="lead" style="margin:0 0 8px">'+bePick([
-  "Automatisch opgesteld uit de gegeven antwoorden — bedoeld als hulpmiddel voor reflectie en gesprek, niet als oordeel.",
-  "Onderstaande analyse is afgeleid uit de scores en dient als startpunt voor het gesprek, niet als eindoordeel.",
-  "Deze beschouwing vat de antwoorden samen ter ondersteuning van reflectie; het blijft een momentopname."])+'</p>';
+ var H='<h2 style="font-size:24px;margin:0 0 4px">'+L.h2+'</h2>';
+ H+='<p class="lead" style="margin:0 0 8px">'+bePick(L.intro())+'</p>';
 
  // 1. Beeld in het kort
  var topD=null,botD=null;(function(){var ds=DOMAINS.filter(function(d){return m.domVal[d.id]!=null;});if(ds.length){var s=ds.slice().sort(function(a,b){return m.domVal[b.id]-m.domVal[a.id];});topD=s[0];botD=s[s.length-1];}})();
  var mean=meanPrim,bw=beBand(mean),s1;
- if(topD&&botD&&topD!==botD){s1=bePick([
-   beCap(bw)+" totaalbeeld: gemiddeld "+mean+" op 100. Het stevigst is "+topD.name+" ("+m.domVal[topD.id]+"); "+botD.name+" ("+m.domVal[botD.id]+") vraagt de meeste aandacht.",
-   "Over de twintig competenties komt "+subj+" uit op gemiddeld "+mean+" (op 100) — "+bw+". De pieken liggen bij "+topD.name+", het dal bij "+botD.name+".",
-   "Gemiddeld "+mean+" van de 100, een "+bw+" beeld. "+topD.name+" draagt het profiel ("+m.domVal[topD.id]+"), terwijl "+botD.name+" achterblijft ("+m.domVal[botD.id]+").",
-   "Het profiel oogt "+bw+" (gemiddeld "+mean+"), met "+topD.name+" als sterkste en "+botD.name+" als zwakste domein."]);
- } else { s1="Over de ingevulde competenties ligt "+subj+" op een "+bw+" niveau (gemiddeld "+mean+" op 100)."; }
+ if(topD&&botD&&topD!==botD){ s1=bePick(L.opener(bw,mean,topD,botD,m.domVal,subj)); }
+ else { s1=L.openerSingle(subj,bw,mean); }
  var arch=beArchetype(m);var s1full=s1+(arch?(" "+arch):"");
  if(m.view==="360"&&m.meanGap!=null&&Math.abs(m.meanGap)>=8){
-  s1full+=" "+(m.meanGap>0
-   ?(lead?bePick(["Over de hele linie schat je jezelf iets gunstiger in dan je collega’s ("+m.meanGap+" punten gemiddeld) — goed om alert op te blijven.","Gemiddeld ligt je zelfbeeld "+m.meanGap+" punten boven dat van je collega’s; dat patroon keert op meerdere competenties terug."])
-         :bePick(["Jij beoordeelt je leidinggevende gemiddeld "+m.meanGap+" punten hoger dan het team.","Jouw beeld ligt gemiddeld "+m.meanGap+" punten boven dat van het team."]))
-   :(lead?bePick(["Opvallend: gemiddeld beoordeel je jezelf "+Math.abs(m.meanGap)+" punten lager dan je collega’s — eerder te streng dan te mild.","Je bent gemiddeld strenger voor jezelf dan je omgeving; collega’s waarderen je "+Math.abs(m.meanGap)+" punten hoger."])
-         :bePick(["Jij beoordeelt je leidinggevende gemiddeld "+Math.abs(m.meanGap)+" punten lager dan het team.","Jouw beeld ligt gemiddeld "+Math.abs(m.meanGap)+" punten onder dat van het team."])));
+  s1full+=" "+(m.meanGap>0?bePick(L.gapOver(lead,m.meanGap)):bePick(L.gapUnder(lead,Math.abs(m.meanGap))));
  }
- H+=beSectie("Het beeld in het kort",beP(s1full));
+ H+=beSectie(L.sect.beeld,beP(s1full));
 
  // 2. Sterke punten
  var strong=byHigh.filter(function(c){return prim[c.n]>=65;}).slice(0,3);if(!strong.length)strong=byHigh.slice(0,2);
- var st=bePick(["De duidelijkste sterktes zijn ","Het meest vaardig komt naar voren: ","De kracht zit vooral in ","Bovenaan staan ","Wat eruit springt: "])+beJoin(strong.map(function(c){return c.label+" ("+prim[c.n]+")";}))+".";
- st+=" "+bePick(["Dit zijn de punten waarop "+subjShort+" kan bouwen.","Hier ligt een natuurlijk vertrekpunt om anderen mee te nemen.","Deze kwaliteiten geven het profiel zijn fundament.","Het loont om deze sterktes bewust in te zetten bij de ontwikkelpunten hieronder."]);
+ var st=bePick(L.strongLead())+beJoin(strong.map(function(c){return c.label+" ("+prim[c.n]+")";}))+".";
+ st+=" "+bePick(L.strongTail(subjShort));
  if(m.view==="360"){var hid=withSelf.filter(function(c){return m.gap[c.n]!=null&&m.gap[c.n]<=-10;}).sort(function(a,b){return m.gap[a.n]-m.gap[b.n];}).slice(0,2);
-  if(hid.length)st+=" "+bePick([(lead?"Je collega’s waarderen je zelfs hoger dan jij jezelf op ":"Het team waardeert hoger dan jij op ")+beJoin(hid.map(function(c){return c.label;}))+" — mogelijk onderschatte krachten.","Hoger dan "+(lead?"je zelfbeeld":"jouw beeld")+" scoort "+(lead?"de omgeving":"het team")+" op "+beJoin(hid.map(function(c){return c.label;}))+": daar zien anderen meer dan in het eigen oordeel."]);}
- H+=beSectie("Sterke punten",beP(st));
+  if(hid.length)st+=" "+bePick(L.hidden(lead,beJoin(hid.map(function(c){return c.label;}))));}
+ H+=beSectie(L.sect.sterk,beP(st));
 
  // 3. Ontwikkelpunten
  var weak=byLow.filter(function(c){return prim[c.n]<=60;}).slice(0,3);if(!weak.length)weak=byLow.slice(0,2);
- var dv=bePick(["De meeste ontwikkelruimte zit bij ","De grootste winst valt te halen op ","Het laagst scoren ","Aandacht vraagt vooral ","Ruimte voor groei ligt bij "])+beJoin(weak.map(function(c){return c.label+" ("+prim[c.n]+")";}))+".";
+ var dv=bePick(L.weakLead())+beJoin(weak.map(function(c){return c.label+" ("+prim[c.n]+")";}))+".";
  if(m.view==="360"){var blind=withSelf.filter(function(c){return m.gap[c.n]!=null&&m.gap[c.n]>=12;}).sort(function(a,b){return m.gap[b.n]-m.gap[a.n];}).slice(0,2);
-  if(blind.length)dv+=" "+bePick([(lead?"Let in het bijzonder op je blinde vlekken — waar je jezelf duidelijk hoger inschat dan je collega’s: ":"Let op de blinde vlekken, waar jij hoger oordeelt dan het team: ")+beJoin(blind.map(function(c){return c.label+" (+"+m.gap[c.n]+")";}))+".","Het grootste verschil tussen "+(lead?"zelfbeeld en omgeving":"jouw beeld en het team")+" zit bij "+beJoin(blind.map(function(c){return c.label+" (+"+m.gap[c.n]+")";}))+" — juist daar is winst te boeken."]);}
- H+=beSectie("Ontwikkelpunten",beP(dv));
+  if(blind.length)dv+=" "+bePick(L.blind(lead,beJoin(blind.map(function(c){return c.label+" (+"+m.gap[c.n]+")";}))));}
+ H+=beSectie(L.sect.ontw,beP(dv));
 
  // 4. Samenhang & patronen
  var obs=[],mrD=null,mr=0;DOMAINS.forEach(function(d){if(m.domRange[d.id]>mr){mr=m.domRange[d.id];mrD=d;}});
- if(mrD&&mr>=25&&m.domOut[mrD.id]&&m.domOut[mrD.id].comp){var oc=m.domOut[mrD.id].comp;obs.push(bePick([
-   "Binnen "+mrD.name+" is het beeld niet gelijkmatig: "+oc.label+" ("+m.self[oc.n]+") wijkt sterk af van de rest van het domein (gemiddeld "+m.domSelf[mrD.id]+").",
-   "Het domein "+mrD.name+" hangt scheef: "+oc.label+" ("+m.self[oc.n]+") trekt het beeld, terwijl de overige competenties dichter bij "+m.domSelf[mrD.id]+" liggen.",
-   "Opvallend binnen "+mrD.name+": "+oc.label+" ("+m.self[oc.n]+") springt eruit ten opzichte van de andere competenties in hetzelfde domein."]));}
+ if(mrD&&mr>=25&&m.domOut[mrD.id]&&m.domOut[mrD.id].comp){var oc=m.domOut[mrD.id].comp;
+  obs.push(bePick(L.outlier(mrD.name,oc.label,m.self[oc.n],m.domSelf[mrD.id])));}
  var fc=null,fm=0;COMPS.forEach(function(c){if(m.ab[c.n]!=null&&Math.abs(m.ab[c.n])>=2&&Math.abs(m.ab[c.n])>fm){fm=Math.abs(m.ab[c.n]);fc=c;}});
- if(fc){var f=BE.FACET[fc.n],hf=m.ab[fc.n]>0?f[0]:f[1],lf=m.ab[fc.n]>0?f[1]:f[0];obs.push(bePick([
-   "Binnen "+fc.label+" lopen de twee gedragingen uiteen: “"+hf+"” gaat beter dan “"+lf+"”.",
-   "Bij "+fc.label+" zit een interne spanning — “"+hf+"” is sterker ontwikkeld dan “"+lf+"”.",
-   fc.label+" is geen eenheid: “"+hf+"” en “"+lf+"” verschillen merkbaar."]));}
+ if(fc){var f=BL().FACET[fc.n],hf=m.ab[fc.n]>0?f[0]:f[1],lf=m.ab[fc.n]>0?f[1]:f[0];
+  obs.push(bePick(L.facet(fc.label,hf,lf)));}
  if(m.view==="360"){var dvd=null,dx=0;COMPS.forEach(function(c){if(m.spread[c.n]!=null&&m.spread[c.n]>=32&&m.spread[c.n]>dx){dx=m.spread[c.n];dvd=c;}});
-  if(dvd)obs.push(bePick([
-   "De collega’s zijn het duidelijk oneens over "+dvd.label+" (spreiding "+m.spread[dvd.n]+") — het beeld hangt sterk af van wie je het vraagt.",
-   "Over "+dvd.label+" lopen de meningen ver uiteen; dat verschil tussen beoordelaars is op zichzelf het bespreken waard."]));
+  if(dvd)obs.push(bePick(L.divided(dvd.label,m.spread[dvd.n])));
   var con=null,cm=999;COMPS.forEach(function(c){if(m.spread[c.n]!=null&&m.spread[c.n]<=12&&m.spread[c.n]<cm){cm=m.spread[c.n];con=c;}});
-  if(con)obs.push(bePick([
-   "Over "+con.label+" is het team het juist opvallend eens — een betrouwbaar signaal.",
-   "Bij "+con.label+" zijn de beoordelaars eensgezind; dat maakt dat deel van het beeld stevig."]));}
- if(obs.length)H+=beSectie("Samenhang & patronen",obs.map(beP).join(""));
+  if(con)obs.push(bePick(L.consensus(con.label)));}
+ if(obs.length)H+=beSectie(L.sect.samen,obs.map(beP).join(""));
 
  // 5. Advies
  var targets=[];
  if(m.view==="360")withSelf.filter(function(c){return m.gap[c.n]!=null&&m.gap[c.n]>=12;}).sort(function(a,b){return m.gap[b.n]-m.gap[a.n];}).slice(0,2).forEach(function(c){targets.push(c);});
  byLow.forEach(function(c){if(targets.indexOf(c)<0&&prim[c.n]!=null&&prim[c.n]<=62)targets.push(c);});
  targets=targets.slice(0,3);if(!targets.length)targets=byLow.slice(0,1);
- var aLead=lead?bePick(["Waar je mee kunt beginnen:","Een paar concrete vervolgstappen:","Suggesties om mee aan de slag te gaan:","Gericht aan de slag:"])
-               :bePick(["Mogelijke ontwikkelpunten om met je leidinggevende te bespreken:","Bespreekpunten voor het gesprek met je leidinggevende:"]);
- var items=targets.map(function(c){return '<p style="margin:0 0 8px;font-size:14px;line-height:1.65"><strong>'+c.label+'.</strong> '+BE.ADVICE[c.n]+'</p>';}).join("");
+ var aLead=bePick(L.adviceLead(lead));
+ var items=targets.map(function(c){return '<p style="margin:0 0 8px;font-size:14px;line-height:1.65"><strong>'+c.label+'.</strong> '+L.ADVICE[c.n]+'</p>';}).join("");
  var combo="";
- if(m.view==="360"&&withSelf.some(function(c){return m.gap[c.n]!=null&&m.gap[c.n]>=12;})&&prim.LV19!=null&&prim.LV19<=55){
-  combo=beP(lead?bePick(["Let op de samenhang: enkele blinde vlekken gaan samen met een lage score op actief feedback vragen (LV19). Die twee versterken elkaar — juist door gerichter om feedback te vragen verklein je de blinde vlekken.","Eén rode draad verdient aandacht: blinde vlekken én weinig om feedback vragen (LV19) horen bij elkaar. Meer feedback ophalen is de hefboom die de rest in beweging zet."])
-                :bePick(["De combinatie van blinde vlekken en een lage score op feedback vragen (LV19) houdt zichzelf in stand — een goed startpunt voor het gesprek.","Blinde vlekken en weinig feedback vragen (LV19) hangen samen; daar feedback op organiseren raakt meerdere punten tegelijk."]));}
- var closing=beP(lead?bePick(["Bespreek deze punten met je manager, een collega of een coach — hun voorbeelden maken de feedback concreet.","Kies er één uit om de komende periode echt op te oefenen; één punt goed verankeren werkt beter dan alles tegelijk."])
-                     :bePick(["Bespreek deze punten samen met je leidinggevende; concrete voorbeelden maken het bruikbaar.","Deel deze punten als ontwikkelsignaal, niet als oordeel — de waarde zit in het gesprek erover."]));
- H+=beSectie("Advies voor ontwikkeling",beP(aLead)+items+combo+closing);
+ if(m.view==="360"&&withSelf.some(function(c){return m.gap[c.n]!=null&&m.gap[c.n]>=12;})&&prim.LV19!=null&&prim.LV19<=55){ combo=beP(bePick(L.combo(lead))); }
+ var closing=beP(bePick(L.closing(lead)));
+ H+=beSectie(L.sect.advies,beP(aLead)+items+combo+closing);
 
  // 6. Vervolg
- var vv=bePick(["Leiderschap groeit door oefening en feedback.","Ontwikkeling is een kwestie van herhaling en reflectie.","Vaardigheden verschuiven langzaam — meten over tijd maakt groei zichtbaar."])+" "+(m.view==="360"
-   ?(lead?"Bespreek dit teambeeld na en herhaal de meting na verloop van tijd om je voortgang te volgen.":"Deel en bespreek dit teambeeld en herhaal de meting periodiek om de ontwikkeling te volgen.")
-   :(lead?"Wil je een vollediger beeld, nodig dan collega’s uit voor de 360-meting; herhaal de meting daarnaast periodiek.":"Wil je dit afzetten tegen het hele team, start dan de teamanalyse; herhaal de meting periodiek om de voortgang te volgen."));
- H+=beSectie("Vervolg",beP(vv));
+ var vv=bePick(L.vervolgOpen())+" "+L.vervolgTail(m.view==="360",lead);
+ H+=beSectie(L.sect.vervolg,beP(vv));
  box.className="cinab-card beschouwing";box.style.marginTop="22px";box.innerHTML=H;
+}
+/* ────────────── AI-verrijking (alleen betaalde 360; lokaal blijft leidend + terugval) ────────────── */
+function beEsc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+
+/* Bouwt een PII-vrij datapakket uit de deterministische metingen (geen namen/e-mail). */
+function aiBeschouwingPacket(){
+ var m=beMetrics(); beSeedRng(m.seed);
+ var prim={}; COMPS.forEach(function(c){prim[c.n]=(m.team[c.n]!=null)?m.team[c.n]:m.self[c.n];});
+ var comps=COMPS.filter(function(c){return prim[c.n]!=null;});
+ var byHigh=comps.slice().sort(function(a,b){return prim[b.n]-prim[a.n];});
+ var byLow=comps.slice().sort(function(a,b){return prim[a.n]-prim[b.n];});
+ function lite(c){return {code:c.n,naam:c.label,score:prim[c.n],gap:m.gap[c.n]};}
+ var blind=comps.filter(function(c){return m.gap[c.n]!=null&&m.gap[c.n]>=12;}).sort(function(a,b){return m.gap[b.n]-m.gap[a.n];});
+ var hidden=comps.filter(function(c){return m.gap[c.n]!=null&&m.gap[c.n]<=-10;}).sort(function(a,b){return m.gap[a.n]-m.gap[b.n];});
+ var sprC=comps.filter(function(c){return m.spread[c.n]!=null;});
+ var con=sprC.slice().sort(function(a,b){return m.spread[a.n]-m.spread[b.n];})[0]||null;
+ var div=sprC.slice().sort(function(a,b){return m.spread[b.n]-m.spread[a.n];})[0]||null;
+ return {
+  meta:{perspectief:state.persp,respondenten:state.responses.length,meting:"360"},
+  domeinen:DOMAINS.map(function(d){return {id:d.id,naam:d.name,zelf:m.domSelf[d.id],team:m.domTeam[d.id]};}),
+  competenties:COMPS.map(function(c){return {code:c.n,naam:c.label,domein:c._d.id,zelf:m.self[c.n],team:m.team[c.n],gap:m.gap[c.n],spreiding:m.spread[c.n]};}),
+  gemiddelde_zelf:m.meanSelf, gemiddelde_gap:m.meanGap,
+  bevindingen:{
+   patroon:beArchetype(m),
+   sterkste:byHigh.slice(0,3).map(lite),
+   zwakste:byLow.slice(0,3).map(lite),
+   blinde_vlekken:blind.slice(0,3).map(lite),
+   onderschatte_krachten:hidden.slice(0,2).map(lite),
+   grootste_consensus:con?{code:con.n,naam:con.label,spreiding:m.spread[con.n]}:null,
+   grootste_verdeeldheid:div?{code:div.n,naam:div.label,spreiding:m.spread[div.n]}:null,
+   feedback_combinatie:(blind.length>0 && prim.LV19!=null && prim.LV19<=55)
+  }
+ };
+}
+
+function parseAiJson(t){ try{return JSON.parse(t);}catch(e){} var mt=String(t).match(/\{[\s\S]*\}/); if(mt){try{return JSON.parse(mt[0]);}catch(e2){}} return null; }
+
+function renderAiBeschouwing(o){
+ var H='<h2 style="font-size:24px;margin:0 0 4px">Beschouwing</h2>';
+ H+='<p class="lead" style="margin:0 0 8px">'+beEsc(T("aiLead"))+'</p>';
+ H+=beSectie("Het beeld in het kort",beP(beEsc(o.beeld_kort)));
+ H+=beSectie("Sterke punten",beP(beEsc(o.sterke_punten)));
+ H+=beSectie("Ontwikkelpunten",beP(beEsc(o.ontwikkelpunten)));
+ if(o.samenhang) H+=beSectie("Samenhang & patronen",beP(beEsc(o.samenhang)));
+ if(Array.isArray(o.advies)&&o.advies.length){
+  var items=o.advies.map(function(a){
+   var g=a.grond?('<br><small style="color:var(--cinab-grey)">'+beEsc(T("aiGround"))+beEsc(a.grond)+'</small>'):'';
+   return '<p style="margin:0 0 8px;font-size:14px;line-height:1.65"><strong>'+beEsc(a.kop||"")+'</strong> '+beEsc(a.tekst||"")+g+'</p>';
+  }).join("");
+  H+=beSectie("Advies voor ontwikkeling",items);
+ }
+ if(o.vervolg) H+=beSectie("Vervolg",beP(beEsc(o.vervolg)));
+ return H;
+}
+
+/* Verrijkt de reeds gerenderde (regelgebaseerde) beschouwing met de AI-analyse.
+   Alleen in de betaalde 360 én live (of ?aitest=1 op staging). Bij elke fout blijft de lokale beschouwing staan. */
+async function enrichBeschouwingAI(){
+ if(!is360()) return;
+ var testMode=new URLSearchParams(location.search).get("aitest");
+ if(!(Platform.isLive() || testMode)) return;              // geen AI-call in pure demo (standaard §15)
+ var box=$("beschouwing"); if(!box||!box.innerHTML) return;
+ var status=document.createElement("p");
+ status.className="lead"; status.style.cssText="margin:6px 0 0;font-size:13px;font-style:italic;color:var(--cinab-grey)";
+ status.textContent=T("aiBusy"); box.appendChild(status);
+ try{
+  var text=await Platform.ai("beschouwing", aiBeschouwingPacket());
+  var o=parseAiJson(text);
+  if(!o||!o.beeld_kort||!o.sterke_punten||!o.ontwikkelpunten) throw new Error("ai_shape");
+  box.innerHTML=renderAiBeschouwing(o); box.setAttribute("data-ai","1");
+  state.aiBeschouwing=o;                                   // meenemen in het opgeslagen rapport
+ }catch(e){
+  console.warn("[VLM] AI-verrijking niet gelukt; regelgebaseerde beschouwing blijft staan:",e);
+  if(status&&status.parentNode) status.parentNode.removeChild(status);
+ }
 }
 
 /* ====================== RESULTAAT ====================== */
 function is360(){return state.variant==="paid"&&state.responses.length>=3;}
 function renderResult(){
  var paid=state.variant==="paid", t=TEKST[state.persp];
- $("result-title").textContent=(state.persp==="lead")?"Jouw leiderschapsprofiel":"Profiel van je leidinggevende";
+ $("result-title").textContent=t.resultTitle;
  $("result-note").textContent=is360()?t.resultNote360:(paid?"":t.resultNoteFree);
  document.body.classList.toggle("can-print",paid); // printen alleen in betaalde variant
 
@@ -930,10 +1443,10 @@ function renderResult(){
  var an=$("result-anon");
  if(paid){
   var c=state.responses.length;
-  if(c<3){an.hidden=false;an.textContent="Er hebben "+c+" collega('s) gereageerd. Het teambeeld verschijnt vanaf 3 reacties; hieronder zie je voorlopig je eigen beeld.";}
+  if(c<3){an.hidden=false;an.textContent=T("anonUnder",{n:c});}
   else{var unlocked=state.responses.every(function(r){return r.naamZichtbaar;});
-   an.hidden=false;an.textContent=unlocked?("Alle "+c+" beoordelaars tonen hun naam — individuele antwoorden zijn herleidbaar.")
-    :("Gebaseerd op "+c+" beoordelaars. Resultaten worden anoniem getoond (gemiddelde + spreiding); namen verschijnen alleen als élke beoordelaar daarmee instemt.");}
+   an.hidden=false;an.textContent=unlocked?T("anonNamed",{n:c})
+    :T("anonAgg",{n:c});}
  } else an.hidden=true;
 
  // kaarten
@@ -947,7 +1460,7 @@ function renderResult(){
 
  // legenda
  var leg=$("result-legend");
- leg.innerHTML='<span><span class="tri"></span>'+t.selLeg+'</span>'+(is360()?'<span><span class="cir"></span>'+t.othLeg+'</span><span><span class="bnd"></span>spreiding</span>':'');
+ leg.innerHTML='<span><span class="tri"></span>'+t.selLeg+'</span>'+(is360()?'<span><span class="cir"></span>'+t.othLeg+'</span><span><span class="bnd"></span>'+T("spreadLeg")+'</span>':'');
  $("sortseg").hidden=!is360();
 
  renderProfile();
@@ -960,22 +1473,23 @@ function renderResult(){
  if(is360()){var best=null,bg=-1;COMPS.forEach(function(c){var s=compPct(c),tm=teamAgg(c);if(s!==null&&tm){var g=Math.abs(s-tm.avg);if(g>bg){bg=g;best=c;}}});if(best){state.sel=best.n;renderInsight(best);}}
 
  renderBeschouwing();
+ enrichBeschouwingAI();   // verrijkt async in de betaalde 360; lokale beschouwing blijft bij fout staan
 
  // acties
  var act=$("result-actions");act.innerHTML="";
  if(paid){
-  act.innerHTML='<button class="cinab-button cinab-button--primary" id="a-print">Download als PDF / Printen</button>'+
-   '<button class="cinab-button cinab-button--outline" id="a-compare">Toon verschil met vorige meting</button>'+
-   '<button class="cinab-button cinab-button--ghost" id="a-back-wait">Terug naar reacties</button>'+
-   '<button class="cinab-button cinab-button--ghost" id="a-restart">Opnieuw</button>';
+  act.innerHTML='<button class="cinab-button cinab-button--primary" id="a-print">'+T("actPrint")+'</button>'+
+   '<button class="cinab-button cinab-button--outline" id="a-compare">'+T("actCompare")+'</button>'+
+   '<button class="cinab-button cinab-button--ghost" id="a-back-wait">'+T("actBackWait")+'</button>'+
+   '<button class="cinab-button cinab-button--ghost" id="a-restart">'+T("actRestart")+'</button>';
   $("a-print").onclick=async function(){
    window.print();                                                    // eerst printen; notifyCompleted kan de parent laten doorschakelen
    try{ var r=await Platform.saveReport(buildWrapper());
-     if(r&&r.demo) msg("result-msg","Demo: het rapport wordt niet opgeslagen in een account.");
-     else { msg("result-msg",r&&r.updated?"Rapport in je account bijgewerkt.":"Rapport opgeslagen in je account."); if(r&&r.rapport_url)Platform.notifyCompleted(r.rapport_url); }
-   }catch(e){ console.warn(e); msg("result-msg","Het rapport kon niet worden opgeslagen in je account ("+((e&&e.message)||"")+"). Printen werkt wel; probeer opslaan later opnieuw."); }
+     if(r&&r.demo) msg("result-msg",T("msgDemoReport"));
+     else { msg("result-msg",r&&r.updated?T("msgUpdated"):T("msgSaved")); if(r&&r.rapport_url)Platform.notifyCompleted(r.rapport_url); }
+   }catch(e){ console.warn(e); msg("result-msg",T("msgSaveFail",{e:((e&&e.message)||"")})); }
   };
-  $("a-compare").onclick=function(){msg("result-msg",Platform.isLive()?"Vergelijken met je vorige meting komt beschikbaar zodra er een eerdere meting in je account staat.":"Demo: in de oefenversie is er geen eerdere meting om mee te vergelijken.");};
+  $("a-compare").onclick=function(){msg("result-msg",Platform.isLive()?T("msgCompareLive"):T("msgCompareDemo"));};
   $("a-back-wait").onclick=function(){buildWait();show("screen-wait");};
   $("a-restart").onclick=resetAll;
  }else{
@@ -1053,7 +1567,8 @@ function buildWrapper(){
  var w={template_id:"vaardigheidsmeter_leidinggeven",schema_version:"1.0",scores:scores,
   meta:{organisatie:org,datum:new Date().toISOString().slice(0,10),deelnemers:state.responses.length,perspectief:state.persp,variant:state.variant||"free"},
   data:{perspectief:state.persp,eigen:COMPS.map(function(c){return {n:c.n,score:compPct(c)};}),
-   team:is360()?COMPS.map(function(c){return {n:c.n,agg:teamAgg(c)};}):null},
+   team:is360()?COMPS.map(function(c){return {n:c.n,agg:teamAgg(c)};}):null,
+   beschouwing_ai:state.aiBeschouwing||null},
   parent_rapport_id:null};
  if(Platform.isLive()&&Platform.getCode()) w.data_ref={store:"firebase-rtdb",path:"/sessions/"+Platform.getCode()};   // herstel-/auditbron (standaard §12)
  return w;
@@ -1066,11 +1581,25 @@ function resetAll(){state={persp:null,variant:null,answers:{},raters:[],response
  $("step2").hidden=true;$("btn-start").disabled=true;document.body.classList.remove("can-print");document.body.dataset.mode="free";
  buildQuiz();show("screen-start");}
 
+/* taalkeuze: URL (?lang=) > eerder gekozen taal > NL */
+(function(){
+ var q=(new URLSearchParams(location.search).get("lang")||"").toLowerCase().trim();
+ var st=""; try{ st=localStorage.getItem("vlm_lang")||""; }catch(e){}
+ var l=(q==="en"||q==="nl")?q:((st==="en"||st==="nl")?st:"nl");
+ LANG=l; TEKST=TEKST_ALL[LANG]; rebuildModel();
+})();
+$("lang-btn").onclick=function(){ setLang(LANG==="nl"?"en":"nl"); };
+
 /* init */
 (async function(){
+ applyI18n();
  await Platform.init();
+ var ps=Platform.restoreState(); if(ps&&ps.lang&&ps.lang!==LANG) setLang(ps.lang);   // sessietaal overleeft refresh/resume
  $("demo-ribbon").hidden=Platform.isLive();
  $("live-err").hidden=!Platform.initFailed;                       // B-11: token aanwezig maar koppeling mislukt -> zeg het
+ if(Platform.isLive() && !Platform.isSync()){                     // wél live, maar RTDB uit: eerlijk melden i.p.v. stil doorgaan
+  var sw=$("sync-err"); if(sw){ sw.textContent=T("syncErr"); sw.hidden=false; }
+ }
  Platform.notifyLoaded();
  if(Platform.isLive() && (Platform.isResume() || Platform.isRestored())){
   var s=Platform.restoreState()||{};
