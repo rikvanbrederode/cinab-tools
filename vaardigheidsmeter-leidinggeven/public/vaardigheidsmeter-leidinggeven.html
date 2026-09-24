@@ -419,10 +419,15 @@ var Platform=(function(){
        niet meer waar je was. De tak 'state' bestaat in database.rules.json al
        voor dit doel, met lees- en schrijfrecht alleen voor de begeleider.
        Bewust géén e-mailadressen: voor het hervatten is de naam genoeg. */
-    if(sync && fb && db && code){
+    /* Alleen wegschrijven als er werkelijk iets te bewaren is. Zonder deze
+       voorwaarde schreef een mislukte hervatting het startscherm over een
+       gevulde stand heen, en was de sessie bij de tweede poging pas echt weg.
+       Let op bij het lezen: Firebase bewaart geen null en geen lege lijst, dus
+       een veld dat hier leeg is ontbreekt daar gewoon. */
+    if(sync && fb && db && code && state.persp){
       try{
         fb.set(fb.ref(db,'sessions/'+code+'/state'),{
-          persp:state.persp||null,
+          persp:state.persp,
           variant:state.variant||null,
           answers:state.answers||{},
           raters:(state.raters||[]).map(function(r){ return {name:(r&&r.name)||''}; }),
@@ -507,6 +512,17 @@ var Platform=(function(){
               herstel.settled=!!uitDb.settled;
               herstel.apiBase=apiBase; herstel.code=code; herstel.token=client&&client.token;
               saveState(herstel);
+
+              /* Ook meteen in het geheugen van de app zetten. Aan het eind van
+                 init() draait persist(), en die schrijft weg wat er op dat
+                 moment in state staat. Zonder deze regels is dat nog leeg en
+                 wist persist() precies wat we net hebben opgehaald. */
+              state.persp=herstel.persp;
+              state.variant=herstel.variant;
+              state.answers=herstel.answers||{};
+              state.raters=herstel.raters||[];
+              state.screen=herstel.screen||null;
+
               restored=true;
             }
           }catch(e){ console.warn('[VLM] voortgang uit de database lezen mislukt:',e); }
