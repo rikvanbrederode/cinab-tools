@@ -564,7 +564,7 @@ var Platform=(function(){
       var res=await fetch(apiBase+'/wp-json/cinab/v1/stuur-uitnodigingen',{
         method:'POST', headers:{'Content-Type':'application/json'},
         body:JSON.stringify({token:client.token, raters:payload,
-          meta:{initiatiefnemer:(meta&&meta.initiatiefnemer)||'', organisatie:(meta&&meta.organisatie)||'', tool_naam:'Vaardigheidsmeter Leidinggeven'}})
+          meta:{initiatiefnemer:(meta&&meta.initiatiefnemer)||'', organisatie:(meta&&meta.organisatie)||'', tool_naam:'Vaardigheidsmeter Leidinggeven', lang:LANG}})   /* CINAB 24-9-2026: taal van de sessie voor de uitnodigingsmail */
       });
       if(!res.ok) throw new Error('stuur-uitnodigingen faalde ('+res.status+')');
       return {sent:raters.length};
