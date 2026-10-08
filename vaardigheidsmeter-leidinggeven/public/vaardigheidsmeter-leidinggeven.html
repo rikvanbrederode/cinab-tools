@@ -743,7 +743,7 @@ var UI={
   spreadLeg:"spreiding",
   actPrint:"Download als PDF / Printen", actCompare:"Toon verschil met vorige meting", actBackWait:"Terug naar reacties", actRestart:"Opnieuw",
   msgDemoReport:"Demo: het rapport wordt niet opgeslagen in een account.",
-  msgSaved:"Rapport opgeslagen in je account.", msgUpdated:"Rapport in je account bijgewerkt.",
+  msgSaving:"Rapport wordt opgeslagen in je account…", msgSaved:"Rapport opgeslagen in je account.", msgUpdated:"Rapport in je account bijgewerkt.",
   msgSaveFail:"Het rapport kon niet worden opgeslagen in je account ({e}). Printen werkt wel; probeer opslaan later opnieuw.",
   msgCompareLive:"Vergelijken met je vorige meting komt beschikbaar zodra er een eerdere meting in je account staat.",
   msgCompareDemo:"Demo: in de oefenversie is er geen eerdere meting om mee te vergelijken.",
@@ -807,7 +807,7 @@ var UI={
   spreadLeg:"spread",
   actPrint:"Download as PDF / Print", actCompare:"Show difference with previous measurement", actBackWait:"Back to responses", actRestart:"Start over",
   msgDemoReport:"Practice mode: the report is not saved to an account.",
-  msgSaved:"Report saved to your account.", msgUpdated:"Report updated in your account.",
+  msgSaving:"Saving the report to your account…", msgSaved:"Report saved to your account.", msgUpdated:"Report updated in your account.",
   msgSaveFail:"The report could not be saved to your account ({e}). Printing still works; try saving again later.",
   msgCompareLive:"Comparing with your previous measurement becomes available once an earlier measurement is in your account.",
   msgCompareDemo:"Practice mode: there is no earlier measurement to compare with.",
@@ -1495,10 +1495,42 @@ async function enrichBeschouwingAI(){
   if(!o||!o.beeld_kort||!o.sterke_punten||!o.ontwikkelpunten) throw new Error("ai_shape");
   box.innerHTML=renderAiBeschouwing(o); box.setAttribute("data-ai","1");
   state.aiBeschouwing=o;                                   // meenemen in het opgeslagen rapport
+  saveAfterAI();                                           // CINAB s105: opgeslagen rapport bijwerken met de AI-beschouwing
  }catch(e){
   console.warn("[VLM] AI-verrijking niet gelukt; regelgebaseerde beschouwing blijft staan:",e);
   if(status&&status.parentNode) status.parentNode.removeChild(status);
  }
+}
+
+/* Automatisch opslaan (CINAB s105). Bij de betaalde 360 komt het rapport in de
+   werkruimte zodra het resultaat er staat, niet pas bij Downloaden/printen.
+   Zo herstelde s37 het al; met v7 was het teruggegaan naar alleen de printknop.
+   Komt de AI-beschouwing daarna binnen, dan werkt saveReport() het rapport bij
+   (patch), zodat beschouwing_ai er ook in staat. Geen notifyCompleted hier: die
+   is bedoeld om de parent te laten doorschakelen, en de gebruiker leest nog. */
+var reportSaved=null;
+function autoSaveReport(){
+ if(!(is360()&&Platform.isLive())){reportSaved=null;return;}
+ msg("result-msg",T("msgSaving"));
+ reportSaved=(async function(){
+  try{
+   try{ await Platform.settle(); }catch(e){ console.warn('[VLM] settle voor opslaan:',e); }   // idempotent; al betaald -> no-op
+   var r=await Platform.saveReport(buildWrapper());
+   msg("result-msg",r&&r.updated?T("msgUpdated"):T("msgSaved"));
+   return r;
+  }catch(e){
+   console.warn('[VLM] automatisch opslaan mislukt:',e);
+   msg("result-msg",T("msgSaveFail",{e:((e&&e.message)||"")}));
+   return null;
+  }
+ })();
+}
+/* Na een geslaagde AI-verrijking: wacht op de eerste opslag en werk het rapport bij. */
+async function saveAfterAI(){
+ if(!reportSaved) return;
+ var eerste=await reportSaved; if(!eerste) return;          // eerste opslag mislukt: niet stil een tweede poging doen
+ try{ await Platform.saveReport(buildWrapper()); msg("result-msg",T("msgUpdated")); }
+ catch(e){ console.warn('[VLM] bijwerken met AI-beschouwing mislukt:',e); }
 }
 
 /* ====================== RESULTAAT ====================== */
@@ -1543,6 +1575,7 @@ function renderResult(){
  if(is360()){var best=null,bg=-1;COMPS.forEach(function(c){var s=compPct(c),tm=teamAgg(c);if(s!==null&&tm){var g=Math.abs(s-tm.avg);if(g>bg){bg=g;best=c;}}});if(best){state.sel=best.n;renderInsight(best);}}
 
  renderBeschouwing();
+ autoSaveReport();        // CINAB s105: rapport meteen in de werkruimte, niet pas bij printen (was s37, viel weg in v7)
  enrichBeschouwingAI();   // verrijkt async in de betaalde 360; lokale beschouwing blijft bij fout staan
 
  // acties
