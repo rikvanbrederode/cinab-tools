@@ -414,7 +414,7 @@ var Platform=(function(){
     /* betaalVanafFase/credits komen alléén uit start-tool; bij restore/resume nooit overschrijven met null */
     if(client&&client.betaalVanafFase!=null) s.betaalVanafFase=client.betaalVanafFase;
     if(client&&client.credits!=null) s.credits=client.credits;
-    s.persp=state.persp; s.variant=state.variant; s.answers=state.answers; s.raters=state.raters; s.screen=state.screen; s.lang=LANG; saveState(s);
+    s.persp=state.persp; s.variant=state.variant; s.answers=state.answers; s.raters=state.raters; s.screen=state.screen; s.lang=LANG; s.aiBy=state.aiBy||{}; saveState(s);
 
     /* CINAB 23-9-2026: dezelfde stand ook naar de database.
        sessionStorage is geheugen per tabblad, dus wie de sessie later hervat
@@ -439,6 +439,7 @@ var Platform=(function(){
           answers:state.answers||{},
           raters:(state.raters||[]).map(function(r){ var o={name:(r&&r.name)||'', email:(r&&r.email)||''}; if(r&&r.rid)o.rid=r.rid; if(r&&r.reminded&&r.reminded.length)o.reminded=r.reminded; return o; }),
           screen:state.screen||null,
+          aiBy:state.aiBy||{},                                   // CINAB s105: AI-beschouwing per taal, zodat hervatten en taalwissel geen nieuwe aanroep kosten
           settled:!!s.settled,
           at:fb.serverTimestamp()
         }).catch(function(){ /* stil: opslaan in het tabblad is al gelukt */ });
@@ -517,6 +518,7 @@ var Platform=(function(){
               herstel.variant=uitDb.variant||null;
               herstel.answers=uitDb.answers||{};
               herstel.raters=uitDb.raters||[];
+              herstel.aiBy=uitDb.aiBy||{};
               herstel.screen=uitDb.screen||null;
               herstel.settled=!!uitDb.settled;
               herstel.apiBase=apiBase; herstel.code=code; herstel.token=client&&client.token;
@@ -530,6 +532,7 @@ var Platform=(function(){
               state.variant=herstel.variant;
               state.answers=herstel.answers||{};
               state.raters=herstel.raters||[];
+              state.aiBy=herstel.aiBy||{};
               state.screen=herstel.screen||null;
 
               restored=true;
@@ -541,7 +544,7 @@ var Platform=(function(){
       /* eigen antwoorden/keuzes herstellen — onafhankelijk van RTDB */
       if(prev && (client.isResume || !urlStart)){
         state.persp=prev.persp||null; state.variant=prev.variant||null; state.answers=prev.answers||{};
-        state.raters=prev.raters||[]; state.screen=prev.screen||null;
+        state.raters=prev.raters||[]; state.screen=prev.screen||null; state.aiBy=prev.aiBy||{};
       }
       persist(); return true;
     },
@@ -934,7 +937,7 @@ function applyI18n(){
 }
 
 /* ====================== STATE & NAV ====================== */
-var state={persp:null,variant:null,answers:{},raters:[],responses:[],sort:"model",sel:null,demoNames:false,screen:null};
+var state={persp:null,variant:null,answers:{},raters:[],responses:[],sort:"model",sel:null,demoNames:false,screen:null,aiBy:{}};
 var $=function(id){return document.getElementById(id);};
 function show(id){["screen-start","screen-quiz","screen-invite","screen-wait","screen-result"].forEach(function(s){$(s).hidden=(s!==id);});state.screen=id.replace("screen-","");if(Platform.isLive())Platform.save();window.scrollTo(0,0);}
 function msg(id,txt){var el=$(id);if(!el)return;el.textContent=txt||"";el.hidden=!txt;}
@@ -1526,20 +1529,21 @@ function aiBeschouwingPacket(){
 function parseAiJson(t){ try{return JSON.parse(t);}catch(e){} var mt=String(t).match(/\{[\s\S]*\}/); if(mt){try{return JSON.parse(mt[0]);}catch(e2){}} return null; }
 
 function renderAiBeschouwing(o){
- var H='<h2 style="font-size:24px;margin:0 0 4px">Beschouwing</h2>';
+ var L=BL(), K=L.sect;                                     // CINAB s105: koppen uit het taalpakket, niet vast Nederlands
+ var H='<h2 style="font-size:24px;margin:0 0 4px">'+beEsc(L.h2)+'</h2>';
  H+='<p class="lead" style="margin:0 0 8px">'+beEsc(T("aiLead"))+'</p>';
- H+=beSectie("Het beeld in het kort",beP(beEsc(o.beeld_kort)));
- H+=beSectie("Sterke punten",beP(beEsc(o.sterke_punten)));
- H+=beSectie("Ontwikkelpunten",beP(beEsc(o.ontwikkelpunten)));
- if(o.samenhang) H+=beSectie("Samenhang & patronen",beP(beEsc(o.samenhang)));
+ H+=beSectie(beEsc(K.beeld),beP(beEsc(o.beeld_kort)));
+ H+=beSectie(beEsc(K.sterk),beP(beEsc(o.sterke_punten)));
+ H+=beSectie(beEsc(K.ontw),beP(beEsc(o.ontwikkelpunten)));
+ if(o.samenhang) H+=beSectie(beEsc(K.samen),beP(beEsc(o.samenhang)));
  if(Array.isArray(o.advies)&&o.advies.length){
   var items=o.advies.map(function(a){
    var g=a.grond?('<br><small style="color:var(--cinab-grey)">'+beEsc(T("aiGround"))+beEsc(a.grond)+'</small>'):'';
    return '<p style="margin:0 0 8px;font-size:14px;line-height:1.65"><strong>'+beEsc(a.kop||"")+'</strong> '+beEsc(a.tekst||"")+g+'</p>';
   }).join("");
-  H+=beSectie("Advies voor ontwikkeling",items);
+  H+=beSectie(beEsc(K.advies),items);
  }
- if(o.vervolg) H+=beSectie("Vervolg",beP(beEsc(o.vervolg)));
+ if(o.vervolg) H+=beSectie(beEsc(K.vervolg),beP(beEsc(o.vervolg)));
  return H;
 }
 
@@ -1550,6 +1554,14 @@ async function enrichBeschouwingAI(){
  var testMode=new URLSearchParams(location.search).get("aitest");
  if(!(Platform.isLive() || testMode)) return;              // geen AI-call in pure demo (standaard §15)
  var box=$("beschouwing"); if(!box||!box.innerHTML) return;
+ /* CINAB s105: per taal één keer. Bij een taalwissel of hervatten staat de
+    analyse er al; dan tonen we die en vragen we niets nieuws (plafond 3). */
+ var taal=LANG;
+ state.aiBy=state.aiBy||{};
+ if(state.aiBy[taal]){ box.innerHTML=renderAiBeschouwing(state.aiBy[taal]); box.setAttribute("data-ai","1"); return; }
+ enrichBeschouwingAI.bezig=enrichBeschouwingAI.bezig||{};
+ if(enrichBeschouwingAI.bezig[taal]) return;               // er loopt al een aanvraag voor deze taal
+ enrichBeschouwingAI.bezig[taal]=true;
  var status=document.createElement("p");
  status.className="lead"; status.style.cssText="margin:6px 0 0;font-size:13px;font-style:italic;color:var(--cinab-grey)";
  status.textContent=T("aiBusy"); box.appendChild(status);
@@ -1557,13 +1569,14 @@ async function enrichBeschouwingAI(){
   var text=await Platform.ai("beschouwing", aiBeschouwingPacket());
   var o=parseAiJson(text);
   if(!o||!o.beeld_kort||!o.sterke_punten||!o.ontwikkelpunten) throw new Error("ai_shape");
-  box.innerHTML=renderAiBeschouwing(o); box.setAttribute("data-ai","1");
-  state.aiBeschouwing=o;                                   // meenemen in het opgeslagen rapport
+  state.aiBy[taal]=o;                                      // bewaard per taal, ook in de sessiestand
+  if(Platform.isLive()) Platform.save();
+  if(LANG===taal && state.screen==="result"){ var b2=$("beschouwing"); if(b2){ b2.innerHTML=renderAiBeschouwing(o); b2.setAttribute("data-ai","1"); } }
   saveAfterAI();                                           // CINAB s105: opgeslagen rapport bijwerken met de AI-beschouwing
  }catch(e){
   console.warn("[VLM] AI-verrijking niet gelukt; regelgebaseerde beschouwing blijft staan:",e);
   if(status&&status.parentNode) status.parentNode.removeChild(status);
- }
+ }finally{ enrichBeschouwingAI.bezig[taal]=false; }
 }
 
 /* Automatisch opslaan (CINAB s105). Bij de betaalde 360 komt het rapport in de
@@ -1728,6 +1741,9 @@ $("teaser-close").onclick=function(){$("teaser").classList.remove("show");};
 $("teaser-dismiss").onclick=function(){$("teaser").classList.remove("show");};
 $("teaser-go").onclick=function(){$("teaser").classList.remove("show");show("screen-start");setPersp(state.persp);setVariant("paid");};
 
+/* Het opgeslagen rapport krijgt de analyse in de taal van nu; is die er (nog) niet, dan de andere. */
+function aiTaalVoorRapport(){ var a=state.aiBy||{}; return a[LANG]?LANG:(a.nl?"nl":(a.en?"en":null)); }
+function aiVoorRapport(){ var t=aiTaalVoorRapport(); return t?state.aiBy[t]:null; }
 function buildWrapper(){
  var scores={};DOMAINS.forEach(function(d){var v=is360()?domainTeam(d):domainSelf(d);scores[d.id]=(v===null?0:v);});
  var org=new URLSearchParams(location.search).get("org")||"";
@@ -1735,7 +1751,8 @@ function buildWrapper(){
   meta:{organisatie:org,datum:new Date().toISOString().slice(0,10),deelnemers:state.responses.length,perspectief:state.persp,variant:state.variant||"free"},
   data:{perspectief:state.persp,eigen:COMPS.map(function(c){return {n:c.n,score:compPct(c)};}),
    team:is360()?COMPS.map(function(c){return {n:c.n,agg:teamAgg(c)};}):null,
-   beschouwing_ai:state.aiBeschouwing||null},
+   beschouwing_ai:aiVoorRapport(), beschouwing_ai_taal:aiVoorRapport()?aiTaalVoorRapport():null,
+   beschouwing_ai_per_taal:(state.aiBy&&Object.keys(state.aiBy).length)?state.aiBy:null},
   parent_rapport_id:null};
  if(Platform.isLive()&&Platform.getCode()) w.data_ref={store:"firebase-rtdb",path:"/sessions/"+Platform.getCode()};   // herstel-/auditbron (standaard §12)
  return w;
@@ -1743,7 +1760,7 @@ function buildWrapper(){
 
 /* onderbouwing + reset */
 $("ob-toggle").onclick=function(){var p=$("ob-panel");var open=p.hidden;p.hidden=!open;this.setAttribute("aria-expanded",open);$("ob-chev").innerHTML=open?"&#9652;":"&#9662;";};
-function resetAll(){state={persp:null,variant:null,answers:{},raters:[],responses:[],sort:"model",sel:null,demoNames:false,screen:null};msg("result-msg","");msg("invite-msg","");
+function resetAll(){state={persp:null,variant:null,answers:{},raters:[],responses:[],sort:"model",sel:null,demoNames:false,screen:null,aiBy:{}};msg("result-msg","");msg("invite-msg","");
  ["p-lead","p-emp","v-free","v-paid"].forEach(function(id){$(id).setAttribute("aria-pressed","false");});
  $("step2").hidden=true;$("btn-start").disabled=true;document.body.classList.remove("can-print");document.body.dataset.mode="free";
  buildQuiz();show("screen-start");}
@@ -1770,7 +1787,7 @@ $("lang-btn").onclick=function(){ setLang(LANG==="nl"?"en":"nl"); };
  Platform.notifyLoaded();
  if(Platform.isLive() && (Platform.isResume() || Platform.isRestored())){
   var s=Platform.restoreState()||{};
-  state.persp=s.persp||state.persp; state.variant=s.variant||state.variant; state.answers=s.answers||{}; state.raters=s.raters||[];
+  state.persp=s.persp||state.persp; state.variant=s.variant||state.variant; state.answers=s.answers||{}; state.raters=s.raters||[]; state.aiBy=s.aiBy||state.aiBy||{};
   if(Platform.isResume() || (state.variant==="paid" && !Platform.isSettled())){
    try{ var st=await Platform.settle(); if(st&&st.redirect) return; }catch(e){ console.warn(e); }   // idempotent; al betaald -> no-op
   }

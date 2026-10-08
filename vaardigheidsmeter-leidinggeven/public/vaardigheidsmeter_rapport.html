@@ -574,8 +574,39 @@ function bouwProfiel(eigenIdx, teamIdx, is360){
 }
 
 /* ── Beschouwing (patroonduiding + adviezen) ── */
-function bouwBeschouwing(scores, eigenIdx, teamIdx, is360, persp){
+/* CINAB s105: de verdiepende analyse uit de tool (data.beschouwing_ai), als die er is.
+   Tot nu toe rekende deze pagina altijd haar eigen korte beschouwing uit, ook als het
+   rapport een AI-beschouwing bevatte. Zelfde secties en volgorde als in de tool. */
+function bouwAiBeschouwing(o, taal){
+  var en = taal === 'en';
+  var K = en
+    ? {lead:'In-depth analysis, generated from the measurement results and the CINAB model. Every observation can be traced back to the figures in this report. It is an aid to reflection and conversation, not a final verdict.', beeld:'The picture in brief', sterk:'Strengths', ontw:'Development points', samen:'Connections & patterns', advies:'Advice for development', vervolg:'Next steps', grond:'Basis: '}
+    : {lead:'Verdiepende analyse, opgesteld op basis van de meetresultaten en het CINAB-model. Elke observatie is te herleiden tot de cijfers in dit rapport. Het is een hulpmiddel voor reflectie en gesprek, geen eindoordeel.', beeld:'Het beeld in het kort', sterk:'Sterke punten', ontw:'Ontwikkelpunten', samen:'Samenhang & patronen', advies:'Advies voor ontwikkeling', vervolg:'Vervolg', grond:'Onderbouwing: '};
+  function sec(t, body){ return '<h3 style="font-size:15px;margin:16px 0 6px">'+esc(t)+'</h3>'+body; }
+  function p(t){ return '<p style="margin:0 0 8px;font-size:13px;line-height:1.65;color:var(--cinab-ink)">'+esc(t)+'</p>'; }
+  var h = '<p style="margin:0 0 6px;font-size:12px;color:var(--cinab-grey)">'+esc(K.lead)+'</p>';
+  h += sec(K.beeld, p(o.beeld_kort));
+  h += sec(K.sterk, p(o.sterke_punten));
+  h += sec(K.ontw, p(o.ontwikkelpunten));
+  if(o.samenhang) h += sec(K.samen, p(o.samenhang));
+  if(Array.isArray(o.advies) && o.advies.length){
+    h += sec(K.advies, '<ul class="adv-list">' + o.advies.map(function(a){
+      return '<li><span><strong>'+esc(a.kop||'')+'</strong> '+esc(a.tekst||'')
+        +(a.grond ? '<br><span style="color:var(--cinab-grey);font-size:12px">'+esc(K.grond+a.grond)+'</span>' : '')
+        +'</span></li>';
+    }).join('') + '</ul>');
+  }
+  if(o.vervolg) h += sec(K.vervolg, p(o.vervolg));
+  return h;
+}
+
+function bouwBeschouwing(scores, eigenIdx, teamIdx, is360, persp, data){
   var box = el('beschouwing');
+  var ai = data && data.beschouwing_ai;
+  if(ai && ai.beeld_kort && ai.sterke_punten && ai.ontwikkelpunten){
+    box.innerHTML = bouwAiBeschouwing(ai, data.beschouwing_ai_taal || 'nl');
+    return;
+  }
   var lead = persp === 'lead';
 
   // domeinwaarden
@@ -714,7 +745,7 @@ function render(wrapper){
   bouwDimGrid(scores);
   bouwLegenda(is360, persp);
   bouwProfiel(eigenIdx, teamIdx, is360);
-  bouwBeschouwing(scores, eigenIdx, teamIdx, is360, persp);
+  bouwBeschouwing(scores, eigenIdx, teamIdx, is360, persp, data);
   bouwOnderbouwing();
 
   el('laadScherm').style.display   = 'none';
