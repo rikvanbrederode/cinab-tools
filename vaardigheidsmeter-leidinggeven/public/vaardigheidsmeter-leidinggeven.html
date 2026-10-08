@@ -157,6 +157,9 @@ main{padding:28px 0 64px;position:relative}
 .rater__sub{color:var(--cinab-grey);font-size:12px;word-break:break-all}
 .badge{font-size:12px;font-weight:700;border-radius:var(--radius-pill);padding:4px 10px;border:1px solid var(--cinab-line);white-space:nowrap}
 .badge--wait{color:var(--cinab-grey)}
+.rater__actie{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.rater__note{color:var(--cinab-grey);font-size:12px;text-align:right}
+.cinab-button--remind{padding:6px 12px;font-size:12px;min-height:0}
 .badge--done{background:var(--tool-green);color:var(--cinab-ink);border-color:var(--tool-green)}
 .iconbtn{background:none;border:0;color:var(--cinab-grey);cursor:pointer;font-size:18px;padding:4px}
 .democtl{border:1px dashed var(--cinab-grey);border-radius:var(--radius-s);padding:12px 14px;margin:16px 0;font-size:13px;color:var(--cinab-grey)}
@@ -569,6 +572,19 @@ var Platform=(function(){
       if(!res.ok) throw new Error('stuur-uitnodigingen faalde ('+res.status+')');
       return {sent:raters.length};
     },
+    /* CINAB s105: herinnering voor wie nog niet reageerde. Het platform begrenst
+       (1 per dag, 2 per adres per sessie) en noemt de initiatiefnemer uit het account. */
+    async sendReminder(rater, meta){
+      if(!live) return {status:'verstuurd', demo:true};
+      var res=await fetch(apiBase+'/wp-json/cinab/v1/stuur-herinnering',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({token:client.token,
+          raters:[{name:rater.name, email:rater.email, join_url:location.origin+'/join/'+code}],
+          meta:{organisatie:(meta&&meta.organisatie)||'', tool_naam:'Vaardigheidsmeter Leidinggeven', lang:LANG}})
+      });
+      if(!res.ok) throw new Error('stuur-herinnering ('+res.status+')');
+      var j=await res.json(); return (j&&j.resultaat&&j.resultaat[0])||{status:'fout'};
+    },
     subscribeResponses(callback){ cb=callback;
       if(!live||!sync) return;
       fb.onValue(fb.ref(db,'sessions/'+code+'/answers'), function(snap){
@@ -737,6 +753,7 @@ var UI={
   errName:"Vul een naam in.", errEmail:"Vul een geldig e-mailadres in.", errDup:"Dit e-mailadres staat al in de lijst.",
   waitCount:"{n} van {t} collega('s) hebben gereageerd.",
   statusOpen:"nog niet gereageerd", statusDone:"gereageerd",
+  btnRemind:"Herinnering sturen", remindArm:"Bevestig herinnering", remindBusy:"Versturen…", reminded:"Herinnerd op {d}", remindMax:"Er zijn al twee herinneringen gestuurd.", remindSoon:"Een volgende herinnering kan vanaf {d}.", remindFail:"De herinnering is niet verstuurd ({e}).",
   anonUnder:"Er hebben {n} collega('s) gereageerd. Het teambeeld verschijnt vanaf 3 reacties; hieronder zie je voorlopig je eigen beeld.",
   anonNamed:"Alle {n} beoordelaars tonen hun naam — individuele antwoorden zijn herleidbaar.",
   anonAgg:"Gebaseerd op {n} beoordelaars. Resultaten worden anoniem getoond (gemiddelde + spreiding); namen verschijnen alleen als élke beoordelaar daarmee instemt.",
@@ -801,6 +818,7 @@ var UI={
   errName:"Please enter a name.", errEmail:"Please enter a valid email address.", errDup:"This email address is already on the list.",
   waitCount:"{n} of {t} colleague(s) have responded.",
   statusOpen:"no response yet", statusDone:"responded",
+  btnRemind:"Send reminder", remindArm:"Confirm reminder", remindBusy:"Sending…", reminded:"Reminded on {d}", remindMax:"Two reminders have already been sent.", remindSoon:"The next reminder can be sent from {d}.", remindFail:"The reminder was not sent ({e}).",
   anonUnder:"{n} colleague(s) have responded. The team picture appears from 3 responses onwards; below you see your own view for now.",
   anonNamed:"All {n} assessors are showing their names — individual answers can be traced.",
   anonAgg:"Based on {n} assessors. Results are shown anonymously (average + spread); names appear only if every assessor agrees to it.",
@@ -1041,15 +1059,48 @@ function buildWait(){
 function renderWait(){
  var box=$("wait-list");box.innerHTML="";
  var norm=function(s){return String(s||"").trim().toLowerCase();};
- state.raters.forEach(function(r){
+ state.raters.forEach(function(r,i){
   var done=state.responses.some(function(x){return (x.email&&norm(x.email)===norm(r.email))||(!x.email&&x.name&&norm(x.name)===norm(r.name));});
   var el=document.createElement("div");el.className="rater";
-  el.innerHTML='<div class="rater__meta"><div class="rater__name">'+esc(r.name)+'</div></div><span class="badge '+(done?"badge--done":"badge--wait")+'">'+(done?T("statusDone"):T("statusOpen"))+'</span>';
+  // CINAB s105: mailadres zichtbaar, en een herinnering voor wie nog open staat.
+  var hist=r.reminded||[], note="", knop="";
+  if(hist.length) note=T("reminded",{d:remindDate(hist[hist.length-1])});
+  if(!done && hist.length<2) knop='<button class="cinab-button cinab-button--ghost cinab-button--remind" data-remind="'+i+'">'+T("btnRemind")+'</button>';
+  el.innerHTML='<div class="rater__meta"><div class="rater__name">'+esc(r.name)+'</div><div class="rater__sub">'+esc(r.email)+'</div></div>'+
+   '<div class="rater__actie"><span class="badge '+(done?"badge--done":"badge--wait")+'">'+(done?T("statusDone"):T("statusOpen"))+'</span>'+knop+
+   (note?'<div class="rater__note" id="remind-note-'+i+'">'+esc(note)+'</div>':'<div class="rater__note" id="remind-note-'+i+'" hidden></div>')+'</div>';
   box.appendChild(el);
  });
+ box.querySelectorAll("[data-remind]").forEach(function(b){ b.onclick=function(){ remindClick(b); }; });
  var c=state.responses.length;
  $("wait-count").textContent=T("waitCount",{n:c,t:state.raters.length});
- $("btn-to-result").disabled=c<1;
+ $("btn-to-result").disabled=c<3;                          // CINAB s105: weer 3, zoals de tekst zegt (s37; viel weg in v7)
+}
+function remindDate(iso){ try{ return new Date(iso).toLocaleDateString(LANG==="en"?"en-GB":"nl-NL",{day:"numeric",month:"short"}); }catch(e){ return ""; } }
+/* Twee stappen, net als versturen: eerst bevestigen, dan pas de mail. */
+async function remindClick(b){
+ var i=+b.getAttribute("data-remind"), r=state.raters[i]; if(!r) return;
+ var note=$("remind-note-"+i);
+ if(b.getAttribute("aria-pressed")!=="true"){ b.setAttribute("aria-pressed","true"); b.textContent=T("remindArm"); return; }
+ b.disabled=true; b.textContent=T("remindBusy");
+ var qp=new URLSearchParams(location.search);
+ try{
+  var u=await Platform.sendReminder(r,{organisatie:qp.get("org")||""});
+  if(u.status==="verstuurd"){
+   r.reminded=(r.reminded||[]).concat([new Date().toISOString()]);
+   if(Platform.isLive()) Platform.save();
+   renderWait(); return;
+  }
+  var tekst = u.reden==="maximum_bereikt" ? T("remindMax")
+            : u.reden==="te_vroeg" ? T("remindSoon",{d:remindDate(u.kan_vanaf)})
+            : T("remindFail",{e:(u.reden||"")});
+  if(note){ note.textContent=tekst; note.hidden=false; }
+  b.remove();
+ }catch(e){
+  console.warn('[VLM] herinnering:',e);
+  if(note){ note.textContent=T("remindFail",{e:((e&&e.message)||"")}); note.hidden=false; }
+  b.disabled=false; b.setAttribute("aria-pressed","false"); b.textContent=T("btnRemind");
+ }
 }
 $("btn-sim").onclick=function(){
  var list=state.raters.map(function(r){
@@ -1059,7 +1110,7 @@ $("btn-sim").onclick=function(){
  var k=Math.max(1,Math.min(list.length,3+Math.floor(Math.random()*Math.max(1,list.length-2))));
  Platform._demoPush(list.slice(0,k));
 };
-$("btn-to-result").onclick=function(){ if(state.responses.length<1) return; renderResult();show("screen-result");};
+$("btn-to-result").onclick=function(){ if(state.responses.length<3) return; renderResult();show("screen-result");};
 
 /* ====================== SCORES ====================== */
 function compPct(c){var a=state.answers[c.n];if(!a||a.na||!a.a||!a.b)return null;return R(((a.a+a.b)-2)/8*100);}
