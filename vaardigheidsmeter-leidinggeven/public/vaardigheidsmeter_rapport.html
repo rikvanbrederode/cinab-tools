@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vaardigheidsmeter Leidinggeven — Rapportage</title>
+<title>Vaardigheidsmeter Leidinggeven · Rapportage</title>
 <style>
 :root{
   --cinab-amber:#EF9F27;--cinab-amber-dark:#D88C14;--cinab-ink:#1C1C1A;--cinab-offwhite:#FAFAF8;
@@ -144,7 +144,7 @@ h1,h2,h3{font-family:var(--font-heading);font-weight:600;line-height:1.1}
 <div class="print-bar">
   <div class="pb-title">
     CINAB
-    <span class="pb-sub">· Vaardigheidsmeter Leidinggeven — Rapportage</span>
+    <span class="pb-sub">· Vaardigheidsmeter Leidinggeven · Rapportage</span>
   </div>
   <div class="pb-actions">
     <button class="btn btn-ghost" id="btnTerug" onclick="window.opener||window.history.length>1?window.close():window.location.href='https://cinab.nl/account/'" style="display:none">
@@ -179,7 +179,7 @@ h1,h2,h3{font-family:var(--font-heading);font-weight:600;line-height:1.1}
         <div class="cover-brand">CINAB</div>
         <div class="cover-main">
           <div class="cover-eyebrow" id="coverEyebrow">Leiderschapsrapportage · 360-meting</div>
-          <div class="cover-org" id="coverOrg">—</div>
+          <div class="cover-org" id="coverOrg"></div>
           <div class="cover-sub" id="coverSub">Vaardigheidsmeter Leidinggeven</div>
           <div class="cover-meta" id="coverMeta"></div>
         </div>
@@ -196,7 +196,7 @@ h1,h2,h3{font-family:var(--font-heading);font-weight:600;line-height:1.1}
         <div class="card-hd-badge" style="background:var(--cinab-ink)">1</div>
         <div>
           <div class="card-hd-t">Vier leiderschapsdomeinen</div>
-          <div class="card-hd-s">Gemiddelde score per domein op basis van alle beoordelingen (0–100)</div>
+          <div class="card-hd-s">Gemiddelde score per domein op basis van alle beoordelingen (0 tot 100)</div>
         </div>
       </div>
       <div class="card-body">
@@ -260,7 +260,7 @@ h1,h2,h3{font-family:var(--font-heading);font-weight:600;line-height:1.1}
       <div class="upsell">
         <div>
           <h2>Meer doen met deze uitkomsten?</h2>
-          <p>De Vaardigheidsmeter geeft een helder beeld van leiderschapsvaardigheden. CINAB biedt aanvullende werkvormen om de inzichten te verankeren — van teamdialoog tot persoonlijk ontwikkelplan.</p>
+          <p>De Vaardigheidsmeter geeft een helder beeld van leiderschapsvaardigheden. CINAB biedt aanvullende werkvormen om de inzichten te verankeren, zoals een teamdialoog of een persoonlijk ontwikkelplan.</p>
           <a class="upsell-btn" href="https://cinab.nl/tools/" target="_blank">Bekijk alle werkvormen</a>
           <a class="upsell-btn outline" href="https://cinab.nl/" target="_blank">Over CINAB</a>
           <p style="font-size:11px;color:var(--cinab-grey);margin-top:8px">cinab.nl</p>
@@ -333,7 +333,7 @@ var ADVICE = {
   LV3:'Voer korte motivatiegesprekken: vraag wat mensen energie geeft en geef ze daar meer ruimte en autonomie in.',
   LV4:'Vraag een vertrouwde collega te wijzen op momenten waarop gedrag en boodschap uiteenlopen.',
   LV5:'Breng de belangrijkste stakeholders in kaart en plan bewust contactmomenten om steun en ruimte voor het team op te halen.',
-  LV6:'Werk met een zichtbare prioriteitenlijst en heldere afspraken over wie wat wanneer doet — ook voor wie op afstand werkt.',
+  LV6:'Werk met een zichtbare prioriteitenlijst en heldere afspraken over wie wat wanneer doet, ook voor wie op afstand werkt.',
   LV7:'Maak vooraf expliciet wie bij een besluit wordt betrokken en waarom, en zet een einddatum zodat besluiten niet blijven hangen.',
   LV8:'Besteed bij een lastig vraagstuk eerst tijd aan de probleemdefinitie en de oorzaken, vóór het zoeken naar oplossingen.',
   LV9:'Toets besluiten op consistentie: wordt dezelfde maatstaf op iedereen toegepast, inclusief op jezelf?',
@@ -451,7 +451,7 @@ function bouwRadar(scores){
   ];
   DOMAINS.forEach(function(d,i){
     var a=lAnk[i];
-    var s=typeof scores[d.id]==='number'?R(scores[d.id]):'—';
+    var s=typeof scores[d.id]==='number'?R(scores[d.id]):'n.v.t.';
     h+='<text x="'+a.x+'" y="'+a.y+'" text-anchor="'+a.ta+'" font-family="Plus Jakarta Sans,sans-serif" font-size="10" font-weight="700" fill="'+d.color+'" dy="'+a.dy+'">'+esc(d.name)+'</text>';
     h+='<text x="'+a.x+'" y="'+(a.y+13)+'" text-anchor="'+a.ta+'" font-family="Plus Jakarta Sans,sans-serif" font-size="13" font-weight="700" fill="#1C1C1A">'+s+'</text>';
   });
@@ -474,7 +474,7 @@ function bouwDimGrid(scores){
     var sv=s!==null?s:50;
     html+='<div class="dcard">'
       +'<div class="dcard-top"><span class="domain-dot" style="background:'+d.color+'"></span><span class="dcard-name">'+esc(d.name)+'</span></div>'
-      +'<div class="dcard-score">'+(s!==null?s:'—')+' <small>/100</small></div>'
+      +'<div class="dcard-score">'+(s!==null?s:'n.v.t.')+' <small>/100</small></div>'
       +'<div class="dcard-bar"><div class="dcard-bar-fill" style="width:'+sv+'%;background:'+d.color+'"></div></div>'
       +'<div class="dcard-desc">'+esc(d.desc)+'</div>'
     +'</div>';
@@ -495,17 +495,17 @@ function bouwLegenda(is360, persp){
   var h = '<span>'+triSvg+' '+esc(selfLabel)+'</span>';
   if(is360){
     h += '<span>'+cirSvg+' '+esc(othLabel)+'</span>';
-    h += '<span>'+bndSvg+' spreiding (laag–hoog)</span>';
+    h += '<span>'+bndSvg+' spreiding (laag tot hoog)</span>';
   }
   el('legenda').innerHTML = h;
 
   var t = el('profielTitel');
   var s = el('profielSub');
   if(is360){
-    t.textContent = 'Competentieprofiel — zelfscore versus beoordelaars';
+    t.textContent = 'Competentieprofiel: zelfscore en beoordelaars';
     s.textContent = 'Per competentie: driehoek = eigen beeld · cirkel = gemiddelde beoordelaars · band = spreiding';
   } else {
-    t.textContent = 'Competentieprofiel — zelfbeoordeling';
+    t.textContent = 'Competentieprofiel: zelfbeoordeling';
     s.textContent = 'Per competentie: driehoek = zelfscore (0 = in ontwikkeling · 100 = zeer vaardig)';
   }
 }
@@ -631,10 +631,10 @@ function bouwBeschouwing(scores, eigenIdx, teamIdx, is360, persp, data){
   var range = domVal[sterkste.id] - domVal[zwakste.id];
   var arch;
   if(range <= 8){
-    arch = 'De vier domeinen liggen dicht bij elkaar (rond '+domVal[sterkste.id]+') — een evenwichtig profiel zonder uitgesproken pieken of dalen.';
+    arch = 'De vier domeinen liggen dicht bij elkaar (rond '+domVal[sterkste.id]+'). Het profiel is evenwichtig, zonder uitgesproken pieken of dalen.';
   } else {
     arch = (lead?'':'Het leiderschap van ') + sterkste.name + ' (' + domVal[sterkste.id] + ') is het sterkste domein. '
-      + zwakste.name + ' (' + domVal[zwakste.id] + ') biedt de meeste groeikans — een verschil van ' + range + ' punten.';
+      + zwakste.name + ' (' + domVal[zwakste.id] + ') biedt de meeste groeikans. Het verschil is ' + range + ' punten.';
   }
 
   var h = '<div class="arch-box">'+esc(arch)+'</div>';
@@ -687,8 +687,8 @@ function bouwBeschouwing(scores, eigenIdx, teamIdx, is360, persp, data){
       h += '<ul class="adv-list">';
       topGaps.forEach(function(g){
         var richting = g.gap>0
-          ? (lead?'Zelfscore hoger dan collega\'s ('+g.gap+' punten) — mogelijk een blinde vlek.':'Jij beoordeelt hoger dan het team ('+g.gap+' punten).')
-          : (lead?'Collega\'s waarderen dit hoger dan jij ('+Math.abs(g.gap)+' punten) — mogelijk te streng voor jezelf.':'Jij beoordeelt lager dan het team ('+Math.abs(g.gap)+' punten).');
+          ? (lead?'Zelfscore hoger dan collega\'s ('+g.gap+' punten). Mogelijk een blinde vlek.':'Jij beoordeelt hoger dan het team ('+g.gap+' punten).')
+          : (lead?'Collega\'s waarderen dit hoger dan jij ('+Math.abs(g.gap)+' punten). Mogelijk te streng voor jezelf.':'Jij beoordeelt lager dan het team ('+Math.abs(g.gap)+' punten).');
         h += '<li><span class="adv-dot" style="background:'+g.d.color+'"></span>'
           +'<span><strong>'+esc(g.n+' · '+(COMP_LABELS[g.n]||g.n))+'</strong>'
           +' <span style="color:var(--cinab-grey)">(eigen '+g.self+' · team '+g.team+')</span>'
@@ -708,12 +708,12 @@ function bouwOnderbouwing(){
     +'<h3>Waarop is deze test gebaseerd?</h3>'
     +'<p>De Vaardigheidsmeter bouwt voort op de oorspronkelijke 360-graden-methodiek met vier domeinen en is geactualiseerd naar de huidige organisatiekunde: een verschuiving van sturend "command-and-control" naar wendbaar, inclusief en mensgericht leiderschap. De competenties zijn aangescherpt op basis van actueel onderzoek (o.a. Korn Ferry, Harvard Business Impact, EY) en gevestigde concepten als psychologische veiligheid (Edmondson), emotionele intelligentie (Goleman), coachend leiderschap en zelfreflectie.</p>'
     +'<h3>Werkwijze</h3>'
-    +'<p>20 competenties over 4 domeinen, elk gemeten met twee gedragsstellingen op een 5-puntsschaal. De scores worden samengevat per competentie en per domein op een schaal van 0–100. In de 360-meting worden meerdere beoordelaars uitgenodigd; hun antwoorden worden samengevat tot een gemiddelde met spreiding.</p>'
+    +'<p>20 competenties over 4 domeinen, elk gemeten met twee gedragsstellingen op een 5-puntsschaal. De scores worden samengevat per competentie en per domein op een schaal van 0 tot 100. In de 360-meting worden meerdere beoordelaars uitgenodigd; hun antwoorden worden samengevat tot een gemiddelde met spreiding.</p>'
     +'<h3>Legenda</h3>'
     +'<div class="ob-leg">'
-      +'<span><svg width="11" height="11" viewBox="0 0 11 11" style="-webkit-print-color-adjust:exact;print-color-adjust:exact"><polygon points="5.5,0 11,11 0,11" fill="#5F5E5A"/></svg> Driehoek: het eigen beeld — zelfbeoordeling of beoordeling van de leidinggevende.</span>'
+      +'<span><svg width="11" height="11" viewBox="0 0 11 11" style="-webkit-print-color-adjust:exact;print-color-adjust:exact"><polygon points="5.5,0 11,11 0,11" fill="#5F5E5A"/></svg> Driehoek: het eigen beeld, dus de zelfbeoordeling of de beoordeling van de leidinggevende.</span>'
       +'<span><svg width="11" height="11" viewBox="0 0 11 11" style="-webkit-print-color-adjust:exact;print-color-adjust:exact"><circle cx="5.5" cy="5.5" r="5" fill="#5F5E5A"/></svg> Cirkel: het gemiddelde beeld van beoordelaars of team.</span>'
-      +'<span><svg width="16" height="10" viewBox="0 0 16 10" style="-webkit-print-color-adjust:exact;print-color-adjust:exact"><rect x="0" y="1" width="16" height="8" rx="4" fill="#5F5E5A" opacity="0.3"/></svg> Band: de spreiding — laagste tot hoogste score van de beoordelaars.</span>'
+      +'<span><svg width="16" height="10" viewBox="0 0 16 10" style="-webkit-print-color-adjust:exact;print-color-adjust:exact"><rect x="0" y="1" width="16" height="8" rx="4" fill="#5F5E5A" opacity="0.3"/></svg> Band: de spreiding, van de laagste tot de hoogste score van de beoordelaars.</span>'
     +'</div>'
     +'<h3>Belangrijk</h3>'
     +'<p>Dit is een ontwikkelinstrument, geen officiële beoordeling of psychologische diagnose. De uitkomsten zijn een startpunt voor gesprek en gerichte ontwikkeling.</p>';
