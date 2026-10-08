@@ -421,7 +421,11 @@ var Platform=(function(){
        kwam op het startscherm terecht: de code klopte wel, maar de app wist
        niet meer waar je was. De tak 'state' bestaat in database.rules.json al
        voor dit doel, met lees- en schrijfrecht alleen voor de begeleider.
-       Bewust géén e-mailadressen: voor het hervatten is de naam genoeg. */
+       CINAB s105: wél e-mailadressen, plus de beoordelaarscode (rid) en de
+       verstuurde herinneringen. Zonder adres toonde het wachtscherm na hervatten
+       "undefined" en kon er geen herinnering uit. Deze tak leest alleen de
+       begeleider (database.rules.json); bewaring is tijdelijk, zie de open
+       bewaartermijn in de HANDOVER. Besluit Rik, 8 okt 2026. */
     /* Alleen wegschrijven als er werkelijk iets te bewaren is. Zonder deze
        voorwaarde schreef een mislukte hervatting het startscherm over een
        gevulde stand heen, en was de sessie bij de tweede poging pas echt weg.
@@ -433,7 +437,7 @@ var Platform=(function(){
           persp:state.persp,
           variant:state.variant||null,
           answers:state.answers||{},
-          raters:(state.raters||[]).map(function(r){ return {name:(r&&r.name)||''}; }),
+          raters:(state.raters||[]).map(function(r){ var o={name:(r&&r.name)||'', email:(r&&r.email)||''}; if(r&&r.rid)o.rid=r.rid; if(r&&r.reminded&&r.reminded.length)o.reminded=r.reminded; return o; }),
           screen:state.screen||null,
           settled:!!s.settled,
           at:fb.serverTimestamp()
@@ -441,6 +445,8 @@ var Platform=(function(){
       }catch(e){}
     }
   }
+  function genRid(){ var a="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789",o=""; var b=new Uint8Array(16); (window.crypto||window.msCrypto).getRandomValues(b); for(var i=0;i<16;i++)o+=a[b[i]%a.length]; return o; }
+  function joinUrl(r){ return location.origin+'/join/'+code+(r&&r.rid?('?r='+encodeURIComponent(r.rid)):''); }
   function genCode(){ var s="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",o=""; for(var i=0;i<6;i++)o+=s[Math.floor(Math.random()*s.length)]; return o; }
   return {
     isLive:function(){return live;},
@@ -563,7 +569,12 @@ var Platform=(function(){
         persp:state.persp, lang:LANG, createdAt:fb.serverTimestamp()   /* CINAB 23-9-2026: was 'nl' vast; de join-pagina volgt dit veld */
       });
       // 2) join-links bouwen en het platform de mails laten versturen (Route 1; geen adressen in WP)
-      var payload=raters.map(function(r){return {name:r.name, email:r.email, join_url:location.origin+'/join/'+code};});
+      /* CINAB s105: een eigen link per beoordelaar (?r=rid). Het antwoord komt onder
+         die code in de database, dus één reactie per uitnodiging en een vinkje bij
+         de goede naam, los van wat iemand op de vragenlijst intypt. */
+      raters.forEach(function(r){ if(!r.rid) r.rid=genRid(); });
+      persist();
+      var payload=raters.map(function(r){return {name:r.name, email:r.email, join_url:joinUrl(r)};});
       var res=await fetch(apiBase+'/wp-json/cinab/v1/stuur-uitnodigingen',{
         method:'POST', headers:{'Content-Type':'application/json'},
         body:JSON.stringify({token:client.token, raters:payload,
@@ -579,7 +590,7 @@ var Platform=(function(){
       var res=await fetch(apiBase+'/wp-json/cinab/v1/stuur-herinnering',{
         method:'POST', headers:{'Content-Type':'application/json'},
         body:JSON.stringify({token:client.token,
-          raters:[{name:rater.name, email:rater.email, join_url:location.origin+'/join/'+code}],
+          raters:[{name:rater.name, email:rater.email, join_url:joinUrl(rater)}],
           meta:{organisatie:(meta&&meta.organisatie)||'', tool_naam:'Vaardigheidsmeter Leidinggeven', lang:LANG}})
       });
       if(!res.ok) throw new Error('stuur-herinnering ('+res.status+')');
@@ -589,7 +600,7 @@ var Platform=(function(){
       if(!live||!sync) return;
       fb.onValue(fb.ref(db,'sessions/'+code+'/answers'), function(snap){
         var list=[]; snap.forEach(function(ch){ var v=ch.val()||{};
-          list.push({name:v.name||'', email:v.email||'', naamZichtbaar:!!v.naamZichtbaar, vals:v.vals||{}}); });
+          list.push({rid:ch.key, name:v.name||'', email:v.email||'', naamZichtbaar:!!v.naamZichtbaar, vals:v.vals||{}}); });
         if(cb) cb(list);
       });
     },
@@ -1060,13 +1071,15 @@ function renderWait(){
  var box=$("wait-list");box.innerHTML="";
  var norm=function(s){return String(s||"").trim().toLowerCase();};
  state.raters.forEach(function(r,i){
-  var done=state.responses.some(function(x){return (x.email&&norm(x.email)===norm(r.email))||(!x.email&&x.name&&norm(x.name)===norm(r.name));});
+  // CINAB s105: met een eigen link (rid) is de koppeling zeker; oude sessies zonder rid vallen terug op adres of naam.
+  var done=r.rid ? state.responses.some(function(x){return x.rid===r.rid;})
+                 : state.responses.some(function(x){return (x.email&&norm(x.email)===norm(r.email))||(!x.email&&x.name&&norm(x.name)===norm(r.name));});
   var el=document.createElement("div");el.className="rater";
   // CINAB s105: mailadres zichtbaar, en een herinnering voor wie nog open staat.
   var hist=r.reminded||[], note="", knop="";
   if(hist.length) note=T("reminded",{d:remindDate(hist[hist.length-1])});
-  if(!done && hist.length<2) knop='<button class="cinab-button cinab-button--ghost cinab-button--remind" data-remind="'+i+'">'+T("btnRemind")+'</button>';
-  el.innerHTML='<div class="rater__meta"><div class="rater__name">'+esc(r.name)+'</div><div class="rater__sub">'+esc(r.email)+'</div></div>'+
+  if(!done && hist.length<2 && r.email) knop='<button class="cinab-button cinab-button--ghost cinab-button--remind" data-remind="'+i+'">'+T("btnRemind")+'</button>';
+  el.innerHTML='<div class="rater__meta"><div class="rater__name">'+esc(r.name)+'</div>'+(r.email?'<div class="rater__sub">'+esc(r.email)+'</div>':'')+'</div>'+
    '<div class="rater__actie"><span class="badge '+(done?"badge--done":"badge--wait")+'">'+(done?T("statusDone"):T("statusOpen"))+'</span>'+knop+
    (note?'<div class="rater__note" id="remind-note-'+i+'">'+esc(note)+'</div>':'<div class="rater__note" id="remind-note-'+i+'" hidden></div>')+'</div>';
   box.appendChild(el);

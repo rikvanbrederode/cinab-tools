@@ -103,7 +103,7 @@ main{padding:22px 0 60px}
       <label class="label" for="f-name" data-i18n-html="lblName"></label>
       <input class="input" id="f-name" type="text" maxlength="120" autocomplete="name" data-i18n-ph="phName" placeholder="Voor- en achternaam">
     </div>
-    <div class="field">
+    <div class="field" id="field-email">
       <label class="label" for="f-email" data-i18n-html="lblEmail"></label>
       <input class="input" id="f-email" type="email" maxlength="200" autocomplete="email" data-i18n-ph="phEmail" placeholder="naam@organisatie.nl">
     </div>
@@ -238,7 +238,7 @@ function R(v){return Math.round(v);}
 function show(id){["screen-intro","screen-quiz","screen-done"].forEach(function(s){$(s).hidden=(s!==id);});window.scrollTo(0,0);}
 function compPct(n){var a=ans[n];if(!a||a.na||!a.a||!a.b)return null;return R(((a.a+a.b)-2)/8*100);}
 
-var ans={}, code="", fb=null, db=null, demo=false, joinedKey="";
+var ans={}, code="", fb=null, db=null, demo=false, joinedKey="", rid="";
 
 /* ═══ VLM SHARED: LIBREADY (gedeeld blok — byte-identiek in hoofd-app en join) ═══ */
 function libReady(){
@@ -277,6 +277,7 @@ var JUI={
   errEmail:"Het e-mailadres lijkt niet te kloppen. Laat het leeg of corrigeer het.",
   errAllNa:"Je hebt alle vaardigheden op 'niet van toepassing' gezet. Beoordeel minimaal één vaardigheid om te kunnen versturen.",
   errSend:"Je beoordeling kon niet worden verstuurd. Controleer je verbinding en probeer het opnieuw. ({e})",
+  errAlready:"Via deze persoonlijke link is al een beoordeling ingestuurd. Je kunt dit venster sluiten.",
   orgNote:"(organisatie: {org})"
  },
  en:{
@@ -301,6 +302,7 @@ var JUI={
   errEmail:"That email address does not look right. Leave it empty or correct it.",
   errAllNa:"You have marked every skill as 'not applicable'. Rate at least one skill in order to send.",
   errSend:"Your assessment could not be sent. Check your connection and try again. ({e})",
+  errAlready:"An assessment has already been sent through this personal link. You can close this window.",
   orgNote:"(organisation: {org})"
  }
 };
@@ -380,15 +382,21 @@ async function submit(){
  var vals={}; COMPS.forEach(function(c){var p=compPct(c.n); if(p!==null) vals[c.n]=p;});
  if(!Object.keys(vals).length){ err(T("errAllNa")); $("btn-submit").disabled=false; return; }
  var entry={ name:name, naamZichtbaar:$("f-consent").checked, vals:vals };
- var email=$("f-email").value.trim(); if(email) entry.email=email;
+ var email=rid?"":$("f-email").value.trim(); if(email) entry.email=email;   // met een eigen link is het adres niet nodig
  if(demo){ finishDone(); return; }
  try{
    entry.at = fb.serverTimestamp();
    var listRef=fb.ref(db,'sessions/'+code+'/answers');
-   await fb.push(listRef, entry);
+   /* CINAB s105: met een eigen link komt het antwoord onder de code van de
+      beoordelaar. De regels staan per sleutel maar één schrijfactie toe, dus een
+      tweede keer invullen, ook op een ander apparaat, wordt geweigerd. */
+   if(rid) await fb.set(fb.ref(db,'sessions/'+code+'/answers/'+rid), entry);
+   else await fb.push(listRef, entry);
    try{ localStorage.setItem(joinedKey,"1"); }catch(_){}
    finishDone();
- }catch(e){ err(T("errSend",{e:(e&&e.message||e)})); $("btn-submit").disabled=false; }
+ }catch(e){
+   if(rid && /permission/i.test(String((e&&(e.code||e.message))||e))){ try{ localStorage.setItem(joinedKey,"1"); }catch(_){} err(T("errAlready")); return; }
+   err(T("errSend",{e:(e&&e.message||e)})); $("btn-submit").disabled=false; }
 }
 function finishDone(){ show("screen-done"); }
 function err(msg){ var b=$("banner-err"); b.textContent=msg; b.hidden=false; window.scrollTo(0,0); }
@@ -402,7 +410,11 @@ function err(msg){ var b=$("banner-err"); b.textContent=msg; b.hidden=false; win
  var q=(p.get("lang")||"").toLowerCase().trim(), st="";
  try{ st=localStorage.getItem("vlm_lang")||""; }catch(e){}
  LANG=(q==="en"||q==="nl")?q:((st==="en"||st==="nl")?st:"nl"); rebuildModel(); applyI18n();
- if(p.get("r")) $("f-email").value=p.get("r");      // optioneel: gepersonaliseerde link prefilt e-mail
+ /* CINAB s105: ?r= is de persoonlijke code van de beoordelaar. Een oude link met een
+    mailadres in r vult nog steeds alleen het adresveld. */
+ var rq=p.get("r")||"";
+ if(/^[A-Za-z0-9_-]{12,40}$/.test(rq)){ rid=rq; joinedKey="vlm_joined_"+code+"_"+rid; var fe=$("field-email"); if(fe) fe.hidden=true; }
+ else if(rq) $("f-email").value=rq;
 
  // al ingevuld op dit apparaat? -> direct bedankt
  try{ if(code && localStorage.getItem(joinedKey)){ buildQuiz(); show("screen-done"); wireButtons(); return; } }catch(_){}
