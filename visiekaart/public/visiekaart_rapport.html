@@ -1326,7 +1326,11 @@ async function vkReportSource(){
   try {
     var rid = new URLSearchParams(location.search).get('rapport_id');
     if (rid) {
-      var url = vkRapportApiBase() + '/wp-json/cinab/v1/rapport-data/' + encodeURIComponent(rid);
+      // 10-10-2026 (platform s114): sleutel k van de rapportpagina mee, zodat de eigenaar
+      // zijn rapport ook na het verlopen van de deellink ziet.
+      var vkSleutel = new URLSearchParams(location.search).get('k') || '';
+      var url = vkRapportApiBase() + '/wp-json/cinab/v1/rapport-data/' + encodeURIComponent(rid)
+              + (vkSleutel ? '?k=' + encodeURIComponent(vkSleutel) : '');
       var res = await fetch(url, { method: 'GET', credentials: 'omit' });
       if (res.ok) {
         var json = await res.json();

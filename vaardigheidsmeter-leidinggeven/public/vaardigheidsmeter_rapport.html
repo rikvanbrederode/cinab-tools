@@ -771,9 +771,16 @@ function render(wrapper){
 
 /* ── Bootstrap ── */
 document.addEventListener('DOMContentLoaded', async function(){
-  // Toon "Werkruimte"-knop alleen als het rapport vanuit een ander venster is geopend
+  // 10-10-2026 (platform s114): het platform geeft een sleutel k mee met de rol van de kijker:
+  // e = eigenaar, d = gedeeld of beheer, a = anoniem. "Werkruimte" alleen voor de eigenaar, of
+  // zonder sleutel als het rapport binnen de eigen sessie of vanuit een ander venster is geopend.
+  var vlmSleutel = '';
+  try{ vlmSleutel = new URLSearchParams(location.search).get('k') || ''; }catch(e){}
+  var vlmRol = (vlmSleutel.split('.')[1] || '');
   try{
-    if(window.opener || (document.referrer && document.referrer.indexOf('cinab.nl') !== -1)){
+    var magTerug = vlmSleutel ? (vlmRol === 'e')
+      : (window.opener || (document.referrer && document.referrer.indexOf('cinab.nl') !== -1));
+    if(magTerug){
       var btn = document.getElementById('btnTerug');
       if(btn) btn.style.display = '';
     }
@@ -783,7 +790,8 @@ document.addEventListener('DOMContentLoaded', async function(){
   if(!rid){ toonFout('Geen rapport_id in de URL (?rapport_id=…).'); return; }
 
   var base = apiBase();
-  var url  = base + '/wp-json/cinab/v1/rapport-data/' + encodeURIComponent(rid);
+  var url  = base + '/wp-json/cinab/v1/rapport-data/' + encodeURIComponent(rid)
+           + (vlmSleutel ? '?k=' + encodeURIComponent(vlmSleutel) : '');
   try{
     var res = await fetch(url, {method:'GET', credentials:'omit'});
     if(!res.ok){ toonFout('Platform antwoordde met status '+res.status+'.'); return; }
