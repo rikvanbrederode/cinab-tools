@@ -1,5 +1,7 @@
 // CINAB firebase.json — vaardigheidsmeter-leidinggeven
-// VERSIE: 1.1.0 — 3 september 2026
+// VERSIE: 1.2.0 — 10 oktober 2026
+//   1.2.0 — Cache-Control no-cache op html en js: elke deploy is meteen zichtbaar
+//           (Firebase liet browsers HTML een uur cachen).
 //   1.1.0 — CSP-header nu op zowel het toolblad als het rapportblad; beide worden in een
 //           iframe geladen door het platform. Origins aangevuld met het kale cinab.nl.
 //           Samengevoegd met de aanlevering v0.5 van de tooldeveloper, die alleen het
@@ -20,6 +22,15 @@
       }
     ],
     "headers": [
+      {
+        "source": "**/*.@(html|js)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      },
       {
         "source": "/vaardigheidsmeter-leidinggeven.html",
         "headers": [

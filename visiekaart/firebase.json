@@ -1,5 +1,7 @@
 // CINAB firebase.json — visiekaart
-// VERSIE: 1.1.0 — 3 september 2026
+// VERSIE: 1.2.0 — 10 oktober 2026
+//   1.2.0 — Cache-Control no-cache op html en js: elke deploy is meteen zichtbaar
+//           (Firebase liet browsers HTML een uur cachen).
 //   1.1.0 — join-rewrite vervangen door een 302-redirect naar visiekaart_fase0.html?join=,
 //           conform B-01 uit het testprotocol: visiekaart_join.html bestaat niet meer en een
 //           interne rewrite laat de URL op /join/ staan, waardoor de relatieve fase-navigatie
@@ -21,6 +23,15 @@
       }
     ],
     "headers": [
+      {
+        "source": "**/*.@(html|js)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      },
       {
         "source": "/visiekaart_rapport.html",
         "headers": [

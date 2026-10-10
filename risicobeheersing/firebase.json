@@ -1,5 +1,7 @@
 // CINAB firebase.json — risicobeheersing
-// VERSIE: 1.0.0 — 3 september 2026 (versieregel toegevoegd; CSP aangevuld met het kale
+// VERSIE: 1.1.0 — 10 oktober 2026 (Cache-Control no-cache op html en js: elke deploy is
+// meteen zichtbaar; Firebase liet browsers HTML een uur cachen)
+// 1.0.0 — 3 september 2026 (versieregel toegevoegd; CSP aangevuld met het kale
 // cinab.nl; join-rewrite verwijderd zolang risicobeheersing_join.html niet bestaat)
 {
   "hosting": {
@@ -10,6 +12,15 @@
       "**/node_modules/**"
     ],
     "headers": [
+      {
+        "source": "**/*.@(html|js)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      },
       {
         "source": "/risicobeheersing_rapport.html",
         "headers": [
