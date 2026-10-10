@@ -4,7 +4,15 @@ Bron van waarheid voor de CINAB-tools op Firebase. Wat hier staat, is wat er dra
 
 ## De ene regel die alles draagt
 
-**Geen `firebase deploy` zonder commit.** De commitmessage is meteen de ene regel changelog die naar de tooldeveloper gaat als de wijziging het contract raakt. Levert de tooldeveloper een nieuwe set bestanden aan, commit die dan onder zijn versienummer, bijvoorbeeld: `Erik v11.2: variantlaag doel=jaarplan/project`.
+**Geen `firebase deploy` zonder commit.** Rik en Erik werken in dezelfde repo; de commitgeschiedenis is de overdracht, er gaat niets per mail of Drive. Begin de commitmessage met de tool, bijvoorbeeld `vaardigheidsmeter rapport: knop Werkruimte navigeert het topvenster`.
+
+## Samenwerken
+
+1. Altijd eerst `git pull` voor je begint, en nog een keer vlak voor `git push`.
+2. Kleine commits, één onderwerp per commit, met de tool voorop in de message.
+3. Een deploy is meteen live op staging én productie: elke tool heeft één Firebase-project voor beide. Deploy alleen wat gecommit en gepusht is.
+4. Zet na een deploy in de commit of in de HANDOVER van het platform welke tool wanneer live ging.
+5. HTML en JS gaan met `Cache-Control: no-cache` de deur uit (firebase.json), dus een deploy is direct zichtbaar. Test toch in een incognitovenster als iets oud lijkt.
 
 ## Het werkboek voor tool-bouwers
 
@@ -29,7 +37,7 @@ Per tool een map met dezelfde opbouw:
 
 ## Versienummers
 
-Drie bestanden dragen een versieregel: `public/cinab-tool-client.js` (header bovenaan), `database.rules.json` en `firebase.json` (commentaarregel bovenaan). Bij elke wijziging: nummer ophogen, datum bijwerken. Raakt de wijziging het datacontract (endpoint, statuscode, TTL, rapport-wrapper), stuur dan het nieuwe bestand met een regel uitleg naar de tooldeveloper.
+Drie bestanden dragen een versieregel: `public/cinab-tool-client.js` (header bovenaan), `database.rules.json` en `firebase.json` (commentaarregel bovenaan). Bij elke wijziging: nummer ophogen, datum bijwerken. Raakt de wijziging het datacontract (endpoint, statuscode, TTL, rapport-wrapper), zet dat dan expliciet in de commitmessage. `cinab-tool-client.js` is in alle tools en in `cinab-platform/docs/tool-koppeling/` byte-identiek; pas je hem aan, pas dan alle kopieën in dezelfde commit aan.
 
 Let op: `.firebaserc` is strikte JSON, daar kan geen commentaar in. Versie-informatie hoort dus niet in dat bestand.
 
