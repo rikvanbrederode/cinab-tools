@@ -1,11 +1,13 @@
 /**
  * CINAB tool-client — route 2 (ADR 0006), contract werkboek v3.1.
  *
- * CLIENTVERSIE: 1.1.0 — 7 augustus 2026
+ * CLIENTVERSIE: 1.1.1 — 10 oktober 2026
  * Dit versienummer gaat over dit bestand, niet over het contract. Bij elke
  * wijziging: nummer ophogen, datum bijwerken, regel toevoegen aan het log.
  *
  * Wijzigingslog:
+ *   1.1.1 (2026-10-10) — postToParent stuurt niets meer als het platform-
+ *                        adres onbekend is, in plaats van naar '*' (audit M4).
  *   1.1.0 (2026-08-07) — sessionCode uit de start-tool-response beschikbaar
  *                        op de client als .sessionCode (F2-21, herstart van
  *                        meerdaagse sessies); versieheader toegevoegd.
@@ -412,15 +414,17 @@ async function handle( res ) {
 }
 
 function postToParent( msg, targetOrigin ) {
+	// Audit M4: nooit naar '*'. Zonder bekend platform-adres gaat er niets uit.
+	if ( ! targetOrigin || targetOrigin === '*' ) return;
 	if ( window.parent && window.parent !== window ) {
-		window.parent.postMessage( msg, targetOrigin || '*' );
+		window.parent.postMessage( msg, targetOrigin );
 	}
 }
 
 function stripSlash( s ) { return String( s ).replace( /\/+$/, '' ); }
 
 function safeOrigin( url ) {
-	try { return new URL( url ).origin; } catch ( _ ) { return '*'; }
+	try { return new URL( url ).origin; } catch ( _ ) { return ''; }
 }
 
 /** Haal launch én token uit de adresbalk/historie (werkboek §3.4-principe). */
